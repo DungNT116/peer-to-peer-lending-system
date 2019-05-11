@@ -1,6 +1,6 @@
 #### Capstone FU HCM SUMMER 2019 
 
-# Website Checker System
+# Peer-to-Peer Lending System
 
 Project: **Peer-to-Peer Lending System Based on BlockChain Technlogy**
 
