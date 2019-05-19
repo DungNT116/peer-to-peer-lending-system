@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import { AppSwitch } from "@coreui/react";
 
-import { Card, CardBody, Col, Progress, Row, Table } from "reactstrap";
+import { Card, CardBody, Col, Row, Table, Pagination, PaginationItem, PaginationLink, CardHeader } from "reactstrap";
 
 // Main Chart
 
@@ -57,6 +57,9 @@ class UserList extends Component {
         <Row>
           <Col>
             <Card>
+            <CardHeader>
+                <i className="fa fa-align-justify"></i> User List
+              </CardHeader>
               <CardBody>
                 <Table
                   hover
@@ -173,8 +176,19 @@ class UserList extends Component {
                         />
                       </td>
                     </tr>
-                  </tbody>
+                  </tbody>                  
                 </Table>
+                <br/>
+                <Pagination>
+                  <PaginationItem disabled><PaginationLink previous tag="button">Prev</PaginationLink></PaginationItem>
+                  <PaginationItem active>
+                    <PaginationLink tag="button">1</PaginationLink>
+                  </PaginationItem>
+                  <PaginationItem><PaginationLink tag="button">2</PaginationLink></PaginationItem>
+                  <PaginationItem><PaginationLink tag="button">3</PaginationLink></PaginationItem>
+                  <PaginationItem><PaginationLink tag="button">4</PaginationLink></PaginationItem>
+                  <PaginationItem><PaginationLink next tag="button">Next</PaginationLink></PaginationItem>
+                </Pagination>
               </CardBody>
             </Card>
           </Col>

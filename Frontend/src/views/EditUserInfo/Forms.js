@@ -1,18 +1,27 @@
 import React, { Component } from 'react';
-
 import { Link } from 'react-router-dom';
-
 import {
+  Badge,
   Button,
   Card,
   CardBody,
   CardFooter,
   CardHeader,
   Col,
+  Collapse,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Fade,
   Form,
   FormGroup,
   FormText,
+  FormFeedback,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButtonDropdown,
+  InputGroupText,
   Label,
   Row,
 } from 'reactstrap';
@@ -50,13 +59,6 @@ class Forms extends Component {
               <CardBody>
                 <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
                   <FormGroup row>
-                    <Col md="1">
-                      <Link style={{ textDecoration: 'none' }} to="/edit-user-info" >
-                        <Button block color="secondary">Edit Profile</Button>
-                      </Link>
-                    </Col>
-                  </FormGroup>
-                  <FormGroup row>
                     <Col md="3">
                       <Label>Username</Label>
                     </Col>
@@ -66,26 +68,22 @@ class Forms extends Component {
                   </FormGroup>
                   <FormGroup row>
                     <Col md="3">
-                      <Label htmlFor="text-input">Password</Label>
+                      <Label htmlFor="text-input">Passoword</Label>
                     </Col>
                     <Col xs="12" md="3">
-                     ***********
+                      <Link style={{ textDecoration: 'none' }} to="/change-password" >
+                        <Button active block color="danger" aria-pressed="true">
+                          Click to Change Password
+                    </Button>
+                      </Link>
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                     <Col md="3">
-                      <Label htmlFor="email-input">Email</Label>
+                      <Label htmlFor="email-input">Email Input</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      usermail@gmail.com
-                    </Col>
-                  </FormGroup>
-                  <FormGroup row>
-                    <Col md="3">
-                      <Label htmlFor="date-input">Date of Birth</Label>
-                    </Col>
-                    <Col xs="12" md="3">
-                      18 May 2019
+                      <Input type="email" id="email-input" name="email-input" placeholder="Enter Email" autoComplete="email" value="email@gmail.com" />
                     </Col>
                   </FormGroup>
                   <FormGroup row>
@@ -93,7 +91,7 @@ class Forms extends Component {
                       <Label htmlFor="date-input">First Name</Label>
                     </Col>
                     <Col xs="12" md="3">
-                    Michael
+                      <Input type="text" id="text-input" name="text-input" placeholder="Text" value="Michael" />
                     </Col>
                   </FormGroup>
                   <FormGroup row>
@@ -101,27 +99,46 @@ class Forms extends Component {
                       <Label htmlFor="date-input">Last Name</Label>
                     </Col>
                     <Col xs="12" md="3">
-                    Grzesiek
+                      <Input type="text" id="text-input" name="text-input" placeholder="Text" value="Grzesiek" />
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                     <Col md="3">
                       <Label>Gender</Label>
                     </Col>
-                    <Col xs="12" md="9">
-                      <p className="form-control-static">Male</p>
+                    <Col md="9">
+                      <FormGroup check inline>
+                        <Input className="form-check-input" type="radio" id="inline-radio1" name="inline-radios" value="option1" checked/>
+                        <Label className="form-check-label" check htmlFor="inline-radio1">Male</Label>
+                      </FormGroup>
+                      <FormGroup check inline>
+                        <Input className="form-check-input" type="radio" id="inline-radio2" name="inline-radios" value="option2" />
+                        <Label className="form-check-label" check htmlFor="inline-radio2">Female</Label>
+                      </FormGroup>
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                     <Col md="3">
-                      <Label htmlFor="date-input">Phone number</Label>
+                      <Label htmlFor="date-input">Date of Birth</Label>
+                    </Col>
+                    <Col xs="12" md="2">
+                      <Input type="date" id="date-input" name="date-input" placeholder="date" value="2019-05-18" />
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row>
+                    <Col md="3">
+                      <Label htmlFor="date-input">Phone Number</Label>
                     </Col>
                     <Col xs="12" md="3">
-                    099 888 777
+                      <Input type="text" id="text-input" name="text-input" placeholder="Text" value="099 888 777" />
                     </Col>
-                  </FormGroup>                 
+                  </FormGroup>                  
                 </Form>
-              </CardBody>             
+              </CardBody>
+              <CardFooter>
+                <Button type="submit" size="sm" color="primary"><i className="fa fa-dot-circle-o"></i> Submit</Button>
+                <Button type="reset" size="sm" color="danger"><i className="fa fa-ban"></i> Reset</Button>
+              </CardFooter>
             </Card>
           </Col>
         </Row>

@@ -38,12 +38,17 @@ const User = React.lazy(() => import('./views/Users/User'));
 
 const UserList = React.lazy(() => import('./views/UserList/UserList'));
 const UserInfo = React.lazy(() => import('./views/UserInfo/Forms'));
+const ChangePassword = React.lazy(() => import('./views/ChangePassword/Forms'));
+const EditUserInfo = React.lazy(() => import('./views/EditUserInfo/Forms'));
+
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
 
   { path: '/user-list', exact: true, name: 'User List', component: UserList },
   { path: '/user-info', exact: true, name: 'User Info', component: UserInfo },
+  { path: '/change-password', exact: true, name: 'Change Password', component: ChangePassword },
+  { path: '/edit-user-info', exact: true, name: 'Edit User Info', component: EditUserInfo },
 
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
