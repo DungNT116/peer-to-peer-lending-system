@@ -34,12 +34,19 @@ const Typography = React.lazy(() => import('./views/Theme/Typography'));
 const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
+
+//request page
+const RequestForm = React.lazy(() => import('./view/RequestForm/Forms'))
+
+//detail request page
+const DetailRequest = React.lazy(() => import('./view/DetailRequest/Forms'))
 const RequestPage = React.lazy(() => import('./view/reqPage'));
 const Home = React.lazy(() => import('./view/Home'));
-// https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home',component: Home },
   { path: '/reqList', exact: true, name:'Request List', component: RequestPage},
+  { path: '/requestForm', name: 'RequestForm', component: RequestForm },
+  { path: '/detailRequest', name: 'DetailRequest', component: DetailRequest },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

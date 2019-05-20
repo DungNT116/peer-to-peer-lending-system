@@ -10,6 +10,25 @@ export default {
       },
     },
     {
+      name: 'RequestForm',
+      url: '/requestForm',
+      icon: 'icon-speedometer',
+      badge: {
+        variant: 'info',
+        text: 'own page',
+      },
+    },
+    {
+      name: 'DetailRequest',
+      url: '/detailRequest',
+      icon: 'icon-speedometer',
+      badge: {
+        variant: 'info',
+        text: 'own page',
+      },
+
+    },
+    {
       name: 'Request List',
       url: '/reqList',
       icon: 'icon-home'
