@@ -22,7 +22,6 @@ const ButtonDropdowns = React.lazy(() => import('./views/Buttons/ButtonDropdowns
 const ButtonGroups = React.lazy(() => import('./views/Buttons/ButtonGroups'));
 const Buttons = React.lazy(() => import('./views/Buttons/Buttons'));
 const Charts = React.lazy(() => import('./views/Charts'));
-const Dashboard = React.lazy(() => import('./views/Dashboard'));
 const CoreUIIcons = React.lazy(() => import('./views/Icons/CoreUIIcons'));
 const Flags = React.lazy(() => import('./views/Icons/Flags'));
 const FontAwesome = React.lazy(() => import('./views/Icons/FontAwesome'));
@@ -40,18 +39,21 @@ const UserList = React.lazy(() => import('./views/UserList/UserList'));
 const UserInfo = React.lazy(() => import('./views/UserInfo/Forms'));
 const ChangePassword = React.lazy(() => import('./views/ChangePassword/Forms'));
 const EditUserInfo = React.lazy(() => import('./views/EditUserInfo/Forms'));
+const RequestForm = React.lazy(() => import('./view/RequestForm/Forms'))
 
-
-// https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
+//detail request page
+const DetailRequest = React.lazy(() => import('./view/DetailRequest/Forms'))
+const RequestPage = React.lazy(() => import('./view/reqPage'));
+const Home = React.lazy(() => import('./view/Home'));
 const routes = [
-
-  { path: '/user-list', exact: true, name: 'User List', component: UserList },
+  { path: '/', exact: true, name: 'Home',component: Home },
+  { path: '/reqList', exact: true, name:'Request List', component: RequestPage},
+  { path: '/requestForm', name: 'RequestForm', component: RequestForm },
+  { path: '/detailRequest', name: 'DetailRequest', component: DetailRequest },
+   { path: '/user-list', exact: true, name: 'User List', component: UserList },
   { path: '/user-info', exact: true, name: 'User Info', component: UserInfo },
   { path: '/change-password', exact: true, name: 'Change Password', component: ChangePassword },
   { path: '/edit-user-info', exact: true, name: 'Edit User Info', component: EditUserInfo },
-
-  { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
