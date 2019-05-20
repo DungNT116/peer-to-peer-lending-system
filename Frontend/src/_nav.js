@@ -10,6 +10,24 @@ export default {
       },
     },
     {
+      name: 'Request List',
+      url: '/reqList',
+      icon: 'icon-speedometer',
+      badge: {
+        variant: 'info',
+        text: 'NEW',
+      },
+    },
+    {
+      name: 'Home Page',
+      url: '/home',
+      icon: 'icon-speedometer',
+      badge: {
+        variant: 'info',
+        text: 'NEW',
+      },
+    },
+    {
       title: true,
       name: 'Theme',
       wrapper: {            // optional wrapper object
