@@ -25,15 +25,15 @@ export default {
       icon: 'icon-user'
     },
     
-    {
-      name: 'Request Form',
-      url: '/requestForm',
-      icon: 'icon-speedometer',
-      badge: {
-        variant: 'info',
-        text: 'own page',
-      },
-    },
+    // {
+    //   name: 'Request Form',
+    //   url: '/requestForm',
+    //   icon: 'icon-speedometer',
+    //   badge: {
+    //     variant: 'info',
+    //     text: 'own page',
+    //   },
+    // },
     {
       name: 'Request List',
       url: '/reqList',

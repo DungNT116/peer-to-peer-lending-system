@@ -1,45 +1,41 @@
 import React, { Component } from 'react';
+
+import { Button, Col, Jumbotron, Badge, Pagination, PaginationItem, PaginationLink, Table } from 'reactstrap';
+
 import { Link } from 'react-router-dom';
-import {
-  Badge,
-  Card,
-  CardBody,
-  CardFooter,
-  Col,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
-  Table,
-  Button,
-  Nav,
-  NavItem,
-  NavLink,
-  TabContent,
-  TabPane,
-} from 'reactstrap';
-
 class Tables extends Component {
-  constructor(props) {
-    super(props);
-
-    this.toggle = this.toggle.bind(this);
-    this.state = {
-      activeTab: new Array(4).fill('1'),
-    };
-  }
-
-  lorem() {
+  render() {
     return (
-      <>
-        <Card>
-          <CardBody>
+      <div className="animated fadeIn">
+        <div className="card">
+
+          <div className="card-body">
+            <h1>Description</h1>
+            <p>
+              We introduce a solution to make loan transactions transparent, a web application called Peer-to-peer Lending System. This Peer-to-peer Lending System helps people borrow money directly by making an agreement with the lender, from which all transactions will be stored on the Blockchain and viewed by anyone in the system.
+
+            </p>
+          </div>
+          <div className="card-body">
+            <Jumbotron>
+              <h1 className="display-3">Join us NOW</h1>
+              {/* <p className="lead">blablablallalalblalblalblalballba</p> */}
+              <hr className="my-2" />
+              <p className="lead">
+                <Link to="/register">
+                  <Button color="warning">Sign Up</Button>
+                </Link>
+              </p>
+            </Jumbotron>
+          </div>
+          <div className="card-body">
+            <h1>Happening transactions</h1>
             <Table responsive>
               <thead>
                 <tr>
                   <th>Request</th>
-                  <th>Username</th>
-                  <th>Rating</th>
-                  <th>Time</th>
+                  <th>Value</th>
+                  <th>Due date</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -48,8 +44,7 @@ class Tables extends Component {
                   <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
                     <Button block color="ghost-primary">No.1</Button>
                   </Col></td>
-                  <td>User 1</td>
-                  <td>5</td>
+                  <td>500,001</td>
                   <td>20/05/2019 17:00</td>
                   <td>
                     <Badge color="warning">Waiting</Badge>
@@ -59,8 +54,7 @@ class Tables extends Component {
                   <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
                     <Button block color="ghost-primary">No.2</Button>
                   </Col></td>
-                  <td>User 2</td>
-                  <td>4</td>
+                  <td>500,002</td>
                   <td>20/05/2019 17:00</td>
                   <td>
                     <Badge color="warning">Waiting</Badge>
@@ -70,8 +64,7 @@ class Tables extends Component {
                   <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
                     <Button block color="ghost-primary">No.3</Button>
                   </Col></td>
-                  <td>User 3</td>
-                  <td>4.5</td>
+                  <td>500,003</td>
                   <td>20/05/2019 17:00</td>
                   <td>
                     <Badge color="warning">Waiting</Badge>
@@ -81,22 +74,20 @@ class Tables extends Component {
                   <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
                     <Button block color="ghost-primary">No.4</Button>
                   </Col></td>
-                  <td>User 4</td>
-                  <td>5</td>
+                  <td>500,004</td>
                   <td>20/05/2019 17:00</td>
                   <td>
-                    <Badge color="warning">Waiting</Badge>
+                    <Badge color="danger">Cancelled</Badge>
                   </td>
                 </tr>
                 <tr>
                   <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
                     <Button block color="ghost-primary">No.5</Button>
                   </Col></td>
-                  <td>User 5</td>
-                  <td>4</td>
+                  <td>500,005</td>
                   <td>20/05/2019 17:00</td>
                   <td>
-                    <Badge color="warning">Waiting</Badge>
+                    <Badge color="success">Success</Badge>
                   </td>
                 </tr>
               </tbody>
@@ -121,64 +112,8 @@ class Tables extends Component {
                 <PaginationLink next tag="button"></PaginationLink>
               </PaginationItem>
             </Pagination>
-          </CardBody>
-        </Card>
-      </>
-    );
-  }
-
-  toggle(tabPane, tab) {
-    const newArray = this.state.activeTab.slice()
-    newArray[tabPane] = tab
-    this.setState({
-      activeTab: newArray,
-    });
-  }
-
-  tabPane() {
-    return (
-      <>
-        <TabPane tabId="1">
-          {this.lorem()}
-        </TabPane>
-        <TabPane tabId="2">
-          {this.lorem()}
-        </TabPane>
-      </>
-    );
-  }
-
-  render() {
-    return (
-      <div className="animated fadeIn" >
-        <Col xs="12" md="12" className="mb-4">
-          <Nav tabs>
-            <NavItem className="w-50">
-              <NavLink
-                active={this.state.activeTab[0] === '1'}
-                onClick={() => { this.toggle(0, '1'); }}
-              >
-                Own Request
-                </NavLink>
-            </NavItem>
-            <NavItem className="w-50">
-              <NavLink
-                active={this.state.activeTab[0] === '2'}
-                onClick={() => { this.toggle(0, '2'); }}
-              >
-                Request From Other User
-                </NavLink>
-            </NavItem>
-          </Nav>
-          <TabContent activeTab={this.state.activeTab[0]}>
-            {this.tabPane()}
-            <CardFooter>
-              <Link to="/requestForm">
-                <Button type="submit" size="sm" color="primary" onClick={this.toggleModal}><i className="fa fa-dot-circle-o"></i> Create</Button>
-              </Link>
-            </CardFooter>
-          </TabContent>
-        </Col>
+          </div>
+        </div>
       </div>
 
     );

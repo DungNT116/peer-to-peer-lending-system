@@ -36,13 +36,11 @@ const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
 const UserList = React.lazy(() => import('./main-view/UserList/UserList'));
-const UserInfo = React.lazy(() => import('./main-view/UserInfo/Forms'));
-const ChangePassword = React.lazy(() => import('./main-view/ChangePassword/Forms'));
-const EditUserInfo = React.lazy(() => import('./main-view/EditUserInfo/Forms'));
-const RequestForm = React.lazy(() => import('./main-view/RequestForm/Forms'))
-
-//detail request page
-const DetailRequest = React.lazy(() => import('./main-view/DetailRequest/Forms'))
+const UserInfo = React.lazy(() => import('./main-view/UserInfo/UserInfo'));
+const ChangePassword = React.lazy(() => import('./main-view/ChangePassword/ChangePassword'));
+const EditUserInfo = React.lazy(() => import('./main-view/EditUserInfo/EditUserInfo'));
+const RequestForm = React.lazy(() => import('./main-view/RequestForm/RequestForm'))
+const DetailRequest = React.lazy(() => import('./main-view/DetailRequest/DetailRequest'))
 const RequestPage = React.lazy(() => import('./main-view/RequestPage'));
 const Home = React.lazy(() => import('./main-view/Home'));
 const routes = [

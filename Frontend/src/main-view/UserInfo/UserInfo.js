@@ -42,17 +42,11 @@ class Forms extends Component {
           <Col xs="12" md="12">
             <Card>
               <CardHeader>
-                <strong>Basic Form</strong> Elements
+                <strong>User Profile</strong> 
               </CardHeader>
               <CardBody>
                 <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
-                  <FormGroup row>
-                    <Col md="1">
-                      <Link style={{ textDecoration: 'none' }} to="/edit-user-info" >
-                        <Button block color="secondary">Edit Profile</Button>
-                      </Link>
-                    </Col>
-                  </FormGroup>
+                  
                   <FormGroup row>
                     <Col md="3">
                       <Label>Username</Label>
@@ -115,6 +109,13 @@ class Forms extends Component {
                     </Col>
                     <Col xs="12" md="3">
                     099 888 777
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row>
+                    <Col md="2">
+                      <Link style={{ textDecoration: 'none' }} to="/edit-user-info" >
+                        <Button block color="secondary">Edit Profile</Button>
+                      </Link>
                     </Col>
                   </FormGroup>                 
                 </Form>
