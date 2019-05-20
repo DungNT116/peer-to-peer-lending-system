@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Badge, Card, CardBody, Col, Pagination, PaginationItem, PaginationLink, Table } from 'reactstrap';
-import { Button} from 'reactstrap';
+import { Badge, Card, CardBody, Col, Pagination, PaginationItem, PaginationLink, Table,Button } from 'reactstrap';
+
 class Tables extends Component {
   render() {
     return (

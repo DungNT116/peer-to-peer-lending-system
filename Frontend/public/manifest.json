@@ -1,6 +1,6 @@
 {
-  "short_name": "CoreUI-React",
-  "name": "CoreUI-React sample",
+  "short_name": "PPLS",
+  "name": "P2P Lending System",
   "icons": [
     {
       "src": "./assets/img/favicon.png",
