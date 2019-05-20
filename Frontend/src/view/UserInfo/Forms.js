@@ -6,13 +6,10 @@ import {
   Button,
   Card,
   CardBody,
-  CardFooter,
   CardHeader,
   Col,
   Form,
   FormGroup,
-  FormText,
-  Input,
   Label,
   Row,
 } from 'reactstrap';

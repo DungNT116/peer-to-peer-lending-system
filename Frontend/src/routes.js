@@ -35,22 +35,22 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
-const UserList = React.lazy(() => import('./views/UserList/UserList'));
-const UserInfo = React.lazy(() => import('./views/UserInfo/Forms'));
-const ChangePassword = React.lazy(() => import('./views/ChangePassword/Forms'));
-const EditUserInfo = React.lazy(() => import('./views/EditUserInfo/Forms'));
+const UserList = React.lazy(() => import('./view/UserList/UserList'));
+const UserInfo = React.lazy(() => import('./view/UserInfo/Forms'));
+const ChangePassword = React.lazy(() => import('./view/ChangePassword/Forms'));
+const EditUserInfo = React.lazy(() => import('./view/EditUserInfo/Forms'));
 const RequestForm = React.lazy(() => import('./view/RequestForm/Forms'))
 
 //detail request page
 const DetailRequest = React.lazy(() => import('./view/DetailRequest/Forms'))
-const RequestPage = React.lazy(() => import('./view/reqPage'));
+const RequestPage = React.lazy(() => import('./view/RequestPage'));
 const Home = React.lazy(() => import('./view/Home'));
 const routes = [
-  { path: '/', exact: true, name: 'Home',component: Home },
-  { path: '/reqList', exact: true, name:'Request List', component: RequestPage},
+  { path: '/', exact: true, name: 'Home', component: Home },
+  { path: '/reqList', exact: true, name: 'Request List', component: RequestPage },
   { path: '/requestForm', name: 'RequestForm', component: RequestForm },
   { path: '/detailRequest', name: 'DetailRequest', component: DetailRequest },
-   { path: '/user-list', exact: true, name: 'User List', component: UserList },
+  { path: '/user-list', exact: true, name: 'User List', component: UserList },
   { path: '/user-info', exact: true, name: 'User Info', component: UserInfo },
   { path: '/change-password', exact: true, name: 'Change Password', component: ChangePassword },
   { path: '/edit-user-info', exact: true, name: 'Edit User Info', component: EditUserInfo },
@@ -91,7 +91,7 @@ const routes = [
   { path: '/notifications/modals', name: 'Modals', component: Modals },
   { path: '/widgets', name: 'Widgets', component: Widgets },
   { path: '/charts', name: 'Charts', component: Charts },
-  { path: '/users', exact: true,  name: 'Users', component: Users },
+  { path: '/users', exact: true, name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
 ];
 
