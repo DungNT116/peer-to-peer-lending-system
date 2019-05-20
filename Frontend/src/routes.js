@@ -22,7 +22,6 @@ const ButtonDropdowns = React.lazy(() => import('./views/Buttons/ButtonDropdowns
 const ButtonGroups = React.lazy(() => import('./views/Buttons/ButtonGroups'));
 const Buttons = React.lazy(() => import('./views/Buttons/Buttons'));
 const Charts = React.lazy(() => import('./views/Charts'));
-const Dashboard = React.lazy(() => import('./views/Dashboard'));
 const CoreUIIcons = React.lazy(() => import('./views/Icons/CoreUIIcons'));
 const Flags = React.lazy(() => import('./views/Icons/Flags'));
 const FontAwesome = React.lazy(() => import('./views/Icons/FontAwesome'));
@@ -41,13 +40,13 @@ const RequestForm = React.lazy(() => import('./view/RequestForm/Forms'))
 
 //detail request page
 const DetailRequest = React.lazy(() => import('./view/DetailRequest/Forms'))
-
-// https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
+const RequestPage = React.lazy(() => import('./view/reqPage'));
+const Home = React.lazy(() => import('./view/Home'));
 const routes = [
+  { path: '/', exact: true, name: 'Home',component: Home },
+  { path: '/reqList', exact: true, name:'Request List', component: RequestPage},
   { path: '/requestForm', name: 'RequestForm', component: RequestForm },
   { path: '/detailRequest', name: 'DetailRequest', component: DetailRequest },
-  { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

@@ -2,8 +2,8 @@ export default {
   items: [
     {
       name: 'Home',
-      url: '/dashboard',
-      icon: 'icon-speedometer',
+      url: '/',
+      icon: 'icon-home',
       badge: {
         variant: 'info',
         text: 'NEW',
@@ -26,6 +26,12 @@ export default {
         variant: 'info',
         text: 'own page',
       },
+
+    },
+    {
+      name: 'Request List',
+      url: '/reqList',
+      icon: 'icon-home'
     },
     {
       title: true,
@@ -275,7 +281,7 @@ export default {
     },
     {
       name: 'Disabled',
-      url: '/dashboard',
+      url: '/home',
       icon: 'icon-ban',
       attributes: { disabled: true },
     },
