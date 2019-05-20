@@ -36,8 +36,16 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
+//request page
+const RequestForm = React.lazy(() => import('./view/RequestForm/Forms'))
+
+//detail request page
+const DetailRequest = React.lazy(() => import('./view/DetailRequest/Forms'))
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
+  { path: '/requestForm', name: 'RequestForm', component: RequestForm },
+  { path: '/detailRequest', name: 'DetailRequest', component: DetailRequest },
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
