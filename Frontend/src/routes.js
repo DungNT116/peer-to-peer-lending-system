@@ -35,16 +35,16 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
-const UserList = React.lazy(() => import('./view/UserList/UserList'));
-const UserInfo = React.lazy(() => import('./view/UserInfo/Forms'));
-const ChangePassword = React.lazy(() => import('./view/ChangePassword/Forms'));
-const EditUserInfo = React.lazy(() => import('./view/EditUserInfo/Forms'));
-const RequestForm = React.lazy(() => import('./view/RequestForm/Forms'))
+const UserList = React.lazy(() => import('./main-view/UserList/UserList'));
+const UserInfo = React.lazy(() => import('./main-view/UserInfo/Forms'));
+const ChangePassword = React.lazy(() => import('./main-view/ChangePassword/Forms'));
+const EditUserInfo = React.lazy(() => import('./main-view/EditUserInfo/Forms'));
+const RequestForm = React.lazy(() => import('./main-view/RequestForm/Forms'))
 
 //detail request page
-const DetailRequest = React.lazy(() => import('./view/DetailRequest/Forms'))
-const RequestPage = React.lazy(() => import('./view/RequestPage'));
-const Home = React.lazy(() => import('./view/Home'));
+const DetailRequest = React.lazy(() => import('./main-view/DetailRequest/Forms'))
+const RequestPage = React.lazy(() => import('./main-view/RequestPage'));
+const Home = React.lazy(() => import('./main-view/Home'));
 const routes = [
   { path: '/', exact: true, name: 'Home', component: Home },
   { path: '/reqList', exact: true, name: 'Request List', component: RequestPage },
