@@ -1,6 +1,11 @@
 export default {
   items: [
     {
+      name: 'User List',
+      url: '/user-list',
+      icon: 'icon-user'
+    },
+    {
       name: 'Home',
       url: '/',
       icon: 'icon-home',

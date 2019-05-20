@@ -35,7 +35,10 @@ const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
-//request page
+const UserList = React.lazy(() => import('./views/UserList/UserList'));
+const UserInfo = React.lazy(() => import('./views/UserInfo/Forms'));
+const ChangePassword = React.lazy(() => import('./views/ChangePassword/Forms'));
+const EditUserInfo = React.lazy(() => import('./views/EditUserInfo/Forms'));
 const RequestForm = React.lazy(() => import('./view/RequestForm/Forms'))
 
 //detail request page
@@ -47,6 +50,10 @@ const routes = [
   { path: '/reqList', exact: true, name:'Request List', component: RequestPage},
   { path: '/requestForm', name: 'RequestForm', component: RequestForm },
   { path: '/detailRequest', name: 'DetailRequest', component: DetailRequest },
+   { path: '/user-list', exact: true, name: 'User List', component: UserList },
+  { path: '/user-info', exact: true, name: 'User Info', component: UserInfo },
+  { path: '/change-password', exact: true, name: 'Change Password', component: ChangePassword },
+  { path: '/edit-user-info', exact: true, name: 'Edit User Info', component: EditUserInfo },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },
