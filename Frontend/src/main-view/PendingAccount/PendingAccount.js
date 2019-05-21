@@ -5,6 +5,7 @@ import { AppSwitch } from "@coreui/react";
 import { Button, Card, CardBody, Col, Row, Table, Pagination, PaginationItem, PaginationLink, CardHeader } from "reactstrap";
 
 import { Link } from 'react-router-dom';
+
 // Main Chart
 
 //Random Numbers
@@ -23,7 +24,7 @@ for (var i = 0; i <= elements; i++) {
   data3.push(65);
 }
 
-class UserList extends Component {
+class PendingAccount extends Component {
   constructor(props) {
     super(props);
 
@@ -78,8 +79,6 @@ class UserList extends Component {
                       <th>Email</th>
                       <th>Phone Number</th>
                       <th className="text-center">Registered</th>
-                      <th className="text-center">Wallet</th>
-                      <th className="text-center">Active Status</th>
                       <th className="text-center">Action</th>
                     </tr>
                   </thead>
@@ -111,25 +110,6 @@ class UserList extends Component {
                         <div>099 888 777</div>
                       </td>
                       <td className="text-center">2018/01/01</td>
-                      <td className="text-center">
-                        <i
-                          className="fa fa-cc-mastercard"
-                          style={{ fontSize: 24 + "px" }}
-                        />
-                        <div>$50.00</div>
-                      </td>
-                      <td className="text-center">
-                        <AppSwitch
-                          className={"mx-1"}
-                          variant={"3d"}
-                          outline={"alt"}
-                          color={"success"}
-                          defaultChecked
-                          label
-                          dataOn={"\u2713"}
-                          dataOff={"\u2715"}
-                        />
-                      </td>
                       <td className="text-center">
                       <Link style={{ textDecoration: 'none' }} to="/pending-account-info" >
                         <Button block color="secondary">Info</Button>
@@ -164,25 +144,6 @@ class UserList extends Component {
                       </td>
                       <td className="text-center">2018/01/01</td>
                       <td className="text-center">
-                        <i
-                          className="fa fa-cc-visa"
-                          style={{ fontSize: 24 + "px" }}
-                        />
-                        <div>$100.00</div>
-                      </td>
-                      <td className="text-center">
-                        <AppSwitch
-                          className={"mx-1"}
-                          variant={"3d"}
-                          outline={"alt"}
-                          color={"success"}
-                          defaultChecked
-                          label
-                          dataOn={"\u2713"}
-                          dataOff={"\u2715"}
-                        />
-                      </td>
-                      <td className="text-center">
                       <Link style={{ textDecoration: 'none' }} to="/pending-account-info" >
                         <Button block color="secondary">Info</Button>
                       </Link>
@@ -210,4 +171,4 @@ class UserList extends Component {
   }
 }
 
-export default UserList;
+export default PendingAccount;

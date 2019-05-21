@@ -40,6 +40,11 @@ export default {
       icon: 'icon-home'
     },
     {
+      name: 'Pending Account Request',
+      url: '/pending-account',
+      icon: 'icon-check'
+    },
+    {
       name: 'Detail Request',
       url: '/detailRequest',
       icon: 'icon-speedometer',
