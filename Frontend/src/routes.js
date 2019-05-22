@@ -36,15 +36,16 @@ const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 
 const UserList = React.lazy(() => import('./main-view/UserList/UserList'));
-const UserInfo = React.lazy(() => import('./main-view/UserInfo/Forms'));
-const ChangePassword = React.lazy(() => import('./main-view/ChangePassword/Forms'));
-const EditUserInfo = React.lazy(() => import('./main-view/EditUserInfo/Forms'));
-const RequestForm = React.lazy(() => import('./main-view/RequestForm/Forms'))
-
-//detail request page
-const DetailRequest = React.lazy(() => import('./main-view/DetailRequest/Forms'))
+const UserInfo = React.lazy(() => import('./main-view/UserInfo/UserInfo'));
+const ChangePassword = React.lazy(() => import('./main-view/ChangePassword/ChangePassword'));
+const EditUserInfo = React.lazy(() => import('./main-view/EditUserInfo/EditUserInfo'));
+const RequestForm = React.lazy(() => import('./main-view/RequestForm/RequestForm'))
+const DetailRequest = React.lazy(() => import('./main-view/DetailRequest/DetailRequest'))
 const RequestPage = React.lazy(() => import('./main-view/RequestPage'));
 const Home = React.lazy(() => import('./main-view/Home'));
+const PendingAccount = React.lazy(() => import('./main-view/PendingAccount/PendingAccount'));
+const PendingAccountInfo = React.lazy(() => import('./main-view/PendingAccountInfo/PendingAccountInfo'));
+
 const routes = [
   { path: '/', exact: true, name: 'Home', component: Home },
   { path: '/reqList', exact: true, name: 'Request List', component: RequestPage },
@@ -54,6 +55,8 @@ const routes = [
   { path: '/user-info', exact: true, name: 'User Info', component: UserInfo },
   { path: '/change-password', exact: true, name: 'Change Password', component: ChangePassword },
   { path: '/edit-user-info', exact: true, name: 'Edit User Info', component: EditUserInfo },
+  { path: '/pending-account', exact: true, name: 'Account Confirmation', component: PendingAccount },
+  { path: '/pending-account-info', exact: true, name: 'Account Confirmation Info', component: PendingAccountInfo },
   { path: '/theme', exact: true, name: 'Theme', component: Colors },
   { path: '/theme/colors', name: 'Colors', component: Colors },
   { path: '/theme/typography', name: 'Typography', component: Typography },

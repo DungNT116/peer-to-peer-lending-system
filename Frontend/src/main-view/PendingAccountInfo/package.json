@@ -1,0 +1,6 @@
+{
+  "name": "PendingAccountInfo",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./PendingAccountInfo.js"
+}

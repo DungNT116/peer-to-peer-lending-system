@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Forms from './Forms';
+import Forms from './UserInfo';
 import {mount} from 'enzyme/build';
 
 it('renders without crashing', () => {

@@ -1,6 +1,6 @@
 {
-  "name": "Forms",
+  "name": "UserInfo",
   "version": "0.0.0",
   "private": true,
-  "main": "./Forms.js"
+  "main": "./UserInfo.js"
 }

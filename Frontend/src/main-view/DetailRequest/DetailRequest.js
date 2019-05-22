@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   Col,
-  Collapse,
+  // Collapse,
   Modal,
   ModalBody,
   ModalFooter,
@@ -20,7 +20,7 @@ import {
   FormGroup,
   // FormText,
   // FormFeedback,
-  Input,
+  // Input,
   // InputGroup,
   // InputGroupAddon,
   // InputGroupButtonDropdown,
@@ -33,12 +33,12 @@ class Forms extends Component {
   constructor(props) {
     super(props);
 
-    this.toggle = this.toggle.bind(this);
+    // this.toggle = this.toggle.bind(this);
     // this.toggleFade = this.toggleFade.bind(this);
     this.state = {
       modal: false,
-      collapse: false,
-      fadeIn: true,
+      // collapse: false,
+      // fadeIn: true,
       timeout: 300
     };
 
@@ -49,9 +49,9 @@ class Forms extends Component {
     this.setState({ modal: !this.state.modal });
   }
 
-  toggle() {
-    this.setState({ collapse: !this.state.collapse });
-  }
+  // toggle() {
+  //   this.setState({ collapse: !this.state.collapse });
+  // }
 
   // toggleFade() {
   //   this.setState((prevState) => { return { fadeIn: !prevState } });
@@ -64,7 +64,7 @@ class Forms extends Component {
           <Col xs="12" md="12">
             <Card>
               <CardHeader>
-                <strong>Request Form</strong>
+                <strong>Detail Request</strong>
               </CardHeader>
               <CardBody>
                 <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
@@ -73,36 +73,45 @@ class Forms extends Component {
                       <Label>Borrower Name</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      <Input type="text" id="text-input" name="text-input" placeholder="Borrower's name" />
+                      <p className="form-control-static">Dung Nguyen</p>
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                     <Col md="3">
-                      <Label>Amount</Label>
+                      <Label>Total amount</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      <Input type="text" id="text-input" name="text-input" placeholder="Enter the amount you need" />
+                      <p className="form-control-static">10,147,940 VND</p>
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                     <Col md="3">
-                      <Label htmlFor="date-input">Borrow Day</Label>
+                      <Label>Borrow Amount</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      <Input type="date" id="date-input" name="date-input" placeholder="borrow day" />
+                      <p className="form-control-static">10,000,000 VND</p>
                     </Col>
                   </FormGroup>
                   <FormGroup row>
-                    <Col md="3">
-                      <Label htmlFor="duration">Borrow Duration</Label>
+                    <Col md="4">
+                      <Label>Borrow Duration</Label>
                     </Col>
-                    <Col xs="12" md="9">
-                      <Input type="select" name="duration" id="duration">
-                        <option value="0">Please select</option>
-                        <option value="1">30 days</option>
-                        <option value="2">90 days</option>
-                        <option value="3">1 Years(365 days)</option>
-                      </Input>
+                    <Col md="4">
+                      <Label>Borrow Day</Label>
+                    </Col>
+                    <Col md="4">
+                      <Label>Pay Back Day</Label>
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row>
+                    <Col md="4">
+                      <p className="form-control-static">30 days</p>
+                    </Col>
+                    <Col md="4">
+                      <p className="form-control-static">17/05/2019</p>
+                    </Col>
+                    <Col md="4">
+                      <p className="form-control-static">16/06/2019</p>
                     </Col>
                   </FormGroup>
                   <FormGroup row>
@@ -115,29 +124,40 @@ class Forms extends Component {
                   </FormGroup>
                   <FormGroup row>
                     <Col md="3">
-                      <Label htmlFor="contact">Type of contact</Label>
+                      <Label>Interest Received</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      <Input type="select" name="contact" id="contact" onChange={this.toggle}>
-                        <option value="0">pay at the end of the term</option>
-                        <option value="1">pay tung phan</option>
-                      </Input>
+                      <p className="form-control-static">147,945 VND</p>
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row>
+                    <Col md="3">
+                      <Label>Service Fee</Label>
+                    </Col>
+                    <Col xs="12" md="9">
+                      <p className="form-control-static">0 VND</p>
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row>
+                    <Col md="3">
+                      <Label>Type of contact</Label>
+                    </Col>
+                    <Col xs="12" md="9">
+                      <p className="form-control-static">Pay at the end of the term</p>
                     </Col>
                   </FormGroup>
                   <FormGroup>
-                    <Collapse isOpen={this.state.collapse}>
-                      <Card>
-                        <CardBody>
-                          TimeLine is here =)))
-                        </CardBody>
-                      </Card>
-                    </Collapse>
+                    <Col xs="12" md="12">
+                      <p className="form-control-static">Timeline is here =))</p>
+                    </Col>
                   </FormGroup>
                 </Form>
               </CardBody>
               <CardFooter>
-                <Button type="submit" size="sm" color="primary" onClick={this.toggleModal}><i className="fa fa-dot-circle-o"></i> Submit</Button>
-                <Button type="reset" size="sm" color="danger"><i className="fa fa-ban"></i> Reset</Button>
+                <Button type="submit" size="md" color="primary" onClick={this.toggleModal}><i className="fa fa-dot-circle-o"></i> Submit</Button>{' '}
+                <Button type="submit" size="md" color="primary" onClick={this.toggleModal}><i className="fa fa-dot-circle-o"></i> Change</Button>{' '}
+                <Button type="reset" size="md" color="danger"><i className="fa fa-ban"></i> Delete</Button>{' '}
+                <Button type="reset" size="md" color="danger"><i className="fa fa-ban"></i> Reset</Button>
               </CardFooter>
             </Card>
           </Col>
@@ -145,7 +165,7 @@ class Forms extends Component {
         <Modal isOpen={this.state.modal} toggle={this.toggleModal} className={this.props.className}>
           <ModalHeader toggle={this.toggleModal}>Xac Nhan yeu cau vay muon</ModalHeader>
           <ModalBody>
-            Ban co chac chan se tao yeu cau nay khong
+            Ban co chac chan se chap nhan yeu cau nay khong
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={this.toggleModal}>Yes</Button>{' '}

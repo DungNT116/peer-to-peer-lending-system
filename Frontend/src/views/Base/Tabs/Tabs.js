@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
-import {Badge, Col, Nav, NavItem, NavLink, Row, TabContent, TabPane} from 'reactstrap';
-import classnames from 'classnames';
+import {Col, Nav, NavItem, NavLink, Row, TabContent, TabPane} from 'reactstrap';
 
 class Tabs extends Component {
 
