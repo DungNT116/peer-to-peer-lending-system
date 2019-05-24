@@ -7,18 +7,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import capstone.p2plend.entity.Account;
-import capstone.p2plend.exception.AccountNotFoundException;
-import capstone.p2plend.repo.AccountRepository;
 import capstone.p2plend.service.AccountService;
 import capstone.p2plend.service.JwtService;
 
@@ -38,7 +35,8 @@ public class AccountController {
 //		this.repository = repository;
 //	}
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@CrossOrigin
+	@PostMapping(value = "/login")
 	public ResponseEntity<String> login(HttpServletRequest request, @RequestBody Account account) {
 		String result = "";
 		HttpStatus httpStatus = null;
@@ -62,27 +60,26 @@ public class AccountController {
 		return new ResponseEntity<List<Account>>(accountService.findAll(), HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/accounts/{id}")
-	public ResponseEntity<Object> getAccountById(@PathVariable int id) {
-		Account user = accountService.findById(id);
-		if (user != null) {
-			return new ResponseEntity<Object>(user, HttpStatus.OK);
+	@GetMapping(value = "/account")
+	public ResponseEntity<Object> getAccountByUsername(@RequestParam String username) {
+		Account account = accountService.findUsername(username);
+		if (account != null) {
+			return new ResponseEntity<Object>(account, HttpStatus.OK);
 		}
 		return new ResponseEntity<Object>("Not Found User", HttpStatus.NO_CONTENT);
 	}
 
-	@PostMapping(value = "/users")
-	public ResponseEntity<String> createAccount(@RequestBody Account account) {
-		if (accountService.add(account)) {
-			return new ResponseEntity<String>("Created!", HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<String>("User Existed!", HttpStatus.BAD_REQUEST);
+	@CrossOrigin
+	@PostMapping(value = "/createAccount")
+	public Integer createAccount(@RequestBody Account account) {
+		HttpStatus status = null;
+		try {
+			accountService.createAccount(account);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
 		}
+		return status.value();
 	}
-
-	@DeleteMapping(value = "/account/{id}")
-	public ResponseEntity<String> deleteAccountById(@PathVariable int id) {
-		accountService.delete(id);
-		return new ResponseEntity<String>("Deleted!", HttpStatus.OK);
-	}
+	
 }

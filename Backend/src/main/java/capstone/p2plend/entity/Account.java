@@ -42,7 +42,7 @@ public class Account {
 	private String password;
 
 	@Column
-	private String[] roles;
+	private String role;
 
 	@Column
 	private String email;
@@ -66,14 +66,12 @@ public class Account {
 		this.username = username;
 		this.password = password;
 	}
-	
+
 	public List<GrantedAuthority> getAuthorities() {
-	    List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-	    for (String role : roles) {
-	      authorities.add(new SimpleGrantedAuthority(role));
-	    }
-	    return authorities;
-	  }
+		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(role));
+		return authorities;
+	}
 
 	public Integer getId() {
 		return id;
@@ -139,12 +137,12 @@ public class Account {
 		this.lastName = lastName;
 	}
 
-	public String[] getRoles() {
-		return roles;
+	public String getRole() {
+		return role;
 	}
 
-	public void setRoles(String[] roles) {
-		this.roles = roles;
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public String getPassword() {
