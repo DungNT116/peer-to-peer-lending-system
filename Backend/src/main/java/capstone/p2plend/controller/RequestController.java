@@ -24,25 +24,25 @@ public class RequestController {
 	// Aggregate root
 
 	@GetMapping("/requests")
-	public List<Request> all() {
+	List<Request> all() {
 		return repository.findAll();
 	}
 
 	@PostMapping("/requests")
-	public Request newRequest(@RequestBody Request newRequest) {
+	Request newRequest(@RequestBody Request newRequest) {
 		return repository.save(newRequest);
 	}
 
 	// Single item
 
 	@GetMapping("/requests/{id}")
-	public Request one(@PathVariable Integer id) {
+	Request one(@PathVariable Integer id) {
 
 		return repository.findById(id).orElseThrow(() -> new RequestNotFoundException(id));
 	}
 
 	@DeleteMapping("/requests/{id}")
-	public void deleteRequest(@PathVariable Integer id) {
+	void deleteRequest(@PathVariable Integer id) {
 		repository.deleteById(id);
 	}
 
