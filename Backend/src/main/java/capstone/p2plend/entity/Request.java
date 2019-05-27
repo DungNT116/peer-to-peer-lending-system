@@ -1,8 +1,6 @@
 package capstone.p2plend.entity;
 
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -26,16 +24,19 @@ public class Request {
 	private Account account;
 	
 	@Column
-	private Integer wallet;
+	private long amount;
 	
 	@Column
-	private Date createDate;
+	private String borrowDay;
 	
 	@Column
-	private Integer amount;
+	private String borrowDuration;
 	
 	@Column
-	private Date dueDate;
+	private String interestedRate;
+	
+	@Column
+	private String typeOfContact;
 
 	public Integer getId() {
 		return id;
@@ -53,36 +54,44 @@ public class Request {
 		this.account = account;
 	}
 
-	public Integer getWallet() {
-		return wallet;
-	}
-
-	public void setWallet(Integer wallet) {
-		this.wallet = wallet;
-	}
-
-	public Date getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
-	public Integer getAmount() {
+	public long getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Integer amount) {
+	public void setAmount(long amount) {
 		this.amount = amount;
 	}
 
-	public Date getDueDate() {
-		return dueDate;
+	public String getBorrowDay() {
+		return borrowDay;
 	}
 
-	public void setDueDate(Date dueDate) {
-		this.dueDate = dueDate;
+	public void setBorrowDay(String borrowDay) {
+		this.borrowDay = borrowDay;
+	}
+
+	public String getBorrowDuration() {
+		return borrowDuration;
+	}
+
+	public void setBorrowDuration(String borrowDuration) {
+		this.borrowDuration = borrowDuration;
+	}
+
+	public String getInterestedRate() {
+		return interestedRate;
+	}
+
+	public void setInterestedRate(String interestedRate) {
+		this.interestedRate = interestedRate;
+	}
+
+	public String getTypeOfContact() {
+		return typeOfContact;
+	}
+
+	public void setTypeOfContact(String typeOfContact) {
+		this.typeOfContact = typeOfContact;
 	}
 	
 	
