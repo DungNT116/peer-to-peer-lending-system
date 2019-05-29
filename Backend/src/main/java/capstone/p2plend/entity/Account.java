@@ -32,7 +32,7 @@ public class Account {
 	private Integer id;
 
 	@JsonIgnore
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "account")
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
 	private List<Request> requests;
 
 	@Column
@@ -58,6 +58,9 @@ public class Account {
 
 	@Column
 	private String lastName;
+	
+	@Column
+	private String status;
 
 	public Account() {
 	}
@@ -153,4 +156,13 @@ public class Account {
 		this.password = password;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	
 }

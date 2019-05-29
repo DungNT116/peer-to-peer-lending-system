@@ -19,7 +19,7 @@ public class Request {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
 	private Account account;
 	
@@ -93,6 +93,8 @@ public class Request {
 	public void setTypeOfContact(String typeOfContact) {
 		this.typeOfContact = typeOfContact;
 	}
+
+	
 	
 	
 }

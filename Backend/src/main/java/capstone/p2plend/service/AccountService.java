@@ -17,6 +17,9 @@ public class AccountService {
 
 	@Transactional
 	public List<Account> findAll() {
+		
+		
+		
 		return accountRepo.findAll();
 	}
 

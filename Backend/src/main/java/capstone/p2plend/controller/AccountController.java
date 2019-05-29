@@ -28,7 +28,7 @@ public class AccountController {
 	private AccountService accountService;
 
 	@CrossOrigin
-	@PostMapping(value = "/api/login")
+	@PostMapping(value = "/rest/login")
 	public ResponseEntity<String> login(HttpServletRequest request, @RequestBody Account account) {
 		String result = "";
 		HttpStatus httpStatus = null;
@@ -47,12 +47,12 @@ public class AccountController {
 		return new ResponseEntity<String>(result, httpStatus);
 	}
 
-	@GetMapping(value = "/accounts")
+	@GetMapping(value = "/rest/accounts")
 	public ResponseEntity<List<Account>> getAllUser() {
 		return new ResponseEntity<List<Account>>(accountService.findAll(), HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/account")
+	@GetMapping(value = "/rest/account")
 	public ResponseEntity<Object> getAccountByUsername(@RequestParam String username) {
 		Account account = accountService.findUsername(username);
 		if (account != null) {
@@ -62,7 +62,7 @@ public class AccountController {
 	}
 
 	@CrossOrigin
-	@PostMapping(value = "/createAccount")
+	@PostMapping(value = "/api/createAccount")
 	public Integer createAccount(@RequestBody Account account) {
 		HttpStatus status = null;
 		try {

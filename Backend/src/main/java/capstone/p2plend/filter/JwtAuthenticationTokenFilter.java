@@ -19,7 +19,7 @@ import capstone.p2plend.service.AccountService;
 
 public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter {
 
-	private final static String TOKEN_HEADER = "authorization";
+	private final static String TOKEN_HEADER = "Authorization";
 
 	@Autowired
 	private JwtService jwtService;
