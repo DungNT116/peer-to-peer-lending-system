@@ -1,6 +1,5 @@
 package capstone.p2plend.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -11,9 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -35,7 +31,7 @@ public class Account {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
 	private List<Request> requests;
 
-	@Column
+	@Column(unique = true)
 	private String username;
 
 	@Column
@@ -44,7 +40,7 @@ public class Account {
 	@Column
 	private String role;
 
-	@Column
+	@Column(unique = true)
 	private String email;
 
 	@Column
@@ -63,17 +59,6 @@ public class Account {
 	private String status;
 
 	public Account() {
-	}
-
-	public Account(String username, String password) {
-		this.username = username;
-		this.password = password;
-	}
-
-	public List<GrantedAuthority> getAuthorities() {
-		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		authorities.add(new SimpleGrantedAuthority(role));
-		return authorities;
 	}
 
 	public Integer getId() {
