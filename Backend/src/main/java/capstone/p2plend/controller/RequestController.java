@@ -6,9 +6,13 @@ import capstone.p2plend.service.AccountService;
 import capstone.p2plend.service.JwtService;
 import capstone.p2plend.service.RequestService;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,6 +32,7 @@ public class RequestController {
 
 	@CrossOrigin
 	@PostMapping(value = "/rest/createRequest")
+	@PreAuthorize("hasAnyRole(['ROLE_ADMIN','ROLE_USER')]")
 	public Integer createAccount(@RequestBody Request request, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		try {
@@ -45,4 +50,10 @@ public class RequestController {
 		return status.value();
 	}
 
+	
+	@CrossOrigin
+	@GetMapping(value = "/rest/allRequest")
+	public List<Request> all() {						
+		return requestService.findAll();
+	}
 }

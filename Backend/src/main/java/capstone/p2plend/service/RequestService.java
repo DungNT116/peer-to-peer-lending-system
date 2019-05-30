@@ -1,5 +1,7 @@
 package capstone.p2plend.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +19,10 @@ public class RequestService {
 	@Autowired
 	AccountRepository accountRepo;
 	
-	
+	@Transactional
+	public List<Request> findAll() {
+		return requestRepo.findAll();
+	}
 	
 	@Transactional
 	public Request createRequest(Request request) {
