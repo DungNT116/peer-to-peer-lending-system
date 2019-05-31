@@ -3,6 +3,7 @@ package capstone.p2plend.filter;
 import javax.validation.constraints.NotBlank;
 
 public class LoginRequest {
+
 	@NotBlank
 	private String usernameOrEmail;
 
