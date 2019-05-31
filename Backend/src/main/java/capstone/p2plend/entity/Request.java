@@ -1,6 +1,8 @@
 package capstone.p2plend.entity;
 
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -23,23 +25,31 @@ public class Request {
 	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
-	private Account account;
+    @JoinColumn(name = "from_account_id")
+	private Account fromAccount;
+	
+	@JsonIgnore
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "to_account_id")
+	private Account toAccount; 
 	
 	@Column
 	private long amount;
 	
 	@Column
-	private String borrowDay;
+	private Date dueDate;
 	
 	@Column
-	private String borrowDuration;
+	private Integer times;
 	
 	@Column
-	private String interestedRate;
+	private Date duration;
 	
 	@Column
-	private String typeOfContact;
+	private Date interestDate;
+	
+	@Column
+	private Date createDate;
 
 	public Integer getId() {
 		return id;
@@ -49,12 +59,20 @@ public class Request {
 		this.id = id;
 	}
 
-	public Account getAccount() {
-		return account;
+	public Account getFromAccount() {
+		return fromAccount;
 	}
 
-	public void setAccount(Account account) {
-		this.account = account;
+	public void setFromAccount(Account fromAccount) {
+		this.fromAccount = fromAccount;
+	}
+
+	public Account getToAccount() {
+		return toAccount;
+	}
+
+	public void setToAccount(Account toAccount) {
+		this.toAccount = toAccount;
 	}
 
 	public long getAmount() {
@@ -65,39 +83,45 @@ public class Request {
 		this.amount = amount;
 	}
 
-	public String getBorrowDay() {
-		return borrowDay;
+	public Date getDueDate() {
+		return dueDate;
 	}
 
-	public void setBorrowDay(String borrowDay) {
-		this.borrowDay = borrowDay;
+	public void setDueDate(Date dueDate) {
+		this.dueDate = dueDate;
 	}
 
-	public String getBorrowDuration() {
-		return borrowDuration;
+	public Integer getTimes() {
+		return times;
 	}
 
-	public void setBorrowDuration(String borrowDuration) {
-		this.borrowDuration = borrowDuration;
+	public void setTimes(Integer times) {
+		this.times = times;
 	}
 
-	public String getInterestedRate() {
-		return interestedRate;
+	public Date getDuration() {
+		return duration;
 	}
 
-	public void setInterestedRate(String interestedRate) {
-		this.interestedRate = interestedRate;
+	public void setDuration(Date duration) {
+		this.duration = duration;
 	}
 
-	public String getTypeOfContact() {
-		return typeOfContact;
+	public Date getInterestDate() {
+		return interestDate;
 	}
 
-	public void setTypeOfContact(String typeOfContact) {
-		this.typeOfContact = typeOfContact;
+	public void setInterestDate(Date interestDate) {
+		this.interestDate = interestDate;
 	}
 
-	
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
 	
 	
 }

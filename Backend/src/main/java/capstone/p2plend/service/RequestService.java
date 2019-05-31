@@ -1,5 +1,6 @@
 package capstone.p2plend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,21 @@ public class RequestService {
 	@Autowired
 	AccountRepository accountRepo;
 	
+	@Autowired
+	JwtService JwtService;
+	
 	@Transactional
 	public List<Request> findAll() {
 		return requestRepo.findAll();
+	}
+	
+	@Transactional
+	public List<Request> findAllExceptUserRequest(Integer id) {
+		List<Request> listRq = new ArrayList<Request>();
+		
+		listRq = requestRepo.findAllRequestExcept(id);
+		
+		return listRq;
 	}
 	
 	@Transactional

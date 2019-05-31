@@ -1,6 +1,9 @@
 package capstone.p2plend.controller;
 
+import capstone.p2plend.entity.Account;
 import capstone.p2plend.entity.Request;
+import capstone.p2plend.service.AccountService;
+import capstone.p2plend.service.JwtService;
 import capstone.p2plend.service.RequestService;
 
 import java.util.List;
@@ -18,17 +21,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class RequestController {
 
 	@Autowired
-	private RequestService requestService;
+	RequestService requestService;
 
+	@Autowired
+	AccountService accountService;
+	
+	@Autowired
+	JwtService jwtService;
+	
 	@CrossOrigin
 	@PostMapping(value = "/rest/createRequest")
 	public Integer createAccount(@RequestBody Request request, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		try {
 
-//			Account account = accountService.findUsername(username);
+			String username = jwtService.getUsernameFromToken(token);
 			
-//			request.setAccount(account);
+			Account account = accountService.findUsername(username);
+			
+			request.setFromAccount(account);
 			
 			requestService.createRequest(request);
 			status = HttpStatus.OK;
@@ -38,10 +49,20 @@ public class RequestController {
 		return status.value();
 	}
 
+	@CrossOrigin
+	@GetMapping(value = "/rest/all")
+	public List<Request> all() {						
+		return requestService.findAll();
+	}
 	
 	@CrossOrigin
 	@GetMapping(value = "/rest/allRequest")
-	public List<Request> all() {						
-		return requestService.findAll();
+	public List<Request> exceptUserRequest( @RequestHeader("Authorization") String token){
+		
+		String username = jwtService.getUsernameFromToken(token);
+		
+		Account account = accountService.findUsername(username);
+		
+		return requestService.findAllExceptUserRequest(account.getId());
 	}
 }

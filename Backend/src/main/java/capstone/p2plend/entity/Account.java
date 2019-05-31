@@ -1,5 +1,6 @@
 package capstone.p2plend.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -10,6 +11,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -28,9 +32,13 @@ public class Account {
 	private Integer id;
 
 	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
-	private List<Request> requests;
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "fromAccount")
+	private List<Request> fromAccount;
 
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "toAccount")
+	private List<Request> toAccount;
+	
 	@Column(unique = true)
 	private String username;
 
@@ -61,12 +69,17 @@ public class Account {
 	public Account() {
 	}
 
-	public Account(String username, String password, String email) {
+	public Account(String username, String password) {
 		this.username = username;
 		this.password = password;
-		this.email = email;
 	}
 
+	 public List<GrantedAuthority> getAuthorities() {
+		    List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		      authorities.add(new SimpleGrantedAuthority(role));
+		    return authorities;
+		  }
+	
 	public Integer getId() {
 		return id;
 	}
@@ -75,12 +88,20 @@ public class Account {
 		this.id = id;
 	}
 
-	public List<Request> getRequests() {
-		return requests;
+	public List<Request> getFromAccount() {
+		return fromAccount;
 	}
 
-	public void setRequests(List<Request> requests) {
-		this.requests = requests;
+	public void setFromAccount(List<Request> fromAccount) {
+		this.fromAccount = fromAccount;
+	}
+
+	public List<Request> getToAccount() {
+		return toAccount;
+	}
+
+	public void setToAccount(List<Request> toAccount) {
+		this.toAccount = toAccount;
 	}
 
 	public String getUsername() {
