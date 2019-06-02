@@ -51,7 +51,7 @@ public class RequestController {
 	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/deal/getById")
+	@GetMapping(value = "/rest/request/getById")
 	public ResponseEntity<Request> getOne(@RequestParam int id) {
 		return new ResponseEntity<Request>(requestService.getOneById(id), HttpStatus.OK);
 	}
