@@ -25,44 +25,43 @@ public class RequestController {
 
 	@Autowired
 	AccountService accountService;
-	
+
 	@Autowired
 	JwtService jwtService;
-	
+
 	@CrossOrigin
 	@PostMapping(value = "/rest/createRequest")
 	public Integer createAccount(@RequestBody Request request, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
-		try {
+		boolean valid = false;
+		valid = requestService.createRequest(request, token);
 
-			String username = jwtService.getUsernameFromToken(token);
-			
-			Account account = accountService.findUsername(username);
-			
-			request.setFromAccount(account);
-			
-			requestService.createRequest(request);
+		if (valid == true) {
 			status = HttpStatus.OK;
-		} catch (Exception e) {
+
+		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
+
 		return status.value();
 	}
 
 	@CrossOrigin
-	@GetMapping(value = "/rest/all")
-	public List<Request> all() {						
+	@GetMapping(value = "/rest/request/all")
+	public List<Request> all() {
 		return requestService.findAll();
 	}
-	
+
 	@CrossOrigin
 	@GetMapping(value = "/rest/allRequest")
-	public List<Request> exceptUserRequest( @RequestHeader("Authorization") String token){
-		
+	public List<Request> findAllExceptUserRequest(@RequestHeader("Authorization") String token) {
+
 		String username = jwtService.getUsernameFromToken(token);
-		
+
 		Account account = accountService.findUsername(username);
-		
+
 		return requestService.findAllExceptUserRequest(account.getId());
 	}
+	
+	
 }

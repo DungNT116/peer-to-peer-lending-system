@@ -3,9 +3,11 @@ package capstone.p2plend.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,16 +28,8 @@ public class AccountController {
 	@Autowired
 	JwtService jwtService;
 
-//	@Autowired
-//	AuthenticationManager authenticationManager;
-
-//	@Autowired
-//	PasswordEncoder passwordEncoder;
-
-//	@Autowired
-//	JwtTokenProvider tokenProvider;
-
-	@PostMapping(value = "/login")
+	@CrossOrigin
+	@PostMapping(value = "/rest/login")
 	public ResponseEntity<String> login(HttpServletRequest request, @RequestBody Account account) {
 		String result = "";
 		HttpStatus httpStatus = null;
@@ -54,11 +48,14 @@ public class AccountController {
 		return new ResponseEntity<String>(result, httpStatus);
 	}
 
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/accounts")
 	public ResponseEntity<List<Account>> getAllUser() {
 		return new ResponseEntity<List<Account>>(accountService.findAll(), HttpStatus.OK);
 	}
 
+	@CrossOrigin
 	@GetMapping(value = "/rest/account")
 	public ResponseEntity<Object> getAccountByUsername(@RequestParam String username) {
 		Account account = accountService.findUsername(username);
@@ -69,7 +66,7 @@ public class AccountController {
 	}
 
 	@CrossOrigin
-	@PostMapping(value = "/api/createAccount")
+	@PostMapping(value = "/rest/createAccount")
 	public Integer createAccount(@RequestBody Account account) {
 		HttpStatus status = null;
 		try {
@@ -81,4 +78,19 @@ public class AccountController {
 		return status.value();
 	}
 
+	@CrossOrigin
+	@Secured("ROLE_ADMIN")
+	@PutMapping(value = "/rest/approveAccount")
+	public Integer approveAccount(@RequestParam String username) {
+		HttpStatus status = null;
+		boolean valid = false;
+		valid = accountService.approveAccount(username);
+		if (valid == true) {
+			status = HttpStatus.OK;
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+
+		return status.value();
+	}
 }

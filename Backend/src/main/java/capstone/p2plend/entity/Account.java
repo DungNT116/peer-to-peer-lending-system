@@ -31,14 +31,6 @@ public class Account {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "fromAccount")
-	private List<Request> fromAccount;
-
-	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "toAccount")
-	private List<Request> toAccount;
-	
 	@Column(unique = true)
 	private String username;
 
@@ -52,19 +44,18 @@ public class Account {
 	private String email;
 
 	@Column
-	private Integer wallet;
-
-	@Column
 	private String phoneNumber;
 
 	@Column
-	private String firstName;
-
-	@Column
-	private String lastName;
-
-	@Column
 	private String status;
+	
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "fromAccount")
+	private List<Request> fromAccount;
+
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "toAccount")
+	private List<Request> toAccount;
 
 	public Account() {
 	}
@@ -74,12 +65,12 @@ public class Account {
 		this.password = password;
 	}
 
-	 public List<GrantedAuthority> getAuthorities() {
-		    List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-		      authorities.add(new SimpleGrantedAuthority(role));
-		    return authorities;
-		  }
-	
+	public List<GrantedAuthority> getAuthorities() {
+		List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority(role));
+		return authorities;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -120,36 +111,12 @@ public class Account {
 		this.email = email;
 	}
 
-	public Integer getWallet() {
-		return wallet;
-	}
-
-	public void setWallet(Integer wallet) {
-		this.wallet = wallet;
-	}
-
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
 
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
 	}
 
 	public String getRole() {

@@ -7,7 +7,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "transaction")
@@ -32,6 +35,10 @@ public class Transaction {
 	@Column
 	private Date createDate;
 
+	@JsonIgnore
+	@OneToOne(mappedBy = "transaction")
+	private Milestone milestone;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -79,6 +86,13 @@ public class Transaction {
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
-	
+
+	public Milestone getMilestone() {
+		return milestone;
+	}
+
+	public void setMilestone(Milestone milestone) {
+		this.milestone = milestone;
+	}
 	
 }

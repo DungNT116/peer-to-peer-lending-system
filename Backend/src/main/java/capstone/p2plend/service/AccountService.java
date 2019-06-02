@@ -47,4 +47,19 @@ public class AccountService {
 	public Account createAccount(Account account) {
 		return accountRepo.save(account);
 	}
+	
+	@Transactional
+	public boolean approveAccount(String username) {
+		boolean valid = false;		
+		try {
+			Account account = accountRepo.findByUsername(username);
+			account.setStatus("active");			
+			accountRepo.save(account);
+			valid = true;
+		} catch (Exception e) {
+			valid = false;
+			return valid;
+		}		
+		return valid;
+	}
 }
