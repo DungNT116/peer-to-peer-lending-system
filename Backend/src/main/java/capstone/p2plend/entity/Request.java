@@ -2,6 +2,7 @@ package capstone.p2plend.entity;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +14,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "request")
 public class Request {
@@ -39,24 +44,30 @@ public class Request {
 	@Column
 	private Date createDate;
 
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "from_account_id")
 	private Account fromAccount;
 
-//	@Column(name = "from_account_id", insertable = false, updatable = false)
-//	private Integer from_account_id;
+	@Column(name = "from_account_id", insertable = false, updatable = false)
+	private Integer fromAccountId;
 
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "to_account_id")
 	private Account toAccount;
 
-//	@Column(name = "to_account_id", insertable = false, updatable = false)
-//	private Integer to_account_id;
+	@Column(name = "to_account_id", insertable = false, updatable = false)
+	private Integer toAccountId;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@JsonIgnore
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
 
+	@Column(name = "deal_id", insertable = false, updatable = false)
+	private Integer dealId;
+	
 	public Integer getId() {
 		return id;
 	}
@@ -137,6 +148,28 @@ public class Request {
 		this.deal = deal;
 	}
 
-	
+	public Integer getFromAccountId() {
+		return fromAccountId;
+	}
+
+	public void setFromAccountId(Integer fromAccountId) {
+		this.fromAccountId = fromAccountId;
+	}
+
+	public Integer getToAccountId() {
+		return toAccountId;
+	}
+
+	public void setToAccountId(Integer toAccountId) {
+		this.toAccountId = toAccountId;
+	}
+
+	public Integer getDealId() {
+		return dealId;
+	}
+
+	public void setDealId(Integer dealId) {
+		this.dealId = dealId;
+	}
 
 }

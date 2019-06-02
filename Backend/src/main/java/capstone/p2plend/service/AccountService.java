@@ -17,10 +17,14 @@ public class AccountService {
 
 	@Transactional
 	public List<Account> findAll() {
-		
-		
-		
 		return accountRepo.findAll();
+	}
+	
+	@Transactional
+	public Account getOneById(int id) {
+		Account account = accountRepo.findById(id).get();
+		account.setPassword(null);		
+		return account;
 	}
 
 	@Transactional

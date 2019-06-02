@@ -50,13 +50,20 @@ public class AccountController {
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/account/getById")
+	public ResponseEntity<Account> getOne(@RequestParam int id) {
+		return new ResponseEntity<Account>(accountService.getOneById(id), HttpStatus.OK);
+	}
+	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/accounts")
 	public ResponseEntity<List<Account>> getAllUser() {
 		return new ResponseEntity<List<Account>>(accountService.findAll(), HttpStatus.OK);
 	}
 
 	@CrossOrigin
-	@GetMapping(value = "/rest/account")
+	@GetMapping(value = "/rest/account/getByUsername")
 	public ResponseEntity<Object> getAccountByUsername(@RequestParam String username) {
 		Account account = accountService.findUsername(username);
 		if (account != null) {

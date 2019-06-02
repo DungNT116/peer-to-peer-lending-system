@@ -11,6 +11,7 @@ import capstone.p2plend.entity.Account;
 import capstone.p2plend.entity.Deal;
 import capstone.p2plend.entity.Request;
 import capstone.p2plend.repo.AccountRepository;
+import capstone.p2plend.repo.DealRepository;
 import capstone.p2plend.repo.RequestRepository;
 
 @Service
@@ -23,22 +24,61 @@ public class RequestService {
 	AccountRepository accountRepo;
 
 	@Autowired
+	DealRepository dealRepo;
+
+	@Autowired
 	JwtService jwtService;
 
+//	@Autowired
+//    private ModelMapper modelMapper;
+	
 	@Transactional
 	public List<Request> findAll() {
 		return requestRepo.findAll();
 	}
 
 	@Transactional
-	public List<Request> findAllExceptUserRequest(Integer id) {
-		List<Request> listRq = new ArrayList<Request>();
+	public Request getOneById(int id) {
+		return requestRepo.findById(id).get();
+	}
+	
+	@Transactional
+	public List<Request> findAllExceptUserRequest(String token) {
+		List<Request> listRq = new ArrayList<>();
 
-		listRq = requestRepo.findAllRequestExcept(id);
+		String username = jwtService.getUsernameFromToken(token);
+		Account account = accountRepo.findByUsername(username);
 
+		listRq = requestRepo.findAllUserRequestExcept(account.getId());
+		
+		
 		return listRq;
 	}
 
+//	private Request convertToEntity(PostDto postDto) throws ParseException {
+//		Request post = modelMapper.map(postDto, Post.class);
+//	    post.setSubmissionDate(postDto.getSubmissionDateConverted(
+//	      userService.getCurrentUser().getPreference().getTimezone()));
+//	  
+//	    if (postDto.getId() != null) {
+//	        Post oldPost = postService.getPostById(postDto.getId());
+//	        post.setRedditID(oldPost.getRedditID());
+//	        post.setSent(oldPost.isSent());
+//	    }
+//	    return post;
+//	}
+	
+	@Transactional
+	public List<Request> findAllRequestHistoryDone(String token) {
+		List<Request> listRq = new ArrayList<>();
+
+		String username = jwtService.getUsernameFromToken(token);
+		Account account = accountRepo.findByUsername(username);
+		listRq = requestRepo.findAllUserHistoryRequestDone(account.getId(), "done");
+		
+		return listRq;
+	}
+	
 	@Transactional
 	public boolean createRequest(Request request, String token) {
 		try {
@@ -47,9 +87,12 @@ public class RequestService {
 			Deal deal = new Deal();
 			deal.setStatus("pending");
 
+			deal.setRequest(request);
+
 			request.setFromAccount(account);
 			request.setDeal(deal);
 
+			requestRepo.save(request);
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -57,14 +100,15 @@ public class RequestService {
 	}
 
 	@Transactional
-	public boolean approveRequest(Request request, String token) {
+	public boolean approveRequest(int id, String token) {
 		try {
-			int id = request.getId();
-
 			Request existRequest = requestRepo.findById(id).get();
 			String username = jwtService.getUsernameFromToken(token);
 			Account account = accountRepo.findByUsername(username);
 			existRequest.setToAccount(account);
+			Deal deal = existRequest.getDeal();
+			deal.setStatus("transitioning");
+
 			requestRepo.save(existRequest);
 
 			return true;
@@ -74,11 +118,13 @@ public class RequestService {
 	}
 
 	@Transactional
-	public void remove(int id) {
+	public boolean remove(int id) {
 		try {
 			requestRepo.deleteById(id);
+			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 }

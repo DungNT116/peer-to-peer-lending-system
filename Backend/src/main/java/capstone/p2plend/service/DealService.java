@@ -28,4 +28,8 @@ public class DealService {
 		return false;
 	}
 	
+	@Transactional
+	public Deal getOneById(int id) {
+		return dealRepo.findById(id).get();
+	}
 }
