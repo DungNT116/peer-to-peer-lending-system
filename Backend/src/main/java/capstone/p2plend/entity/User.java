@@ -24,8 +24,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @JsonIgnoreProperties(value = { "roles", "authorities" })
 
 @Entity
-@Table(name = "account")
-public class Account {
+@Table(name = "user")
+public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +38,12 @@ public class Account {
 	private String password;
 
 	@Column
+	private String firstName;
+
+	@Column
+	private String lastName;
+	
+	@Column
 	private String role;
 
 	@Column(unique = true)
@@ -48,19 +54,19 @@ public class Account {
 
 	@Column
 	private String status;
-	
-	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "fromAccount")
-	private List<Request> fromAccount;
 
 	@JsonIgnore
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "toAccount")
-	private List<Request> toAccount;
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "borrower")
+	private List<Request> borrower;
 
-	public Account() {
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lender")
+	private List<Request> lender;
+
+	public User() {
 	}
 
-	public Account(String username, String password) {
+	public User(String username, String password) {
 		this.username = username;
 		this.password = password;
 	}
@@ -79,28 +85,44 @@ public class Account {
 		this.id = id;
 	}
 
-	public List<Request> getFromAccount() {
-		return fromAccount;
-	}
-
-	public void setFromAccount(List<Request> fromAccount) {
-		this.fromAccount = fromAccount;
-	}
-
-	public List<Request> getToAccount() {
-		return toAccount;
-	}
-
-	public void setToAccount(List<Request> toAccount) {
-		this.toAccount = toAccount;
-	}
-
 	public String getUsername() {
 		return username;
 	}
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 	public String getEmail() {
@@ -119,22 +141,6 @@ public class Account {
 		this.phoneNumber = phoneNumber;
 	}
 
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
 	public String getStatus() {
 		return status;
 	}
@@ -143,4 +149,21 @@ public class Account {
 		this.status = status;
 	}
 
+	public List<Request> getBorrower() {
+		return borrower;
+	}
+
+	public void setBorrower(List<Request> borrower) {
+		this.borrower = borrower;
+	}
+
+	public List<Request> getLender() {
+		return lender;
+	}
+
+	public void setLender(List<Request> lender) {
+		this.lender = lender;
+	}
+
+	
 }

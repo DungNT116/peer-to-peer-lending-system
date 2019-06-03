@@ -14,8 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 
-import capstone.p2plend.entity.Account;
-import capstone.p2plend.service.AccountService;
+import capstone.p2plend.service.UserService;
 import capstone.p2plend.service.JwtService;
 
 public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter {
@@ -26,7 +25,7 @@ public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthentication
 	private JwtService jwtService;
 	
 	@Autowired
-	private AccountService userService;
+	private UserService userService;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -35,7 +34,7 @@ public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthentication
 		String authToken = httpRequest.getHeader(TOKEN_HEADER);
 		if (jwtService.validateTokenLogin(authToken)) {
 			String username = jwtService.getUsernameFromToken(authToken);
-			Account user = userService.findUsername(username);
+			capstone.p2plend.entity.User user = userService.findUsername(username);
 			if (user != null) {
 				boolean enabled = true;
 				boolean accountNonExpired = true;

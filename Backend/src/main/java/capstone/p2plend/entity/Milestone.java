@@ -1,7 +1,5 @@
 package capstone.p2plend.entity;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +11,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "milestone")
 public class Milestone {
@@ -20,21 +20,29 @@ public class Milestone {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
-	@Column
-	private Date beginDate;
-	
-	@Column
-	private Date endDate;
 
+	@Column
+	private Long beginDate;
+
+	@Column
+	private Long endDate;
+
+	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "transaction_id")
 	private Transaction transaction;
-	
+
+	@Column(name = "transaction_id", insertable = false, updatable = false)
+	private Integer transactionId;
+
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
-	
+
+	@Column(name = "deal_id", insertable = false, updatable = false)
+	private Integer dealId;
+
 	public Integer getId() {
 		return id;
 	}
@@ -43,20 +51,36 @@ public class Milestone {
 		this.id = id;
 	}
 
-	public Date getBeginDate() {
+	public Long getBeginDate() {
 		return beginDate;
 	}
 
-	public void setBeginDate(Date beginDate) {
+	public void setBeginDate(Long beginDate) {
 		this.beginDate = beginDate;
 	}
 
-	public Date getEndDate() {
+	public Long getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(Long endDate) {
 		this.endDate = endDate;
+	}
+
+	public Transaction getTransaction() {
+		return transaction;
+	}
+
+	public void setTransaction(Transaction transaction) {
+		this.transaction = transaction;
+	}
+
+	public Integer getTransactionId() {
+		return transactionId;
+	}
+
+	public void setTransactionId(Integer transactionId) {
+		this.transactionId = transactionId;
 	}
 
 	public Deal getDeal() {
@@ -67,13 +91,12 @@ public class Milestone {
 		this.deal = deal;
 	}
 
-	public Transaction getTransaction() {
-		return transaction;
+	public Integer getDealId() {
+		return dealId;
 	}
 
-	public void setTransaction(Transaction transaction) {
-		this.transaction = transaction;
+	public void setDealId(Integer dealId) {
+		this.dealId = dealId;
 	}
-	
-	
+
 }

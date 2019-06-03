@@ -1,7 +1,5 @@
 package capstone.p2plend.entity;
 
-import java.util.Date;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,38 +25,38 @@ public class Request {
 	private Integer id;
 
 	@Column
-	private long amount;
+	private Long amount;
 
 	@Column
-	private Date dueDate;
+	private Long dueDate;
 
 	@Column
 	private Integer times;
 
 	@Column
-	private Date duration;
+	private Integer duration;
 
 	@Column
-	private Date interestDate;
+	private float interestRate;
 
 	@Column
-	private Date createDate;
+	private Long createDate;
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "from_account_id")
-	private Account fromAccount;
+	@JoinColumn(name = "borrrower_id")
+	private User borrower;
 
-	@Column(name = "from_account_id", insertable = false, updatable = false)
-	private Integer fromAccountId;
+	@Column(name = "borrrower_id", insertable = false, updatable = false)
+	private Integer borrowerId;
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "to_account_id")
-	private Account toAccount;
+	@JoinColumn(name = "lender_id")
+	private User lender;
 
-	@Column(name = "to_account_id", insertable = false, updatable = false)
-	private Integer toAccountId;
+	@Column(name = "lender_id", insertable = false, updatable = false)
+	private Integer lenderId;
 
 	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -67,7 +65,7 @@ public class Request {
 
 	@Column(name = "deal_id", insertable = false, updatable = false)
 	private Integer dealId;
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -76,19 +74,19 @@ public class Request {
 		this.id = id;
 	}
 
-	public long getAmount() {
+	public Long getAmount() {
 		return amount;
 	}
 
-	public void setAmount(long amount) {
+	public void setAmount(Long amount) {
 		this.amount = amount;
 	}
 
-	public Date getDueDate() {
+	public Long getDueDate() {
 		return dueDate;
 	}
 
-	public void setDueDate(Date dueDate) {
+	public void setDueDate(Long dueDate) {
 		this.dueDate = dueDate;
 	}
 
@@ -100,44 +98,60 @@ public class Request {
 		this.times = times;
 	}
 
-	public Date getDuration() {
+	public Integer getDuration() {
 		return duration;
 	}
 
-	public void setDuration(Date duration) {
+	public void setDuration(Integer duration) {
 		this.duration = duration;
 	}
 
-	public Date getInterestDate() {
-		return interestDate;
+	public float getInterestRate() {
+		return interestRate;
 	}
 
-	public void setInterestDate(Date interestDate) {
-		this.interestDate = interestDate;
+	public void setInterestRate(float interestRate) {
+		this.interestRate = interestRate;
 	}
 
-	public Date getCreateDate() {
+	public Long getCreateDate() {
 		return createDate;
 	}
 
-	public void setCreateDate(Date createDate) {
+	public void setCreateDate(Long createDate) {
 		this.createDate = createDate;
 	}
 
-	public Account getFromAccount() {
-		return fromAccount;
+	public User getBorrower() {
+		return borrower;
 	}
 
-	public void setFromAccount(Account fromAccount) {
-		this.fromAccount = fromAccount;
+	public void setBorrower(User borrower) {
+		this.borrower = borrower;
 	}
 
-	public Account getToAccount() {
-		return toAccount;
+	public Integer getBorrowerId() {
+		return borrowerId;
 	}
 
-	public void setToAccount(Account toAccount) {
-		this.toAccount = toAccount;
+	public void setBorrowerId(Integer borrowerId) {
+		this.borrowerId = borrowerId;
+	}
+
+	public User getLender() {
+		return lender;
+	}
+
+	public void setLender(User lender) {
+		this.lender = lender;
+	}
+
+	public Integer getLenderId() {
+		return lenderId;
+	}
+
+	public void setLenderId(Integer lenderId) {
+		this.lenderId = lenderId;
 	}
 
 	public Deal getDeal() {
@@ -148,22 +162,6 @@ public class Request {
 		this.deal = deal;
 	}
 
-	public Integer getFromAccountId() {
-		return fromAccountId;
-	}
-
-	public void setFromAccountId(Integer fromAccountId) {
-		this.fromAccountId = fromAccountId;
-	}
-
-	public Integer getToAccountId() {
-		return toAccountId;
-	}
-
-	public void setToAccountId(Integer toAccountId) {
-		this.toAccountId = toAccountId;
-	}
-
 	public Integer getDealId() {
 		return dealId;
 	}
@@ -172,4 +170,6 @@ public class Request {
 		this.dealId = dealId;
 	}
 
+
+	
 }

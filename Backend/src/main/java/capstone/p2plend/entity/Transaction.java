@@ -1,7 +1,5 @@
 package capstone.p2plend.entity;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,26 +17,26 @@ public class Transaction {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
+
 	@Column
 	private String sender;
-	
+
 	@Column
 	private String receiver;
-	
+
 	@Column
 	private Integer amount;
-	
+
 	@Column
 	private String status;
-	
+
 	@Column
-	private Date createDate;
+	private Long createDate;
 
 	@JsonIgnore
 	@OneToOne(mappedBy = "transaction")
 	private Milestone milestone;
-	
+
 	public Integer getId() {
 		return id;
 	}
@@ -79,11 +77,11 @@ public class Transaction {
 		this.status = status;
 	}
 
-	public Date getCreateDate() {
+	public Long getCreateDate() {
 		return createDate;
 	}
 
-	public void setCreateDate(Date createDate) {
+	public void setCreateDate(Long createDate) {
 		this.createDate = createDate;
 	}
 
@@ -94,5 +92,5 @@ public class Transaction {
 	public void setMilestone(Milestone milestone) {
 		this.milestone = milestone;
 	}
-	
+
 }
