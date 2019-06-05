@@ -13,10 +13,7 @@ public interface RequestRepository extends JpaRepository<Request, Integer> {
 	@Query(value = "SELECT * FROM request WHERE borrower_id <> ?1 AND lender_id is null", nativeQuery = true)
 	List<Request> findAllUserRequestExcept(Integer id);
 
-	@Query(value = "SELECT request.* "
-			+ "FROM request "
-			+ "LEFT JOIN deal ON ppls.deal.id = ppls.request.deal_id "
-			+ "WHERE borrower_id = :id AND ppls.deal.status = :status", nativeQuery = true)
+	@Query(value = "SELECT request.* FROM request WHERE borrower_id = :id AND status = :status", nativeQuery = true)
 	List<Request> findAllUserHistoryRequestDone(@Param("id") int id, @Param("status") String status);
 
 }
