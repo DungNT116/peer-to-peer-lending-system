@@ -160,7 +160,7 @@ class Forms extends Component {
                     </Col>
                   </FormGroup>
                   <FormGroup row>
-                    <Col xl="6">
+                    <Col xl="10">
                       <Card>
                         <CardHeader>
                           <i className="fa fa-align-justify"></i> Image <small>Paper</small>

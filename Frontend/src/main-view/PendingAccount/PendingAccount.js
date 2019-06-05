@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import { AppSwitch } from "@coreui/react";
+// import { AppSwitch } from "@coreui/react";
 
 import { Button, Card, CardBody, Col, Row, Table, Pagination, PaginationItem, PaginationLink, CardHeader } from "reactstrap";
 
