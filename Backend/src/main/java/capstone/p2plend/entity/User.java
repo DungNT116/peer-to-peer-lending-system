@@ -18,11 +18,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties(value = { "roles", "authorities" })
-
+@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler", "roles", "authorities" })
 @Entity
 @Table(name = "user")
 public class User {
@@ -42,7 +39,7 @@ public class User {
 
 	@Column
 	private String lastName;
-	
+
 	@Column
 	private String role;
 
@@ -55,13 +52,13 @@ public class User {
 	@Column
 	private String status;
 
-	@JsonIgnore
+	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "borrower")
-	private List<Request> borrower;
+	private List<Request> borrowRequest = new ArrayList<>();
 
-	@JsonIgnore
+	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lender")
-	private List<Request> lender;
+	private List<Request> lendRequest = new ArrayList<>();;
 
 	public User() {
 	}
@@ -149,21 +146,20 @@ public class User {
 		this.status = status;
 	}
 
-	public List<Request> getBorrower() {
-		return borrower;
+	public List<Request> getBorrowRequest() {
+		return borrowRequest;
 	}
 
-	public void setBorrower(List<Request> borrower) {
-		this.borrower = borrower;
+	public void setBorrowRequest(List<Request> borrowRequest) {
+		this.borrowRequest = borrowRequest;
 	}
 
-	public List<Request> getLender() {
-		return lender;
+	public List<Request> getLendRequest() {
+		return lendRequest;
 	}
 
-	public void setLender(List<Request> lender) {
-		this.lender = lender;
+	public void setLendRequest(List<Request> lendRequest) {
+		this.lendRequest = lendRequest;
 	}
 
-	
 }

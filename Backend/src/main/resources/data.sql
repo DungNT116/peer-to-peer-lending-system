@@ -4,7 +4,7 @@
 --
 --INSERT INTO deal (status) VALUES ('transitioning'), ('transitioning'), ('pending'), ('done');
 --
---INSERT INTO request (from_account_id, to_account_id, deal_id, amount) VALUES (2, 3, 1, 10);
---INSERT INTO request (from_account_id, to_account_id, deal_id, amount) VALUES (3, 2, 2, 20);
---INSERT INTO request (from_account_id, deal_id, amount) VALUES (2, 3, 200);
---INSERT INTO request (from_account_id, to_account_id, deal_id, amount) VALUES (3, 2, 4, 500);
+--INSERT INTO request (borrower_id, lender_id, deal_id, amount) VALUES (2, 3, 1, 10);
+--INSERT INTO request (borrower_id, lender_id, deal_id, amount) VALUES (3, 2, 2, 20);
+--INSERT INTO request (borrower_id, deal_id, amount) VALUES (2, 3, 200);
+--INSERT INTO request (borrower_id, lender_id, deal_id, amount) VALUES (3, 2, 4, 500);

@@ -32,17 +32,14 @@ public class RequestService {
 //	@Autowired
 //    private ModelMapper modelMapper;
 
-	@Transactional
 	public List<Request> findAll() {
 		return requestRepo.findAll();
 	}
 
-	@Transactional
 	public Request getOneById(int id) {
 		return requestRepo.findById(id).get();
 	}
 
-	@Transactional
 	public List<Request> findAllExceptUserRequest(String token) {
 		List<Request> listRq = new ArrayList<>();
 
@@ -50,6 +47,31 @@ public class RequestService {
 		User account = accountRepo.findByUsername(username);
 
 		listRq = requestRepo.findAllUserRequestExcept(account.getId());
+
+		for (Request r : listRq) {
+			if (r.getBorrower() != null) {
+				User borrower = new User();
+				borrower.setId(r.getBorrower().getId());
+				borrower.setUsername(r.getBorrower().getUsername());
+				borrower.setFirstName(r.getBorrower().getFirstName());
+				borrower.setLastName(r.getBorrower().getLastName());
+				r.setBorrower(borrower);
+			}
+			if (r.getLender() != null) {
+				User lender = new User();
+				lender.setId(r.getLender().getId());
+				lender.setUsername(r.getLender().getUsername());
+				lender.setFirstName(r.getLender().getFirstName());
+				lender.setLastName(r.getLender().getLastName());
+				r.setLender(lender);
+			}
+			if (r.getDeal() != null) {
+				Deal deal = new Deal();
+				deal.setId(r.getDeal().getId());
+				deal.setStatus(r.getDeal().getStatus());
+				r.setDeal(deal);
+			}
+		}
 
 		return listRq;
 	}
@@ -67,7 +89,6 @@ public class RequestService {
 //	    return post;
 //	}
 
-	@Transactional
 	public List<Request> findAllRequestHistoryDone(String token) {
 		List<Request> listRq = new ArrayList<>();
 
@@ -78,19 +99,14 @@ public class RequestService {
 		return listRq;
 	}
 
-	@Transactional
 	public boolean createRequest(Request request, String token) {
 		try {
 			String username = jwtService.getUsernameFromToken(token);
 			User account = accountRepo.findByUsername(username);
-			Deal deal = new Deal();
-			deal.setStatus("pending");
-
-			deal.setRequest(request);
 
 			request.setBorrower(account);
-			request.setDeal(deal);
-
+			request.setStatus("pending");
+			
 			requestRepo.save(request);
 			return true;
 		} catch (Exception e) {
@@ -98,7 +114,6 @@ public class RequestService {
 		}
 	}
 
-	@Transactional
 	public boolean approveRequest(int id, String token) {
 		try {
 			Request existRequest = requestRepo.findById(id).get();
@@ -116,20 +131,19 @@ public class RequestService {
 		}
 	}
 
-	@Transactional
 	public boolean remove(int id, String token) {
 		try {
 			Request request = requestRepo.findById(id).get();
 			User user = accountRepo.findByUsername(jwtService.getUsernameFromToken(token));
-			
-			if(request.getBorrower().getId() != user.getId()) {
+
+			if (request.getBorrower().getId() != user.getId()) {
 				return false;
 			}
-			
-			if(!request.getDeal().getStatus().equals("pending")) {
+
+			if (!request.getDeal().getStatus().equals("pending")) {
 				return false;
 			}
-			
+
 			requestRepo.deleteById(id);
 			return true;
 		} catch (Exception e) {

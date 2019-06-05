@@ -33,7 +33,7 @@ public class RequestController {
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@PostMapping(value = "/rest/createRequest")
+	@PostMapping(value = "/rest/request/createRequest")
 	public Integer createAccount(@RequestBody Request request, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
@@ -65,21 +65,21 @@ public class RequestController {
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/allRequest")
+	@GetMapping(value = "/rest/request/user/allRequest")
 	public List<Request> findAllExceptUserRequest(@RequestHeader("Authorization") String token) {
 		return requestService.findAllExceptUserRequest(token);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/allRequestHistoryDone")
+	@GetMapping(value = "/rest/request/allRequestHistoryDone")
 	public List<Request> findAllRequestHistoryDone(@RequestHeader("Authorization") String token) {
 		return requestService.findAllRequestHistoryDone(token);
 	}
 	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@PostMapping(value = "/rest/approveRequest")
+	@PostMapping(value = "/rest/request/approveRequest")
 	public Integer approveRequest(@RequestBody Request request, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;

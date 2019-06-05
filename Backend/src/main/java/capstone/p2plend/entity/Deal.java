@@ -12,8 +12,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 @Entity
 @Table(name = "deal")
 public class Deal {
@@ -24,12 +27,18 @@ public class Deal {
 	
 	@Column
 	private String status;
+	
+	@Column
+	private Integer borrowTime;
+	
+	@Column
+	private Integer paybackTime;
 
-	@JsonIgnore
+	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
 	@OneToOne(mappedBy = "deal")
 	private Request request;
 	
-	@JsonIgnore
+	@JsonIgnoreProperties(value = { "transaction", "deal" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "deal")
 	private List<Milestone> milestone;
 	

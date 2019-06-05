@@ -22,31 +22,18 @@ import capstone.p2plend.service.JwtService;
 public class UserController {
 
 	@Autowired
-	UserService accountService;
+	UserService userService;
 
 	@Autowired
 	JwtService jwtService;
 
-	@CrossOrigin
-	@PostMapping(value = "/rest/createAccount")
-	public Integer createAccount(@RequestBody User user) {
-		HttpStatus status = null;
-		try {
-			accountService.createAccount(user);
-			status = HttpStatus.OK;
-		} catch (Exception e) {
-			status = HttpStatus.BAD_REQUEST;
-		}
-		return status.value();
-	}
-	
 	@CrossOrigin
 	@PostMapping(value = "/rest/login")
 	public ResponseEntity<String> login(HttpServletRequest request, @RequestBody User account) {
 		String result = "";
 		HttpStatus httpStatus = null;
 		try {
-			if (accountService.checkLogin(account)) {
+			if (userService.checkLogin(account)) {
 				result = jwtService.generateTokenLogin(account.getUsername());
 				httpStatus = HttpStatus.OK;
 			} else {
@@ -59,26 +46,39 @@ public class UserController {
 		}
 		return new ResponseEntity<String>(result, httpStatus);
 	}
+	
+	@CrossOrigin
+	@PostMapping(value = "/rest/user/createUser")
+	public Integer createAccount(@RequestBody User user) {
+		HttpStatus status = null;
+		try {
+			userService.createAccount(user);
+			status = HttpStatus.OK;
+		} catch (Exception e) {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return status.value();
+	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/account/getById")
+	@GetMapping(value = "/rest/user/getById")
 	public ResponseEntity<User> getOne(@RequestBody User user) {
-		return new ResponseEntity<User>(accountService.getOneById(user.getId()), HttpStatus.OK);
+		return new ResponseEntity<User>(userService.getOneById(user.getId()), HttpStatus.OK);
 	}
 	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/accounts")
+	@GetMapping(value = "/rest/users")
 	public ResponseEntity<List<User>> getAllUser() {
-		return new ResponseEntity<List<User>>(accountService.findAll(), HttpStatus.OK);
+		return new ResponseEntity<List<User>>(userService.findAll(), HttpStatus.OK);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/account/getByUsername")
+	@GetMapping(value = "/rest/user/getByUsername")
 	public ResponseEntity<Object> getAccountByUsername(@RequestBody User user) {
-		User account = accountService.findUsername(user.getUsername());
+		User account = userService.findUsername(user.getUsername());
 		if (account != null) {
 			return new ResponseEntity<Object>(account, HttpStatus.OK);
 		}
@@ -87,11 +87,11 @@ public class UserController {
 
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
-	@PutMapping(value = "/rest/activeAccount")
+	@PutMapping(value = "/rest/user/activeUser")
 	public Integer approveAccount(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = accountService.activeAccount(user.getId());
+		valid = userService.activeAccount(user.getId());
 		if (valid == true) {
 			status = HttpStatus.OK;
 		} else {
@@ -103,11 +103,11 @@ public class UserController {
 	
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
-	@PutMapping(value = "/rest/approveAccount")
+	@PutMapping(value = "/rest/user/approveUser")
 	public Integer deactivateAccount(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = accountService.deactivateAccount(user.getId());
+		valid = userService.deactivateAccount(user.getId());
 		if (valid == true) {
 			status = HttpStatus.OK;
 		} else {

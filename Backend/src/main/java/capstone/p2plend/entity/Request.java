@@ -12,10 +12,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 @Entity
 @Table(name = "request")
 public class Request {
@@ -28,43 +29,43 @@ public class Request {
 	private Long amount;
 
 	@Column
-	private Long dueDate;
-
-	@Column
-	private Integer times;
+	private Long borrowDate;
 
 	@Column
 	private Integer duration;
 
 	@Column
-	private float interestRate;
+	private Float interestRate;
 
 	@Column
 	private Long createDate;
 
-	@JsonIgnore
+	@Column
+	private String status;
+
+	@JsonIgnoreProperties(value = { "borrowRequest", "lendRequest" })
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "borrrower_id")
+	@JoinColumn(name = "borrower_id")
 	private User borrower;
 
-	@Column(name = "borrrower_id", insertable = false, updatable = false)
-	private Integer borrowerId;
+//	@Column(name = "borrrower_id", insertable = false, updatable = false)
+//	private Integer borrowerId;
 
-	@JsonIgnore
+	@JsonIgnoreProperties(value = { "borrowRequest", "lendRequest" })
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "lender_id")
 	private User lender;
 
-	@Column(name = "lender_id", insertable = false, updatable = false)
-	private Integer lenderId;
+//	@Column(name = "lender_id", insertable = false, updatable = false)
+//	private Integer lenderId;
 
-	@JsonIgnore
+//	@Column(name = "deal_id", insertable = false, updatable = false)
+//	private Integer dealId;
+
+	@JsonIgnoreProperties(value = { "request", "milestone" })
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
-
-	@Column(name = "deal_id", insertable = false, updatable = false)
-	private Integer dealId;
 
 	public Integer getId() {
 		return id;
@@ -82,20 +83,12 @@ public class Request {
 		this.amount = amount;
 	}
 
-	public Long getDueDate() {
-		return dueDate;
+	public Long getBorrowDate() {
+		return borrowDate;
 	}
 
-	public void setDueDate(Long dueDate) {
-		this.dueDate = dueDate;
-	}
-
-	public Integer getTimes() {
-		return times;
-	}
-
-	public void setTimes(Integer times) {
-		this.times = times;
+	public void setBorrowDate(Long borrowDate) {
+		this.borrowDate = borrowDate;
 	}
 
 	public Integer getDuration() {
@@ -106,11 +99,11 @@ public class Request {
 		this.duration = duration;
 	}
 
-	public float getInterestRate() {
+	public Float getInterestRate() {
 		return interestRate;
 	}
 
-	public void setInterestRate(float interestRate) {
+	public void setInterestRate(Float interestRate) {
 		this.interestRate = interestRate;
 	}
 
@@ -122,20 +115,20 @@ public class Request {
 		this.createDate = createDate;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	public User getBorrower() {
 		return borrower;
 	}
 
 	public void setBorrower(User borrower) {
 		this.borrower = borrower;
-	}
-
-	public Integer getBorrowerId() {
-		return borrowerId;
-	}
-
-	public void setBorrowerId(Integer borrowerId) {
-		this.borrowerId = borrowerId;
 	}
 
 	public User getLender() {
@@ -146,14 +139,6 @@ public class Request {
 		this.lender = lender;
 	}
 
-	public Integer getLenderId() {
-		return lenderId;
-	}
-
-	public void setLenderId(Integer lenderId) {
-		this.lenderId = lenderId;
-	}
-
 	public Deal getDeal() {
 		return deal;
 	}
@@ -162,14 +147,4 @@ public class Request {
 		this.deal = deal;
 	}
 
-	public Integer getDealId() {
-		return dealId;
-	}
-
-	public void setDealId(Integer dealId) {
-		this.dealId = dealId;
-	}
-
-
-	
 }

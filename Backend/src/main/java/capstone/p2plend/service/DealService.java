@@ -19,7 +19,6 @@ public class DealService {
 		return dealRepo.findAll();
 	}
 	
-	@Transactional
 	public Boolean approveRequest(Deal deal) {
 		
 		String status = "Approved";		
@@ -28,8 +27,12 @@ public class DealService {
 		return false;
 	}
 	
-	@Transactional
 	public Deal getOneById(int id) {
 		return dealRepo.findById(id).get();
+	}
+	
+	public Deal makeDeal() {
+		
+		return null;
 	}
 }

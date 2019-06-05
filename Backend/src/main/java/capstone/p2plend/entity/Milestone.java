@@ -11,8 +11,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 @Entity
 @Table(name = "milestone")
 public class Milestone {
@@ -27,21 +30,21 @@ public class Milestone {
 	@Column
 	private Long endDate;
 
-	@JsonIgnore
+//	@Column(name = "transaction_id", insertable = false, updatable = false)
+//	private Integer transactionId;
+
+	@JsonIgnoreProperties(value = { "milestone" })
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "transaction_id")
 	private Transaction transaction;
 
-	@Column(name = "transaction_id", insertable = false, updatable = false)
-	private Integer transactionId;
+//	@Column(name = "deal_id", insertable = false, updatable = false)
+//	private Integer dealId;
 
-	@JsonIgnore
+	@JsonIgnoreProperties(value = { "request", "milestone" })
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
-
-	@Column(name = "deal_id", insertable = false, updatable = false)
-	private Integer dealId;
 
 	public Integer getId() {
 		return id;
@@ -75,28 +78,12 @@ public class Milestone {
 		this.transaction = transaction;
 	}
 
-	public Integer getTransactionId() {
-		return transactionId;
-	}
-
-	public void setTransactionId(Integer transactionId) {
-		this.transactionId = transactionId;
-	}
-
 	public Deal getDeal() {
 		return deal;
 	}
 
 	public void setDeal(Deal deal) {
 		this.deal = deal;
-	}
-
-	public Integer getDealId() {
-		return dealId;
-	}
-
-	public void setDealId(Integer dealId) {
-		this.dealId = dealId;
 	}
 
 }

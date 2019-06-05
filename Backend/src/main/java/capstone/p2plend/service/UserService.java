@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import capstone.p2plend.entity.User;
 import capstone.p2plend.repo.UserRepository;
@@ -15,24 +14,22 @@ public class UserService {
 	@Autowired
 	UserRepository accountRepo;
 
-	@Transactional
 	public List<User> findAll() {
 		return accountRepo.findAll();
 	}
 	
-	@Transactional
 	public User getOneById(int id) {
 		User account = accountRepo.findById(id).get();
-		account.setPassword(null);		
+		account.setPassword(null);	
+		account.setBorrowRequest(null);
+		account.setLendRequest(null);
 		return account;
 	}
 
-	@Transactional
 	public User findUsername(String username) {
 		return accountRepo.findByUsername(username);
 	}
 
-	@Transactional
 	public boolean checkLogin(User account) {
 
 		String username = account.getUsername();
@@ -40,6 +37,10 @@ public class UserService {
 
 		User checkExist = accountRepo.findByUsernameAndPassword(username, password);
 
+		if(checkExist.getStatus().equals("deactivate")) {
+			return false;
+		}
+		
 		if (checkExist != null) {
 			return true;
 		}
@@ -47,16 +48,14 @@ public class UserService {
 		return false;
 	}
 	
-	@Transactional
 	public User createAccount(User account) {
 		
-		account.setRole(null);
-		account.setStatus("pending");
+		account.setRole("ROLE_USER");
+		account.setStatus("active");
 		
 		return accountRepo.save(account);
 	}
 	
-	@Transactional
 	public boolean activeAccount(int id) {
 		boolean valid = false;		
 		try {
@@ -72,12 +71,11 @@ public class UserService {
 		return valid;
 	}
 	
-	@Transactional
 	public boolean deactivateAccount(int id) {
 		boolean valid = false;		
 		try {
 			User account = accountRepo.findById(id).get();
-			account.setRole(null);
+//			account.setRole(null);
 			account.setStatus("deactivate");			
 			accountRepo.save(account);
 			valid = true;
