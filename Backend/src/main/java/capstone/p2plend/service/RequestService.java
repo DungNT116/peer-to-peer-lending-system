@@ -164,7 +164,7 @@ public class RequestService {
 				return false;
 			}
 
-			if (!request.getDeal().getStatus().equals("pending")) {
+			if (!request.getStatus().equals("pending")) {
 				return false;
 			}
 
