@@ -1,10 +1,8 @@
---INSERT INTO user (username, password, email, role) VALUES ('admin', 'admin', 'mail@admin.com', 'ROLE_ADMIN');
---INSERT INTO user (username, password, email, role) VALUES ('user1', 'pass1', 'mail1', 'ROLE_USER');
---INSERT INTO user (username, password, email, role) VALUES ('user2', 'pass2', 'mail2', 'ROLE_USER');
+--INSERT INTO user (username, password, email, role, first_name, last_name) VALUES ('admin', 'admin', 'mail@admin.com', 'ROLE_ADMIN', 'minh', 'le');
+--INSERT INTO user (username, password, email, role, first_name, last_name) VALUES ('user1', 'pass1', 'mail1', 'ROLE_USER', 'loc', 'hv');
+--INSERT INTO user (username, password, email, role, first_name, last_name) VALUES ('user2', 'pass2', 'mail2', 'ROLE_USER', 'dung', 'nt');
 --
---INSERT INTO deal (status) VALUES ('transitioning'), ('transitioning'), ('pending'), ('done');
---
---INSERT INTO request (borrower_id, lender_id, deal_id, amount) VALUES (2, 3, 1, 10);
---INSERT INTO request (borrower_id, lender_id, deal_id, amount) VALUES (3, 2, 2, 20);
---INSERT INTO request (borrower_id, deal_id, amount) VALUES (2, 3, 200);
---INSERT INTO request (borrower_id, lender_id, deal_id, amount) VALUES (3, 2, 4, 500);
+--INSERT INTO request (borrower_id, amount, borrow_date, duration, interest_rate, create_date, status) VALUES (2, 100, 123123123, 30, 18, 1235235235, 'pending');
+--INSERT INTO request (borrower_id, amount, borrow_date, duration, interest_rate, create_date, status) VALUES (3, 50, 2523423423, 60, 18, 234234234, 'pending');
+--INSERT INTO request (borrower_id, amount, borrow_date, duration, interest_rate, create_date, status) VALUES (2, 20, 23556456456, 90, 18, 54645645645, 'pending');
+--INSERT INTO request (borrower_id, lender_id, amount, borrow_date, duration, interest_rate, create_date, status) VALUES (3, 2, 40, 3453463634, 120, 18, 345345345, 'done');

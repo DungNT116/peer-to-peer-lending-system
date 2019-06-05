@@ -36,10 +36,6 @@ public class UserService {
 		String password = account.getPassword();
 
 		User checkExist = accountRepo.findByUsernameAndPassword(username, password);
-
-		if(checkExist.getStatus().equals("deactivate")) {
-			return false;
-		}
 		
 		if (checkExist != null) {
 			return true;
