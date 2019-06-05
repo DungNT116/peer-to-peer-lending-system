@@ -30,8 +30,8 @@ class Hero extends React.Component {
                     <img
                       alt="..."
                       className="img-fluid"
-                      src={require("assets/img/brand/argon-react-white.png")}
-                      style={{ width: "200px" }}
+                      src={require("assets/img/brand/logo-white.png")}
+                      style={{ width: "400px" }}
                     />
                     <p className="lead text-white">
                       A web-based system that allows individuals lending money to others.
@@ -40,7 +40,7 @@ class Hero extends React.Component {
                       <Button
                         className="btn-white btn-icon mb-3 mb-sm-0"
                         color="default"
-                        href="https://www.creative-tim.com/product/argon-design-system-react?ref=adsr-landing-page"
+                        href="#"
                         size="lg"
                       >
                         <span className="btn-inner--icon mr-1">
