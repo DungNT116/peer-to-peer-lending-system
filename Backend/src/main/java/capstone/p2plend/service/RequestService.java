@@ -95,6 +95,31 @@ public class RequestService {
 		User account = accountRepo.findByUsername(username);
 		listRq = requestRepo.findAllUserHistoryRequestDone(account.getId(), "done");
 
+		for (Request r : listRq) {
+			if (r.getBorrower() != null) {
+				User borrower = new User();
+				borrower.setId(r.getBorrower().getId());
+				borrower.setUsername(r.getBorrower().getUsername());
+				borrower.setFirstName(r.getBorrower().getFirstName());
+				borrower.setLastName(r.getBorrower().getLastName());
+				r.setBorrower(borrower);
+			}
+			if (r.getLender() != null) {
+				User lender = new User();
+				lender.setId(r.getLender().getId());
+				lender.setUsername(r.getLender().getUsername());
+				lender.setFirstName(r.getLender().getFirstName());
+				lender.setLastName(r.getLender().getLastName());
+				r.setLender(lender);
+			}
+			if (r.getDeal() != null) {
+				Deal deal = new Deal();
+				deal.setId(r.getDeal().getId());
+				deal.setStatus(r.getDeal().getStatus());
+				r.setDeal(deal);
+			}
+		}
+
 		return listRq;
 	}
 
@@ -105,7 +130,7 @@ public class RequestService {
 
 			request.setBorrower(account);
 			request.setStatus("pending");
-			
+
 			requestRepo.save(request);
 			return true;
 		} catch (Exception e) {
