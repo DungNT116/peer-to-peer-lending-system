@@ -175,4 +175,16 @@ public class RequestService {
 			return false;
 		}
 	}
+
+	public boolean makeDeal(Request request) {
+		try {
+			int id = request.getId();
+			request.setStatus("transitioning");
+			Request rq = requestRepo.findById(id).get();
+			rq.setDeal(request.getDeal());
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }

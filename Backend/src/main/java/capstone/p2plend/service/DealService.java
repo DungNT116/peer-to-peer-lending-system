@@ -30,8 +30,10 @@ public class DealService {
 		return dealRepo.findById(id).get();
 	}
 	
-	public Deal makeDeal() {
+	public Deal makeDeal(Deal deal) {
 		
-		return null;
+		deal.setStatus("transitioning");		
+		dealRepo.save(deal);		
+		return deal;
 	}
 }
