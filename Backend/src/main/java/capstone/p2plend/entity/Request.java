@@ -23,6 +23,7 @@ public class Request {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private Integer id;
 
 	@Column
@@ -62,6 +63,7 @@ public class Request {
 //	@Column(name = "deal_id", insertable = false, updatable = false)
 //	private Integer dealId;
 
+	
 	@JsonIgnoreProperties(value = { "request", "milestone" })
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "deal_id")
