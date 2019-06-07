@@ -86,5 +86,4 @@ public class Milestone {
 		this.deal = deal;
 	}
 
-
 }
