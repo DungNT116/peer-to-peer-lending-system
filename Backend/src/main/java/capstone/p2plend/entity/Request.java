@@ -63,10 +63,8 @@ public class Request {
 //	@Column(name = "deal_id", insertable = false, updatable = false)
 //	private Integer dealId;
 
-	
 	@JsonIgnoreProperties(value = { "request", "milestone" })
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "deal_id")
+	@OneToOne(mappedBy = "request", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Deal deal;
 
 	public Integer getId() {

@@ -2,9 +2,11 @@ package capstone.p2plend.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -36,9 +38,10 @@ public class Transaction {
 
 	@Column
 	private Long createDate;
-
-	@JsonIgnore
-	@OneToOne(mappedBy = "transaction")
+	
+	@JsonIgnoreProperties(value = { "transaction", "deal" })
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "milestone_id")
 	private Milestone milestone;
 
 	public Integer getId() {

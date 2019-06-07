@@ -1,5 +1,6 @@
 package capstone.p2plend.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,8 +35,7 @@ public class Milestone {
 //	private Integer transactionId;
 
 	@JsonIgnoreProperties(value = { "milestone" })
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "transaction_id")
+	@OneToOne(mappedBy = "milestone", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Transaction transaction;
 
 //	@Column(name = "deal_id", insertable = false, updatable = false)
@@ -85,5 +85,6 @@ public class Milestone {
 	public void setDeal(Deal deal) {
 		this.deal = deal;
 	}
+
 
 }

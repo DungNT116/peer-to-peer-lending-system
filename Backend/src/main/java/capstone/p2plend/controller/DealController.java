@@ -7,6 +7,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import capstone.p2plend.entity.Deal;
@@ -24,5 +25,21 @@ public class DealController {
 	public ResponseEntity<Deal> getOne(@RequestBody Deal deal) {
 		return new ResponseEntity<Deal>(dealService.getOneById(deal.getId()), HttpStatus.OK);
 	}
-	
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/deal/makeDeal")
+	public Integer makeDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
+		HttpStatus status = null;
+		boolean valid = false;
+		valid = dealService.makeDeal(deal, token);
+		if (valid == true) {
+			status = HttpStatus.OK;
+
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+
+		return status.value();
+	}
 }

@@ -93,23 +93,6 @@ public class RequestController {
 
 		return status.value();
 	}
-
-	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@PostMapping(value = "/rest/request/makeDeal")
-	public Integer makeDeal(@RequestBody Request request) {
-		HttpStatus status = null;
-		boolean valid = false;
-		valid = requestService.makeDeal(request);
-
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
-		}
-
-		return status.value();
-	}
 	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
