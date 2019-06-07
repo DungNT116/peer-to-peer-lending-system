@@ -242,7 +242,9 @@ class ApplyPaypal extends React.Component {
                             disableFunding : true,
                             tagline:false
                           }}
-                          clientId = {{client_API}}
+                          options={{
+                            clientId : client_API
+                          }}
                         />
                       </Form>
                     </CardBody>
