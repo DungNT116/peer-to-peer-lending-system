@@ -164,7 +164,7 @@ public class RequestService {
 				return false;
 			}
 
-			if (!request.getDeal().getStatus().equals("pending")) {
+			if (!request.getStatus().equals("pending")) {
 				return false;
 			}
 
@@ -172,6 +172,18 @@ public class RequestService {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public boolean makeDeal(Request request) {
+		try {
+			int id = request.getId();
+			request.setStatus("transitioning");
+			Request rq = requestRepo.findById(id).get();
+			rq.setDeal(request.getDeal());
+			return true;
+		} catch (Exception e) {
 			return false;
 		}
 	}
