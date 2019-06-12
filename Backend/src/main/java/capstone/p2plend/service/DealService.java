@@ -65,4 +65,19 @@ public class DealService {
 			return false;
 		}
 	}
+	
+	public boolean acceptDeal(Deal deal, String token) {
+		try {
+			
+			Deal dealExist = dealRepo.findById(deal.getId()).get();
+			dealExist.setStatus("done");
+			dealRepo.save(dealExist);
+			
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	
 }

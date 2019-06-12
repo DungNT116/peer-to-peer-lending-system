@@ -130,6 +130,13 @@ public class RequestService {
 
 			request.setBorrower(account);
 			request.setStatus("pending");
+			
+			Deal deal = new Deal();
+			deal.setBorrowTime(1);
+			deal.setPaybackTime(1);
+			deal.setStatus("pending");
+			deal.setRequest(request);			
+			request.setDeal(deal);
 
 			requestRepo.save(request);
 			return true;
@@ -144,8 +151,8 @@ public class RequestService {
 			String username = jwtService.getUsernameFromToken(token);
 			User account = accountRepo.findByUsername(username);
 			existRequest.setLender(account);
-			Deal deal = existRequest.getDeal();
-			deal.setStatus("transitioning");
+//			Deal deal = existRequest.getDeal();
+//			deal.setStatus("transitioning");
 
 			requestRepo.save(existRequest);
 
