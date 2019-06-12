@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import capstone.p2plend.entity.Deal;
 import capstone.p2plend.entity.Request;
-import capstone.p2plend.entity.User;
 import capstone.p2plend.repo.DealRepository;
 import capstone.p2plend.repo.RequestRepository;
 import capstone.p2plend.repo.UserRepository;
@@ -32,10 +31,8 @@ public class DealService {
 	}
 
 	public Boolean approveRequest(Deal deal) {
-
 		String status = "Approved";
 		deal.setStatus(status);
-
 		return false;
 	}
 
@@ -45,39 +42,28 @@ public class DealService {
 
 	public boolean makeDeal(Deal deal, String token) {
 		try {
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
-
-			Request request = requestRepo.findById(deal.getRequest().getId()).get();
-			
-			if(request != null) {
-				return false;
-			}
-			
-			request.setLender(user);
-
-			deal.setRequest(request);
 			deal.setStatus("dealing");
-
 			dealRepo.save(deal);
 			return true;
 		} catch (Exception e) {
 			return false;
 		}
 	}
-	
+
 	public boolean acceptDeal(Deal deal, String token) {
 		try {
-			
 			Deal dealExist = dealRepo.findById(deal.getId()).get();
-			dealExist.setStatus("done");
-			dealRepo.save(dealExist);
+			dealExist.setStatus("accepted");
 			
+			Request request = dealExist.getRequest();
+			request.setStatus("trading");
+			deal.setRequest(request);
+			
+			dealRepo.save(dealExist);			
 			return true;
 		} catch (Exception e) {
 			return false;
 		}
 	}
-	
-	
+
 }

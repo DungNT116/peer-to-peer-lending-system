@@ -1,5 +1,6 @@
 package capstone.p2plend.controller;
 
+import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.Request;
 import capstone.p2plend.service.UserService;
 import capstone.p2plend.service.JwtService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,24 +40,21 @@ public class RequestController {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = requestService.createRequest(request, token);
-
 		if (valid == true) {
 			status = HttpStatus.OK;
-
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-
 		return status.value();
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/getById")
 	public ResponseEntity<Request> getOne(@RequestBody Request request) {
 		return new ResponseEntity<Request>(requestService.getOneById(request.getId()), HttpStatus.OK);
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/all")
@@ -66,17 +65,19 @@ public class RequestController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/user/allRequest")
-	public List<Request> findAllExceptUserRequest(@RequestHeader("Authorization") String token) {
-		return requestService.findAllExceptUserRequest(token);
+	public PageDTO<Request> findAllExceptUserRequest(@RequestParam Integer page, @RequestParam Integer element,
+			@RequestHeader("Authorization") String token) {
+		return requestService.findAllExceptUserRequest(page, element, token);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/allRequestHistoryDone")
-	public List<Request> findAllRequestHistoryDone(@RequestHeader("Authorization") String token) {
-		return requestService.findAllRequestHistoryDone(token);
+	public PageDTO<Request> findAllRequestHistoryDone(@RequestParam Integer page, @RequestParam Integer element,
+			@RequestHeader("Authorization") String token) {
+		return requestService.findAllRequestHistoryDone(page, element, token);
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping(value = "/rest/request/approveRequest")
@@ -93,7 +94,7 @@ public class RequestController {
 
 		return status.value();
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@DeleteMapping(value = "/rest/request/delete")

@@ -15,7 +15,6 @@ import com.nimbusds.jwt.SignedJWT;
 public class JwtService {
 	public static final String USERNAME = "username";
 	public static final String SECRET_KEY = "11111111111111111111111111111111";
-//	public static final int EXPIRE_TIME = 86400000;
 	public static final int EXPIRE_TIME = 1800000;
 
 	public String generateTokenLogin(String username) {
@@ -30,8 +29,6 @@ public class JwtService {
 			SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.HS256), claimsSet);
 			// Apply the HMAC protection
 			signedJWT.sign(signer);
-			// Serialize to compact form, produces something like
-			// eyJhbGciOiJIUzI1NiJ9.SGVsbG8sIHdvcmxkIQ.onO9Ihudz3WkiauDO2Uhyuz0Y18UASXlSc1eS0NkWyA
 			token = signedJWT.serialize();
 		} catch (Exception e) {
 			e.printStackTrace();
