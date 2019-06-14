@@ -1,5 +1,6 @@
 package capstone.p2plend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,17 +89,19 @@ public class UserService {
 
 	public PageDTO<User> getUsers(int page, int element) {
 		Pageable pageable = PageRequest.of(page - 1, element);
-		Page<User> allUsers = userRepo.findAll(pageable);			
+		Page<User> allUsers = userRepo.findAll(pageable);
+		List<User> userList = new ArrayList<>();
 		for (User u : allUsers) {
-			u.setPassword(null);
-			u.setRole(null);
-			u.setStatus(null);
-			u.setBorrowRequest(null);
-			u.setLendRequest(null);
+			User user = new User();
+			user.setId(u.getId());
+			user.setUsername(u.getUsername());
+			user.setFirstName(u.getFirstName());
+			user.setLastName(u.getLastName());
+			userList.add(user);
 		}
 		PageDTO<User> pageDTO = new PageDTO<>();
 		pageDTO.setMaxPage(allUsers.getTotalPages());
-		pageDTO.setData(allUsers.getContent());		
+		pageDTO.setData(userList);		
 		return pageDTO;
 	}
 }

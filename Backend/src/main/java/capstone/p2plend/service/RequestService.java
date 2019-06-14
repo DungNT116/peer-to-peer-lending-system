@@ -40,7 +40,7 @@ public class RequestService {
 
 	public Request getOneById(int id) {
 		Request r = requestRepo.findById(id).get();
-		
+
 		if (r.getBorrower() != null) {
 			User borrower = new User();
 			borrower.setId(r.getBorrower().getId());
@@ -63,7 +63,7 @@ public class RequestService {
 			deal.setStatus(r.getDeal().getStatus());
 			r.setDeal(deal);
 		}
-		
+
 		return r;
 	}
 
@@ -149,7 +149,7 @@ public class RequestService {
 			Deal deal = new Deal();
 			deal.setStatus("pending");
 			deal.setRequest(request);
-			
+
 			request.setDeal(deal);
 
 			requestRepo.save(request);
@@ -169,7 +169,7 @@ public class RequestService {
 //			deal.setStatus("transitioning");
 
 			existRequest.setStatus("dealing");
-			
+
 			requestRepo.save(existRequest);
 
 			return true;
