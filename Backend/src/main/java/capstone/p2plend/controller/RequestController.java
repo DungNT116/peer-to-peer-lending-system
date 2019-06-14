@@ -75,7 +75,7 @@ public class RequestController {
 	@GetMapping(value = "/rest/request/allRequestHistoryDone")
 	public PageDTO<Request> findAllRequestHistoryDone(@RequestParam Integer page, @RequestParam Integer element,
 			@RequestHeader("Authorization") String token) {
-		return requestService.findAllRequestHistoryDone(page, element, token);
+		return requestService.findUserAllRequestByStatus(page, element, token);
 	}
 
 	@CrossOrigin

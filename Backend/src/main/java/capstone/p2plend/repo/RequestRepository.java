@@ -14,6 +14,6 @@ public interface RequestRepository extends JpaRepository<Request, Integer> {
 	Page<Request> findAllUserRequestExcept(Pageable pageable, @Param("id") Integer id);
 
 	@Query(value = "SELECT request.* FROM request WHERE borrower_id = :id AND status = :status", nativeQuery = true)
-	Page<Request> findAllUserHistoryRequestDone(Pageable pageable, @Param("id") Integer id, @Param("status") String status);
+	Page<Request> findAllUserRequestByStatus(Pageable pageable, @Param("id") Integer id, @Param("status") String status);
 
 }

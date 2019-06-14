@@ -103,11 +103,11 @@ public class RequestService {
 		return pageDTO;
 	}
 
-	public PageDTO<Request> findAllRequestHistoryDone(Integer page, Integer element, String token) {
+	public PageDTO<Request> findUserAllRequestByStatus(Integer page, Integer element, String token) {
 		String username = jwtService.getUsernameFromToken(token);
 		User account = accountRepo.findByUsername(username);
 		Pageable pageable = PageRequest.of(page - 1, element);
-		Page<Request> listRq = requestRepo.findAllUserHistoryRequestDone(pageable, account.getId(), "done");
+		Page<Request> listRq = requestRepo.findAllUserRequestByStatus(pageable, account.getId(), "done");
 		for (Request r : listRq) {
 			if (r.getBorrower() != null) {
 				User borrower = new User();
