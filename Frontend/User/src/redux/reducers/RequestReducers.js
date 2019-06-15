@@ -27,6 +27,7 @@ export const RequestReducers = (state = STATE, action) => {
                 data: action.payload
 
             }
+            break;
             // console.log("test token " + state.a)
         default:
             return state;

@@ -9,11 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.service.UserService;
 import capstone.p2plend.service.JwtService;
@@ -115,5 +117,12 @@ public class UserController {
 		}
 
 		return status.value();
+	}
+	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/user/users")
+	public PageDTO<User> listUser(@RequestParam Integer page, @RequestParam Integer element) {
+		return userService.getUsers(page, element);
 	}
 }

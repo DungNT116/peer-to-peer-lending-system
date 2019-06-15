@@ -13,6 +13,7 @@ export const TokenReducers = (state = STATE, action) => {
                 ...state,
                 token: action.payload
             }
+            break;
             // console.log("test token " + state.token)
         default:
             return state;

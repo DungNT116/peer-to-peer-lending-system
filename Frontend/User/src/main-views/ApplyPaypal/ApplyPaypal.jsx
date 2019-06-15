@@ -6,8 +6,8 @@ import { connect } from "react-redux";
 import ReactDatetime from "react-datetime";
 // reactstrap components
 import {
-  Badge,
-  Button,
+  // Badge,
+  // Button,
   Card,
   CardBody,
   FormGroup,
@@ -27,7 +27,6 @@ import { PayPalButton } from "react-paypal-button-v2";
 //api link
 import { apiLink, bigchainAPI, client_API } from "../../api.jsx";
 import HorizontalTimeline from "react-horizontal-timeline";
-
 import Slider from "nouislider";
 class ApplyPaypal extends React.Component {
   componentDidMount() {

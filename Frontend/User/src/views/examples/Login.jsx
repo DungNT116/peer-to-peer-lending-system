@@ -5,13 +5,12 @@ import { connect } from 'react-redux';
 // import  { Redirect } from 'react-router-dom';
 // reactstrap components
 import {
-  Button, Card, CardHeader, CardBody, FormGroup, Form, Input, InputGroupAddon,
+  Card, CardHeader, CardBody, FormGroup, Form, Input, InputGroupAddon,
   InputGroupText, InputGroup, Container, Row, Col
 } from "reactstrap";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
-import { setTokenABC } from "../../redux/action/TestAction";
 
 //api link
 import {apiLink} from '../../api.jsx';
@@ -57,17 +56,27 @@ class Login extends React.Component {
                 password: this.state.password,
             })
 
-        }) .then(
+        }).then(
                 (result) => {
                   result.text().then((data) => {
                     // this.setState({ token: data});
                     // console.log(this.state.token);
                     // this.props.setToken(data);
-                    this.setToken(data);
+                    
                     // this.setState({
                     //   savedToken: data
                     // })
                     // console.log("aaaaaaaa " + this.state.savedToken)
+                    if(result.status === 200) {
+                      this.setToken(data);
+                      this.props.history.push('view-request-list');
+                    }
+                    if(result.status !== 200) {
+                      event.preventDefault();
+                      // alert(data);
+                      if(data === "Wrong userId and password")
+                        document.getElementById("loginError").innerHTML = "<small>username or password is incorrect<br/> please try again</small>";
+                    }
                   });
                 }
 
@@ -104,7 +113,7 @@ class Login extends React.Component {
         <DemoNavbar />
         <main ref="main">
           <section className="section section-shaped section-lg">
-            <div className="shape shape-style-1 bg-gradient-default">
+            <div className="shape shape-style-1 shape-default">
               <span />
               <span />
               <span />
@@ -121,9 +130,9 @@ class Login extends React.Component {
                     <CardHeader className="bg-white pb-1">
                       <p className="text-center text-muted mb-4">Peer-to-Peer Lending System</p>
                     </CardHeader>
-                    <CardBody className="px-lg-5 py-lg-5">
-                      <div className="text-center text-muted mb-4">
-                        <small>sign in here</small>
+                    <CardBody className="">
+                      <div className="text-center text-muted">
+                        <p>sign in here</p>
                       </div>
                       <Form role="form" onSubmit={this.handleSubmit}>
                         <FormGroup className="mb-3">
@@ -133,7 +142,7 @@ class Login extends React.Component {
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="Email" type="text" value={this.state.username} onChange={this.handleNameChange} />
+                            <Input placeholder="Email or username" type="text" value={this.state.username} onChange={this.handleNameChange} />
                           </InputGroup>
                         </FormGroup>
                         <FormGroup>
@@ -151,15 +160,18 @@ class Login extends React.Component {
                             />
                           </InputGroup>
                         </FormGroup>
-                        <div className="custom-control custom-control-alternative custom-checkbox">
+                        <div>
+                          <p style={{color: "red"}} id="loginError"></p>
+                        </div>
+                        {/* <div className="custom-control custom-control-alternative custom-checkbox">
                           <input
                             className="custom-control-input"
                             id="customCheckLogin"
                             type="checkbox"
                           />
-                        </div>
+                        </div> */}
                         <div className="text-center my-4">
-                          <Input type="submit" value="Sign in" />
+                          <Input type="submit" value="Sign in" className="text-light"/>
                           {/* <Button
                             className="my-4"
                             color="primary"
@@ -174,7 +186,7 @@ class Login extends React.Component {
                   <Row className="mt-3">
                     <Col xs="6">
                       <a
-                        className="text-light"
+                        className="text-white"
                         href="#pablo"
                         onClick={e => e.preventDefault()}
                       >
@@ -183,7 +195,7 @@ class Login extends React.Component {
                     </Col>
                     <Col className="text-right" xs="6">
                       <a
-                        className="text-light"
+                        className="text-white"
                         href="#pablo"
                         onClick={e => e.preventDefault()}
                       >

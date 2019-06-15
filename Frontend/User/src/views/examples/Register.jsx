@@ -33,8 +33,12 @@ class Register extends React.Component {
       firstname: '',
       lastname: '',
       email: '',
-      phone: ''
-
+      phone: '',
+      validUsername: false,
+      validFirstname: false,
+      validLastname: false,
+      validEmail: false,
+      validPhone: false,
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -52,7 +56,22 @@ class Register extends React.Component {
   }
 
   handleUserNameChange(event) {
-    this.setState({ username: event.target.value });
+    const tmp = event.target.value.trim();
+    console.log(tmp);
+    if(!tmp.match(/^\w*$/)) {
+      document.getElementById("usernameError").innerHTML = "username does not contain special character";
+      this.setState({ 
+        username: tmp,
+        validUsername: false
+      });
+    } else {
+      console.log("correct");
+      document.getElementById("usernameError").innerHTML = "";
+      this.setState({ 
+        username: tmp,
+        validUsername: true
+      });
+    }
   }
 
   handlePasswordChange(event) {
@@ -60,58 +79,107 @@ class Register extends React.Component {
   }
 
   handleFirstNameChange(event) {
-    this.setState({ firstname: event.target.value });
+    const tmp = event.target.value;
+    if(!tmp.match(/^[a-z A-Z]*$/)) {
+      document.getElementById("firstnameError").innerHTML = "firtname only contain alphabet character";
+      this.setState({ 
+        firstname: tmp,
+        validFirstname: false
+      });
+    } else {
+      console.log("correct");
+      document.getElementById("firstnameError").innerHTML = "";
+      this.setState({ 
+        firstname: tmp,
+        validFirstname: true
+      });
+    }
   }
 
   handleLastNameChange(event) {
-    this.setState({ lastname: event.target.value });
+    const tmp = event.target.value;
+    if(tmp.match(/^[a-z A-Z]*$/)) {
+      console.log("correct");
+      document.getElementById("lastnameError").innerHTML = "";
+      this.setState({
+        lastname: tmp,
+        validLastname: true
+      });
+    } else {
+      document.getElementById("lastnameError").innerHTML = "lastname only contain alphabet character";
+      this.setState({ 
+        lastname: tmp,
+        validLastname: false
+      });
+    }
   }
 
   handleEmailChange(event) {
-    this.setState({ email: event.target.value });
+    const tmp = event.target.value.trim();
+  if(tmp.match(/^[a-zA-Z0-9]{5,30}@[a-z]{3,10}(.[a-z]{2,3})+$/)) {
+      //^[a-zA-Z0-9]@[a-z]{2,}(.[a-z]{2,3})*$
+      console.log("correct");
+      document.getElementById("emailError").innerHTML = "";
+      this.setState({
+        email: tmp,
+        validEmail: true
+      });
+    } else {
+      document.getElementById("emailError").innerHTML = "email only contain alphabet character";
+      this.setState({
+        email: tmp,
+        validEmail: false
+      });
+    }
+  // console.log("blurrrrrrrrrrrr")
   }
 
   handlePhoneChange(event) {
-    this.setState({ phone: event.target.value });
+    const tmp = event.target.value.trim();
+    if(!tmp.match(/^(\d{10,12})*$/)) {
+      document.getElementById("phoneError").innerHTML = "phone only contain number";
+      this.setState({
+        phone: tmp,
+        validPhone: false
+      });
+    } else {
+      console.log("correct");
+      document.getElementById("phoneError").innerHTML = "";
+      this.setState({
+        phone: tmp,
+        validPhone: true
+      });
+    }
   }
 
   handleSubmit(event) {
-    alert(this.state.username + " " + this.state.password);
-    fetch(apiLink + "/rest/user/createUser", {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-        // 'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({
-        username: this.state.username,
-        password: this.state.password,
-        email: this.state.email,
-        firstName: this.state.firstname,
-        lastName: this.state.lastname,
-        phoneNumber: this.state.phone
-      })
-
-    }).then(
-      (result) => {
-        console.log(result)
-        // result.text().then((data) => {
-        //   this.setState({ token: data });
-        //   console.log(this.state.token);
-
-        // });
-      }
-
-    )
-
-    console.log("username:" + this.state.username);
-    console.log("password:" + this.state.password);
-    console.log("email:" + this.state.email);
-    console.log("firstname:" + this.state.firstname);
-    console.log("lastname:" + this.state.lastname);
-    console.log("phone:" + this.state.phone);
+    if(this.state.validEmail === true && this.state.validFirstname === true 
+      && this.state.validLastname === true && this.state.validPhone === true
+    && this.state.validUsername === true) {
+      fetch(apiLink + "/rest/user/createUser", {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          // 'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          username: this.state.username,
+          password: this.state.password,
+          email: this.state.email,
+          firstName: this.state.firstname,
+          lastName: this.state.lastname,
+          phoneNumber: this.state.phone
+        })
+  
+      }).then(
+        (result) => {
+          console.log(result)
+        }
+  
+      )
+      // this.props.history.push('/login-page')
+    }
     event.preventDefault();
-    // this.props.history.push('/')
   }
   render() {
     return (
@@ -168,9 +236,9 @@ class Register extends React.Component {
                         </Button>
                       </div>
                     </CardHeader>
-                    <CardBody className="px-lg-5 py-lg-5">
+                    <CardBody>
                       <div className="text-center text-muted mb-4">
-                        <small>Or sign up with credentials</small>
+                        <p>Sign up</p>
                       </div>
                       <Form role="form" onSubmit={this.handleSubmit}>
                         <FormGroup>
@@ -180,8 +248,9 @@ class Register extends React.Component {
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="Firstname" type="text" value={this.state.firstname} onChange={this.handleFirstNameChange} />
+                            <Input placeholder="Firstname" type="text" value={this.state.firstname} onChange={this.handleFirstNameChange} required/>
                           </InputGroup>
+                          <p id="firstnameError"></p>
                         </FormGroup>
                         <FormGroup>
                           <InputGroup className="input-group-alternative mb-3">
@@ -190,8 +259,9 @@ class Register extends React.Component {
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="Lastname" type="text" value={this.state.lastname} onChange={this.handleLastNameChange} />
+                            <Input placeholder="Lastname" type="text" value={this.state.lastname} onChange={this.handleLastNameChange} required/>
                           </InputGroup>
+                          <p id="lastnameError"></p>
                         </FormGroup>
                         <FormGroup>
                           <InputGroup className="input-group-alternative mb-3">
@@ -200,8 +270,9 @@ class Register extends React.Component {
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="Email" type="text" value={this.state.email} onChange={this.handleEmailChange} />
+                            <Input placeholder="Email" type="text" value={this.state.email} onChange={this.handleEmailChange} required/>
                           </InputGroup>
+                          <p id="emailError"></p>
                         </FormGroup>
                         <FormGroup>
                           <InputGroup className="input-group-alternative mb-3">
@@ -210,8 +281,9 @@ class Register extends React.Component {
                                 <i className="ni ni-hat-3" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="username" type="text" value={this.state.username} onChange={this.handleUserNameChange} />
+                            <Input placeholder="username" type="text" value={this.state.username} onChange={this.handleUserNameChange} required/>
                           </InputGroup>
+                          <p id="usernameError"></p>
                         </FormGroup>
                         <FormGroup>
                           <InputGroup className="input-group-alternative">
@@ -225,6 +297,7 @@ class Register extends React.Component {
                               type="password"
                               autoComplete="off"
                               value={this.state.password} onChange={this.handlePasswordChange}
+                              required
                             />
                           </InputGroup>
                         </FormGroup>
@@ -235,8 +308,9 @@ class Register extends React.Component {
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="phone" type="text" value={this.state.phone} onChange={this.handlePhoneChange} />
+                            <Input placeholder="phone" type="phone" value={this.state.phone} onChange={this.handlePhoneChange} required/>
                           </InputGroup>
+                          <p id="phoneError"></p>
                         </FormGroup>
 
                         <Row className="my-4">

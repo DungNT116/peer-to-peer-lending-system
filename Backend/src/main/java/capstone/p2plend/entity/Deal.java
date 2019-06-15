@@ -1,5 +1,6 @@
 package capstone.p2plend.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -8,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -20,29 +22,30 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Entity
 @Table(name = "deal")
 public class Deal {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Integer id;
-	
+
 	@Column
 	private String status;
-	
+
 	@Column
 	private Integer borrowTime;
-	
+
 	@Column
 	private Integer paybackTime;
 
 	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
-	@OneToOne(mappedBy = "deal")
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "request_id")
 	private Request request;
-	
+
 	@JsonIgnoreProperties(value = { "transaction", "deal" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "deal")
-	private List<Milestone> milestone;
-	
+	private List<Milestone> milestone = new ArrayList<>();
+
 	public Integer getId() {
 		return id;
 	}
@@ -59,12 +62,20 @@ public class Deal {
 		this.status = status;
 	}
 
-	public List<Milestone> getMilestone() {
-		return milestone;
+	public Integer getBorrowTime() {
+		return borrowTime;
 	}
 
-	public void setMilestone(List<Milestone> milestone) {
-		this.milestone = milestone;
+	public void setBorrowTime(Integer borrowTime) {
+		this.borrowTime = borrowTime;
+	}
+
+	public Integer getPaybackTime() {
+		return paybackTime;
+	}
+
+	public void setPaybackTime(Integer paybackTime) {
+		this.paybackTime = paybackTime;
 	}
 
 	public Request getRequest() {
@@ -74,6 +85,13 @@ public class Deal {
 	public void setRequest(Request request) {
 		this.request = request;
 	}
-	
-	
+
+	public List<Milestone> getMilestone() {
+		return milestone;
+	}
+
+	public void setMilestone(List<Milestone> milestone) {
+		this.milestone = milestone;
+	}
+
 }
