@@ -10,8 +10,8 @@ import {
     Col,
     Label,
     FormGroup,
-    CardHeader,
-    CardBody,
+    // CardHeader,
+    // CardBody,
     CardFooter,
     Modal,
     ModalHeader,
@@ -19,7 +19,7 @@ import {
     ModalFooter,
     Form,
     Progress,
-    InputGroup,
+    // InputGroup,
     Input
 } from "reactstrap";
 

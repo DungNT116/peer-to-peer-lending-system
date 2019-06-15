@@ -4,18 +4,18 @@ import React from "react";
 import classnames from "classnames";
 import { connect } from 'react-redux';
 
-import ReactDatetime from "react-datetime";
+// import ReactDatetime from "react-datetime";
 // reactstrap components
 import {
-  Badge,
-  Button,
+  // Badge,
+  // Button,
   Card,
   CardBody,
-  CardImg,
+  // CardImg,
   FormGroup,
   Input,
-  InputGroupAddon,
-  InputGroupText,
+  // InputGroupAddon,
+  // InputGroupText,
   InputGroup,
   Container,
   Row,
@@ -26,13 +26,13 @@ import {
 
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
-import CardsFooter from "components/Footers/CardsFooter.jsx";
+// import CardsFooter from "components/Footers/CardsFooter.jsx";
 import { PayPalButton } from "react-paypal-button-v2";
 //api link
 import { apiLink, bigchainAPI ,client_API} from '../../api.jsx';
 
 // index page sections
-import Download from "../../views/IndexSections/Download.jsx";
+// import Download from "../../views/IndexSections/Download.jsx";
 
 class ApplyPaypal extends React.Component {
   componentDidMount() {
@@ -135,7 +135,7 @@ class ApplyPaypal extends React.Component {
 
           <section className="section">
             <Container>
-              <Card className="card-profile shadow mt--300">
+              <Card className="card-profile shadow mt--200">
                 <div className="px-4">
                   <Row className="justify-content-center ">
                     <CardBody className="p-lg-5 ">
