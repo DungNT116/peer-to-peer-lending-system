@@ -1,38 +1,21 @@
 import React from "react";
-
-// nodejs library that concatenates classes
-// import classnames from "classnames";
 import { connect } from 'react-redux';
 // reactstrap components
 import {
-  // Badge,
   Button,
-  // Card,
-  // CardBody,
-  // CardImg,
-  // FormGroup,
-  // Input,
-  // InputGroupAddon,
-  // InputGroupText,
-  // InputGroup,
   Container,
   Row,
   Col,
-  // Label,
-  // Form,
   Table
 } from "reactstrap";
 
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
-// import CardsFooter from "components/Footers/CardsFooter.jsx";
 import Pagination from "../../views/IndexSections/Pagination.jsx";
 
 //api link
-import {apiLink} from '../../api.jsx';
-
-// index page sections
-// import Download from "../../views/IndexSections/Download.jsx";
+import { apiLink } from '../../api.jsx';
+import SimpleFooter from "components/Footers/SimpleFooter";
 
 class ViewRequestList extends React.Component {
   constructor(props) {
@@ -53,70 +36,47 @@ class ViewRequestList extends React.Component {
         "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       },
-      // body: JSON.stringify({
-      //   borrowerName: this.state.borrowerName,
-      //   amount: this.state.amount,
-      //   borrowDay: this.state.borrowDay,
-      //   borrowDuration: this.state.borrowDuration,
-      //   interestRate: this.state.interestRate,
-      //   typeOfContact: this.state.typeOfContact,
-      // })
 
     }).then(
       (result) => {
-        // result.text().then((data) => {
-        //   this.setState({ token: data });
-          // console.log(this.state.token);
-          // console.log(result.json());
-          result.json().then((data) => {
-            console.log(data);
-            this.setState({requests: data});
-            console.log(this.state.requests);
-          })
-          if(result.status === 200) {
-            console.log("create success");
-          }
-
+        result.json().then((data) => {
+          this.setState({ requests: data });
+        })
+        if (result.status === 200) {
+          // console.log("create success");
         }
+
+      }
     )
     // event.preventDefault();
     // this.props.history.push('/')
   }
 
-  deleteRequest(id) {
+  //maybe not use
+  // deleteRequest(id) {
 
-    fetch(apiLink + "/rest/request/delete", {
-      method: 'DELETE',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": this.props.tokenReducer.token
-        // 'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({
-        id: id
-      })
+  //   fetch(apiLink + "/rest/request/delete", {
+  //     method: 'DELETE',
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       "Authorization": this.props.tokenReducer.token
+  //       // 'Access-Control-Allow-Origin': '*'
+  //     },
+  //     body: JSON.stringify({
+  //       id: id
+  //     })
 
-    }).then(
-      (result) => {
-        // result.text().then((data) => {
-        //   this.setState({ token: data });
-          // console.log(this.state.token);
-          // console.log(result.json());
-          // result.json().then((data) => {
-          //   console.log(data);
-          //   this.setState({requests: data});
-          //   console.log(this.state.requests);
-          // })
-          console.log(result)
-          if(result.status === 200) {
-            console.log("delete success");
-          }
+  //   }).then(
+  //     (result) => {
+  //       if (result.status === 200) {
+  //         alert("delete success");
+  //       }
 
-        }
-    )
-    // event.preventDefault();
-    // this.props.history.push('/')
-  }
+  //     }
+  //   )
+  //   // event.preventDefault();
+  //   // this.props.history.push('/')
+  // }
 
   componentDidMount() {
     document.documentElement.scrollTop = 0;
@@ -130,22 +90,15 @@ class ViewRequestList extends React.Component {
         <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
           {request.id}
         </Col></td>
-        {/* <td>{request.borrowerName}</td> */}
         <td>{request.amount}</td>
         <td>{request.dueDate}</td>
         <td>{request.createDate}</td>
         <td>{request.duration}</td>
-        {/* <td>{request.borrowDay}</td>
-        <td>{request.borrowDuration}</td>
-        <td>{request.interestRate}</td>
-        <td>{request.typeOfContact}</td> */}
         <td>{request.status}</td>
         <td>
-          {/* <Link to="/view-history-request"> */}
-            <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.deleteRequest(request.id)}>
-              <i className="fa fa-dot-circle-o"></i> Delete
+          <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.deleteRequest(request.id)}>
+            <i className="fa fa-dot-circle-o"></i> Delete
             </Button>{' '}
-          {/* </Link> */}
         </td>
       </tr>
     );
@@ -193,16 +146,11 @@ class ViewRequestList extends React.Component {
                 <Table>
                   <thead>
                     <tr>
-                    <th>Id</th>
-                      {/* <th>Borrower Name</th> */}
+                      <th>Id</th>
                       <th>Amount</th>
                       <th>DueDate</th>
                       <th>CreateDate</th>
                       <th>Duration</th>
-                      {/* <th>Borrow Day</th>
-                      <th>Borrow Duration</th>
-                      <th>Interest Rate</th>
-                      <th>Type Of Contact</th> */}
                       <td>status</td>
                       <th>Delete</th>
                     </tr>
@@ -218,7 +166,7 @@ class ViewRequestList extends React.Component {
             </Container>
           </section>
         </main>
-        {/* <CardsFooter /> */}
+        <SimpleFooter />
       </>
     );
   }

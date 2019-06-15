@@ -5,15 +5,10 @@ import classnames from "classnames";
 import { connect } from 'react-redux';
 // reactstrap components
 import {
-  // Badge,
-  // Button,
   Card,
   CardBody,
-  // CardImg,
   FormGroup,
   Input,
-  // InputGroupAddon,
-  // InputGroupText,
   InputGroup,
   Container,
   Row,
@@ -24,40 +19,24 @@ import {
 
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
-// import CardsFooter from "components/Footers/CardsFooter.jsx";
 
 //api link
 import { apiLink } from '../../api.jsx';
 
-// index page sections
-// import Download from "../../views/IndexSections/Download.jsx";
 
 class CreateRequestPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // borrowerName: '',
       amount: '',
-      // borrowDay: '',
       borrowDuration: '',
       interestRate: '',
-      // typeOfContact: '',
       createDate: '',
     }
-    // this.onBorrowerNameChange = this.onBorrowerNameChange.bind(this);
     this.onAmountChange = this.onAmountChange.bind(this);
-    // this.onBorrowDayChange = this.onBorrowDayChange.bind(this);
     this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
-    // this.onInterestRateChange = this.onInterestRateChange.bind(this);
-    // this.onTypeOfContactChange = this.onTypeOfContactChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
-
-  // onBorrowerNameChange(event) {
-  //   this.setState({
-  //     borrowerName: event.target.value
-  //   })
-  // }
 
   onAmountChange(event) {
     this.setState({
@@ -65,36 +44,15 @@ class CreateRequestPage extends React.Component {
     })
   }
 
-  // onBorrowDayChange(event) {
-  //   this.setState({
-  //     borrowDay: new Date(event.target.value).toLocaleDateString()
-  //   })
-  // }
-
   onBorrowDurationChange(event) {
     var index = event.target.selectedIndex;
-    console.log("index: " + index);
     var text = event.target[index].innerText.split(" ")[0];
-    console.log("text: " + text);
     this.setState({
       borrowDuration: text
     })
   }
 
-  // onInterestRateChange(event) {
-  //   this.setState({
-  //     interestRate: event.target.value
-  //   })
-  // }
-
-  // onTypeOfContactChange(event) {
-  //   this.setState({
-  //     typeOfContact: event.target.value
-  //   })
-  // }
-
   handleSubmit(event) {
-    console.log(this.state.borrowerName + " " + this.state.amount + " " + this.state.borrowDay + " " + this.state.borrowDuration + " " + this.state.interestRate + " " + this.state.typeOfContact + " ");
     fetch(apiLink + "/rest/request/createRequest", {
       method: 'POST',
       headers: {
@@ -105,10 +63,6 @@ class CreateRequestPage extends React.Component {
       body: JSON.stringify({
         // borrowerName: this.state.borrowerName,
         amount: this.state.amount,
-        // borrowDay: this.state.borrowDay,
-        // borrowDuration: this.state.borrowDuration,
-        // interestRate: this.state.interestRate,
-        // typeOfContact: this.state.typeOfContact,
         // dueDate: 125666,
         // times: 5,
         duration: this.state.borrowDuration,
@@ -118,32 +72,13 @@ class CreateRequestPage extends React.Component {
 
     }).then(
       (result) => {
-        // result.text().then((data) => {
-        //   this.setState({ token: data });
-        // console.log(this.state.token);
-        console.log(result);
         if (result.status === 200) {
-          console.log("create success");
+          alert("create success");
         }
 
       }
     )
-    // console.log(document.querySelector('meta[name="token"]').getAttribute('content'))
-    // let metaTags = document.getElementsByTagName("META");
-    // for (let index = 0; index < metaTags.length; index++) {
-    //   if(metaTags[index].getAttribute("name") === "token") {
-    //     console.log(metaTags[index].getAttribute("content"));    
-    //   } 
-    // }
-
-    // console.log(this.state.borrowDay);
-    // console.log("aaaaaa");
-    // console.log(this.state.interestRate)
-    // console.log("Test token Create : " + this.props.tokenReducer.token);
-    // console.log(this.props)
-    // console.log(this.state)
     event.preventDefault();
-    // this.props.history.push('/')
   }
 
   componentDidMount() {
@@ -151,9 +86,7 @@ class CreateRequestPage extends React.Component {
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
     var dateNow = new Date();
-    console.log(dateNow)
     var timeStampeDateNow = Math.round(dateNow.getTime() / 1000);
-    console.log(timeStampeDateNow);
     this.setState({
       createDate: timeStampeDateNow
     })

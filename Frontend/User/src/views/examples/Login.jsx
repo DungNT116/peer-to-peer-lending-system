@@ -40,7 +40,6 @@ class Login extends React.Component {
 
   setToken(token) {
     this.props.setToken(token);
-    console.log("TOKENNNNNN :", token);
   }
 
   handleSubmit(event) {
@@ -59,14 +58,6 @@ class Login extends React.Component {
         }).then(
                 (result) => {
                   result.text().then((data) => {
-                    // this.setState({ token: data});
-                    // console.log(this.state.token);
-                    // this.props.setToken(data);
-                    
-                    // this.setState({
-                    //   savedToken: data
-                    // })
-                    // console.log("aaaaaaaa " + this.state.savedToken)
                     if(result.status === 200) {
                       this.setToken(data);
                       this.props.history.push('view-request-list');
@@ -81,12 +72,6 @@ class Login extends React.Component {
                 }
 
             )
-    // this.setState({ savedToken: "data" });
-    // console.log(this.state.savedToken)
-
-    // console.log("Test token : " + this.props.tokenReducer.token);
-    
-    // console.log(this.state);
     event.preventDefault();
     // this.props.history.push('/')
   }
@@ -99,6 +84,7 @@ class Login extends React.Component {
 
   }
   render() {
+    // back up save token in meta tags
     // document.getElementsByTagName("META")[3].content="Your description about the page or site here to set dynamically";
     // let metaTags = document.getElementsByTagName("META");
     // for (let index = 0; index < metaTags.length; index++) {
@@ -163,22 +149,8 @@ class Login extends React.Component {
                         <div>
                           <p style={{color: "red"}} id="loginError"></p>
                         </div>
-                        {/* <div className="custom-control custom-control-alternative custom-checkbox">
-                          <input
-                            className="custom-control-input"
-                            id="customCheckLogin"
-                            type="checkbox"
-                          />
-                        </div> */}
                         <div className="text-center my-4">
                           <Input type="submit" value="Sign in" className="text-light"/>
-                          {/* <Button
-                            className="my-4"
-                            color="primary"
-                            type="button"
-                          >
-                            Sign in
-                          </Button> */}
                         </div>
                       </Form>
                     </CardBody>
