@@ -33,6 +33,7 @@ import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import Pagination from "../../views/IndexSections/Pagination.jsx";
 //api link
 import { apiLink } from '../../api.jsx';
+import SimpleFooter from "components/Footers/SimpleFooter";
 
 // index page sections
 // import Download from "../../views/IndexSections/Download.jsx";
@@ -59,13 +60,8 @@ class ViewRequestList extends React.Component {
   }
 
   getRequest() {
-    // console.log("page: " + this.props.paging.page);
-    // let pageParam = encodeURIComponent(this.props.paging.page);
     let pageParam = encodeURIComponent(this.state.page);
-    console.log("page in request list: " + this.state.page);
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
-    console.log("page " + pageParam);
-    console.log("page Size" + pageSizeParam);
     fetch(apiLink + "/rest/request/user/allRequest?page=" + pageParam + "&element=" + pageSizeParam, {
       method: 'GET',
       headers: {
@@ -73,50 +69,21 @@ class ViewRequestList extends React.Component {
         "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       },
-      // body: JSON.stringify({
-      //   borrowerName: this.state.borrowerName,
-      //   amount: this.state.amount,
-      //   borrowDay: this.state.borrowDay,
-      //   borrowDuration: this.state.borrowDuration,
-      //   interestRate: this.state.interestRate,
-      //   typeOfContact: this.state.typeOfContact,
-      // })
-
     }).then(
       (result) => {
-        // result.text().then((data) => {
-        //   this.setState({ token: data });
-        // console.log(this.state.token);
-        // console.log(result.json());
+
         result.json().then((data) => {
-          // console.log("data: " + data.maxPage);
-          // console.log("data: " + data.data;
           this.setState({ 
             requests: data.data,
             maxPage: data.maxPage
           });
-          console.log(this.state.requests);
         })
         if (result.status === 200) {
-          console.log("create success");
+          // alert("create success");
         }
 
       }
     )
-    // console.log(document.querySelector('meta[name="token"]').getAttribute('content'))
-    // let metaTags = document.getElementsByTagName("META");
-    // for (let index = 0; index < metaTags.length; index++) {
-    //   if(metaTags[index].getAttribute("name") === "token") {
-    //     console.log(metaTags[index].getAttribute("content"));    
-    //   } 
-    // }
-
-    // console.log(this.state.borrowDay);
-    // console.log("aaaaaa");
-    // console.log(this.state.interestRate)
-    // console.log("Test token Create : " + this.props.tokenReducer.token);
-    // console.log(this.props)
-    // console.log(this.state)
     // event.preventDefault();
     // this.props.history.push('/')
   }
@@ -128,14 +95,12 @@ class ViewRequestList extends React.Component {
 
   componentWillMount() {
     this.getRequest();
-    // this.props.setPage(this.state.page);
   }
 
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
-    // this.getRequest();
     
     //change timestamp to date String and vice versa
     // var date = "07/22/2018";
@@ -156,15 +121,10 @@ class ViewRequestList extends React.Component {
         <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
           {request.id}
         </Col></td>
-        {/* <td>{request.borrowerName}</td> */}
         <td>{request.amount}</td>
         <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration}</td>
-        {/* <td>{request.borrowDay}</td>
-        <td>{request.borrowDuration}</td>
-        <td>{request.interestRate}</td>
-        <td>{request.typeOfContact}</td> */}
         <td>
           <Link to="/view-detail-request">
             <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.setDataToDetailPage(request)}>
@@ -219,15 +179,10 @@ class ViewRequestList extends React.Component {
                   <thead>
                     <tr>
                       <th>Id</th>
-                      {/* <th>Borrower Name</th> */}
                       <th>Amount</th>
                       <th>user</th>
                       <th>CreateDate</th>
                       <th>Duration</th>
-                      {/* <th>Borrow Day</th>
-                      <th>Borrow Duration</th>
-                      <th>Interest Rate</th>
-                      <th>Type Of Contact</th> */}
                       <th>View Detail</th>
                     </tr>
                   </thead>
@@ -244,7 +199,7 @@ class ViewRequestList extends React.Component {
             </Container>
           </section>
         </main>
-        {/* <CardsFooter /> */}
+        <SimpleFooter />
       </>
     );
   }

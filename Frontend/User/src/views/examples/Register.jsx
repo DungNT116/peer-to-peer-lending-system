@@ -57,7 +57,6 @@ class Register extends React.Component {
 
   handleUserNameChange(event) {
     const tmp = event.target.value.trim();
-    console.log(tmp);
     if(!tmp.match(/^\w*$/)) {
       document.getElementById("usernameError").innerHTML = "username does not contain special character";
       this.setState({ 
@@ -65,7 +64,6 @@ class Register extends React.Component {
         validUsername: false
       });
     } else {
-      console.log("correct");
       document.getElementById("usernameError").innerHTML = "";
       this.setState({ 
         username: tmp,
@@ -87,7 +85,6 @@ class Register extends React.Component {
         validFirstname: false
       });
     } else {
-      console.log("correct");
       document.getElementById("firstnameError").innerHTML = "";
       this.setState({ 
         firstname: tmp,
@@ -99,7 +96,6 @@ class Register extends React.Component {
   handleLastNameChange(event) {
     const tmp = event.target.value;
     if(tmp.match(/^[a-z A-Z]*$/)) {
-      console.log("correct");
       document.getElementById("lastnameError").innerHTML = "";
       this.setState({
         lastname: tmp,
@@ -117,8 +113,6 @@ class Register extends React.Component {
   handleEmailChange(event) {
     const tmp = event.target.value.trim();
   if(tmp.match(/^[a-zA-Z0-9]{5,30}@[a-z]{3,10}(.[a-z]{2,3})+$/)) {
-      //^[a-zA-Z0-9]@[a-z]{2,}(.[a-z]{2,3})*$
-      console.log("correct");
       document.getElementById("emailError").innerHTML = "";
       this.setState({
         email: tmp,
@@ -131,7 +125,6 @@ class Register extends React.Component {
         validEmail: false
       });
     }
-  // console.log("blurrrrrrrrrrrr")
   }
 
   handlePhoneChange(event) {
@@ -143,7 +136,6 @@ class Register extends React.Component {
         validPhone: false
       });
     } else {
-      console.log("correct");
       document.getElementById("phoneError").innerHTML = "";
       this.setState({
         phone: tmp,
@@ -173,7 +165,7 @@ class Register extends React.Component {
   
       }).then(
         (result) => {
-          console.log(result)
+          // console.log(result)
         }
   
       )

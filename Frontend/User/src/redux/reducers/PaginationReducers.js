@@ -4,7 +4,6 @@ let STATE = {
 }
 
 export const PaginationReducers = (state = STATE, action) => {
-    console.log("page clicked: " + action.payload);
     switch (action.type) {
         case SET_PAGE_NUMBER:
             state = {
