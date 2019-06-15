@@ -1,54 +1,72 @@
 import React from "react";
 
 // nodejs library that concatenates classes
-import classnames from "classnames";
+// import classnames from "classnames";
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+
+import { SET_PAGE_NUMBER } from "../../redux/action/types";
 // reactstrap components
 import {
-  Badge,
+  // Badge,
   Button,
-  Card,
-  CardBody,
-  CardImg,
-  FormGroup,
-  Input,
-  InputGroupAddon,
-  InputGroupText,
-  InputGroup,
+  // Card,
+  // CardBody,
+  // CardImg,
+  // FormGroup,
+  // Input,
+  // InputGroupAddon,
+  // InputGroupText,
+  // InputGroup,
   Container,
   Row,
   Col,
-  Label,
-  Form,
+  // Label,
+  // Form,
   Table
 } from "reactstrap";
 
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
-import CardsFooter from "components/Footers/CardsFooter.jsx";
+// import CardsFooter from "components/Footers/CardsFooter.jsx";
 
 import Pagination from "../../views/IndexSections/Pagination.jsx";
 //api link
 import { apiLink } from '../../api.jsx';
 
 // index page sections
-import Download from "../../views/IndexSections/Download.jsx";
+// import Download from "../../views/IndexSections/Download.jsx";
 
 class ViewRequestList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      requests: Array().fill(null)
+      requests: [],
+      page: 1,
+      pageSize: 1,
+      maxPage: 0,
     }
     this.getRequest = this.getRequest.bind(this);
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
+    this.changePage = this.changePage.bind(this);
+  }
+
+  changePage(index) {
+    this.setState({
+      page: index
+    })
   }
 
   getRequest() {
-
-    fetch(apiLink + "/rest/request/user/allRequest", {
+    // console.log("page: " + this.props.paging.page);
+    // let pageParam = encodeURIComponent(this.props.paging.page);
+    let pageParam = encodeURIComponent(this.state.page);
+    console.log("page in request list: " + this.state.page);
+    let pageSizeParam = encodeURIComponent(this.state.pageSize);
+    console.log("page " + pageParam);
+    console.log("page Size" + pageSizeParam);
+    fetch(apiLink + "/rest/request/user/allRequest?page=" + pageParam + "&element=" + pageSizeParam, {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
@@ -71,8 +89,12 @@ class ViewRequestList extends React.Component {
         // console.log(this.state.token);
         // console.log(result.json());
         result.json().then((data) => {
-          console.log(data);
-          this.setState({ requests: data });
+          // console.log("data: " + data.maxPage);
+          // console.log("data: " + data.data;
+          this.setState({ 
+            requests: data.data,
+            maxPage: data.maxPage
+          });
           console.log(this.state.requests);
         })
         if (result.status === 200) {
@@ -106,13 +128,14 @@ class ViewRequestList extends React.Component {
 
   componentWillMount() {
     this.getRequest();
+    // this.props.setPage(this.state.page);
   }
 
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
-    
+    // this.getRequest();
     
     //change timestamp to date String and vice versa
     // var date = "07/22/2018";
@@ -215,7 +238,8 @@ class ViewRequestList extends React.Component {
 
               </Row>
               <Row className="align-items-center justify-content-center text-center">
-                <Pagination />
+                <Pagination maxPage={this.state.maxPage} currentPage={this.state.page} 
+                pageSize={this.state.pageSize} onChange={this.getRequest} changePage={this.changePage}/>
               </Row>
             </Container>
           </section>
@@ -229,7 +253,8 @@ class ViewRequestList extends React.Component {
 const mapStateToProps = (state) => {
   return {
     request: state.request,
-    tokenReducer: state.tokenReducer
+    tokenReducer: state.tokenReducer,
+    paging: state.paging
   }
 }
 const mapDispatchToProps = (dispatch) => {
@@ -238,6 +263,12 @@ const mapDispatchToProps = (dispatch) => {
       dispatch({
         type: "SET_REQUEST",
         payload: id
+      });
+    },
+    setPage: (page) => {
+      dispatch({
+        type: "SET_PAGE_NUMBER",
+        payload: page
       });
     }
   }

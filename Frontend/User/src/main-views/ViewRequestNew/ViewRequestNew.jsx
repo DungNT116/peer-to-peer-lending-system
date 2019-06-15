@@ -41,7 +41,7 @@ class ViewRequestList extends React.Component {
       requests: []
     }
     this.getRequest = this.getRequest.bind(this);
-    // this.deleteRequest = this.deleteRequest.bind(this);
+    this.deleteRequest = this.deleteRequest.bind(this);
   }
 
   getRequest() {
@@ -83,40 +83,40 @@ class ViewRequestList extends React.Component {
     // this.props.history.push('/')
   }
 
-  // deleteRequest(id) {
+  deleteRequest(id) {
 
-  //   fetch(apiLink + "/rest/request/delete", {
-  //     method: 'DELETE',
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       "Authorization": this.props.tokenReducer.token
-  //       // 'Access-Control-Allow-Origin': '*'
-  //     },
-  //     body: JSON.stringify({
-  //       id: id
-  //     })
+    fetch(apiLink + "/rest/request/delete", {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        id: id
+      })
 
-  //   }).then(
-  //     (result) => {
-  //       // result.text().then((data) => {
-  //       //   this.setState({ token: data });
-  //         // console.log(this.state.token);
-  //         // console.log(result.json());
-  //         // result.json().then((data) => {
-  //         //   console.log(data);
-  //         //   this.setState({requests: data});
-  //         //   console.log(this.state.requests);
-  //         // })
-  //         console.log(result)
-  //         if(result.status === 200) {
-  //           console.log("delete success");
-  //         }
+    }).then(
+      (result) => {
+        // result.text().then((data) => {
+        //   this.setState({ token: data });
+          // console.log(this.state.token);
+          // console.log(result.json());
+          // result.json().then((data) => {
+          //   console.log(data);
+          //   this.setState({requests: data});
+          //   console.log(this.state.requests);
+          // })
+          console.log(result)
+          if(result.status === 200) {
+            console.log("delete success");
+          }
 
-  //       }
-  //   )
-  //   // event.preventDefault();
-  //   // this.props.history.push('/')
-  // }
+        }
+    )
+    // event.preventDefault();
+    // this.props.history.push('/')
+  }
 
   componentDidMount() {
     document.documentElement.scrollTop = 0;
@@ -140,11 +140,13 @@ class ViewRequestList extends React.Component {
         <td>{request.interestRate}</td>
         <td>{request.typeOfContact}</td> */}
         <td>{request.status}</td>
-        {/* <td>
+        <td>
+          {/* <Link to="/view-history-request"> */}
             <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.deleteRequest(request.id)}>
               <i className="fa fa-dot-circle-o"></i> Delete
             </Button>{' '}
-        </td> */}
+          {/* </Link> */}
+        </td>
       </tr>
     );
     return (
@@ -202,7 +204,7 @@ class ViewRequestList extends React.Component {
                       <th>Interest Rate</th>
                       <th>Type Of Contact</th> */}
                       <td>status</td>
-                      {/* <th>Delete</th> */}
+                      <th>Delete</th>
                     </tr>
                   </thead>
                   <tbody>

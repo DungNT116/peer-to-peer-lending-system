@@ -5,15 +5,15 @@ import classnames from "classnames";
 import { connect } from 'react-redux';
 // reactstrap components
 import {
-  Badge,
-  Button,
+  // Badge,
+  // Button,
   Card,
   CardBody,
-  CardImg,
+  // CardImg,
   FormGroup,
   Input,
-  InputGroupAddon,
-  InputGroupText,
+  // InputGroupAddon,
+  // InputGroupText,
   InputGroup,
   Container,
   Row,
@@ -24,39 +24,40 @@ import {
 
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
-import CardsFooter from "components/Footers/CardsFooter.jsx";
+// import CardsFooter from "components/Footers/CardsFooter.jsx";
 
 //api link
-import {apiLink} from '../../api.jsx';
+import { apiLink } from '../../api.jsx';
 
 // index page sections
-import Download from "../../views/IndexSections/Download.jsx";
+// import Download from "../../views/IndexSections/Download.jsx";
 
 class CreateRequestPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      borrowerName: '',
+      // borrowerName: '',
       amount: '',
-      borrowDay: '',
+      // borrowDay: '',
       borrowDuration: '',
-      interestRate: '18',
-      typeOfContact: '',
+      interestRate: '',
+      // typeOfContact: '',
+      createDate: '',
     }
-    this.onBorrowerNameChange = this.onBorrowerNameChange.bind(this);
+    // this.onBorrowerNameChange = this.onBorrowerNameChange.bind(this);
     this.onAmountChange = this.onAmountChange.bind(this);
-    this.onBorrowDayChange = this.onBorrowDayChange.bind(this);
+    // this.onBorrowDayChange = this.onBorrowDayChange.bind(this);
     this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
     // this.onInterestRateChange = this.onInterestRateChange.bind(this);
-    this.onTypeOfContactChange = this.onTypeOfContactChange.bind(this);
+    // this.onTypeOfContactChange = this.onTypeOfContactChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  onBorrowerNameChange(event) {
-    this.setState({
-      borrowerName: event.target.value
-    })
-  }
+  // onBorrowerNameChange(event) {
+  //   this.setState({
+  //     borrowerName: event.target.value
+  //   })
+  // }
 
   onAmountChange(event) {
     this.setState({
@@ -64,15 +65,19 @@ class CreateRequestPage extends React.Component {
     })
   }
 
-  onBorrowDayChange(event) {
-    this.setState({
-      borrowDay: new Date(event.target.value).toLocaleDateString()
-    })
-  }
+  // onBorrowDayChange(event) {
+  //   this.setState({
+  //     borrowDay: new Date(event.target.value).toLocaleDateString()
+  //   })
+  // }
 
   onBorrowDurationChange(event) {
+    var index = event.target.selectedIndex;
+    console.log("index: " + index);
+    var text = event.target[index].innerText.split(" ")[0];
+    console.log("text: " + text);
     this.setState({
-      borrowDuration: event.target.value
+      borrowDuration: text
     })
   }
 
@@ -82,11 +87,11 @@ class CreateRequestPage extends React.Component {
   //   })
   // }
 
-  onTypeOfContactChange(event) {
-    this.setState({
-      typeOfContact: event.target.value
-    })
-  }
+  // onTypeOfContactChange(event) {
+  //   this.setState({
+  //     typeOfContact: event.target.value
+  //   })
+  // }
 
   handleSubmit(event) {
     console.log(this.state.borrowerName + " " + this.state.amount + " " + this.state.borrowDay + " " + this.state.borrowDuration + " " + this.state.interestRate + " " + this.state.typeOfContact + " ");
@@ -104,24 +109,24 @@ class CreateRequestPage extends React.Component {
         // borrowDuration: this.state.borrowDuration,
         // interestRate: this.state.interestRate,
         // typeOfContact: this.state.typeOfContact,
-        dueDate: 125666,
-        times: 5,
-        duration: 30,
+        // dueDate: 125666,
+        // times: 5,
+        duration: this.state.borrowDuration,
         interestRate: 18,
-        createDate: 155555
+        createDate: this.state.createDate
       })
 
     }).then(
       (result) => {
         // result.text().then((data) => {
         //   this.setState({ token: data });
-          // console.log(this.state.token);
-          console.log(result);
-          if(result.status === 200) {
-            console.log("create success");
-          }
-
+        // console.log(this.state.token);
+        console.log(result);
+        if (result.status === 200) {
+          console.log("create success");
         }
+
+      }
     )
     // console.log(document.querySelector('meta[name="token"]').getAttribute('content'))
     // let metaTags = document.getElementsByTagName("META");
@@ -130,7 +135,7 @@ class CreateRequestPage extends React.Component {
     //     console.log(metaTags[index].getAttribute("content"));    
     //   } 
     // }
-    
+
     // console.log(this.state.borrowDay);
     // console.log("aaaaaa");
     // console.log(this.state.interestRate)
@@ -145,6 +150,14 @@ class CreateRequestPage extends React.Component {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
+    var dateNow = new Date();
+    console.log(dateNow)
+    var timeStampeDateNow = Math.round(dateNow.getTime() / 1000);
+    console.log(timeStampeDateNow);
+    this.setState({
+      createDate: timeStampeDateNow
+    })
+    
   }
   render() {
     return (
@@ -184,17 +197,18 @@ class CreateRequestPage extends React.Component {
             {/* 1st Hero Variation */}
           </div>
 
-
-          <section className="section section-lg bg-info">
+          <section className="section">
             <Container>
-              <Row className="justify-content-center text-center">
+              <Card className="card-profile shadow mt--200">
+                {/* <div className="px-4"> */}
+                <Row className="justify-content-center ">
                 <Col>
-                  <h2 className="display-3 text-white">Create your request</h2>
+                  <h2 className="display-3 text-center">Create your request</h2>
                   <Card className="bg-gradient-secondary shadow">
                     <CardBody className="p-lg-5">
-                      <h4 className="mb-1">Fill your information into the form</h4>
+                      <h4 className="mb-1 text-center mb-5">Fill your information into the form</h4>
                       <Form role="form" onSubmit={this.handleSubmit}>
-                        <FormGroup
+                        {/* <FormGroup
                           className={classnames("mt-5", {
                             focused: this.state.nameFocused
                           })}
@@ -211,26 +225,30 @@ class CreateRequestPage extends React.Component {
                               onChange={this.onBorrowerNameChange}
                             />
                           </InputGroup>
-                        </FormGroup>
-                        <FormGroup
+                        </FormGroup> */}
+                        <FormGroup row
                           className={classnames({
                             focused: this.state.amountFocused
                           })}
                         >
-                          <Label>
-                            Amount
-                          </Label>
-                          <InputGroup className="input-group-alternative">
-                            <Input
-                              placeholder="Amount"
-                              type="text"
-                              onFocus={e => this.setState({ amountFocused: true })}
-                              onBlur={e => this.setState({ amountFocused: false })}
-                              onChange={this.onAmountChange}
-                            />
-                          </InputGroup>
+                          <Col lg="3" md="3">
+                            <Label>
+                              Amount
+                            </Label>
+                            </Col>
+                            <Col lg="9" md="9">
+                              <InputGroup className="input-group-alternative">
+                                <Input
+                                  placeholder="Amount"
+                                  type="text"
+                                  onFocus={e => this.setState({ amountFocused: true })}
+                                  onBlur={e => this.setState({ amountFocused: false })}
+                                  onChange={this.onAmountChange}
+                                />
+                              </InputGroup>
+                            </Col>
                         </FormGroup>
-                        <FormGroup
+                        {/* <FormGroup
                           className={classnames({
                             focused: this.state.borrowDayFocused
                           })}
@@ -246,14 +264,14 @@ class CreateRequestPage extends React.Component {
                               onChange={this.onBorrowDayChange}
                             />
                           </InputGroup>
-                        </FormGroup>
-                        <FormGroup className={classnames({
+                        </FormGroup> */}
+                        <FormGroup row className={classnames({
                           focused: this.state.durationFocused
                         })}>
-                          <Col>
+                          <Col lg="3" md="3">
                             <Label htmlFor="duration">Borrow Duration</Label>
                           </Col>
-                          <Col>
+                          <Col lg="9" md="9">
                             <InputGroup className="input-group-alternative">
                               <Input type="select" name="duration" id="duration"
                                 onFocus={e => this.setState({ durationFocused: true })}
@@ -267,10 +285,13 @@ class CreateRequestPage extends React.Component {
                             </InputGroup>
                           </Col>
                         </FormGroup>
-                        <FormGroup>
+                        <FormGroup row>
+                        <Col lg="3" md="3">
                           <Label>
                             Interest rate
                           </Label>
+                          </Col>
+                          <Col lg="9" md="9">
                           <InputGroup className="input-group-alternative">
                             <Input
                               type="text"
@@ -279,14 +300,15 @@ class CreateRequestPage extends React.Component {
                             // onChange={this.onInterestRateChange}
                             />
                           </InputGroup>
+                          </Col>
                         </FormGroup>
-                        <FormGroup className={classnames({
+                        {/* <FormGroup row className={classnames({
                           focused: this.state.typeFocused
                         })}>
-                          <Col>
+                          <Col lg="3" md="3">
                             <Label htmlFor="type">Type of contact</Label>
                           </Col>
-                          <Col>
+                          <Col lg="9" md="9">
                             <InputGroup className="input-group-alternative">
                               <Input type="select" name="type" id="type"
                                 onFocus={e => this.setState({ typeFocused: true })}
@@ -298,7 +320,7 @@ class CreateRequestPage extends React.Component {
                               </Input>
                             </InputGroup>
                           </Col>
-                        </FormGroup>
+                        </FormGroup> */}
                         <p>TimeLine is here</p>
                         <div>
                           {/* <Button
@@ -317,8 +339,16 @@ class CreateRequestPage extends React.Component {
                   </Card>
                 </Col>
               </Row>
+                {/* </div> */}
+              </Card>
             </Container>
           </section>
+
+          {/* <section className="section section-lg bg-info">
+            <Container>
+              
+            </Container>
+          </section> */}
         </main>
         {/* <CardsFooter /> */}
       </>
