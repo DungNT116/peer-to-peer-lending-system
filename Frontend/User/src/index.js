@@ -15,6 +15,7 @@ import Profile from "views/examples/Profile.jsx";
 import Register from "views/examples/Register.jsx";
 import CreateRequestPage from "main-views/CreateRequestPage/CreateRequestPage.jsx";
 import ApplyPaypal from "main-views/ApplyPaypal/ApplyPaypal.jsx";
+import ApplyTimeline from "main-views/ApplyTimeline/ApplyTimeline.jsx";
 import ViewRequestList from "main-views/ViewRequestList/ViewRequestList.jsx";
 import ViewDetailRequest from "main-views/ViewDetailRequest/ViewDetailRequest.jsx";
 import ViewHistoryRequest from "main-views/HistoryRequest/HistoryRequest.jsx";
@@ -64,6 +65,11 @@ ReactDOM.render(
         path="/apply-paypal"
         exact
         render={props => <ApplyPaypal {...props} />}
+      />
+      <Route
+        path="/apply-timeline"
+        exact
+        render={props => <ApplyTimeline {...props} />}
       />
       <Redirect to="/" />
     </Switch>

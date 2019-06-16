@@ -3,11 +3,10 @@ import React from "react";
 // nodejs library that concatenates classes
 import classnames from "classnames";
 import { connect } from "react-redux";
-import ReactDatetime from "react-datetime";
 // reactstrap components
 import {
   // Badge,
-  // Button,
+  Button,
   Card,
   CardBody,
   FormGroup,
@@ -17,8 +16,7 @@ import {
   Row,
   Col,
   Label,
-  Form,
-  UncontrolledCollapse
+  Form
 } from "reactstrap";
 
 // core components
@@ -26,8 +24,6 @@ import DemoNavbar from "../../components/Navbars/DemoNavbar";
 import { PayPalButton } from "react-paypal-button-v2";
 //api link
 import { apiLink, bigchainAPI, client_API } from "../../api.jsx";
-import HorizontalTimeline from "react-horizontal-timeline";
-import Slider from "nouislider";
 class ApplyPaypal extends React.Component {
   componentDidMount() {
     document.documentElement.scrollTop = 0;
@@ -42,9 +38,7 @@ class ApplyPaypal extends React.Component {
       sender: "",
       receiver: "",
       createDate: "",
-      userId: "",
-      curIdx: 0,
-      prevIdx: -1
+      userId: ""
     };
     this.onUserIdChange = this.onUserIdChange.bind(this);
     this.onAmountChange = this.onAmountChange.bind(this);
@@ -92,28 +86,8 @@ class ApplyPaypal extends React.Component {
   onReceiverChange(event) {
     this.setState({ receiver: event.target.value });
   }
+
   render() {
-    const EXAMPLE = [
-      {
-        data: "2018-01-20",
-        statusE: "In Progress 30%"
-      },
-      {
-        data: "2018-03-20",
-        statusE: "In Progress 60%"
-      },
-      {
-        data: "2018-03-23",
-        statusE: "In Progress 90%"
-      },
-      {
-        data: "2019-03-23",
-        statusE: "Done"
-      }
-    ];
-    const { curIdx, prevIdx } = this.state;
-    const curStatus = EXAMPLE[curIdx].statusE;
-    const prevStatus = prevIdx >= 0 ? EXAMPLE[prevIdx].statusE : "";
 
     return (
       <>
@@ -145,7 +119,6 @@ class ApplyPaypal extends React.Component {
                 </div>
               </Container>
             </section>
-            {/* 1st Hero Variation */}
           </div>
 
           <section className="section">
@@ -156,34 +129,6 @@ class ApplyPaypal extends React.Component {
                     <CardBody className="p-lg-5 ">
                       <h4 className="mb-1">Transaction Information</h4>
                       
-                      <div>
-                        <div
-                          style={{
-                            width: "100%",
-                            height: "100px",
-                            margin: "0 auto",
-                            marginTop: "20px",
-                            fontSize: "13px"
-                          }}
-                        >
-                          <HorizontalTimeline
-                            styles={{
-                              // background: "#f8f8f8",
-                              foreground: "#1A79AD",
-                              outline: "#dfdfdf"
-                            }}
-                            index={this.state.curIdx}
-                            indexClick={index => {
-                              const curIdx = this.state.curIdx;
-                              this.setState({ curIdx: index, prevIdx: curIdx });
-                              console.log({ curStatus });
-                            }}
-                            values={EXAMPLE.map(x => x.data)}
-                          />
-                        </div>
-                        <div className="text-center">{curStatus}</div>
-                      </div>
-
                       <Form role="form">
                         <FormGroup
                           className={classnames({
