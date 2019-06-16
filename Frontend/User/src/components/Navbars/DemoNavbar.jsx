@@ -175,6 +175,9 @@ class DemoNavbar extends React.Component {
                       <DropdownItem to="/apply-paypal" tag={Link}>
                         Paypal
                       </DropdownItem>
+                      <DropdownItem to="/apply-timeline" tag={Link}>
+                        Timeline
+                      </DropdownItem>
                     </DropdownMenu>
                   </UncontrolledDropdown>
                 </Nav>
