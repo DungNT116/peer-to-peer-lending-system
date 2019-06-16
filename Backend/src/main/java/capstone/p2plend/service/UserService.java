@@ -41,7 +41,7 @@ public class UserService {
 		String password = account.getPassword();
 
 		User checkExist = userRepo.findByUsernameAndPassword(username, password);
-		
+
 		if (checkExist != null && checkExist.getStatus().equals("active")) {
 			return true;
 		}
@@ -87,6 +87,17 @@ public class UserService {
 		return valid;
 	}
 
+	public boolean changeLoanLimit(Integer id, Long loanLimit) {
+		try {
+			User user = userRepo.findById(id).get();
+			user.setLoanLimit(loanLimit);
+			userRepo.save(user);			
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	public PageDTO<User> getUsers(int page, int element) {
 		Pageable pageable = PageRequest.of(page - 1, element);
 		Page<User> allUsers = userRepo.findAll(pageable);
@@ -101,7 +112,7 @@ public class UserService {
 		}
 		PageDTO<User> pageDTO = new PageDTO<>();
 		pageDTO.setMaxPage(allUsers.getTotalPages());
-		pageDTO.setData(userList);		
+		pageDTO.setData(userList);
 		return pageDTO;
 	}
 }

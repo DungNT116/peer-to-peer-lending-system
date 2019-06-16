@@ -105,6 +105,22 @@ public class UserController {
 	
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
+	@PutMapping(value = "/rest/user/loanLimit")
+	public Integer changeLoanLimit(@RequestBody User user) {
+		HttpStatus status = null;
+		boolean valid = false;
+		valid = userService.changeLoanLimit(user.getId(), user.getLoanLimit());
+		if (valid == true) {
+			status = HttpStatus.OK;
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+
+		return status.value();
+	}
+	
+	@CrossOrigin
+	@Secured("ROLE_ADMIN")
 	@PutMapping(value = "/rest/user/approveUser")
 	public Integer deactivateAccount(@RequestBody User user) {
 		HttpStatus status = null;
