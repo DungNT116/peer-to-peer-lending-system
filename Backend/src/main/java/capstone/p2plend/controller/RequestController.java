@@ -65,9 +65,17 @@ public class RequestController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/user/allRequest")
-	public PageDTO<Request> findAllExceptUserRequest(@RequestParam Integer page, @RequestParam Integer element,
+	public PageDTO<Request> findAllOtherUserRequest(@RequestParam Integer page, @RequestParam Integer element,
 			@RequestHeader("Authorization") String token) {
-		return requestService.findAllExceptUserRequest(page, element, token);
+		return requestService.findAllOtherUserRequest(page, element, token);
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/request/user/allNewRequest")
+	public PageDTO<Request> findAllOtherUserNewRequest(@RequestParam Integer page, @RequestParam Integer element,
+			@RequestHeader("Authorization") String token) {
+		return requestService.findAllOtherUserRequestSortByDateDesc(page, element, token);
 	}
 
 	@CrossOrigin

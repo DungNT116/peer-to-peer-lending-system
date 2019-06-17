@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import capstone.p2plend.entity.User;
@@ -67,11 +68,47 @@ public class RequestService {
 		return r;
 	}
 
-	public PageDTO<Request> findAllExceptUserRequest(Integer page, Integer element, String token) {
+	public PageDTO<Request> findAllOtherUserRequest(Integer page, Integer element, String token) {
 		String username = jwtService.getUsernameFromToken(token);
 		User account = accountRepo.findByUsername(username);
 		Pageable pageable = PageRequest.of(page - 1, element);
-		Page<Request> listRq = requestRepo.findAllUserRequestExcept(pageable, account.getId());
+		Page<Request> listRq = requestRepo.findAllOtherUserRequest(pageable, account.getId());
+
+		for (Request r : listRq) {
+			if (r.getBorrower() != null) {
+				User borrower = new User();
+				borrower.setId(r.getBorrower().getId());
+				borrower.setUsername(r.getBorrower().getUsername());
+				borrower.setFirstName(r.getBorrower().getFirstName());
+				borrower.setLastName(r.getBorrower().getLastName());
+				r.setBorrower(borrower);
+			}
+			if (r.getLender() != null) {
+				User lender = new User();
+				lender.setId(r.getLender().getId());
+				lender.setUsername(r.getLender().getUsername());
+				lender.setFirstName(r.getLender().getFirstName());
+				lender.setLastName(r.getLender().getLastName());
+				r.setLender(lender);
+			}
+			if (r.getDeal() != null) {
+				Deal deal = new Deal();
+				deal.setId(r.getDeal().getId());
+				deal.setStatus(r.getDeal().getStatus());
+				r.setDeal(deal);
+			}
+		}
+		PageDTO<Request> pageDTO = new PageDTO<>();
+		pageDTO.setMaxPage(listRq.getTotalPages());
+		pageDTO.setData(listRq.getContent());
+		return pageDTO;
+	}
+	
+	public PageDTO<Request> findAllOtherUserRequestSortByDateDesc(Integer page, Integer element, String token) {
+		String username = jwtService.getUsernameFromToken(token);
+		User account = accountRepo.findByUsername(username);
+		Pageable pageable = PageRequest.of(page - 1, element, Sort.by("create_date").descending());
+		Page<Request> listRq = requestRepo.findAllOtherUserRequest(pageable, account.getId());
 
 		for (Request r : listRq) {
 			if (r.getBorrower() != null) {
