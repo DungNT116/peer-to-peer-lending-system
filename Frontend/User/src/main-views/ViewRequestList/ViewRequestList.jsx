@@ -44,7 +44,7 @@ class ViewRequestList extends React.Component {
     this.state = {
       requests: [],
       page: 1,
-      pageSize: 1,
+      pageSize: 5,
       maxPage: 0,
     }
     this.getRequest = this.getRequest.bind(this);
@@ -89,7 +89,6 @@ class ViewRequestList extends React.Component {
   }
 
   setDataToDetailPage(id) {
-    console.log("request id " + id);
     this.props.setRequest(id);
   }
 
@@ -193,8 +192,8 @@ class ViewRequestList extends React.Component {
 
               </Row>
               <Row className="align-items-center justify-content-center text-center">
-                <Pagination maxPage={this.state.maxPage} currentPage={this.state.page} 
-                pageSize={this.state.pageSize} onChange={this.getRequest} changePage={this.changePage}/>
+                <Pagination maxPage={this.state.maxPage} currentPage={this.state.page}
+                 onChange={this.getRequest} changePage={this.changePage}/>
               </Row>
             </Container>
           </section>

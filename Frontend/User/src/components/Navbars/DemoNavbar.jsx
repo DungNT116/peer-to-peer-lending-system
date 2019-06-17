@@ -143,6 +143,9 @@ class DemoNavbar extends React.Component {
                       <DropdownItem to="/view-history-request" tag={Link}>
                         View History Request
                       </DropdownItem>
+                      <DropdownItem to="/view-new-request" tag={Link}>
+                        View New Request
+                      </DropdownItem>
                     </DropdownMenu>
                   </UncontrolledDropdown>
                   <UncontrolledDropdown nav>

@@ -22,14 +22,19 @@ class ViewRequestList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      requests: []
+      historyRequests: [],
+      page: 1,
+      pageSize: 5,
+      maxPage: 0,
     }
     this.getRequest = this.getRequest.bind(this);
+    this.changePage = this.changePage.bind(this);
   }
 
   getRequest() {
-
-    fetch(apiLink + "/rest/request/allRequestHistoryDone", {
+    let pageParam = encodeURIComponent(this.state.page);
+    let pageSizeParam = encodeURIComponent(this.state.pageSize);
+    fetch(apiLink + "/rest/request/allRequestHistoryDone?page=" + pageParam + "&element=" + pageSizeParam, {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +44,10 @@ class ViewRequestList extends React.Component {
     }).then(
       (result) => {
           result.json().then((data) => {
-            this.setState({requests: data});
+            this.setState({
+              historyRequests: data.data,
+              maxPage: data.maxPage
+            });
           })
           if(result.status === 200) {
             // alert("create success");
@@ -51,6 +59,12 @@ class ViewRequestList extends React.Component {
     // this.props.history.push('/')
   }
 
+  changePage(index) {
+    this.setState({
+      page: index
+    })
+  }
+
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -58,7 +72,7 @@ class ViewRequestList extends React.Component {
     this.getRequest();
   }
   render() {
-    const listItems = this.state.requests.map((request) =>
+    const listItems = this.state.historyRequests.map((request) =>
       <tr>
         <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
           {request.id}
@@ -128,7 +142,8 @@ class ViewRequestList extends React.Component {
                 </Table>
               </Row>
               <Row className="align-items-center justify-content-center text-center">
-                <Pagination />
+              <Pagination maxPage={this.state.maxPage} currentPage={this.state.page}
+                 onChange={this.getRequest} changePage={this.changePage}/>
               </Row>
             </Container>
           </section>
