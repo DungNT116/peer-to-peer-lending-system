@@ -21,15 +21,29 @@ class ViewRequestList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      requests: []
+      newRequests: [],
+      page: 1,
+      pageSize: 5,
+      maxPage: 0,
     }
     this.getRequest = this.getRequest.bind(this);
     this.deleteRequest = this.deleteRequest.bind(this);
+    this.changePage = this.changePage.bind(this);
+  }
+
+  changePage(index) {
+    this.setState({
+      page: index
+    })
   }
 
   getRequest() {
-
-    fetch(apiLink + "/rest/request/allRequestHistoryDone", {
+    let pageParam = encodeURIComponent(this.state.page);
+    console.log(pageParam);
+    let pageSizeParam = encodeURIComponent(this.state.pageSize);
+    console.log(pageSizeParam);
+    console.log(apiLink + "/rest/request/allRequestHistoryPending?page=" + pageParam + "&element=" +  pageSizeParam)
+    fetch(apiLink + "/rest/request/allRequestHistoryPending?page=" + pageParam + "&element=" +  pageSizeParam, {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
@@ -40,7 +54,11 @@ class ViewRequestList extends React.Component {
     }).then(
       (result) => {
         result.json().then((data) => {
-          this.setState({ requests: data });
+          console.log(data.data);
+          this.setState({
+            newRequests: data.data,
+            maxPage: data.maxPage
+          });
         })
         if (result.status === 200) {
           // console.log("create success");
@@ -53,30 +71,32 @@ class ViewRequestList extends React.Component {
   }
 
   //maybe not use
-  // deleteRequest(id) {
+  deleteRequest(id) {
 
-  //   fetch(apiLink + "/rest/request/delete", {
-  //     method: 'DELETE',
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       "Authorization": this.props.tokenReducer.token
-  //       // 'Access-Control-Allow-Origin': '*'
-  //     },
-  //     body: JSON.stringify({
-  //       id: id
-  //     })
+    fetch(apiLink + "/rest/request/delete", {
+      method: 'DELETE',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        id: id
+      })
 
-  //   }).then(
-  //     (result) => {
-  //       if (result.status === 200) {
-  //         alert("delete success");
-  //       }
+    }).then(
+      (result) => {
+        if (result.status === 200) {
+          alert("delete success");
+          //reload data
+          this.getRequest();
+        }
 
-  //     }
-  //   )
-  //   // event.preventDefault();
-  //   // this.props.history.push('/')
-  // }
+      }
+    )
+    // event.preventDefault();
+    // this.props.history.push('/')
+  }
 
   componentDidMount() {
     document.documentElement.scrollTop = 0;
@@ -85,7 +105,7 @@ class ViewRequestList extends React.Component {
     this.getRequest();
   }
   render() {
-    const listItems = this.state.requests.map((request) =>
+    const listItems = this.state.newRequests.map((request) =>
       <tr>
         <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
           {request.id}
@@ -125,11 +145,11 @@ class ViewRequestList extends React.Component {
                   <Row>
                     <Col lg="10">
                       <h1 className="display-3 text-white">
-                        History Request{" "}
-                        <span>View your own history request</span>
+                        History New Request{" "}
+                        <span>View your own new request</span>
                       </h1>
                       <p className="lead text-white">
-                        View borrow request more easier. Every where, every times, ...
+                        View your new borrow request more easier. Every where, every times, ...
                       </p>
                     </Col>
                   </Row>
@@ -151,7 +171,7 @@ class ViewRequestList extends React.Component {
                       <th>DueDate</th>
                       <th>CreateDate</th>
                       <th>Duration</th>
-                      <td>status</td>
+                      <th>status</th>
                       <th>Delete</th>
                     </tr>
                   </thead>
@@ -161,7 +181,8 @@ class ViewRequestList extends React.Component {
                 </Table>
               </Row>
               <Row className="align-items-center justify-content-center text-center">
-                <Pagination />
+              <Pagination maxPage={this.state.maxPage} currentPage={this.state.page}
+                 onChange={this.getRequest} changePage={this.changePage}/>
               </Row>
             </Container>
           </section>

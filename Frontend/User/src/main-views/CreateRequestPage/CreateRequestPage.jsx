@@ -74,6 +74,7 @@ class CreateRequestPage extends React.Component {
       (result) => {
         if (result.status === 200) {
           alert("create success");
+          this.props.history.push('view-new-request');
         }
 
       }
