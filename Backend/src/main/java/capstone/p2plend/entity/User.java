@@ -41,6 +41,9 @@ public class User {
 	private String lastName;
 
 	@Column
+	private Long loanLimit;
+	
+	@Column
 	private String role;
 
 	@Column(unique = true)
@@ -161,5 +164,14 @@ public class User {
 	public void setLendRequest(List<Request> lendRequest) {
 		this.lendRequest = lendRequest;
 	}
+
+	public Long getLoanLimit() {
+		return loanLimit;
+	}
+
+	public void setLoanLimit(Long loanLimit) {
+		this.loanLimit = loanLimit;
+	}
+
 
 }

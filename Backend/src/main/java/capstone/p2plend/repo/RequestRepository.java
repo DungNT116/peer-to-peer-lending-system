@@ -16,4 +16,5 @@ public interface RequestRepository extends JpaRepository<Request, Integer> {
 	@Query(value = "SELECT * FROM request WHERE borrower_id = :id AND status = :status", nativeQuery = true)
 	Page<Request> findAllUserRequestByStatus(Pageable pageable, @Param("id") Integer id, @Param("status") String status);
 
+	
 }
