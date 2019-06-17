@@ -88,23 +88,37 @@ class ApplyTimeline extends React.Component {
     document.getElementById("horizontalTimeline").style.display = "";
   }
   async saveChange() {
+    let isDuplicate = false;
     //create new array same with timeline for modifing
     let EXAMPLEcopy = JSON.parse(JSON.stringify(this.state.backup_EXAMPLE));
     for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
       EXAMPLEcopy[i].data = document.getElementById([
         "day-timeline-" + i
       ]).value;
-      document.getElementById(["day-timeline-" + i]).style.display = "none";
-      document.getElementById(["delete-milestone-" + i]).style.display = "none";
     }
-    // save data after changing
-    await this.setState({
-      EXAMPLE: EXAMPLEcopy
-    });
-    document.getElementById("addMilestone").style.display = "none";
-    document.getElementById("saveTimeline").style.display = "none";
-    document.getElementById("cancelButton").style.display = "none";
-    document.getElementById("horizontalTimeline").style.display = "";
+    for (let i = 0; i < EXAMPLEcopy.length; i++) {
+      EXAMPLEcopy.sort(function(day1, day2) {
+        if (new Date(day1.data) - new Date(day2.data) == 0) {
+          isDuplicate = true;
+          return console.log("Duplicate date in milestone");
+        }
+        return new Date(day1.data) - new Date(day2.data);
+      });
+    }
+    if (!isDuplicate) {
+      // save data after changing
+      await this.setState({
+        EXAMPLE: EXAMPLEcopy
+      });
+      for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
+        document.getElementById(["day-timeline-" + i]).style.display = "none";
+        document.getElementById(["delete-milestone-" + i]).style.display = "none";
+      }
+      document.getElementById("addMilestone").style.display = "none";
+      document.getElementById("saveTimeline").style.display = "none";
+      document.getElementById("cancelButton").style.display = "none";
+      document.getElementById("horizontalTimeline").style.display = "";
+    }
   }
   async addChange() {
     await this.setState({
@@ -125,14 +139,18 @@ class ApplyTimeline extends React.Component {
     document.getElementById("cancelButton").style.display = "";
     document.getElementById("horizontalTimeline").style.display = "";
   }
-  async deleteMilestone(index){
-    if(this.state.backup_EXAMPLE.length <= 2){
+  async deleteMilestone(index) {
+    if (this.state.backup_EXAMPLE.length <= 2) {
       // Using modal for popup error
-      console.log("Timeline have at least 2 milestone")
-    }else{
-      await this.state.backup_EXAMPLE.splice(index,1)
-      document.getElementById("day-timeline-" + this.state.backup_EXAMPLE.length).style.display = "none";
-      document.getElementById("delete-milestone-" + this.state.backup_EXAMPLE.length ).style.display = "none";
+      console.log("Timeline have at least 2 milestone");
+    } else {
+      await this.state.backup_EXAMPLE.splice(index, 1);
+      document.getElementById(
+        "day-timeline-" + this.state.backup_EXAMPLE.length
+      ).style.display = "none";
+      document.getElementById(
+        "delete-milestone-" + this.state.backup_EXAMPLE.length
+      ).style.display = "none";
       this.cancelChange();
       this.changeMilestone();
       //show button
@@ -185,7 +203,7 @@ class ApplyTimeline extends React.Component {
     this.setState({
       dayTimeline: new Date(event.target.value).toLocaleDateString()
     });
-  } 
+  }
   render() {
     const { curIdx, prevIdx } = this.state;
     // const curStatus = this.state.EXAMPLE[curIdx].statusE;
@@ -247,7 +265,8 @@ class ApplyTimeline extends React.Component {
                               color="danger"
                               style={{ display: "none" }}
                               onClick={() => this.deleteMilestone(index)}
-                            >Delete
+                            >
+                              Delete
                             </Button>{" "}
                           </Col>
                         </Row>
