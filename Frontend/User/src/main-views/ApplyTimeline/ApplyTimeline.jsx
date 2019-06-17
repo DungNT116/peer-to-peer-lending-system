@@ -60,35 +60,34 @@ class ApplyTimeline extends React.Component {
     this.addChange = this.addChange.bind(this);
     this.cancelChange = this.cancelChange.bind(this);
     this.onDayChange = this.onDayChange.bind(this);
+    this.deleteMilestone = this.deleteMilestone.bind(this);
   }
 
-  async makeDeal(index) {
+  async makeDeal() {
+    // create temporary data for making backup data
+    let dataEXAMPLE = JSON.parse(JSON.stringify(this.state.EXAMPLE));
     await this.setState({
-      backup_EXAMPLE: this.state.EXAMPLE
+      backup_EXAMPLE: dataEXAMPLE
     });
-    //display field to edit data and import data to field
-    for (let i = 0; i < this.state.EXAMPLE.length; i++) {
-      document.getElementById(["day-timeline-" + i]).style.display = "";
-      document.getElementById([
-        "day-timeline-" + i
-      ]).value = this.state.backup_EXAMPLE[i].data;
-    }
+    this.changeMilestone();
     //show button
-    
     document.getElementById("addMilestone").style.display = "";
     document.getElementById("saveTimeline").style.display = "";
     document.getElementById("cancelButton").style.display = "";
+    document.getElementById("horizontalTimeline").style.display = "none";
   }
   cancelChange() {
     for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
       document.getElementById(["day-timeline-" + i]).style.display = "none";
+      document.getElementById(["delete-milestone-" + i]).style.display = "none";
     }
-    
+
     document.getElementById("addMilestone").style.display = "none";
     document.getElementById("saveTimeline").style.display = "none";
     document.getElementById("cancelButton").style.display = "none";
+    document.getElementById("horizontalTimeline").style.display = "";
   }
-  saveChange() {
+  async saveChange() {
     //create new array same with timeline for modifing
     let EXAMPLEcopy = JSON.parse(JSON.stringify(this.state.backup_EXAMPLE));
     for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
@@ -96,45 +95,106 @@ class ApplyTimeline extends React.Component {
         "day-timeline-" + i
       ]).value;
       document.getElementById(["day-timeline-" + i]).style.display = "none";
+      document.getElementById(["delete-milestone-" + i]).style.display = "none";
     }
-    this.setState({
+    // save data after changing
+    await this.setState({
       EXAMPLE: EXAMPLEcopy
     });
     document.getElementById("addMilestone").style.display = "none";
     document.getElementById("saveTimeline").style.display = "none";
     document.getElementById("cancelButton").style.display = "none";
+    document.getElementById("horizontalTimeline").style.display = "";
   }
-  addChange() {
-    //create new array same with timeline for modifing
-    let EXAMPLEcopy = JSON.parse(JSON.stringify(this.state.backup_EXAMPLE));
-    for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
-      EXAMPLEcopy[i].data = document.getElementById([
-        "day-timeline-" + i
-      ]).value;
-      document.getElementById(["day-timeline-" + i]).style.display = "none";
-    }
-    this.setState({
-      EXAMPLE: EXAMPLEcopy
+  async addChange() {
+    await this.setState({
+      backup_EXAMPLE: [
+        ...this.state.backup_EXAMPLE,
+        {
+          data: "2019-07-03",
+          statusE: "ABC"
+        }
+      ]
     });
-    document.getElementById("saveTimeline").style.display = "none";
-    document.getElementById("cancelButton").style.display = "none";
+    //re-render change milestone
+    this.cancelChange();
+    this.changeMilestone();
+    //show button
+    document.getElementById("addMilestone").style.display = "";
+    document.getElementById("saveTimeline").style.display = "";
+    document.getElementById("cancelButton").style.display = "";
+    document.getElementById("horizontalTimeline").style.display = "";
+  }
+  async deleteMilestone(index){
+    if(this.state.backup_EXAMPLE.length <= 2){
+      // Using modal for popup error
+      console.log("Timeline have at least 2 milestone")
+    }else{
+      await this.state.backup_EXAMPLE.splice(index,1)
+      document.getElementById("day-timeline-" + this.state.backup_EXAMPLE.length).style.display = "none";
+      document.getElementById("delete-milestone-" + this.state.backup_EXAMPLE.length ).style.display = "none";
+      this.cancelChange();
+      this.changeMilestone();
+      //show button
+      document.getElementById("addMilestone").style.display = "";
+      document.getElementById("saveTimeline").style.display = "";
+      document.getElementById("cancelButton").style.display = "";
+      document.getElementById("horizontalTimeline").style.display = "none";
+    }
+  }
+  changeMilestone() {
+    for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
+      document.getElementById(["day-timeline-" + i]).style.display = "";
+      document.getElementById([
+        "day-timeline-" + i
+      ]).value = this.state.backup_EXAMPLE[i].data;
+      document.getElementById(["delete-milestone-" + i]).style.display = "";
+    }
+  }
+  createTimeline() {
+    return (
+      <HorizontalTimeline
+        styles={{
+          // background: "#f8f8f8",
+          foreground: "#1A79AD",
+          outline: "#dfdfdf"
+        }}
+        index={this.state.curIdx}
+        indexClick={index => {
+          const curIdx = this.state.curIdx;
+          this.setState({ curIdx: index, prevIdx: curIdx });
+          this.makeDeal(index);
+        }}
+        minEventPadding={100}
+        maxEventPadding={150}
+        isOpenBeginning={false}
+        isOpenEnding={false}
+        fillingMotion={{
+          stiffness: 0,
+          damping: 25
+        }}
+        slidingMotion={{
+          stiffness: 0,
+          damping: 25
+        }}
+        values={this.state.EXAMPLE.map(x => x.data)}
+      />
+    );
   }
   onDayChange(event) {
     this.setState({
       dayTimeline: new Date(event.target.value).toLocaleDateString()
     });
-  }
+  } 
   render() {
     const { curIdx, prevIdx } = this.state;
-    const curStatus = this.state.EXAMPLE[curIdx].statusE;
-    const prevStatus = prevIdx >= 0 ? this.state.EXAMPLE[prevIdx].statusE : "";
-
+    // const curStatus = this.state.EXAMPLE[curIdx].statusE;
+    // const prevStatus = prevIdx >= 0 ? this.state.EXAMPLE[prevIdx].statusE : "";
     return (
       <>
         <DemoNavbar />
         <main ref="main">
           <div className="position-relative">
-            {/* shape Hero */}
             <section className="section section-lg section-shaped">
               <div className="shape shape-style-1 shape-default">
                 <span />
@@ -167,16 +227,28 @@ class ApplyTimeline extends React.Component {
                 <div className="px-4">
                   <Row className="justify-content-center ">
                     <CardBody className="p-lg-5 ">
-                      <h4 className="mb-1">Transaction Information</h4>
-                      {this.state.EXAMPLE.map((key, index) => (
-                        <Row>
-                          <Col md="4" key={key}>
+                      <h4 className="mb-1">Timeline Implement</h4>
+                      {this.state.backup_EXAMPLE.map((data, index) => (
+                        <Row key={index}>
+                          <Col md="4">
                             <Input
                               id={"day-timeline-" + index}
                               type="date"
-                              onChange={this.onDayChange}
+                              onChange={this.onDayChange.bind(this)}
                               style={{ display: "none" }}
                             />
+                          </Col>
+                          <Col>
+                            {/* Delete button */}
+                            <Button
+                              type="submit"
+                              id={"delete-milestone-" + index}
+                              size="md"
+                              color="danger"
+                              style={{ display: "none" }}
+                              onClick={() => this.deleteMilestone(index)}
+                            >Delete
+                            </Button>{" "}
                           </Col>
                         </Row>
                       ))}
@@ -215,6 +287,7 @@ class ApplyTimeline extends React.Component {
                       </Button>
                       <div>
                         <div
+                          id="horizontalTimeline"
                           style={{
                             width: "100%",
                             height: "100px",
@@ -223,34 +296,9 @@ class ApplyTimeline extends React.Component {
                             fontSize: "13px"
                           }}
                         >
-                          <HorizontalTimeline
-                            styles={{
-                              // background: "#f8f8f8",
-                              foreground: "#1A79AD",
-                              outline: "#dfdfdf"
-                            }}
-                            index={this.state.curIdx}
-                            indexClick={index => {
-                              const curIdx = this.state.curIdx;
-                              this.setState({ curIdx: index, prevIdx: curIdx });
-                              this.makeDeal(index);
-                            }}
-                            minEventPadding={100}
-                            maxEventPadding={150}
-                            isOpenBeginning={false}
-                            isOpenEnding={false}
-                            fillingMotion={{
-                              stiffness: 0,
-                              damping: 25
-                            }}
-                            slidingMotion={{
-                              stiffness: 0,
-                              damping: 25
-                            }}
-                            values={this.state.EXAMPLE.map(x => x.data)}
-                          />
+                          {this.createTimeline()}
                         </div>
-                        <div className="text-center">{curStatus}</div>
+                        {/* <div className="text-center">{curStatus}</div> */}
                       </div>
                     </CardBody>
                   </Row>
