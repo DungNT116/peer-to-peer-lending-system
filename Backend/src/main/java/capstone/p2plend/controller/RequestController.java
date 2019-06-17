@@ -81,11 +81,19 @@ public class RequestController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/allRequestHistoryDone")
-	public PageDTO<Request> findAllRequestHistoryDone(@RequestParam Integer page, @RequestParam Integer element,
+	public PageDTO<Request> findAllRequestHistoryStatusDone(@RequestParam Integer page, @RequestParam Integer element,
 			@RequestHeader("Authorization") String token) {
-		return requestService.findUserAllRequestByStatus(page, element, token);
+		return requestService.findUserAllRequestByStatus(page, element, token, "done");
 	}
 
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/request/allRequestHistoryPending")
+	public PageDTO<Request> findAllUserRequestStatusPending(@RequestParam Integer page, @RequestParam Integer element,
+			@RequestHeader("Authorization") String token) {
+		return requestService.findUserAllRequestByStatus(page, element, token, "pending");
+	}
+	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping(value = "/rest/request/approveRequest")
