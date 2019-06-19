@@ -24,7 +24,6 @@ public class TransactionController {
 	TransactionService transactionService;
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/transaction/getTop20Transaction")
 	public List<Transaction> getTop20TransactionOrderByCreateDateDesc() {
 		return transactionService.getTopTransactionOrderByCreateDateDesc();
