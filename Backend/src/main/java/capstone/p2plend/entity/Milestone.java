@@ -41,7 +41,8 @@ public class Milestone {
 //	@Column(name = "deal_id", insertable = false, updatable = false)
 //	private Integer dealId;
 
-	@JsonIgnoreProperties(value = { "request", "milestone" })
+//	@JsonIgnoreProperties(value = { "request", "milestone" })
+	@JsonIgnoreProperties(value = { "milestone" })
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
@@ -84,6 +85,6 @@ public class Milestone {
 
 	public void setDeal(Deal deal) {
 		this.deal = deal;
-	}
+	}	
 
 }

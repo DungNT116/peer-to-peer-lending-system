@@ -1,5 +1,6 @@
 package capstone.p2plend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,11 @@ import org.springframework.stereotype.Service;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.Deal;
+import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.entity.Request;
 import capstone.p2plend.repo.UserRepository;
 import capstone.p2plend.repo.DealRepository;
+import capstone.p2plend.repo.MilestoneRepository;
 import capstone.p2plend.repo.RequestRepository;
 
 @Service
@@ -28,6 +31,9 @@ public class RequestService {
 
 	@Autowired
 	DealRepository dealRepo;
+
+	@Autowired
+	MilestoneRepository milestoneRepo;
 
 	@Autowired
 	JwtService jwtService;
@@ -177,19 +183,32 @@ public class RequestService {
 
 	public boolean createRequest(Request request, String token) {
 		try {
+			Deal deal = new Deal();
+			if (request.getDeal() != null) {
+
+				deal = request.getDeal();
+			}
+			List<Milestone> listMilestone = new ArrayList<>();
+			if (request.getDeal().getMilestone() != null) {
+
+				listMilestone.addAll(request.getDeal().getMilestone());
+			}
+
 			String username = jwtService.getUsernameFromToken(token);
 			User account = accountRepo.findByUsername(username);
 
 			request.setBorrower(account);
 			request.setStatus("pending");
+			Request reObj = requestRepo.saveAndFlush(request);
 
-			Deal deal = new Deal();
 			deal.setStatus("pending");
-			deal.setRequest(request);
+			deal.setRequest(reObj);
+			Deal dealObj = dealRepo.saveAndFlush(deal);
 
-			request.setDeal(deal);
-
-			requestRepo.save(request);
+			for (Milestone m : listMilestone) {
+				m.setDeal(dealObj);
+				milestoneRepo.saveAndFlush(m);
+			}
 			return true;
 		} catch (Exception e) {
 			return false;

@@ -55,11 +55,13 @@ public class User {
 	@Column
 	private String status;
 
-	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
+//	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
+	@JsonIgnoreProperties(value = { "borrower", "lender" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "borrower")
 	private List<Request> borrowRequest = new ArrayList<>();
 
-	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
+//	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
+	@JsonIgnoreProperties(value = { "borrower", "lender" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lender")
 	private List<Request> lendRequest = new ArrayList<>();;
 

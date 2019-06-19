@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import capstone.p2plend.entity.Deal;
 import capstone.p2plend.entity.Request;
+import capstone.p2plend.entity.Transaction;
 import capstone.p2plend.repo.DealRepository;
 import capstone.p2plend.repo.RequestRepository;
 import capstone.p2plend.repo.UserRepository;
@@ -26,6 +27,28 @@ public class DealService {
 	@Autowired
 	JwtService jwtService;
 
+	public boolean newDeal(Deal deal) {
+		try {
+
+			dealRepo.saveAndFlush(deal);
+			
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public boolean updateDeal(Deal deal) {
+		try {
+
+			dealRepo.saveAndFlush(deal);
+			
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
 	public List<Deal> findAll() {
 		return dealRepo.findAll();
 	}
