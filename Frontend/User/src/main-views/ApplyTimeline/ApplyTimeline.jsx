@@ -35,7 +35,7 @@ class ApplyTimeline extends React.Component {
       curIdx: 0,
       prevIdx: -1,
       editable: false,
-      EXAMPLE: [
+      timeline: [
         {
           data: "2018-01-20",
           statusE: "In Progress 30%"
@@ -53,7 +53,7 @@ class ApplyTimeline extends React.Component {
           statusE: "Done"
         }
       ],
-      backup_EXAMPLE: []
+      backup_timeline: []
     };
     this.makeDeal = this.makeDeal.bind(this);
     this.saveChange = this.saveChange.bind(this);
@@ -62,12 +62,11 @@ class ApplyTimeline extends React.Component {
     this.onDayChange = this.onDayChange.bind(this);
     this.deleteMilestone = this.deleteMilestone.bind(this);
   }
-
   async makeDeal() {
     // create temporary data for making backup data
-    let dataEXAMPLE = JSON.parse(JSON.stringify(this.state.EXAMPLE));
+    let dataEXAMPLE = JSON.parse(JSON.stringify(this.state.timeline));
     await this.setState({
-      backup_EXAMPLE: dataEXAMPLE
+      backup_timeline: dataEXAMPLE
     });
     this.changeMilestone();
     //show button
@@ -76,54 +75,10 @@ class ApplyTimeline extends React.Component {
     document.getElementById("cancelButton").style.display = "";
     document.getElementById("horizontalTimeline").style.display = "none";
   }
-  cancelChange() {
-    for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
-      document.getElementById(["day-timeline-" + i]).style.display = "none";
-      document.getElementById(["delete-milestone-" + i]).style.display = "none";
-    }
-
-    document.getElementById("addMilestone").style.display = "none";
-    document.getElementById("saveTimeline").style.display = "none";
-    document.getElementById("cancelButton").style.display = "none";
-    document.getElementById("horizontalTimeline").style.display = "";
-  }
-  async saveChange() {
-    let isDuplicate = false;
-    //create new array same with timeline for modifing
-    let EXAMPLEcopy = JSON.parse(JSON.stringify(this.state.backup_EXAMPLE));
-    for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
-      EXAMPLEcopy[i].data = document.getElementById([
-        "day-timeline-" + i
-      ]).value;
-    }
-    for (let i = 0; i < EXAMPLEcopy.length; i++) {
-      EXAMPLEcopy.sort(function(day1, day2) {
-        if (new Date(day1.data) - new Date(day2.data) == 0) {
-          isDuplicate = true;
-          return console.log("Duplicate date in milestone");
-        }
-        return new Date(day1.data) - new Date(day2.data);
-      });
-    }
-    if (!isDuplicate) {
-      // save data after changing
-      await this.setState({
-        EXAMPLE: EXAMPLEcopy
-      });
-      for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
-        document.getElementById(["day-timeline-" + i]).style.display = "none";
-        document.getElementById(["delete-milestone-" + i]).style.display = "none";
-      }
-      document.getElementById("addMilestone").style.display = "none";
-      document.getElementById("saveTimeline").style.display = "none";
-      document.getElementById("cancelButton").style.display = "none";
-      document.getElementById("horizontalTimeline").style.display = "";
-    }
-  }
   async addChange() {
     await this.setState({
-      backup_EXAMPLE: [
-        ...this.state.backup_EXAMPLE,
+      backup_timeline: [
+        ...this.state.backup_timeline,
         {
           data: "2019-07-03",
           statusE: "ABC"
@@ -139,17 +94,62 @@ class ApplyTimeline extends React.Component {
     document.getElementById("cancelButton").style.display = "";
     document.getElementById("horizontalTimeline").style.display = "";
   }
+  async saveChange() {
+    let isDuplicate = false;
+    //create new array same with timeline for modifing
+    let timelineCopy = JSON.parse(JSON.stringify(this.state.backup_timeline));
+    for (let i = 0; i < this.state.backup_timeline.length; i++) {
+      timelineCopy[i].data = document.getElementById([
+        "day-timeline-" + i
+      ]).value;
+    }
+    //Sort and check duplicate before saving
+    for (let i = 0; i < timelineCopy.length; i++) {
+      timelineCopy.sort(function(day1, day2) {
+        if (new Date(day1.data) - new Date(day2.data) == 0) {
+          isDuplicate = true;
+          return console.log("Duplicate date in milestone"); // popup show Error
+        }
+        return new Date(day1.data) - new Date(day2.data);
+      });
+    }
+    if (!isDuplicate) {
+      // save data after changing
+      await this.setState({
+        timeline: timelineCopy
+      });
+      for (let i = 0; i < this.state.backup_timeline.length; i++) {
+        document.getElementById(["day-timeline-" + i]).style.display = "none";
+        document.getElementById(["delete-milestone-" + i]).style.display = "none";
+      }
+      document.getElementById("addMilestone").style.display = "none";
+      document.getElementById("saveTimeline").style.display = "none";
+      document.getElementById("cancelButton").style.display = "none";
+      document.getElementById("horizontalTimeline").style.display = "";
+    }
+  }
+  cancelChange() {
+    for (let i = 0; i < this.state.backup_timeline.length; i++) {
+      document.getElementById(["day-timeline-" + i]).style.display = "none";
+      document.getElementById(["delete-milestone-" + i]).style.display = "none";
+    }
+
+    document.getElementById("addMilestone").style.display = "none";
+    document.getElementById("saveTimeline").style.display = "none";
+    document.getElementById("cancelButton").style.display = "none";
+    document.getElementById("horizontalTimeline").style.display = "";
+  }
   async deleteMilestone(index) {
-    if (this.state.backup_EXAMPLE.length <= 2) {
+    if (this.state.backup_timeline.length <= 2) {
       // Using modal for popup error
       console.log("Timeline have at least 2 milestone");
     } else {
-      await this.state.backup_EXAMPLE.splice(index, 1);
+      await this.state.backup_timeline.splice(index, 1);
       document.getElementById(
-        "day-timeline-" + this.state.backup_EXAMPLE.length
+        "day-timeline-" + this.state.backup_timeline.length
       ).style.display = "none";
       document.getElementById(
-        "delete-milestone-" + this.state.backup_EXAMPLE.length
+        "delete-milestone-" + this.state.backup_timeline.length
       ).style.display = "none";
       this.cancelChange();
       this.changeMilestone();
@@ -161,11 +161,11 @@ class ApplyTimeline extends React.Component {
     }
   }
   changeMilestone() {
-    for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
+    for (let i = 0; i < this.state.backup_timeline.length; i++) {
       document.getElementById(["day-timeline-" + i]).style.display = "";
       document.getElementById([
         "day-timeline-" + i
-      ]).value = this.state.backup_EXAMPLE[i].data;
+      ]).value = this.state.backup_timeline[i].data;
       document.getElementById(["delete-milestone-" + i]).style.display = "";
     }
   }
@@ -195,7 +195,7 @@ class ApplyTimeline extends React.Component {
           stiffness: 0,
           damping: 25
         }}
-        values={this.state.EXAMPLE.map(x => x.data)}
+        values={this.state.timeline.map(x => x.data)}
       />
     );
   }
@@ -206,8 +206,8 @@ class ApplyTimeline extends React.Component {
   }
   render() {
     const { curIdx, prevIdx } = this.state;
-    // const curStatus = this.state.EXAMPLE[curIdx].statusE;
-    // const prevStatus = prevIdx >= 0 ? this.state.EXAMPLE[prevIdx].statusE : "";
+    // const curStatus = this.state.timeline[curIdx].statusE;
+    // const prevStatus = prevIdx >= 0 ? this.state.timeline[prevIdx].statusE : "";
     return (
       <>
         <DemoNavbar />
@@ -246,7 +246,7 @@ class ApplyTimeline extends React.Component {
                   <Row className="justify-content-center ">
                     <CardBody className="p-lg-5 ">
                       <h4 className="mb-1">Timeline Implement</h4>
-                      {this.state.backup_EXAMPLE.map((data, index) => (
+                      {this.state.backup_timeline.map((data, index) => (
                         <Row key={index}>
                           <Col md="4">
                             <Input
