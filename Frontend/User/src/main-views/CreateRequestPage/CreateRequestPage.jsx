@@ -257,8 +257,8 @@ class CreateRequestPage extends React.Component {
                             </InputGroup>
                           </Col>
                         </FormGroup> */}
-                        <p>TimeLine is  here</p>
-                        {/* <ApplyTimeline /> */}
+                        {/* <p>TimeLine is here</p> */}
+                        <ApplyTimeline></ApplyTimeline>
                         <div>
                           {/* <Button
                             type="submit"

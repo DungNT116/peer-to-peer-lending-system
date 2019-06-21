@@ -197,7 +197,7 @@ class Register extends React.Component {
               <Row className="justify-content-center">
                 <Col lg="7">
                   <Card className="bg-secondary shadow border-0">
-                    <CardHeader className="bg-white pb-5">
+                    {/* <CardHeader className="bg-white pb-5">
                       <div className="text-muted text-center mb-3">
                         <small>Sign up with</small>
                       </div>
@@ -231,10 +231,10 @@ class Register extends React.Component {
                           <span className="btn-inner--text">Google</span>
                         </Button>
                       </div>
-                    </CardHeader>
+                    </CardHeader> */}
                     <CardBody>
                       <div className="text-center text-muted mb-4">
-                        <p>Sign up</p>
+                        <h3>Sign up</h3>
                       </div>
                       <Form role="form" onSubmit={this.handleSubmit}>
                         <FormGroup>

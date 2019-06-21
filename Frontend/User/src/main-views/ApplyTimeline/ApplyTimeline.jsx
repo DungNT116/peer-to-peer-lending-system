@@ -16,142 +16,206 @@ import {
   Row,
   Col,
   Label,
-  Form
+  Form,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem
 } from "reactstrap";
 
-// core components
-import DemoNavbar from "../../components/Navbars/DemoNavbar";
 //api link
 import HorizontalTimeline from "react-horizontal-timeline";
 class ApplyTimeline extends React.Component {
-  componentDidMount() {
-    document.documentElement.scrollTop = 0;
-    document.scrollingElement.scrollTop = 0;
-    this.refs.main.scrollTop = 0;
-  }
+  // componentDidMount() {
+  //   document.documentElement.scrollTop = 0;
+  //   document.scrollingElement.scrollTop = 0;
+  //   this.refs.main.scrollTop = 0;
+  // }
   constructor(props) {
     super(props);
     this.state = {
-      curIdx: 0,
-      prevIdx: -1,
+      //lending state
+      curLendingId: 0,
+      prevLendingId: -1,
       editable: false,
-      EXAMPLE: [
+      isLendOnce: true,
+      isLendMany: false,
+      timeline_lending: [
         {
           data: "2018-01-20",
-          statusE: "In Progress 30%"
+          status: "In Progress 30%"
         },
         {
           data: "2018-03-20",
-          statusE: "In Progress 60%"
-        },
-        {
-          data: "2018-03-23",
-          statusE: "In Progress 90%"
-        },
-        {
-          data: "2019-03-23",
-          statusE: "Done"
+          status: "In Progress 60%"
         }
       ],
-      backup_EXAMPLE: []
+      backup_timeline_lending: [],
+      // payback state
+      curPaybackId: 0,
+      prevPaybackId: -1,
+      editable: false,
+      isPaybackOnce: true,
+      isPaybackMany: false,
+      timeline_payback: [
+        {
+          data: "2018-01-20",
+          status: "In Progress 30%"
+        },
+        {
+          data: "2018-03-20",
+          status: "In Progress 60%"
+        }
+      ],
+      backup_timeline_payback: []
     };
-    this.makeDeal = this.makeDeal.bind(this);
-    this.saveChange = this.saveChange.bind(this);
-    this.addChange = this.addChange.bind(this);
-    this.cancelChange = this.cancelChange.bind(this);
-    this.onDayChange = this.onDayChange.bind(this);
-    this.deleteMilestone = this.deleteMilestone.bind(this);
-  }
+    this.changeTimeLineLending = this.changeTimeLineLending.bind(this);
+    this.saveTimeLineLending = this.saveTimeLineLending.bind(this);
+    this.addMilestoneLending = this.addMilestoneLending.bind(this);
+    this.cancelTimeLineLending = this.cancelTimeLineLending.bind(this);
+    this.onDayChangeLending = this.onDayChangeLending.bind(this);
+    this.deleteMilestoneLending = this.deleteMilestoneLending.bind(this);
 
-  async makeDeal() {
+    this.changePaybackTimeLine = this.changePaybackTimeLine.bind(this);
+    this.savePaybackTimeLine = this.savePaybackTimeLine.bind(this);
+    this.addPaybackMilestone = this.addPaybackMilestone.bind(this);
+    this.cancelPaybackTimeLine = this.cancelPaybackTimeLine.bind(this);
+    this.onDayChangePayback = this.onDayChangePayback.bind(this);
+    this.deleteMilestonePayback = this.deleteMilestonePayback.bind(this);
+  }
+  // Begin Function Lending
+  async changeTimeLineLending() {
     // create temporary data for making backup data
-    let dataEXAMPLE = JSON.parse(JSON.stringify(this.state.EXAMPLE));
+    let dataEXAMPLE = JSON.parse(JSON.stringify(this.state.timeline_lending));
     await this.setState({
-      backup_EXAMPLE: dataEXAMPLE
+      backup_timeline_lending: dataEXAMPLE
     });
-    this.changeMilestone();
+    this.changeLendingMilestone();
     //show button
-    document.getElementById("addMilestone").style.display = "";
-    document.getElementById("saveTimeline").style.display = "";
-    document.getElementById("cancelButton").style.display = "";
-    document.getElementById("horizontalTimeline").style.display = "none";
-  }
-  cancelChange() {
-    for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
-      document.getElementById(["day-timeline-" + i]).style.display = "none";
-      document.getElementById(["delete-milestone-" + i]).style.display = "none";
+    if (this.state.isLendMany) {
+      document.getElementById("addMilestoneLending").style.display = "";
     }
-
-    document.getElementById("addMilestone").style.display = "none";
-    document.getElementById("saveTimeline").style.display = "none";
-    document.getElementById("cancelButton").style.display = "none";
-    document.getElementById("horizontalTimeline").style.display = "";
+    document.getElementById("saveTimelineLending").style.display = "";
+    document.getElementById("cancelButtonLending").style.display = "";
+    document.getElementById("horizontalLendingTimeline").style.display = "none";
+    document.getElementById("dropdownChooseLending").style.display = "none";
   }
-  async saveChange() {
-    //create new array same with timeline for modifing
-    let EXAMPLEcopy = JSON.parse(JSON.stringify(this.state.backup_EXAMPLE));
-    for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
-      EXAMPLEcopy[i].data = document.getElementById([
-        "day-timeline-" + i
-      ]).value;
-      document.getElementById(["day-timeline-" + i]).style.display = "none";
-      document.getElementById(["delete-milestone-" + i]).style.display = "none";
-    }
-    // save data after changing
+  async addMilestoneLending() {
     await this.setState({
-      EXAMPLE: EXAMPLEcopy
-    });
-    document.getElementById("addMilestone").style.display = "none";
-    document.getElementById("saveTimeline").style.display = "none";
-    document.getElementById("cancelButton").style.display = "none";
-    document.getElementById("horizontalTimeline").style.display = "";
-  }
-  async addChange() {
-    await this.setState({
-      backup_EXAMPLE: [
-        ...this.state.backup_EXAMPLE,
+      backup_timeline_lending: [
+        ...this.state.backup_timeline_lending,
         {
           data: "2019-07-03",
-          statusE: "ABC"
+          status: "ABC"
         }
       ]
     });
     //re-render change milestone
-    this.cancelChange();
-    this.changeMilestone();
+    this.cancelTimeLineLending();
+    this.changeLendingMilestone();
     //show button
-    document.getElementById("addMilestone").style.display = "";
-    document.getElementById("saveTimeline").style.display = "";
-    document.getElementById("cancelButton").style.display = "";
-    document.getElementById("horizontalTimeline").style.display = "";
+    if (this.state.isLendMany) {
+      document.getElementById("addMilestoneLending").style.display = "";
+    }
+    document.getElementById("saveTimelineLending").style.display = "";
+    document.getElementById("cancelButtonLending").style.display = "";
+    document.getElementById("horizontalLendingTimeline").style.display = "none";
+    document.getElementById("dropdownChooseLending").style.display = "none";
   }
-  async deleteMilestone(index){
-    if(this.state.backup_EXAMPLE.length <= 2){
+  async saveTimeLineLending() {
+    let isDuplicate = false;
+    //create new array same with timeline_lending for modifing
+    let timelineCopy = JSON.parse(
+      JSON.stringify(this.state.backup_timeline_lending)
+    );
+    for (let i = 0; i < this.state.backup_timeline_lending.length; i++) {
+      timelineCopy[i].data = document.getElementById([
+        "day-timeline-lending-" + i
+      ]).value;
+    }
+    //Sort and check duplicate before saving
+    for (let i = 0; i < timelineCopy.length; i++) {
+      timelineCopy.sort(function(day1, day2) {
+        if (new Date(day1.data) - new Date(day2.data) == 0) {
+          isDuplicate = true;
+        }
+        return new Date(day1.data) - new Date(day2.data);
+      });
+    }
+    if (!isDuplicate) {
+      // save data after changing
+      await this.setState({
+        timeline_lending: timelineCopy
+      });
+      for (let i = 0; i < this.state.backup_timeline_lending.length; i++) {
+        document.getElementById(["day-timeline-lending-" + i]).style.display =
+          "none";
+        document.getElementById([
+          "delete-milestone-lending-" + i
+        ]).style.display = "none";
+      }
+      if (this.state.isLendMany) {
+        document.getElementById("addMilestoneLending").style.display = "none";
+      }
+      document.getElementById("saveTimelineLending").style.display = "none";
+      document.getElementById("cancelButtonLending").style.display = "none";
+      document.getElementById("horizontalLendingTimeline").style.display = "";
+      document.getElementById("dropdownChooseLending").style.display = "";
+    } else {
+      window.alert("Duplicate date in milestone"); // popup show Error
+    }
+  }
+  cancelTimeLineLending() {
+    for (let i = 0; i < this.state.backup_timeline_lending.length; i++) {
+      document.getElementById(["day-timeline-lending-" + i]).style.display =
+        "none";
+      document.getElementById(["delete-milestone-lending-" + i]).style.display =
+        "none";
+    }
+    if (this.state.isLendMany) {
+      document.getElementById("addMilestoneLending").style.display = "none";
+    }
+    document.getElementById("saveTimelineLending").style.display = "none";
+    document.getElementById("cancelButtonLending").style.display = "none";
+    document.getElementById("horizontalLendingTimeline").style.display = "";
+    document.getElementById("dropdownChooseLending").style.display = "";
+  }
+  async deleteMilestoneLending(index) {
+    if (this.state.backup_timeline_lending.length <= 2) {
       // Using modal for popup error
-      console.log("Timeline have at least 2 milestone")
-    }else{
-      await this.state.backup_EXAMPLE.splice(index,1)
-      document.getElementById("day-timeline-" + this.state.backup_EXAMPLE.length).style.display = "none";
-      document.getElementById("delete-milestone-" + this.state.backup_EXAMPLE.length ).style.display = "none";
-      this.cancelChange();
-      this.changeMilestone();
+      window.alert("Timeline have at least 2 milestone");
+    } else {
+      await this.state.backup_timeline_lending.splice(index, 1);
+      document.getElementById(
+        "day-timeline-lending-" + this.state.backup_timeline_lending.length
+      ).style.display = "none";
+      document.getElementById(
+        "delete-milestone-lending-" + this.state.backup_timeline_lending.length
+      ).style.display = "none";
+      this.cancelTimeLineLending();
+      this.changeLendingMilestone();
       //show button
-      document.getElementById("addMilestone").style.display = "";
-      document.getElementById("saveTimeline").style.display = "";
-      document.getElementById("cancelButton").style.display = "";
-      document.getElementById("horizontalTimeline").style.display = "none";
+      if (this.state.isLendMany) {
+        document.getElementById("addMilestoneLending").style.display = "";
+      }
+      document.getElementById("saveTimelineLending").style.display = "";
+      document.getElementById("cancelButtonLending").style.display = "";
+      document.getElementById("horizontalLendingTimeline").style.display =
+        "none";
+      document.getElementById("dropdownChooseLending").style.display = "none";
     }
   }
-  changeMilestone() {
-    for (let i = 0; i < this.state.backup_EXAMPLE.length; i++) {
-      document.getElementById(["day-timeline-" + i]).style.display = "";
+  changeLendingMilestone() {
+    for (let i = 0; i < this.state.backup_timeline_lending.length; i++) {
+      document.getElementById(["day-timeline-lending-" + i]).style.display = "";
       document.getElementById([
-        "day-timeline-" + i
-      ]).value = this.state.backup_EXAMPLE[i].data;
-      document.getElementById(["delete-milestone-" + i]).style.display = "";
+        "day-timeline-lending-" + i
+      ]).value = this.state.backup_timeline_lending[i].data;
+      document.getElementById(["delete-milestone-lending-" + i]).style.display =
+        "";
     }
   }
-  createTimeline() {
+  createLendingTimeline() {
     return (
       <HorizontalTimeline
         styles={{
@@ -159,11 +223,11 @@ class ApplyTimeline extends React.Component {
           foreground: "#1A79AD",
           outline: "#dfdfdf"
         }}
-        index={this.state.curIdx}
+        index={this.state.curLendingId}
         indexClick={index => {
-          const curIdx = this.state.curIdx;
-          this.setState({ curIdx: index, prevIdx: curIdx });
-          this.makeDeal(index);
+          const curLendingId = this.state.curLendingId;
+          this.setState({ curLendingId: index, prevLendingId: curLendingId });
+          // this.changeTimeLineLending();
         }}
         minEventPadding={100}
         maxEventPadding={150}
@@ -177,136 +241,480 @@ class ApplyTimeline extends React.Component {
           stiffness: 0,
           damping: 25
         }}
-        values={this.state.EXAMPLE.map(x => x.data)}
+        values={this.state.timeline_lending.map(x => x.data)}
       />
     );
   }
-  onDayChange(event) {
+  onDayChangeLending(event) {
     this.setState({
-      dayTimeline: new Date(event.target.value).toLocaleDateString()
+      dayTimelineLending: new Date(event.target.value).toLocaleDateString()
     });
-  } 
+  }
+  // End Function Lending
+
+  //Begin Function Payback
+  async changePaybackTimeLine() {
+    // create temporary data for making backup data
+    let dataEXAMPLE = JSON.parse(JSON.stringify(this.state.timeline_payback));
+    await this.setState({
+      backup_timeline_payback: dataEXAMPLE
+    });
+    this.changePaybackMilestone();
+    //show button
+    if (this.state.isPaybackMany) {
+      document.getElementById("addMilestonePayback").style.display = "";
+    }
+    document.getElementById("saveTimelinePayback").style.display = "";
+    document.getElementById("cancelButtonPayback").style.display = "";
+    document.getElementById("horizontalPaybackTimeline").style.display = "none";
+    document.getElementById("dropdownChoosePayback").style.display = "none";
+  }
+  async addPaybackMilestone() {
+    await this.setState({
+      backup_timeline_payback: [
+        ...this.state.backup_timeline_payback,
+        {
+          data: "2019-07-03",
+          status: "ABC"
+        }
+      ]
+    });
+    //re-render change milestone
+    this.cancelPaybackTimeLine();
+    this.changePaybackMilestone();
+    //show button
+    if (this.state.isPaybackMany) {
+      document.getElementById("addMilestonePayback").style.display = "";
+    }
+    document.getElementById("saveTimelinePayback").style.display = "";
+    document.getElementById("cancelButtonPayback").style.display = "";
+    document.getElementById("horizontalPaybackTimeline").style.display = "none";
+    document.getElementById("dropdownChoosePayback").style.display = "none";
+  }
+  async savePaybackTimeLine() {
+    let isDuplicate = false;
+    //create new array same with timeline_payback for modifing
+    let timelineCopy = JSON.parse(
+      JSON.stringify(this.state.backup_timeline_payback)
+    );
+    for (let i = 0; i < this.state.backup_timeline_payback.length; i++) {
+      timelineCopy[i].data = document.getElementById([
+        "day-timeline-payback-" + i
+      ]).value;
+    }
+    //Sort and check duplicate before saving
+    for (let i = 0; i < timelineCopy.length; i++) {
+      timelineCopy.sort(function(day1, day2) {
+        if (new Date(day1.data) - new Date(day2.data) == 0) {
+          isDuplicate = true;
+        }
+        return new Date(day1.data) - new Date(day2.data);
+      });
+    }
+    if (!isDuplicate) {
+      // save data after changing
+      await this.setState({
+        timeline_payback: timelineCopy
+      });
+      for (let i = 0; i < this.state.backup_timeline_payback.length; i++) {
+        document.getElementById(["day-timeline-payback-" + i]).style.display =
+          "none";
+        document.getElementById([
+          "delete-milestone-payback-" + i
+        ]).style.display = "none";
+      }
+      if (this.state.isPaybackMany) {
+        document.getElementById("addMilestonePayback").style.display = "none";
+      }
+      document.getElementById("saveTimelinePayback").style.display = "none";
+      document.getElementById("cancelButtonPayback").style.display = "none";
+      document.getElementById("horizontalPaybackTimeline").style.display = "";
+      document.getElementById("dropdownChoosePayback").style.display = "";
+    } else {
+      window.alert("Duplicate date in milestone"); // popup show Error
+    }
+  }
+  cancelPaybackTimeLine() {
+    for (let i = 0; i < this.state.backup_timeline_payback.length; i++) {
+      document.getElementById(["day-timeline-payback-" + i]).style.display =
+        "none";
+      document.getElementById(["delete-milestone-payback-" + i]).style.display =
+        "none";
+    }
+    if (this.state.isPaybackMany) {
+      document.getElementById("addMilestonePayback").style.display = "none";
+    }
+    document.getElementById("saveTimelinePayback").style.display = "none";
+    document.getElementById("cancelButtonPayback").style.display = "none";
+    document.getElementById("horizontalPaybackTimeline").style.display = "";
+    document.getElementById("dropdownChoosePayback").style.display = "";
+  }
+  async deleteMilestonePayback(index) {
+    if (this.state.backup_timeline_payback.length <= 2) {
+      // Using modal for popup error
+      window.alert("Timeline have at least 2 milestone");
+    } else {
+      await this.state.backup_timeline_payback.splice(index, 1);
+      document.getElementById(
+        "day-timeline-payback-" + this.state.backup_timeline_payback.length
+      ).style.display = "none";
+      document.getElementById(
+        "delete-milestone-payback-" + this.state.backup_timeline_payback.length
+      ).style.display = "none";
+      this.cancelPaybackTimeLine();
+      this.changePaybackMilestone();
+      //show button
+      if (this.state.isPaybackMany) {
+        document.getElementById("addMilestonePayback").style.display = "";
+      }
+      document.getElementById("saveTimelinePayback").style.display = "";
+      document.getElementById("cancelButtonPayback").style.display = "";
+      document.getElementById("horizontalPaybackTimeline").style.display =
+        "none";
+      document.getElementById("dropdownChoosePayback").style.display = "none";
+    }
+  }
+  changePaybackMilestone() {
+    for (let i = 0; i < this.state.backup_timeline_payback.length; i++) {
+      document.getElementById(["day-timeline-payback-" + i]).style.display = "";
+      document.getElementById([
+        "day-timeline-payback-" + i
+      ]).value = this.state.backup_timeline_payback[i].data;
+      document.getElementById(["delete-milestone-payback-" + i]).style.display =
+        "";
+    }
+  }
+  createPaybackTimeline() {
+    return (
+      <HorizontalTimeline
+        styles={{
+          // background: "#f8f8f8",
+          foreground: "#1A79AD",
+          outline: "#dfdfdf"
+        }}
+        index={this.state.curPaybackId}
+        indexClick={index => {
+          const curPaybackId = this.state.curPaybackId;
+          this.setState({ curPaybackId: index, prevPaybackId: curPaybackId });
+          // this.changePaybackTimeLine();
+        }}
+        minEventPadding={100}
+        maxEventPadding={150}
+        isOpenBeginning={false}
+        isOpenEnding={false}
+        fillingMotion={{
+          stiffness: 0,
+          damping: 25
+        }}
+        slidingMotion={{
+          stiffness: 0,
+          damping: 25
+        }}
+        values={this.state.timeline_payback.map(x => x.data)}
+      />
+    );
+  }
+  onDayChangePayback(event) {
+    this.setState({
+      dayTimelinePayback: new Date(event.target.value).toLocaleDateString()
+    });
+  }
+  //End Function Payback
+
   render() {
-    const { curIdx, prevIdx } = this.state;
-    // const curStatus = this.state.EXAMPLE[curIdx].statusE;
-    // const prevStatus = prevIdx >= 0 ? this.state.EXAMPLE[prevIdx].statusE : "";
+    const {
+      curLendingId,
+      prevLendingId,
+      curPaybackId,
+      prevPaybackId
+    } = this.state;
+    const curLendingStatus = this.state.timeline_lending[curLendingId].status;
+    const prevLendingStatus =
+      prevLendingId >= 0
+        ? this.state.timeline_lending[prevLendingId].status
+        : "";
+    const isLendMany = this.state.isLendMany;
+
+    const curPaybackStatus = this.state.timeline_payback[curPaybackId].status;
+    const prevPaybackStatus =
+      prevPaybackId >= 0
+        ? this.state.timeline_payback[prevPaybackId].status
+        : "";
+    const isPaybackMany = this.state.isPaybackMany;
     return (
       <>
-        <DemoNavbar />
-        <main ref="main">
-          <div className="position-relative">
-            <section className="section section-lg section-shaped">
-              <div className="shape shape-style-1 shape-default">
-                <span />
-                <span />
-                <span />
-                <span />
-                <span />
-                <span />
-                <span />
-                <span />
-                <span />
+        {/* Begin Lending  */}
+        <Row className="justify-content-center ">
+          <CardBody className="p-lg-4">
+            <div id="dropdownChooseLending">
+              <Label>
+                Type Lending Timeline <span>&nbsp;&nbsp;&nbsp;</span>{" "}
+              </Label>
+              <UncontrolledDropdown>
+                <DropdownToggle caret color="secondary">
+                  Choose Type
+                </DropdownToggle>
+                <DropdownMenu>
+                  <DropdownItem
+                    href="#pablo"
+                    onClick={e => {
+                      if (this.state.timeline_lending.length > 2) {
+                        window.alert("Timeline have over 2 milestones.");
+                      } else {
+                        this.setState({
+                          isLendOnce: true,
+                          isLendMany: false
+                        });
+                      }
+                      e.preventDefault();
+                    }}
+                  >
+                    Lend Once
+                  </DropdownItem>
+                  <DropdownItem
+                    href="#pablo"
+                    onClick={e => {
+                      this.setState({
+                        isLendOnce: false,
+                        isLendMany: true
+                      });
+                      e.preventDefault();
+                    }}
+                  >
+                    Lend Many
+                  </DropdownItem>
+                </DropdownMenu>
+              </UncontrolledDropdown>
+            </div>
+            {this.state.backup_timeline_lending.map((data, index) => (
+              <Row key={index}>
+                <Col md="4">
+                  <Input
+                    id={"day-timeline-lending-" + index}
+                    type="date"
+                    onChange={this.onDayChangeLending.bind(this)}
+                    style={{ display: "none" }}
+                  />
+                </Col>
+                <Col>
+                  {/* Delete button */}
+                  <Button
+                    type="submit"
+                    id={"delete-milestone-lending-" + index}
+                    size="md"
+                    color="danger"
+                    style={{ display: "none" }}
+                    onClick={() => this.deleteMilestoneLending(index)}
+                  >
+                    Delete
+                  </Button>{" "}
+                </Col>
+              </Row>
+            ))}
+            {/* Lend - Add New button */}
+            {isLendMany ? (
+              <Button
+                type="submit"
+                id="addMilestoneLending"
+                size="md"
+                color="primary"
+                style={{ display: "none" }}
+                onClick={() => this.addMilestoneLending()}
+              >
+                <i className="fa fa-dot-circle-o" /> Add Milestone
+              </Button>
+            ) : (
+              ""
+            )}
+            {/* Lend - Save button */}
+            <Button
+              type="submit"
+              id="saveTimelineLending"
+              size="md"
+              color="primary"
+              style={{ display: "none" }}
+              onClick={() => this.saveTimeLineLending()}
+            >
+              <i className="fa fa-dot-circle-o" /> Save Timeline
+            </Button>{" "}
+            {/* Lend - Cancel Button */}
+            <Button
+              type="submit"
+              id="cancelButtonLending"
+              size="md"
+              color="primary"
+              style={{ display: "none" }}
+              onClick={() => this.cancelTimeLineLending()}
+            >
+              <i className="fa" /> Cancel
+            </Button>
+            <div id="horizontalLendingTimeline">
+              <Label>
+                Lending Timeline <span>&nbsp;&nbsp;&nbsp;</span>
+              </Label>
+              <Button
+                type="submit"
+                id="changeTimeline"
+                size="sm"
+                outline
+                color="primary"
+                onClick={() => this.changeTimeLineLending()}
+              >
+                Change timeline lending
+              </Button>
+              <div
+                style={{
+                  width: "100%",
+                  height: "100px",
+                  margin: "0 auto",
+                  marginTop: "20px",
+                  fontSize: "13px"
+                }}
+              >
+                {this.createLendingTimeline()}
               </div>
-              <Container className="py-lg-md d-flex">
-                <div className="col px-0">
-                  <Row>
-                    <Col lg="10">
-                      <h1 className="display-3 text-white">
-                        Apply Timeline <span>Apply Timeline </span>
-                      </h1>
-                    </Col>
-                  </Row>
-                </div>
-              </Container>
-            </section>
-          </div>
+              <div className="text-center">{curLendingStatus}</div>
+            </div>
+          </CardBody>
+        </Row>
+        {/* End Lending  */}
 
-          <section className="section">
-            <Container>
-              <Card className="card-profile shadow mt--200">
-                <div className="px-4">
-                  <Row className="justify-content-center ">
-                    <CardBody className="p-lg-5 ">
-                      <h4 className="mb-1">Timeline Implement</h4>
-                      {this.state.backup_EXAMPLE.map((data, index) => (
-                        <Row key={index}>
-                          <Col md="4">
-                            <Input
-                              id={"day-timeline-" + index}
-                              type="date"
-                              onChange={this.onDayChange.bind(this)}
-                              style={{ display: "none" }}
-                            />
-                          </Col>
-                          <Col>
-                            {/* Delete button */}
-                            <Button
-                              type="submit"
-                              id={"delete-milestone-" + index}
-                              size="md"
-                              color="danger"
-                              style={{ display: "none" }}
-                              onClick={() => this.deleteMilestone(index)}
-                            >Delete
-                            </Button>{" "}
-                          </Col>
-                        </Row>
-                      ))}
-                      {/* Add New button */}
-                      <Button
-                        type="submit"
-                        id="addMilestone"
-                        size="md"
-                        color="primary"
-                        style={{ display: "none" }}
-                        onClick={() => this.addChange()}
-                      >
-                        <i className="fa fa-dot-circle-o" /> Add Milestone
-                      </Button>{" "}
-                      {/* Save button */}
-                      <Button
-                        type="submit"
-                        id="saveTimeline"
-                        size="md"
-                        color="primary"
-                        style={{ display: "none" }}
-                        onClick={() => this.saveChange()}
-                      >
-                        <i className="fa fa-dot-circle-o" /> Save Timeline
-                      </Button>{" "}
-                      {/* Cancel Button */}
-                      <Button
-                        type="submit"
-                        id="cancelButton"
-                        size="md"
-                        color="primary"
-                        style={{ display: "none" }}
-                        onClick={() => this.cancelChange()}
-                      >
-                        <i className="fa" /> Cancel
-                      </Button>
-                      <div>
-                        <div
-                          id="horizontalTimeline"
-                          style={{
-                            width: "100%",
-                            height: "100px",
-                            margin: "0 auto",
-                            marginTop: "20px",
-                            fontSize: "13px"
-                          }}
-                        >
-                          {this.createTimeline()}
-                        </div>
-                        {/* <div className="text-center">{curStatus}</div> */}
-                      </div>
-                    </CardBody>
-                  </Row>
-                </div>
-              </Card>
-            </Container>
-          </section>
-        </main>
+        {/* Begin Payback  */}
+        <Row className="justify-content-center ">
+          <CardBody className="p-lg-4">
+            <div id="dropdownChoosePayback">
+              <Label>
+                Type Payback Timeline <span>&nbsp;&nbsp;&nbsp;</span>{" "}
+              </Label>
+              <UncontrolledDropdown>
+                <DropdownToggle caret color="secondary">
+                  Choose Type
+                </DropdownToggle>
+                <DropdownMenu>
+                  <DropdownItem
+                    href="#pablo"
+                    onClick={e => {
+                      if (this.state.timeline_payback.length > 2) {
+                        window.alert("Timeline have over 2 milestones.");
+                      } else {
+                        this.setState({
+                          isPaybackOnce: true,
+                          isPaybackMany: false
+                        });
+                      }
+                      e.preventDefault();
+                    }}
+                  >
+                    Payback Once
+                  </DropdownItem>
+                  <DropdownItem
+                    href="#pablo"
+                    onClick={e => {
+                      this.setState({
+                        isPaybackOnce: false,
+                        isPaybackMany: true
+                      });
+                      e.preventDefault();
+                    }}
+                  >
+                    Payback Many
+                  </DropdownItem>
+                </DropdownMenu>
+              </UncontrolledDropdown>
+            </div>
+            {this.state.backup_timeline_payback.map((data, index) => (
+              <Row key={index}>
+                <Col md="4">
+                  <Input
+                    id={"day-timeline-payback-" + index}
+                    type="date"
+                    onChange={this.onDayChangePayback.bind(this)}
+                    style={{ display: "none" }}
+                  />
+                </Col>
+                <Col>
+                  {/* Delete button */}
+                  <Button
+                    type="submit"
+                    id={"delete-milestone-payback-" + index}
+                    size="md"
+                    color="danger"
+                    style={{ display: "none" }}
+                    onClick={() => this.deleteMilestonePayback(index)}
+                  >
+                    Delete
+                  </Button>{" "}
+                </Col>
+              </Row>
+            ))}
+            {/* Payback - Add New button */}
+            {isPaybackMany ? (
+              <Button
+                type="submit"
+                id="addMilestonePayback"
+                size="md"
+                color="primary"
+                style={{ display: "none" }}
+                onClick={() => this.addPaybackMilestone()}
+              >
+                <i className="fa fa-dot-circle-o" /> Add Milestone
+              </Button>
+            ) : (
+              ""
+            )}
+            {/* Payback - Save button */}
+            <Button
+              type="submit"
+              id="saveTimelinePayback"
+              size="md"
+              color="primary"
+              style={{ display: "none" }}
+              onClick={() => this.savePaybackTimeLine()}
+            >
+              <i className="fa fa-dot-circle-o" /> Save Timeline
+            </Button>{" "}
+            {/* Payback - Cancel Button */}
+            <Button
+              type="submit"
+              id="cancelButtonPayback"
+              size="md"
+              color="primary"
+              style={{ display: "none" }}
+              onClick={() => this.cancelPaybackTimeLine()}
+            >
+              <i className="fa" /> Cancel
+            </Button>
+            <div id="horizontalPaybackTimeline">
+              <Label>
+                Payback Timeline <span>&nbsp;&nbsp;&nbsp;</span>
+              </Label>
+              <Button
+                type="submit"
+                id="changeTimeline"
+                size="sm"
+                outline
+                color="primary"
+                onClick={() => this.changePaybackTimeLine()}
+              >
+                Change timeline payback
+              </Button>
+              <div
+                style={{
+                  width: "100%",
+                  height: "100px",
+                  margin: "0 auto",
+                  marginTop: "20px",
+                  fontSize: "13px"
+                }}
+              >
+                {this.createPaybackTimeline()}
+              </div>
+              <div className="text-center">{curPaybackStatus}</div>
+            </div>
+          </CardBody>
+        </Row>
+
+        {/* End Payback  */}
       </>
     );
   }
