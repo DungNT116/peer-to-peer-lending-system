@@ -21,13 +21,13 @@ class Login extends React.Component {
     this.state = {
       username: '',
       password: '',
-      savedToken: ''
+      // savedToken: ''
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    this.setToken = this.setToken.bind(this);
+    // this.setToken = this.setToken.bind(this);
   }
 
   handleNameChange(event) {
@@ -38,9 +38,9 @@ class Login extends React.Component {
     this.setState({ password: event.target.value });
   }
 
-  setToken(token) {
-    this.props.setToken(token);
-  }
+  // setToken(token) {
+  //   this.props.setToken(token);
+  // }
 
   handleSubmit(event) {
     console.log(this.state.username + " " + this.state.password);
@@ -59,7 +59,18 @@ class Login extends React.Component {
                 (result) => {
                   result.text().then((data) => {
                     if(result.status === 200) {
-                      this.setToken(data);
+                      // this.setToken(data);
+    //                   let header = document.getElementsByTagName("head")[0];
+    // // console.log("header" + header);
+    // var meta = document.createElement("meta");
+    // meta.name = "token";
+    // meta.content = data;
+    // header.appendChild(meta);
+                      var token = localStorage.getItem("token");
+                      if(token !== null) {
+                        localStorage.removeItem("token");
+                      }
+                      localStorage.setItem("token", data);
                       this.props.history.push('view-request-list');
                     }
                     if(result.status !== 200) {
@@ -80,12 +91,17 @@ class Login extends React.Component {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
-    
 
   }
   render() {
     // back up save token in meta tags
     // document.getElementsByTagName("META")[3].content="Your description about the page or site here to set dynamically";
+    // let header = document.getElementsByTagName("head")[0];
+    // // console.log("header" + header);
+    // var meta = document.createElement("meta");
+    // meta.name = "token";
+    // meta.content = "aaaaa";
+    // header.appendChild(meta);
     // let metaTags = document.getElementsByTagName("META");
     // for (let index = 0; index < metaTags.length; index++) {
     //   if(metaTags[index].getAttribute("name") === "token") {
@@ -186,22 +202,23 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    tokenReducer: state.tokenReducer
-  };
-}
+// const mapStateToProps = (state) => {
+//   return {
+//     tokenReducer: state.tokenReducer
+//   };
+// }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setToken: (token) => {
-      dispatch({
-        type: "SET_TOKEN",
-        payload: token
-      });
-    }
-  }
-}
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     setToken: (token) => {
+//       dispatch({
+//         type: "SET_TOKEN",
+//         payload: token
+//       });
+//     }
+//   }
+// }
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+// export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default Login;

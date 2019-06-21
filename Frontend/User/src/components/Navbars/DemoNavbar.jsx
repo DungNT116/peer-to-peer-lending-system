@@ -23,6 +23,18 @@ import {
 } from "reactstrap";
 
 class DemoNavbar extends React.Component {
+  constructor(props) {
+    super(props);
+    // this.state = {
+
+    // }
+    this.logout = this.logout.bind(this);
+  }
+
+  logout() {
+    localStorage.removeItem("token");
+  }
+
   componentDidMount() {
     let headroom = new Headroom(document.getElementById("navbar-main"));
     // initialise
@@ -261,6 +273,19 @@ class DemoNavbar extends React.Component {
                       </span>
                       <span className="nav-link-inner--text ml-1">
                         Login
+                      </span>
+                    </Button>
+                    <Button
+                      className="btn-neutral btn-icon"
+                      color="default"
+                      href="/"
+                      onClick={this.logout()}
+                    >
+                      <span className="btn-inner--icon">
+                        <i className="fa fa-user mr-2" />
+                      </span>
+                      <span className="nav-link-inner--text ml-1">
+                        Logout
                       </span>
                     </Button>
                   </NavItem>

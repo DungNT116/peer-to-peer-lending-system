@@ -165,7 +165,11 @@ class Register extends React.Component {
   
       }).then(
         (result) => {
-          // console.log(result)
+          console.log(result)
+          result.text().then((data) => {
+            console.log(data);
+          })
+          
         }
   
       )

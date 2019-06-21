@@ -29,6 +29,7 @@ class ViewRequestList extends React.Component {
     this.getRequest = this.getRequest.bind(this);
     this.deleteRequest = this.deleteRequest.bind(this);
     this.changePage = this.changePage.bind(this);
+    this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
   }
 
   changePage(index) {
@@ -47,7 +48,8 @@ class ViewRequestList extends React.Component {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
-        "Authorization": this.props.tokenReducer.token
+        "Authorization": localStorage.getItem("token")
+        // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       },
 
@@ -70,6 +72,11 @@ class ViewRequestList extends React.Component {
     // this.props.history.push('/')
   }
 
+  convertTimeStampToDate(date) {
+    var timestampToDate = new Date(date * 1000);
+    return timestampToDate.toLocaleDateString();
+  }
+
   //maybe not use
   deleteRequest(id) {
 
@@ -77,7 +84,8 @@ class ViewRequestList extends React.Component {
       method: 'DELETE',
       headers: {
         "Content-Type": "application/json",
-        "Authorization": this.props.tokenReducer.token
+        "Authorization": localStorage.getItem("token")
+        // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
@@ -110,10 +118,10 @@ class ViewRequestList extends React.Component {
         <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
           {request.id}
         </Col></td>
-        <td>{request.amount}</td>
-        <td>{request.dueDate}</td>
-        <td>{request.createDate}</td>
-        <td>{request.duration}</td>
+        <td>{request.amount} VND</td>
+        {/* <td>{request.dueDate}</td> */}
+        <td>{this.convertTimeStampToDate(request.createDate)}</td>
+        <td>{request.duration} days</td>
         <td>{request.status}</td>
         <td>
           <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.deleteRequest(request.id)}>
@@ -168,7 +176,7 @@ class ViewRequestList extends React.Component {
                     <tr>
                       <th>Id</th>
                       <th>Amount</th>
-                      <th>DueDate</th>
+                      {/* <th>DueDate</th> */}
                       <th>CreateDate</th>
                       <th>Duration</th>
                       <th>status</th>
@@ -193,20 +201,21 @@ class ViewRequestList extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    tokenReducer: state.tokenReducer
-  }
-}
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setToken: (token) => {
-      dispatch({
-        type: "SET_TOKEN",
-        payload: token
-      });
-    }
-  }
-}
+// const mapStateToProps = (state) => {
+//   return {
+//     tokenReducer: state.tokenReducer
+//   }
+// }
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     setToken: (token) => {
+//       dispatch({
+//         type: "SET_TOKEN",
+//         payload: token
+//       });
+//     }
+//   }
+// }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ViewRequestList);
+// export default connect(mapStateToProps, mapDispatchToProps)(ViewRequestList);
+export default ViewRequestList;
