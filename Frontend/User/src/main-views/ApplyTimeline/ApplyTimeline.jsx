@@ -445,7 +445,7 @@ class ApplyTimeline extends React.Component {
       <>
         {/* Begin Lending  */}
         <Row className="justify-content-center ">
-          <CardBody className="p-lg-5 ">
+          <CardBody className="p-lg-4">
             <div id="dropdownChooseLending">
               <Label>
                 Type Lending Timeline <span>&nbsp;&nbsp;&nbsp;</span>{" "}
@@ -581,7 +581,7 @@ class ApplyTimeline extends React.Component {
 
         {/* Begin Payback  */}
         <Row className="justify-content-center ">
-          <CardBody className="p-lg-5 ">
+          <CardBody className="p-lg-4">
             <div id="dropdownChoosePayback">
               <Label>
                 Type Payback Timeline <span>&nbsp;&nbsp;&nbsp;</span>{" "}
