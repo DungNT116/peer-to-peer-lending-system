@@ -66,8 +66,8 @@ public class UserController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getById")
-	public ResponseEntity<User> getOne(@RequestBody User user) {
-		return new ResponseEntity<User>(userService.getOneById(user.getId()), HttpStatus.OK);
+	public User getOne(@RequestBody User user) {
+		return userService.getOneById(user.getId());
 	}
 	
 	@CrossOrigin
