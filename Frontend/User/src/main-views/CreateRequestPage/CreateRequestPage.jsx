@@ -22,6 +22,7 @@ import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 
 //api link
 import { apiLink } from '../../api.jsx';
+import ApplyTimeline from "main-views/ApplyTimeline/ApplyTimeline.jsx";
 
 
 class CreateRequestPage extends React.Component {
@@ -255,7 +256,8 @@ class CreateRequestPage extends React.Component {
                             </InputGroup>
                           </Col>
                         </FormGroup> */}
-                        <p>TimeLine is here</p>
+                        {/* <p>TimeLine is here</p> */}
+                        <ApplyTimeline></ApplyTimeline>
                         <div>
                           {/* <Button
                             type="submit"
