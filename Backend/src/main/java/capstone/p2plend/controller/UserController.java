@@ -51,15 +51,16 @@ public class UserController {
 	
 	@CrossOrigin
 	@PostMapping(value = "/rest/user/createUser")
-	public Integer createAccount(@RequestBody User user) {
-		HttpStatus status = null;
+	public ResponseEntity<String> createAccount(@RequestBody User user) {
+		HttpStatus httpStatus = null;
+		String result = "";
 		try {
-			userService.createAccount(user);
-			status = HttpStatus.OK;
+			result = userService.createAccount(user);
+			httpStatus = HttpStatus.OK;
 		} catch (Exception e) {
-			status = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<String>(result, httpStatus);
 	}
 
 	@CrossOrigin
