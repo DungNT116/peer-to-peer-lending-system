@@ -186,9 +186,9 @@ class Index extends React.Component {
                 </Table>
 
               </Row>
-              <Row className="align-items-center justify-content-center text-center">
+              {/* <Row className="align-items-center justify-content-center text-center">
                 <Pagination />
-              </Row>
+              </Row> */}
             </Container>
           </section>
         </main>

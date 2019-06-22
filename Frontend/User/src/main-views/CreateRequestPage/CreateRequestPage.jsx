@@ -77,6 +77,9 @@ class CreateRequestPage extends React.Component {
         if (result.status === 200) {
           alert("create success");
           this.props.history.push('view-new-request');
+        } else if(result.status === 401) {
+          localStorage.setItem("isLoggedIn", false);
+          this.props.history.push('/login-page')
         }
 
       }

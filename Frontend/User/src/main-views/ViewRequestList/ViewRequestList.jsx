@@ -72,15 +72,19 @@ class ViewRequestList extends React.Component {
       },
     }).then(
       (result) => {
-
-        result.json().then((data) => {
-          this.setState({ 
-            requests: data.data,
-            maxPage: data.maxPage
-          });
-        })
+        console.log(result);
+        if(result.status === 401) {
+          localStorage.setItem("isLoggedIn", false);
+          this.props.history.push('/login-page')
+        } else 
         if (result.status === 200) {
           // alert("create success");
+          result.json().then((data) => {
+            this.setState({ 
+              requests: data.data,
+              maxPage: data.maxPage
+            });
+          })
         }
 
       }

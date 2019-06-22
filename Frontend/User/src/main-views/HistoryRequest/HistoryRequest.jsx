@@ -46,15 +46,18 @@ class HistoryRequest extends React.Component {
         // 'Access-Control-Allow-Origin': '*'
       },
     }).then(
-      (result) => {
-        result.json().then((data) => {
-          this.setState({
-            historyRequests: data.data,
-            maxPage: data.maxPage
-          });
-        })
+      (result) => { 
         if (result.status === 200) {
           // alert("create success");
+          result.json().then((data) => {
+            this.setState({
+              historyRequests: data.data,
+              maxPage: data.maxPage
+            });
+          })
+        } else if(result.status === 401) {
+          localStorage.setItem("isLoggedIn", false);
+          this.props.history.push('/login-page')
         }
 
       }

@@ -54,18 +54,20 @@ class ViewRequestList extends React.Component {
       },
 
     }).then(
-      (result) => {
-        result.json().then((data) => {
-          console.log(data.data);
-          this.setState({
-            newRequests: data.data,
-            maxPage: data.maxPage
-          });
-        })
+      (result) => { 
         if (result.status === 200) {
           // console.log("create success");
+          result.json().then((data) => {
+            console.log(data.data);
+            this.setState({
+              newRequests: data.data,
+              maxPage: data.maxPage
+            });
+          })
+        } else if(result.status === 401) {
+          localStorage.setItem("isLoggedIn", false);
+          this.props.history.push('/login-page')
         }
-
       }
     )
     // event.preventDefault();
@@ -98,8 +100,10 @@ class ViewRequestList extends React.Component {
           alert("delete success");
           //reload data
           this.getRequest();
+        } else if(result.status === 401) {
+          localStorage.setItem("isLoggedIn", false);
+          this.props.history.push('/login-page')
         }
-
       }
     )
     // event.preventDefault();

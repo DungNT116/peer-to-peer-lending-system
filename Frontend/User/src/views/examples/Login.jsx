@@ -71,6 +71,8 @@ class Login extends React.Component {
                         localStorage.removeItem("token");
                       }
                       localStorage.setItem("token", data);
+                      localStorage.setItem("isLoggedIn", true);
+
                       this.props.history.push('view-request-list');
                     }
                     if(result.status !== 200) {
