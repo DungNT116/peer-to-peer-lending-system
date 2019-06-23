@@ -18,7 +18,7 @@ import ApplyPaypal from "main-views/ApplyPaypal/ApplyPaypal.jsx";
 import ApplyTimeline from "main-views/ApplyTimeline/ApplyTimeline.jsx";
 import ViewRequestList from "main-views/ViewRequestList/ViewRequestList.jsx";
 import ViewDetailRequest from "main-views/ViewDetailRequest/ViewDetailRequest.jsx";
-import ViewHistoryRequest from "main-views/HistoryRequest/HistoryRequest.jsx";
+import HistoryRequest from "main-views/HistoryRequest/HistoryRequest.jsx";
 import ViewRequestNew from "main-views/ViewRequestNew/ViewRequestNew.jsx";
 
 ReactDOM.render(
@@ -60,7 +60,7 @@ ReactDOM.render(
       <Route
         path="/view-history-request"
         exact
-        render={props => <ViewHistoryRequest {...props} />}
+        render={props => <HistoryRequest {...props} />}
       />
       <Route
         path="/view-new-request"

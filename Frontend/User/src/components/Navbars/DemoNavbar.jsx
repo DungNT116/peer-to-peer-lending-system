@@ -23,11 +23,30 @@ import {
 } from "reactstrap";
 
 class DemoNavbar extends React.Component {
-  componentDidMount() {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoggedIn: false
+    }
+    this.logout = this.logout.bind(this);
+  }
+
+   logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("isLoggedIn");
+  }
+
+  async componentDidMount() {
     let headroom = new Headroom(document.getElementById("navbar-main"));
     // initialise
     headroom.init();
+    if (localStorage.getItem("isLoggedIn") !== null) {
+      await this.setState({
+        isLoggedIn: localStorage.getItem("isLoggedIn")
+      });
+    }
   }
+
   render() {
     return (
       <>
@@ -131,58 +150,65 @@ class DemoNavbar extends React.Component {
                       </div>
                     </DropdownMenu>
                   </UncontrolledDropdown> */}
-                  <UncontrolledDropdown nav>
-                    <DropdownToggle nav>
-                      <i className="ni ni-collection d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">Borrowing</span>
-                    </DropdownToggle>
-                    <DropdownMenu>
-                      <DropdownItem to="/create-request-page" tag={Link}>
-                        Create Request
+                  {(this.state.isLoggedIn) ?
+                    <UncontrolledDropdown nav>
+                      <DropdownToggle nav>
+                        <i className="ni ni-collection d-lg-none mr-1" />
+                        <span className="nav-link-inner--text">Borrowing</span>
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        <DropdownItem to="/create-request-page" tag={Link}>
+                          Create Request
                       </DropdownItem>
-                      <DropdownItem to="/view-history-request" tag={Link}>
-                        View History Request
+                        <DropdownItem to="/view-history-request" tag={Link}>
+                          View History Request
                       </DropdownItem>
-                      <DropdownItem to="/view-new-request" tag={Link}>
-                        View New Request
+                        <DropdownItem to="/view-new-request" tag={Link}>
+                          View New Request
                       </DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                  <UncontrolledDropdown nav>
-                    <DropdownToggle nav>
-                      <i className="ni ni-collection d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">Lending</span>
-                    </DropdownToggle>
-                    <DropdownMenu>
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                    : ""}
+                  {(this.state.isLoggedIn) ?
+                    <UncontrolledDropdown nav>
+                      <DropdownToggle nav>
+                        <i className="ni ni-collection d-lg-none mr-1" />
+                        <span className="nav-link-inner--text">Lending</span>
+                      </DropdownToggle>
+                      <DropdownMenu>
 
-                      <DropdownItem to="/view-request-list" tag={Link}>
-                        View Request
+                        <DropdownItem to="/view-request-list" tag={Link}>
+                          View Request
                       </DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                  <UncontrolledDropdown nav>
-                    <DropdownToggle nav>
-                      <i className="ni ni-collection d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">Other</span>
-                    </DropdownToggle>
-                    <DropdownMenu>
-                      <DropdownItem to="/profile-page" tag={Link}>
-                        Profile
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                    : ""}
+                  {(this.state.isLoggedIn) ?
+                    <UncontrolledDropdown nav>
+                      <DropdownToggle nav>
+                        <i className="ni ni-collection d-lg-none mr-1" />
+                        <span className="nav-link-inner--text">Other</span>
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        <DropdownItem to="/profile-page" tag={Link}>
+                          Profile
                       </DropdownItem>
-                      <DropdownItem to="/login-page" tag={Link}>
-                        Login
+                        <DropdownItem to="/login-page" tag={Link}>
+                          Login
                       </DropdownItem>
-                      <DropdownItem to="/register-page" tag={Link}>
-                        Register
+                        <DropdownItem to="/register-page" tag={Link}>
+                          Register
                       </DropdownItem>
-                      <DropdownItem to="/apply-paypal" tag={Link}>
-                        Paypal
+                        <DropdownItem to="/apply-paypal" tag={Link}>
+                          Paypal
                       </DropdownItem>
-                      <DropdownItem to="/apply-timeline" tag={Link}>
-                        Timeline
+                        <DropdownItem to="/apply-timeline" tag={Link}>
+                          Timeline
                       </DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                    : ""}
+
                 </Nav>
                 <Nav className="align-items-lg-center ml-lg-auto" navbar>
                   {/* <NavItem>
@@ -249,20 +275,39 @@ class DemoNavbar extends React.Component {
                       Star us on Github
                     </UncontrolledTooltip>
                   </NavItem> */}
+
                   <NavItem className="d-none d-lg-block ml-lg-4">
-                    <Button
-                      className="btn-neutral btn-icon"
-                      color="default"
-                      href="#"
-                      target="_blank"
-                    >
-                      <span className="btn-inner--icon">
-                        <i className="fa fa-user mr-2" />
+                    {(this.state.isLoggedIn) ?
+                      ""
+                      :
+                      <Button
+                        className="btn-neutral btn-icon"
+                        color="default"
+                        href="/login-page"
+                      >
+                        <span className="btn-inner--icon">
+                          <i className="fa fa-user mr-2" />
+                        </span>
+                        <span className="nav-link-inner--text ml-1">
+                          Login
+                    </span>
+                      </Button>
+                    }
+                    {(this.state.isLoggedIn) ?
+                      <Button
+                        className="btn-neutral btn-icon"
+                        color="default"
+                        href="/"
+                        onClick={() => this.logout()}
+                      >
+                        <span className="btn-inner--icon">
+                          <i className="fa fa-user mr-2" />
+                        </span>
+                        <span className="nav-link-inner--text ml-1">
+                          Logout
                       </span>
-                      <span className="nav-link-inner--text ml-1">
-                        Login
-                      </span>
-                    </Button>
+                      </Button>
+                      : ""}
                   </NavItem>
                 </Nav>
               </UncontrolledCollapse>

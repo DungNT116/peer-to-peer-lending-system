@@ -66,20 +66,25 @@ class ViewRequestList extends React.Component {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
-        "Authorization": this.props.tokenReducer.token
+        "Authorization": localStorage.getItem("token")
+        // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       },
     }).then(
       (result) => {
-
-        result.json().then((data) => {
-          this.setState({ 
-            requests: data.data,
-            maxPage: data.maxPage
-          });
-        })
+        console.log(result);
+        if(result.status === 401) {
+          localStorage.setItem("isLoggedIn", false);
+          this.props.history.push('/login-page')
+        } else 
         if (result.status === 200) {
           // alert("create success");
+          result.json().then((data) => {
+            this.setState({ 
+              requests: data.data,
+              maxPage: data.maxPage
+            });
+          })
         }
 
       }
@@ -100,6 +105,7 @@ class ViewRequestList extends React.Component {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
+    // console.log(localStorage.getItem("token"));
     
     //change timestamp to date String and vice versa
     // var date = "07/22/2018";
@@ -114,16 +120,17 @@ class ViewRequestList extends React.Component {
     var timestampToDate = new Date(date * 1000);
     return timestampToDate.toLocaleDateString();
   }
+  
   render() {
     const listItems = this.state.requests.map((request, index) =>
       <tr key={index}>
         <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
           {request.id}
         </Col></td>
-        <td>{request.amount}</td>
+        <td>{request.amount} VND</td>
         <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
-        <td>{request.duration}</td>
+        <td>{request.duration} days</td>
         <td>
           <Link to="/view-detail-request">
             <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.setDataToDetailPage(request)}>
@@ -207,8 +214,8 @@ class ViewRequestList extends React.Component {
 const mapStateToProps = (state) => {
   return {
     request: state.request,
-    tokenReducer: state.tokenReducer,
-    paging: state.paging
+    // tokenReducer: state.tokenReducer,
+    // paging: state.paging
   }
 }
 const mapDispatchToProps = (dispatch) => {
@@ -218,13 +225,14 @@ const mapDispatchToProps = (dispatch) => {
         type: "SET_REQUEST",
         payload: id
       });
-    },
-    setPage: (page) => {
-      dispatch({
-        type: "SET_PAGE_NUMBER",
-        payload: page
-      });
     }
+    // ,
+    // setPage: (page) => {
+    //   dispatch({
+    //     type: "SET_PAGE_NUMBER",
+    //     payload: page
+    //   });
+    // }
   }
 }
 

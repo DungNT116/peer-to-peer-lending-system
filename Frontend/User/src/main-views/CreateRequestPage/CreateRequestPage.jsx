@@ -19,10 +19,10 @@ import {
 
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import ApplyTimeline from "../ApplyTimeline/ApplyTimeline.jsx";
 
 //api link
 import { apiLink } from '../../api.jsx';
-import ApplyTimeline from "main-views/ApplyTimeline/ApplyTimeline.jsx";
 
 
 class CreateRequestPage extends React.Component {
@@ -58,7 +58,8 @@ class CreateRequestPage extends React.Component {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
-        "Authorization": this.props.tokenReducer.token
+        "Authorization": localStorage.getItem("token")
+        // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
@@ -76,6 +77,9 @@ class CreateRequestPage extends React.Component {
         if (result.status === 200) {
           alert("create success");
           this.props.history.push('view-new-request');
+        } else if(result.status === 401) {
+          localStorage.setItem("isLoggedIn", false);
+          this.props.history.push('/login-page')
         }
 
       }
@@ -292,20 +296,21 @@ class CreateRequestPage extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    tokenReducer: state.tokenReducer
-  }
-}
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setToken: (token) => {
-      dispatch({
-        type: "SET_TOKEN",
-        payload: token
-      });
-    }
-  }
-}
+// const mapStateToProps = (state) => {
+//   return {
+//     tokenReducer: state.tokenReducer
+//   }
+// }
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     setToken: (token) => {
+//       dispatch({
+//         type: "SET_TOKEN",
+//         payload: token
+//       });
+//     }
+//   }
+// }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateRequestPage);
+// export default connect(mapStateToProps, mapDispatchToProps)(CreateRequestPage);
+export default (CreateRequestPage);

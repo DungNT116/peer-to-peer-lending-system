@@ -29,14 +29,68 @@ import Pagination from "./IndexSections/Pagination.jsx";
 // import Login from "./IndexSections/Login.jsx";
 // import Download from "./IndexSections/Download.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter";
+import Datepicker from "./IndexSections/Datepicker";
+import { apiLink } from "api";
 
 class Index extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      transactions: []
+    }
+    this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
+  }
+
+  // /rest/transaction/getTop20Transaction
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
+
+    //get transaction
+    fetch(apiLink + "/rest/transaction/getTop20Transaction", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        // "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      },
+    }).then(
+      (result) => {
+
+        result.json().then((data) => {
+          this.setState({ 
+            transactions: data
+          });
+        })
+        if (result.status === 200) {
+          // alert("create success");
+        }
+
+      }
+    )
+    // event.preventDefault();
+    // this.props.history.push('/')
   }
+
+  convertTimeStampToDate(date) {
+    var timestampToDate = new Date(date * 1000);
+    return timestampToDate.toLocaleDateString();
+  }
+
   render() {
+    const listItems = this.state.transactions.map((transaction, index) =>
+      <tr key={index}>
+        <td>
+          {transaction.id}
+        </td>
+        <td>{transaction.sender}</td>
+        <td>{transaction.receiver}</td>
+        <td>{transaction.amount} VND</td>
+        <td>{this.convertTimeStampToDate(transaction.createDate)}</td>
+        <td>{transaction.status}</td>
+      </tr>
+    );
     return (
       <>
         <DemoNavbar />
@@ -81,7 +135,7 @@ class Index extends React.Component {
                 </p>
               </Row>
               <Row className="justify-content-center text-center">
-
+              {/* <Datepicker /> */}
                 <Table>
                   <thead>
                     <tr>
@@ -94,8 +148,8 @@ class Index extends React.Component {
                     </tr>
                   </thead>
                   <tbody>
-                    {/* {listItems} */}
-                    <tr>
+                    {listItems}
+                    {/* <tr>
                       <td>1</td>
                       <td>DungNT</td>
                       <td>MinhLN</td>
@@ -126,15 +180,15 @@ class Index extends React.Component {
                       <td>1000 VND</td>
                       <td>05/06/2019</td>
                       <td>Completed</td>
-                    </tr>
+                    </tr> */}
                   </tbody>
 
                 </Table>
 
               </Row>
-              <Row className="align-items-center justify-content-center text-center">
+              {/* <Row className="align-items-center justify-content-center text-center">
                 <Pagination />
-              </Row>
+              </Row> */}
             </Container>
           </section>
         </main>

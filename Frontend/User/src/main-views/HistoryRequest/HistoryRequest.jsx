@@ -1,6 +1,7 @@
 import React from "react";
 
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 // reactstrap components
 import {
   Button,
@@ -15,10 +16,10 @@ import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import Pagination from "../../views/IndexSections/Pagination.jsx";
 
 //api link
-import {apiLink} from '../../api.jsx';
+import { apiLink } from '../../api.jsx';
 import SimpleFooter from "components/Footers/SimpleFooter";
 
-class ViewRequestList extends React.Component {
+class HistoryRequest extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -29,6 +30,8 @@ class ViewRequestList extends React.Component {
     }
     this.getRequest = this.getRequest.bind(this);
     this.changePage = this.changePage.bind(this);
+    this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
+    this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
   }
 
   getRequest() {
@@ -38,25 +41,38 @@ class ViewRequestList extends React.Component {
       method: 'GET',
       headers: {
         "Content-Type": "application/json",
-        "Authorization": this.props.tokenReducer.token
+        "Authorization": localStorage.getItem("token")
+        // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       },
     }).then(
-      (result) => {
+      (result) => { 
+        if (result.status === 200) {
+          // alert("create success");
           result.json().then((data) => {
             this.setState({
               historyRequests: data.data,
               maxPage: data.maxPage
             });
           })
-          if(result.status === 200) {
-            // alert("create success");
-          }
-
+        } else if(result.status === 401) {
+          localStorage.setItem("isLoggedIn", false);
+          this.props.history.push('/login-page')
         }
+
+      }
     )
     // event.preventDefault();
     // this.props.history.push('/')
+  }
+
+  convertTimeStampToDate(date) {
+    var timestampToDate = new Date(date * 1000);
+    return timestampToDate.toLocaleDateString();
+  }
+
+  setDataToDetailPage(id) {
+    this.props.setRequest(id);
   }
 
   changePage(index) {
@@ -77,11 +93,18 @@ class ViewRequestList extends React.Component {
         <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
           {request.id}
         </Col></td>
-        <td>{request.amount}</td>
-        <td>{request.dueDate}</td>
-        <td>{request.createDate}</td>
-        <td>{request.duration}</td>
+        <td>{request.amount} VND</td>
+        {/* <td>{request.dueDate}</td> */}
+        <td>{this.convertTimeStampToDate(request.createDate)}</td>
+        <td>{request.duration} days</td>
         <td>{request.status}</td>
+        <td>
+          <Link to="/view-detail-request">
+            <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.setDataToDetailPage(request)}>
+              <i className="fa fa-dot-circle-o"></i> View Detail
+            </Button>{' '}
+          </Link>
+        </td>
       </tr>
     );
     return (
@@ -128,12 +151,13 @@ class ViewRequestList extends React.Component {
                 <Table>
                   <thead>
                     <tr>
-                    <th>Id</th>
+                      <th>Id</th>
                       <th>Amount</th>
-                      <th>DueDate</th>
+                      {/* <th>DueDate</th> */}
                       <th>CreateDate</th>
                       <th>Duration</th>
-                      <td>status</td>
+                      <th>status</th>
+                      <th>detail</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -142,8 +166,8 @@ class ViewRequestList extends React.Component {
                 </Table>
               </Row>
               <Row className="align-items-center justify-content-center text-center">
-              <Pagination maxPage={this.state.maxPage} currentPage={this.state.page}
-                 onChange={this.getRequest} changePage={this.changePage}/>
+                <Pagination maxPage={this.state.maxPage} currentPage={this.state.page}
+                  onChange={this.getRequest} changePage={this.changePage} />
               </Row>
             </Container>
           </section>
@@ -154,20 +178,27 @@ class ViewRequestList extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    tokenReducer: state.tokenReducer
-  }
-}
+// const mapStateToProps = (state) => {
+//   return {
+//     tokenReducer: state.tokenReducer
+//   }
+// }
 const mapDispatchToProps = (dispatch) => {
   return {
-    setToken: (token) => {
+    // setToken: (token) => {
+    //   dispatch({
+    //     type: "SET_TOKEN",
+    //     payload: token
+    //   })
+    // },
+    setRequest: (id) => {
       dispatch({
-        type: "SET_TOKEN",
-        payload: token
+        type: "SET_REQUEST",
+        payload: id
       });
     }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ViewRequestList);
+// export default connect(mapStateToProps, mapDispatchToProps)(ViewRequestList);
+export default HistoryRequest;

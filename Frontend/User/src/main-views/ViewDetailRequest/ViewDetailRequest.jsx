@@ -32,7 +32,7 @@ class ViewDetailRequest extends React.Component {
       timeout: 300,
       editable: false,
       borrowDay: '',
-      payBackDay: '',
+      dueDay: '',
       borrowDuration: '',
       typeOfContact: ''
     };
@@ -41,37 +41,68 @@ class ViewDetailRequest extends React.Component {
     this.makeDeal = this.makeDeal.bind(this);
     this.saveDeal = this.saveDeal.bind(this);
     this.onBorrowDayChange = this.onBorrowDayChange.bind(this);
-    this.onPayBackDayChange = this.onPayBackDayChange.bind(this);
+    this.onDueDayChange = this.onDueDayChange.bind(this);
     this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
     this.onTypeOfContactChange = this.onTypeOfContactChange.bind(this);
+    this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
+    // this.testdaytime = this.testdaytime.bind(this);
   }
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
-    document.getElementById("borrowDay").value = "2014-02-09";
-    document.getElementById("payBackDay").value = "2014-02-09";
+
+    //change timestamp to date String and vice versa
+    // var date = "07/22/2018";
+    // var dateToTimestamp = Math.round(new Date(date).getTime() / 1000);
+    // console.log("getTime 22/7/2018: " + dateToTimestamp);
+    // var timestampToDate = new Date(dateToTimestamp * 1000);
+    // console.log("day 22/7/2018: " + timestampToDate);
+
+    // dateToTimestamp = dateToTimestamp + (86400 * 30);
+    // console.log("getTime 21/8/2018: " + dateToTimestamp);
+    // var timestampToDate2 = new Date(dateToTimestamp * 1000);
+    // console.log("day 21/8/2018: " + timestampToDate2);
+
+    // var timestampToDate = new Date(dateToTimestamp * 1000);
+
+    // console.log("dateToTimestamp: " + dateToTimestamp);
+    // console.log("timestampToDate: " +timestampToDate.toLocaleDateString())
+
+    // document.getElementById("borrowDay").value = "2014-02-09";
+    // document.getElementById("dueDay").value = "2014-02-09";
+    // document.getElementById("borrowDay").value = this.convertTimeStampToDate(this.props.request.data.amount);
+    // document.getElementById("dueDay").value = "2014-02-09";
     document.getElementById("saveDealButton").style.display = "none";
-    document.getElementById("duration").value = 1;
+    // document.getElementById("duration").value = 1;
     document.getElementById("borrowDay").style.display = "none";
     document.getElementById("duration").style.display = "none";
-    document.getElementById("payBackDay").style.display = "none";
+    document.getElementById("dueDay").style.display = "none";
+  }
+
+  convertTimeStampToDate(date) {
+    var timestampToDate = new Date(date * 1000);
+    return timestampToDate.toLocaleDateString();
   }
 
   toggleModal() {
     this.setState({ modal: !this.state.modal });
   }
 
-  makeDeal() {
-    this.setState({
+  // testdaytime() {
+    
+  // }
+
+  async makeDeal() {
+    await this.setState({
       editable: !this.state.editable,
       //when load data from api, set default data for edit field
       //when save deal p tags will have data, if we dont set it
       //p tags will have no data, if we doesnt change anything
       borrowDay: "2014-02-09",
-      borrowDuration: 1,
-      typeOfContact: 1,
-      payBackDay: "2014-02-09"
+      borrowDuration: this.props.request.data.duration / 30,
+      // typeOfContact: 1,
+      dueDay: "2014-02-09"
     });
     //button visiable and invisible
     document.getElementById("dealButton").style.display = "none";
@@ -81,16 +112,18 @@ class ViewDetailRequest extends React.Component {
     //display field to edit data
     document.getElementById("borrowDay").style.display = "";
     document.getElementById("duration").style.display = "";
-    document.getElementById("payBackDay").style.display = "";
+    document.getElementById("dueDay").style.display = "";
 
     //hidden p tags
     document.getElementById("borrowDayText").style.display = "none";
     document.getElementById("durationText").style.display = "none";
-    document.getElementById("payBackText").style.display = "none";
+    document.getElementById("dueDateText").style.display = "none";
 
     //select default value
     document.getElementById("borrowDay").value = this.state.borrowDay;
-    document.getElementById("payBackDay").value = this.state.payBackDay;
+    document.getElementById("dueDay").value = this.state.dueDay;
+    // document.getElementById("borrowDay").value = this.convertTimeStampToDate(this.state.borrowDay);
+    // document.getElementById("dueDay").value = this.convertTimeStampToDate(this.state.dueDay);
     document.getElementById("duration").value = this.state.borrowDuration;
   }
 
@@ -104,16 +137,20 @@ class ViewDetailRequest extends React.Component {
     //hidden field to edit data
     document.getElementById("borrowDay").style.display = "none";
     document.getElementById("duration").style.display = "none";
-    document.getElementById("payBackDay").style.display = "none";
+    document.getElementById("dueDay").style.display = "none";
 
     //display p tags
     document.getElementById("borrowDayText").style.display = "";
     document.getElementById("durationText").style.display = "";
-    document.getElementById("payBackText").style.display = "";
+    document.getElementById("dueDateText").style.display = "";
 
     document.getElementById("borrowDayText").innerHTML = this.state.borrowDay;
-    document.getElementById("durationText").innerHTML = this.state.borrowDuration;
-    document.getElementById("payBackText").innerHTML = this.state.payBackDay;
+    if(this.state.borrowDuration < 12) {
+      document.getElementById("durationText").innerHTML = this.state.borrowDuration * 30 + " days";
+    } else {
+      document.getElementById("durationText").innerHTML = this.state.borrowDuration + " days";
+    }
+    document.getElementById("dueDateText").innerHTML = this.state.dueDay;
   }
 
   onBorrowDayChange(event) {
@@ -121,15 +158,17 @@ class ViewDetailRequest extends React.Component {
       borrowDay: new Date(event.target.value).toLocaleDateString()
     })
   }
-  onPayBackDayChange(event) {
+  onDueDayChange(event) {
     this.setState({
-      payBackDay: new Date(event.target.value).toLocaleDateString()
+      dueDay: new Date(event.target.value).toLocaleDateString()
     })
   }
 
   onBorrowDurationChange(event) {
+    var index = event.target.selectedIndex;
+    var text = event.target[index].innerText.split(" ")[0];
     this.setState({
-      borrowDuration: event.target.value
+      borrowDuration: text
     })
   }
 
@@ -218,7 +257,7 @@ class ViewDetailRequest extends React.Component {
                               <Label className="h6">Borrow Day</Label>
                             </Col>
                             <Col md="4">
-                              <Label className="h6">Pay Back Day</Label>
+                              <Label className="h6">Due Day</Label>
                             </Col>
                           </FormGroup>
                           <FormGroup row className="py-2">
@@ -230,12 +269,13 @@ class ViewDetailRequest extends React.Component {
                               >
                                 <option value="0">Please select</option>
                                 <option value="1">30 days</option>
+                                <option value="2">60 days</option>
                                 <option value="2">90 days</option>
-                                <option value="3">1 Years(365 days)</option>
+                                <option value="12">1 Years(360 days)</option>
                               </Input>
                             </Col>
                             <Col md="4">
-                              <p className="h6" id="borrowDayText">17/05/2019</p>
+                              <p className="h6" id="borrowDayText">{this.convertTimeStampToDate(this.props.request.data.borrowDate)}</p>
                               <Input
                                 id="borrowDay"
                                 type="date"
@@ -244,12 +284,12 @@ class ViewDetailRequest extends React.Component {
                               />
                             </Col>
                             <Col md="4">
-                              <p className="h6" id="payBackText">16/06/2019</p>
+                              <p className="h6" id="dueDateText">{this.convertTimeStampToDate(this.props.request.data.borrowDate +  (86400 * this.props.request.data.duration))}</p>
                               <Input
-                                id="payBackDay"
+                                id="dueDay"
                                 type="date"
                                 disabled={!this.state.editable}
-                                onChange={this.onPayBackDayChange}
+                                onChange={this.onDueDayChange}
                               />
                             </Col>
                           </FormGroup>
@@ -266,7 +306,7 @@ class ViewDetailRequest extends React.Component {
                               <Label className="h6">Interest Received</Label>
                             </Col>
                             <Col xs="12" md="9">
-                              <p className="h6">{this.props.request.data.amount * (this.props.request.data.duration / 30) * 1.5 / 100} VND</p>
+                              <p className="h6">{Math.round((this.props.request.data.amount * (this.props.request.data.duration / 30) * 1.5 / 100) * 1000) / 1000} VND</p>
                             </Col>
                           </FormGroup>
                           <FormGroup>
