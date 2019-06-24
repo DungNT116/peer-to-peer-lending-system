@@ -1,0 +1,81 @@
+{
+  "name": "argon-design-system-react",
+  "version": "1.0.0",
+  "description": "React version of Argon Design System by Creative Tim",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/creativetimofficial/argon-design-system-react.git"
+  },
+  "keywords": [
+    "react",
+    "reactjs",
+    "argon",
+    "argon-react",
+    "design",
+    "design-react",
+    "argon-design",
+    "argon-design-react",
+    "kit",
+    "react-kit",
+    "argon-design-system",
+    "argon-design-system-react",
+    "design-system-react"
+  ],
+  "author": "Creative Tim",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/creativetimofficial/argon-design-system-react/issues"
+  },
+  "homepage": "https://demos.creative-tim.com/argon-design-system-react/",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
+    "compile-sass": "node-sass src/assets/scss/argon-design-system-react.scss src/assets/css/argon-design-system-react.css",
+    "minify-sass": "node-sass src/assets/scss/argon-design-system-react.scss src/assets/css/argon-design-system-react.min.css --output-style compressed",
+    "map-sass": "node-sass src/assets/scss/argon-design-system-react.scss src/assets/css/argon-design-system-react.css --source-map true"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "dependencies": {
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
+    "@material-ui/core": "^4.1.1",
+    "classnames": "2.2.6",
+    "glamor": "^2.20.40",
+    "glamorous": "^5.0.0",
+    "govuk-colours": "^1.0.3",
+    "headroom.js": "0.9.4",
+    "jquery": "^3.4.1",
+    "moment": "2.24.0",
+    "node-sass": "4.12.0",
+    "nouislider": "13.1.5",
+    "react": "16.8.6",
+    "react-datetime": "2.16.3",
+    "react-dom": "16.8.6",
+    "react-horizontal-timeline": "^1.5.3",
+    "react-icons": "^3.7.0",
+    "react-paypal-button-v2": "^2.3.1",
+    "react-redux": "^7.0.3",
+    "react-router": "5.0.0",
+    "react-router-dom": "5.0.0",
+    "react-scripts": "3.0.0",
+    "reactstrap": "8.0.0",
+    "redux": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/googlemaps": "3.30.19",
+    "@types/markerclustererplus": "2.1.33",
+    "@types/react": "16.8.16",
+    "typescript": "3.4.5"
+  }
+}
