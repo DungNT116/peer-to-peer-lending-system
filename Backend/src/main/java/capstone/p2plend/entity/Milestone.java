@@ -26,7 +26,13 @@ public class Milestone {
 	private Integer id;
 
 	@Column
-	private Long date;
+	private Long previousDate;
+
+	@Column
+	private Long currentDate;
+
+	@Column
+	private String type;
 
 //	@Column(name = "transaction_id", insertable = false, updatable = false)
 //	private Integer transactionId;
@@ -52,12 +58,28 @@ public class Milestone {
 		this.id = id;
 	}
 
-	public Long getDate() {
-		return date;
+	public Long getPreviousDate() {
+		return previousDate;
 	}
 
-	public void setDate(Long date) {
-		this.date = date;
+	public void setPreviousDate(Long previousDate) {
+		this.previousDate = previousDate;
+	}
+
+	public Long getCurrentDate() {
+		return currentDate;
+	}
+
+	public void setCurrentDate(Long currentDate) {
+		this.currentDate = currentDate;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public Transaction getTransaction() {
