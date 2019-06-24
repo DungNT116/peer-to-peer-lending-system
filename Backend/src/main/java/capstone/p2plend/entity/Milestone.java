@@ -26,10 +26,7 @@ public class Milestone {
 	private Integer id;
 
 	@Column
-	private Long beginDate;
-
-	@Column
-	private Long endDate;
+	private Long date;
 
 //	@Column(name = "transaction_id", insertable = false, updatable = false)
 //	private Integer transactionId;
@@ -55,20 +52,12 @@ public class Milestone {
 		this.id = id;
 	}
 
-	public Long getBeginDate() {
-		return beginDate;
+	public Long getDate() {
+		return date;
 	}
 
-	public void setBeginDate(Long beginDate) {
-		this.beginDate = beginDate;
-	}
-
-	public Long getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Long endDate) {
-		this.endDate = endDate;
+	public void setDate(Long date) {
+		this.date = date;
 	}
 
 	public Transaction getTransaction() {
@@ -85,6 +74,6 @@ public class Milestone {
 
 	public void setDeal(Deal deal) {
 		this.deal = deal;
-	}	
+	}
 
 }
