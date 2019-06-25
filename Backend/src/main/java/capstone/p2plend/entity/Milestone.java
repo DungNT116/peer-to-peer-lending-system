@@ -29,7 +29,7 @@ public class Milestone {
 	private Long previousDate;
 
 	@Column
-	private Long currentDate;
+	private Long presentDate;
 
 	@Column
 	private String type;
@@ -66,12 +66,12 @@ public class Milestone {
 		this.previousDate = previousDate;
 	}
 
-	public Long getCurrentDate() {
-		return currentDate;
+	public Long getPresentDate() {
+		return presentDate;
 	}
 
-	public void setCurrentDate(Long currentDate) {
-		this.currentDate = currentDate;
+	public void setPresentDate(Long presentDate) {
+		this.presentDate = presentDate;
 	}
 
 	public String getType() {
@@ -98,4 +98,6 @@ public class Milestone {
 		this.deal = deal;
 	}
 
+	
+	
 }
