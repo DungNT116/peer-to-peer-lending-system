@@ -1,12 +1,21 @@
 import React from "react";
 
 // reactstrap components
-import { Button, Card, Container, Row, Col } from "reactstrap";
-
+import {
+  Button,
+  Card,
+  Container,
+  Row,
+  Col,
+  CardHeader,
+  CardBody,
+  FormGroup,
+  Form,
+  Input
+} from "reactstrap";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
-
 class Profile extends React.Component {
   componentDidMount() {
     document.documentElement.scrollTop = 0;
@@ -14,12 +23,21 @@ class Profile extends React.Component {
     this.refs.main.scrollTop = 0;
   }
   render() {
+    const style ={
+      profileComponent :{
+        position:'relative',
+        top: -250,
+      },
+      myAccount : {
+        position: 'relative',
+        top: -150,
+      }
+    }
     return (
       <>
         <DemoNavbar />
         <main className="profile-page" ref="main">
           <section className="section-profile-cover section-shaped my-0">
-            {/* Circles background */}
             <div className="shape shape-style-1 shape-default alpha-4">
               <span />
               <span />
@@ -47,27 +65,27 @@ class Profile extends React.Component {
             </div>
           </section>
           <section className="section">
-            <Container>
-              <Card className="card-profile shadow mt--300">
-                <div className="px-4">
-                  <Row className="justify-content-center">
-                    <Col className="order-lg-2" lg="3">
-                      <div className="card-profile-image">
-                        <a href="#pablo" onClick={e => e.preventDefault()}>
-                          <img
-                            alt="..."
-                            className="rounded-circle"
-                            src={require("assets/img/theme/team-4-800x800.jpg")}
-                          />
-                        </a>
-                      </div>
-                    </Col>
-                    <Col
-                      className="order-lg-3 text-lg-right align-self-lg-center"
-                      lg="4"
-                    >
-                      <div className="card-profile-actions py-4 mt-lg-0">
-                        <Button
+          
+            <Container className="mt--7" style={style.profileComponent} > {/* fluid */}
+              <Row>
+                <Col className="order-xl-1 mb-5 mb-xl-0" xl="4">
+                  <Card className="card-profile shadow">
+                    <Row className="justify-content-center">
+                      <Col className="order-lg-2" lg="3">
+                        <div className="card-profile-image">
+                          <a href="#pablo" onClick={e => e.preventDefault()}>
+                            <img
+                              alt="..."
+                              className="rounded-circle"
+                              src={require("assets/img/theme/team-4-800x800.jpg")}
+                            />
+                          </a>
+                        </div>
+                      </Col>
+                    </Row>
+                    <CardHeader className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+                      <div className="d-flex justify-content-between">
+                        {/* <Button
                           className="mr-4"
                           color="info"
                           href="#pablo"
@@ -84,62 +102,266 @@ class Profile extends React.Component {
                           size="sm"
                         >
                           Message
-                        </Button>
+                        </Button> */}
                       </div>
-                    </Col>
-                    <Col className="order-lg-1" lg="4">
-                      <div className="card-profile-stats d-flex justify-content-center">
-                        <div>
-                          <span className="heading">22</span>
-                          <span className="description">Friends</span>
+                    </CardHeader>
+                    <CardBody className="pt-0 pt-md-4">
+                      <Row>
+                        <div className="col">
+                          <div className="card-profile-stats d-flex justify-content-center mt-md-5">
+                            {/* <div>
+                              <span className="heading">22</span>
+                              <span className="description">Friends</span>
+                            </div>
+                            <div>
+                              <span className="heading">10</span>
+                              <span className="description">Photos</span>
+                            </div>
+                            <div>
+                              <span className="heading">89</span>
+                              <span className="description">Comments</span>
+                            </div> */}
+                          </div>
+                        </div>
+                      </Row>
+                      <div className="text-center">
+                        <h3>
+                          Jessica Jones
+                          <span className="font-weight-light">, 27</span>
+                        </h3>
+                        <div className="h5 font-weight-300">
+                          <i className="ni location_pin mr-2" />
+                          Bucharest, Romania
+                        </div>
+                        <div className="h5 mt-4">
+                          <i className="ni business_briefcase-24 mr-2" />
+                          Solution Manager - Creative Tim Officer
                         </div>
                         <div>
-                          <span className="heading">10</span>
-                          <span className="description">Photos</span>
+                          <i className="ni education_hat mr-2" />
+                          University of Computer Science
                         </div>
-                        <div>
-                          <span className="heading">89</span>
-                          <span className="description">Comments</span>
-                        </div>
-                      </div>
-                    </Col>
-                  </Row>
-                  <div className="text-center mt-5">
-                    <h3>
-                      Jessica Jones{" "}
-                      <span className="font-weight-light">, 27</span>
-                    </h3>
-                    <div className="h6 font-weight-300">
-                      <i className="ni location_pin mr-2" />
-                      Bucharest, Romania
-                    </div>
-                    <div className="h6 mt-4">
-                      <i className="ni business_briefcase-24 mr-2" />
-                      Solution Manager - Creative Tim Officer
-                    </div>
-                    <div>
-                      <i className="ni education_hat mr-2" />
-                      University of Computer Science
-                    </div>
-                  </div>
-                  <div className="mt-5 py-5 border-top text-center">
-                    <Row className="justify-content-center">
-                      <Col lg="9">
+                        <hr className="my-4" />
                         <p>
-                          An artist of considerable range, Ryan — the name taken
-                          by Melbourne-raised, Brooklyn-based Nick Murphy —
-                          writes, performs and records all of his own music,
-                          giving it a warm, intimate feel with a solid groove
-                          structure. An artist of considerable range.
+                          Ryan — the name taken by Melbourne-raised,
+                          Brooklyn-based Nick Murphy — writes, performs and
+                          records all of his own music.
                         </p>
                         <a href="#pablo" onClick={e => e.preventDefault()}>
                           Show more
                         </a>
-                      </Col>
-                    </Row>
-                  </div>
-                </div>
-              </Card>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+                <Col className="order-xl-2 " style={style.myAccount} xl="8">
+                  <Card className="bg-secondary shadow">
+                    <CardHeader className="bg-white border-0">
+                      <Row className="align-items-center">
+                        <Col xs="6">
+                          <h3 className="mb-0">My account</h3>
+                        </Col>
+                        <Col className="text-right" xs="3">
+                          <Button
+                            color="primary"
+                            href="#pablo"
+                            onClick={e => e.preventDefault()}
+                            size="sm"
+                          >
+                            Edit Profile
+                          </Button>
+                        </Col>
+                        <Col className="text-right" xs="3">
+                          <Button
+                            color="primary"
+                            href="#pablo"
+                            onClick={e => e.preventDefault()}
+                            size="sm"
+                          >
+                            Change Password
+                          </Button>
+                        </Col>
+                      </Row>
+                    </CardHeader>
+                    <CardBody>
+                      <Form>
+                        <h6 className="heading-small text-muted mb-4">
+                          User information
+                        </h6>
+                        <div className="pl-lg-4">
+                          <Row>
+                            <Col lg="6">
+                              <FormGroup>
+                                <label
+                                  className="form-control-label"
+                                  htmlFor="input-username"
+                                >
+                                  Username
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  defaultValue="lucky.jesse"
+                                  id="input-username"
+                                  placeholder="Username"
+                                  type="text"
+                                />
+                              </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                              <FormGroup>
+                                <label
+                                  className="form-control-label"
+                                  htmlFor="input-email"
+                                >
+                                  Email address
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  id="input-email"
+                                  placeholder="jesse@example.com"
+                                  type="email"
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col lg="6">
+                              <FormGroup>
+                                <label
+                                  className="form-control-label"
+                                  htmlFor="input-first-name"
+                                >
+                                  First name
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  defaultValue="Lucky"
+                                  id="input-first-name"
+                                  placeholder="First name"
+                                  type="text"
+                                />
+                              </FormGroup>
+                            </Col>
+                            <Col lg="6">
+                              <FormGroup>
+                                <label
+                                  className="form-control-label"
+                                  htmlFor="input-last-name"
+                                >
+                                  Last name
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  defaultValue="Jesse"
+                                  id="input-last-name"
+                                  placeholder="Last name"
+                                  type="text"
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                        </div>
+                        <hr className="my-4" />
+                        {/* Address */}
+                        <h6 className="heading-small text-muted mb-4">
+                          Contact information
+                        </h6>
+                        <div className="pl-lg-4">
+                          <Row>
+                            <Col md="12">
+                              <FormGroup>
+                                <label
+                                  className="form-control-label"
+                                  htmlFor="input-address"
+                                >
+                                  Address
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
+                                  id="input-address"
+                                  placeholder="Home Address"
+                                  type="text"
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                          <Row>
+                            <Col lg="4">
+                              <FormGroup>
+                                <label
+                                  className="form-control-label"
+                                  htmlFor="input-city"
+                                >
+                                  City
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  defaultValue="New York"
+                                  id="input-city"
+                                  placeholder="City"
+                                  type="text"
+                                />
+                              </FormGroup>
+                            </Col>
+                            <Col lg="4">
+                              <FormGroup>
+                                <label
+                                  className="form-control-label"
+                                  htmlFor="input-country"
+                                >
+                                  Country
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  defaultValue="United States"
+                                  id="input-country"
+                                  placeholder="Country"
+                                  type="text"
+                                />
+                              </FormGroup>
+                            </Col>
+                            <Col lg="4">
+                              <FormGroup>
+                                <label
+                                  className="form-control-label"
+                                  htmlFor="input-country"
+                                >
+                                  Postal code
+                                </label>
+                                <Input
+                                  className="form-control-alternative"
+                                  id="input-postal-code"
+                                  placeholder="Postal code"
+                                  type="number"
+                                />
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                        </div>
+                        <hr className="my-4" />
+                        {/* Description */}
+                        <h6 className="heading-small text-muted mb-4">
+                          About me
+                        </h6>
+                        <div className="pl-lg-4">
+                          <FormGroup>
+                            <label>About Me</label>
+                            <Input
+                              className="form-control-alternative"
+                              placeholder="A few words about you ..."
+                              rows="4"
+                              defaultValue="A beautiful Dashboard for Bootstrap 4. It is Free and
+                          Open Source."
+                              type="textarea"
+                            />
+                          </FormGroup>
+                        </div>
+                      </Form>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
             </Container>
           </section>
         </main>
