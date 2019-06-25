@@ -1,25 +1,9 @@
 import React from "react";
-import Headroom from "headroom.js";
+
 // reactstrap components
 import { Button, Container, Row, Col } from "reactstrap";
 
 class Hero extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoggedIn: false
-    };
-  }
-  async componentDidMount() {
-    let headroom = new Headroom(document.getElementById("navbar-main"));
-    // initialise
-    headroom.init();
-    if (localStorage.getItem("isLoggedIn") !== null) {
-      await this.setState({
-        isLoggedIn: localStorage.getItem("isLoggedIn")
-      });
-    }
-  }
   render() {
     return (
       <>
@@ -50,28 +34,36 @@ class Hero extends React.Component {
                       style={{ width: "400px" }}
                     />
                     <p className="lead text-white">
-                      A web-based system that allows individuals lending money
-                      to others.
+                      A web-based system that allows individuals lending money to others.
                     </p>
-                    {this.state.isLoggedIn ? (
-                      ""
-                    ) : (
-                      <div className="btn-wrapper mt-5">
-                        <Button
-                          className="btn-white btn-icon mb-3 mb-sm-0"
-                          color="default"
-                          href="/register-page"
-                          size="lg"
-                        >
-                          <span className="btn-inner--icon mr-1">
-                            <i className="ni ni-cloud-download-95" />
-                          </span>
-                          <span className="btn-inner--text">
-                            Sign up to Join
-                          </span>
-                        </Button>{" "}
-                      </div>
-                    )}
+                    <div className="btn-wrapper mt-5">
+                      <Button
+                        className="btn-white btn-icon mb-3 mb-sm-0"
+                        color="default"
+                        href="#"
+                        size="lg"
+                      >
+                        <span className="btn-inner--icon mr-1">
+                          <i className="ni ni-cloud-download-95" />
+                        </span>
+                        <span className="btn-inner--text">Sign up to Join</span>
+                      </Button>{" "}
+                      {/* <Button
+                        className="btn-icon mb-3 mb-sm-0"
+                        color="github"
+                        href="https://github.com/creativetimofficial/argon-design-system-react"
+                        size="lg"
+                        target="_blank"
+                      >
+                        <span className="btn-inner--icon mr-1">
+                          <i className="fa fa-github" />
+                        </span>
+                        <span className="btn-inner--text">
+                          <span className="text-warning mr-1">Star us</span>
+                          on Github
+                        </span>
+                      </Button> */}
+                    </div>
                     {/* <div className="mt-5">
                       <small className="text-white font-weight-bold mb-0 mr-2">
                         *proudly coded by

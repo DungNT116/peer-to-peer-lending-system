@@ -26,14 +26,13 @@ import {
 //api link
 import HorizontalTimeline from "react-horizontal-timeline";
 class ApplyTimeline extends React.Component {
-  componentDidMount() {
-    // document.documentElement.scrollTop = 0;
-    // document.scrollingElement.scrollTop = 0;
-    // this.refs.main.scrollTop = 0;
-  }
+  // componentDidMount() {
+  //   document.documentElement.scrollTop = 0;
+  //   document.scrollingElement.scrollTop = 0;
+  //   this.refs.main.scrollTop = 0;
+  // }
   constructor(props) {
     super(props);
-    let duration = 30;
     this.state = {
       //lending state
       curLendingId: 0,
@@ -41,22 +40,16 @@ class ApplyTimeline extends React.Component {
       editable: false,
       isLendOnce: true,
       isLendMany: false,
-      duration: 30,
       timeline_lending: [
         {
-          data: this.formatDate(new Date(Date.now())),
+          data: "2018-01-20",
           status: "In Progress 30%"
         },
         {
-          data: this.formatDate(
-            new Date(
-              (new Date(Date.now()).getTime() / 1000 + 86400 * duration) * 1000
-            ).toLocaleDateString()
-          ),
+          data: "2018-03-20",
           status: "In Progress 60%"
         }
       ],
-
       backup_timeline_lending: [],
       // payback state
       curPaybackId: 0,
@@ -66,20 +59,11 @@ class ApplyTimeline extends React.Component {
       isPaybackMany: false,
       timeline_payback: [
         {
-          data: this.formatDate(
-            new Date(
-              (new Date(Date.now()).getTime() / 1000 + 86400 * duration) * 1000
-            ).toLocaleDateString()
-          ),
+          data: "2018-01-20",
           status: "In Progress 30%"
         },
         {
-          data: this.formatDate(
-            new Date(
-              (new Date(Date.now()).getTime() / 1000 + 86400 * duration * 2) *
-                1000
-            ).toLocaleDateString()
-          ),
+          data: "2018-03-20",
           status: "In Progress 60%"
         }
       ],
@@ -99,19 +83,6 @@ class ApplyTimeline extends React.Component {
     this.onDayChangePayback = this.onDayChangePayback.bind(this);
     this.deleteMilestonePayback = this.deleteMilestonePayback.bind(this);
   }
-
-  formatDate(date) {
-    var d = new Date(date),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
-
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
-  }
-
   // Begin Function Lending
   async changeTimeLineLending() {
     // create temporary data for making backup data
@@ -134,23 +105,11 @@ class ApplyTimeline extends React.Component {
       backup_timeline_lending: [
         ...this.state.backup_timeline_lending,
         {
-          data: this.formatDate(
-            new Date(
-              (new Date(
-                this.state.timeline_lending[
-                  this.state.timeline_lending.length - 1
-                ].data
-              ).getTime() /
-                1000 +
-                86400 * this.state.duration) *
-                1000
-            ).toLocaleDateString()
-          ),
+          data: "2019-07-03",
           status: "ABC"
         }
       ]
     });
-
     //re-render change milestone
     this.cancelTimeLineLending();
     this.changeLendingMilestone();
@@ -162,12 +121,6 @@ class ApplyTimeline extends React.Component {
     document.getElementById("cancelButtonLending").style.display = "";
     document.getElementById("horizontalLendingTimeline").style.display = "none";
     document.getElementById("dropdownChooseLending").style.display = "none";
-  }
-
-  updatePaybackTimelineState() {
-    this.setState({
-      backup_timeline_payback: []
-    });
   }
   async saveTimeLineLending() {
     let isDuplicate = false;
@@ -210,21 +163,6 @@ class ApplyTimeline extends React.Component {
       document.getElementById("dropdownChooseLending").style.display = "";
     } else {
       window.alert("Duplicate date in milestone"); // popup show Error
-    }
-    // synchonize last milestone lending with first milestone payback
-    if (this.state.backup_timeline_payback.length <= 2) {
-      let payback = [...this.state.timeline_payback];
-      payback[0].data = this.state.backup_timeline_lending[
-        this.state.backup_timeline_lending.length - 1
-      ].data;
-      payback[1].data = this.formatDate(
-        new Date(
-          (new Date(payback[0].data).getTime() / 1000 +
-            86400 * this.state.duration) *
-            1000
-        ).toLocaleDateString()
-      );
-      this.setState({ timeline_payback: payback });
     }
   }
   cancelTimeLineLending() {
@@ -293,8 +231,8 @@ class ApplyTimeline extends React.Component {
         }}
         minEventPadding={100}
         maxEventPadding={150}
-        // isOpenBeginning={false}
-        // isOpenEnding={false}
+        isOpenBeginning={false}
+        isOpenEnding={false}
         fillingMotion={{
           stiffness: 0,
           damping: 25
@@ -336,18 +274,7 @@ class ApplyTimeline extends React.Component {
       backup_timeline_payback: [
         ...this.state.backup_timeline_payback,
         {
-          data: this.formatDate(
-            new Date(
-              (new Date(
-                this.state.timeline_payback[
-                  this.state.timeline_payback.length - 1
-                ].data
-              ).getTime() /
-                1000 +
-                86400 * this.state.duration) *
-                1000
-            ).toLocaleDateString()
-          ),
+          data: "2019-07-03",
           status: "ABC"
         }
       ]
@@ -473,8 +400,8 @@ class ApplyTimeline extends React.Component {
         }}
         minEventPadding={100}
         maxEventPadding={150}
-        // isOpenBeginning={false}
-        // isOpenEnding={false}
+        isOpenBeginning={false}
+        isOpenEnding={false}
         fillingMotion={{
           stiffness: 0,
           damping: 25
@@ -572,7 +499,7 @@ class ApplyTimeline extends React.Component {
                 <Col>
                   {/* Delete button */}
                   <Button
-                    // type="submit"
+                    type="submit"
                     id={"delete-milestone-lending-" + index}
                     size="md"
                     color="danger"
@@ -587,7 +514,7 @@ class ApplyTimeline extends React.Component {
             {/* Lend - Add New button */}
             {isLendMany ? (
               <Button
-                // type="submit"
+                type="submit"
                 id="addMilestoneLending"
                 size="md"
                 color="primary"
@@ -601,7 +528,7 @@ class ApplyTimeline extends React.Component {
             )}
             {/* Lend - Save button */}
             <Button
-              // type="submit"
+              type="submit"
               id="saveTimelineLending"
               size="md"
               color="primary"
@@ -612,7 +539,7 @@ class ApplyTimeline extends React.Component {
             </Button>{" "}
             {/* Lend - Cancel Button */}
             <Button
-              // type="submit"
+              type="submit"
               id="cancelButtonLending"
               size="md"
               color="primary"
@@ -626,7 +553,7 @@ class ApplyTimeline extends React.Component {
                 Lending Timeline <span>&nbsp;&nbsp;&nbsp;</span>
               </Label>
               <Button
-                // type="submit"
+                type="submit"
                 id="changeTimeline"
                 size="sm"
                 outline
@@ -708,7 +635,7 @@ class ApplyTimeline extends React.Component {
                 <Col>
                   {/* Delete button */}
                   <Button
-                    // type="submit"
+                    type="submit"
                     id={"delete-milestone-payback-" + index}
                     size="md"
                     color="danger"
@@ -723,7 +650,7 @@ class ApplyTimeline extends React.Component {
             {/* Payback - Add New button */}
             {isPaybackMany ? (
               <Button
-                // type="submit"
+                type="submit"
                 id="addMilestonePayback"
                 size="md"
                 color="primary"
@@ -737,7 +664,7 @@ class ApplyTimeline extends React.Component {
             )}
             {/* Payback - Save button */}
             <Button
-              // type="submit"
+              type="submit"
               id="saveTimelinePayback"
               size="md"
               color="primary"
@@ -748,7 +675,7 @@ class ApplyTimeline extends React.Component {
             </Button>{" "}
             {/* Payback - Cancel Button */}
             <Button
-              // type="submit"
+              type="submit"
               id="cancelButtonPayback"
               size="md"
               color="primary"
@@ -762,7 +689,7 @@ class ApplyTimeline extends React.Component {
                 Payback Timeline <span>&nbsp;&nbsp;&nbsp;</span>
               </Label>
               <Button
-                // type="submit"
+                type="submit"
                 id="changeTimeline"
                 size="sm"
                 outline
