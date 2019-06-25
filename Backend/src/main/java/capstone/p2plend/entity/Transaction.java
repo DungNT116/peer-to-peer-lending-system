@@ -38,7 +38,8 @@ public class Transaction {
 	@Column
 	private Long createDate;
 
-	@JsonIgnoreProperties(value = { "transaction", "deal" })
+//	@JsonIgnoreProperties(value = { "transaction", "deal" })
+	@JsonIgnoreProperties(value = { "transaction" })
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "milestone_id")
 	private Milestone milestone;

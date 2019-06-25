@@ -51,22 +51,23 @@ public class UserController {
 	
 	@CrossOrigin
 	@PostMapping(value = "/rest/user/createUser")
-	public Integer createAccount(@RequestBody User user) {
-		HttpStatus status = null;
+	public ResponseEntity<String> createAccount(@RequestBody User user) {
+		HttpStatus httpStatus = null;
+		String result = "";
 		try {
-			userService.createAccount(user);
-			status = HttpStatus.OK;
+			result = userService.createAccount(user);
+			httpStatus = HttpStatus.OK;
 		} catch (Exception e) {
-			status = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<String>(result, httpStatus);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getById")
-	public ResponseEntity<User> getOne(@RequestBody User user) {
-		return new ResponseEntity<User>(userService.getOneById(user.getId()), HttpStatus.OK);
+	public User getOne(@RequestBody User user) {
+		return userService.getOneById(user.getId());
 	}
 	
 	@CrossOrigin
@@ -94,6 +95,22 @@ public class UserController {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = userService.activeAccount(user.getId());
+		if (valid == true) {
+			status = HttpStatus.OK;
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+
+		return status.value();
+	}
+	
+	@CrossOrigin
+	@Secured("ROLE_ADMIN")
+	@PutMapping(value = "/rest/user/loanLimit")
+	public Integer changeLoanLimit(@RequestBody User user) {
+		HttpStatus status = null;
+		boolean valid = false;
+		valid = userService.changeLoanLimit(user.getId(), user.getLoanLimit());
 		if (valid == true) {
 			status = HttpStatus.OK;
 		} else {

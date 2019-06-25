@@ -26,10 +26,13 @@ public class Milestone {
 	private Integer id;
 
 	@Column
-	private Long beginDate;
+	private Long previousDate;
 
 	@Column
-	private Long endDate;
+	private Long presentDate;
+
+	@Column
+	private String type;
 
 //	@Column(name = "transaction_id", insertable = false, updatable = false)
 //	private Integer transactionId;
@@ -41,7 +44,8 @@ public class Milestone {
 //	@Column(name = "deal_id", insertable = false, updatable = false)
 //	private Integer dealId;
 
-	@JsonIgnoreProperties(value = { "request", "milestone" })
+//	@JsonIgnoreProperties(value = { "request", "milestone" })
+	@JsonIgnoreProperties(value = { "milestone" })
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
@@ -54,20 +58,28 @@ public class Milestone {
 		this.id = id;
 	}
 
-	public Long getBeginDate() {
-		return beginDate;
+	public Long getPreviousDate() {
+		return previousDate;
 	}
 
-	public void setBeginDate(Long beginDate) {
-		this.beginDate = beginDate;
+	public void setPreviousDate(Long previousDate) {
+		this.previousDate = previousDate;
 	}
 
-	public Long getEndDate() {
-		return endDate;
+	public Long getPresentDate() {
+		return presentDate;
 	}
 
-	public void setEndDate(Long endDate) {
-		this.endDate = endDate;
+	public void setPresentDate(Long presentDate) {
+		this.presentDate = presentDate;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public Transaction getTransaction() {
@@ -86,4 +98,6 @@ public class Milestone {
 		this.deal = deal;
 	}
 
+	
+	
 }
