@@ -26,15 +26,30 @@ import {
 //api link
 import HorizontalTimeline from "react-horizontal-timeline";
 class ApplyTimeline extends React.Component {
-  componentWillMount() {
+  async componentWillMount() {
 
     //this function will update lending array and payback array in parent component (create request)
     this.props.onDataChange(this.state.timeline_lending, this.state.timeline_payback);
+
+    if(this.props.setTimelineData !== undefined) {
+      let timelineData = this.props.setTimelineData();
+      console.log(timelineData)
+      // = {lendingTimeline : [], payBackTimeline: []};
+      // await this.setState({
+      //   timelineData: this.props.setTimelineData()});
+      // console.log(this.state.timelineData);
+      await this.setState({
+        timeline_lending: timelineData.lendingTimeline,
+        timeline_payback: timelineData.payBackTimeline
+      })
+    }
+    
   }
   componentDidMount() {
     // document.documentElement.scrollTop = 0;
     // document.scrollingElement.scrollTop = 0;
     // this.refs.main.scrollTop = 0;
+
     
   }
   constructor(props) {
@@ -42,6 +57,7 @@ class ApplyTimeline extends React.Component {
     let duration = 30;
     this.state = {
       //lending state
+      // timelineData: {},
       curLendingId: 0,
       prevLendingId: -1,
       editable: false,
