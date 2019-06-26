@@ -46,7 +46,7 @@ public class UserService {
 		account.setLastName(user.getLastName());
 		account.setEmail(user.getEmail());
 		account.setPhoneNumber(user.getPhoneNumber());
-		
+		account.setLoanLimit(user.getLoanLimit());
 		return account;
 	}
 	
