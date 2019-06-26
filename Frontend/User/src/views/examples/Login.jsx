@@ -13,7 +13,7 @@ import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
 
 //api link
-import {apiLink} from '../../api.jsx';
+import { apiLink } from '../../api.jsx';
 
 class Login extends React.Component {
   constructor(props) {
@@ -45,48 +45,53 @@ class Login extends React.Component {
   handleSubmit(event) {
     console.log(this.state.username + " " + this.state.password);
     fetch(apiLink + "/rest/login", {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json",
-                // 'Access-Control-Allow-Origin': '*'
-            },
-            body: JSON.stringify({
-                username: this.state.username,
-                password: this.state.password,
-            })
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        // 'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        username: this.state.username,
+        password: this.state.password,
+      })
 
-        }).then(
-                (result) => {
-                  result.text().then((data) => {
-                    if(result.status === 200) {
-                      // this.setToken(data);
-    //                   let header = document.getElementsByTagName("head")[0];
-    // // console.log("header" + header);
-    // var meta = document.createElement("meta");
-    // meta.name = "token";
-    // meta.content = data;
-    // header.appendChild(meta);
-                      var token = localStorage.getItem("token");
-                      if(token !== null) {
-                        localStorage.removeItem("token");
-                      }
-                      localStorage.setItem("token", data);
-                      localStorage.setItem("isLoggedIn", true);
+    }).then(
+      (result) => {
+        result.text().then((data) => {
+          if (result.status === 200) {
+            // this.setToken(data);
+            //                   let header = document.getElementsByTagName("head")[0];
+            // // console.log("header" + header);
+            // var meta = document.createElement("meta");
+            // meta.name = "token";
+            // meta.content = data;
+            // header.appendChild(meta);
+            localStorage.setItem("token", data);
+            localStorage.setItem("isLoggedIn", true);
 
-                      this.props.history.push('view-request-list');
-                    }
-                    if(result.status !== 200) {
-                      event.preventDefault();
-                      // alert(data);
-                      if(data === "Wrong userId and password")
-                        document.getElementById("loginError").innerHTML = "<small>username or password is incorrect<br/> please try again</small>";
-                    }
-                  });
-                }
+            this.props.history.push('view-request-list');
+          }
+          if (result.status !== 200) {
+            event.preventDefault();
+            // alert(data);
+            if (data === "Wrong userId and password")
+              document.getElementById("loginError").innerHTML = "<small>username or password is incorrect<br/> please try again</small>";
+          }
+        });
+      }
 
-            )
+    )
     event.preventDefault();
     // this.props.history.push('/')
+  }
+
+  componentWillMount() {
+    // var token = localStorage.getItem("token");
+    // if (token !== null) {
+
+    // }
+    localStorage.removeItem("token");
+    localStorage.removeItem("isLoggedIn");
   }
 
   componentDidMount() {
@@ -109,11 +114,11 @@ class Login extends React.Component {
     //   if(metaTags[index].getAttribute("name") === "token") {
     //     metaTags[index].content= this.state.savedToken;
     //   }
-      
+
     // }
     return (
       <>
-        
+
         <DemoNavbar />
         <main ref="main">
           <section className="section section-shaped section-lg">
@@ -165,10 +170,10 @@ class Login extends React.Component {
                           </InputGroup>
                         </FormGroup>
                         <div>
-                          <p style={{color: "red"}} id="loginError"></p>
+                          <p style={{ color: "red" }} id="loginError"></p>
                         </div>
                         <div className="text-center my-4">
-                          <Input type="submit" value="Sign in" className="text-light"/>
+                          <Input type="submit" value="Sign in" className="text-light" />
                         </div>
                       </Form>
                     </CardBody>

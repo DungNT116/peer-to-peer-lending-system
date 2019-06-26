@@ -22,7 +22,7 @@ import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
 
 //api link
-import {apiLink} from '../../api.jsx';
+import { apiLink } from '../../api.jsx';
 
 class Register extends React.Component {
   constructor(props) {
@@ -49,6 +49,11 @@ class Register extends React.Component {
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePhoneChange = this.handlePhoneChange.bind(this);
   }
+
+  componentWillMount() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("isLoggedIn");
+  }
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -57,15 +62,15 @@ class Register extends React.Component {
 
   handleUserNameChange(event) {
     const tmp = event.target.value.trim();
-    if(!tmp.match(/^\w*$/)) {
+    if (!tmp.match(/^\w*$/)) {
       document.getElementById("usernameError").innerHTML = "username does not contain special character";
-      this.setState({ 
+      this.setState({
         username: tmp,
         validUsername: false
       });
     } else {
       document.getElementById("usernameError").innerHTML = "";
-      this.setState({ 
+      this.setState({
         username: tmp,
         validUsername: true
       });
@@ -78,15 +83,15 @@ class Register extends React.Component {
 
   handleFirstNameChange(event) {
     const tmp = event.target.value;
-    if(!tmp.match(/^[a-z A-Z]*$/)) {
+    if (!tmp.match(/^[a-z A-Z]*$/)) {
       document.getElementById("firstnameError").innerHTML = "firtname only contain alphabet character";
-      this.setState({ 
+      this.setState({
         firstname: tmp,
         validFirstname: false
       });
     } else {
       document.getElementById("firstnameError").innerHTML = "";
-      this.setState({ 
+      this.setState({
         firstname: tmp,
         validFirstname: true
       });
@@ -95,7 +100,7 @@ class Register extends React.Component {
 
   handleLastNameChange(event) {
     const tmp = event.target.value;
-    if(tmp.match(/^[a-z A-Z]*$/)) {
+    if (tmp.match(/^[a-z A-Z]*$/)) {
       document.getElementById("lastnameError").innerHTML = "";
       this.setState({
         lastname: tmp,
@@ -103,7 +108,7 @@ class Register extends React.Component {
       });
     } else {
       document.getElementById("lastnameError").innerHTML = "lastname only contain alphabet character";
-      this.setState({ 
+      this.setState({
         lastname: tmp,
         validLastname: false
       });
@@ -112,7 +117,7 @@ class Register extends React.Component {
 
   handleEmailChange(event) {
     const tmp = event.target.value.trim();
-  if(tmp.match(/^[a-zA-Z0-9]{5,30}@[a-z]{3,10}(.[a-z]{2,3})+$/)) {
+    if (tmp.match(/^[a-zA-Z0-9]{5,30}@[a-z]{3,10}(.[a-z]{2,3})+$/)) {
       document.getElementById("emailError").innerHTML = "";
       this.setState({
         email: tmp,
@@ -129,7 +134,7 @@ class Register extends React.Component {
 
   handlePhoneChange(event) {
     const tmp = event.target.value.trim();
-    if(!tmp.match(/^(\d{10,12})*$/)) {
+    if (!tmp.match(/^(\d{10,12})*$/)) {
       document.getElementById("phoneError").innerHTML = "phone only contain number";
       this.setState({
         phone: tmp,
@@ -145,9 +150,9 @@ class Register extends React.Component {
   }
 
   handleSubmit(event) {
-    if(this.state.validEmail === true && this.state.validFirstname === true 
+    if (this.state.validEmail === true && this.state.validFirstname === true
       && this.state.validLastname === true && this.state.validPhone === true
-    && this.state.validUsername === true) {
+      && this.state.validUsername === true) {
       fetch(apiLink + "/rest/user/createUser", {
         method: 'POST',
         headers: {
@@ -162,16 +167,16 @@ class Register extends React.Component {
           lastName: this.state.lastname,
           phoneNumber: this.state.phone
         })
-  
+
       }).then(
         (result) => {
           console.log(result)
           result.text().then((data) => {
             console.log(data);
           })
-          
+
         }
-  
+
       )
       // this.props.history.push('/login-page')
     }
@@ -244,7 +249,7 @@ class Register extends React.Component {
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="Firstname" type="text" value={this.state.firstname} onChange={this.handleFirstNameChange} required/>
+                            <Input placeholder="Firstname" type="text" value={this.state.firstname} onChange={this.handleFirstNameChange} required />
                           </InputGroup>
                           <p id="firstnameError"></p>
                         </FormGroup>
@@ -255,7 +260,7 @@ class Register extends React.Component {
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="Lastname" type="text" value={this.state.lastname} onChange={this.handleLastNameChange} required/>
+                            <Input placeholder="Lastname" type="text" value={this.state.lastname} onChange={this.handleLastNameChange} required />
                           </InputGroup>
                           <p id="lastnameError"></p>
                         </FormGroup>
@@ -266,7 +271,7 @@ class Register extends React.Component {
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="Email" type="text" value={this.state.email} onChange={this.handleEmailChange} required/>
+                            <Input placeholder="Email" type="text" value={this.state.email} onChange={this.handleEmailChange} required />
                           </InputGroup>
                           <p id="emailError"></p>
                         </FormGroup>
@@ -277,7 +282,7 @@ class Register extends React.Component {
                                 <i className="ni ni-hat-3" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="username" type="text" value={this.state.username} onChange={this.handleUserNameChange} required/>
+                            <Input placeholder="username" type="text" value={this.state.username} onChange={this.handleUserNameChange} required />
                           </InputGroup>
                           <p id="usernameError"></p>
                         </FormGroup>
@@ -304,7 +309,7 @@ class Register extends React.Component {
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="phone" type="phone" value={this.state.phone} onChange={this.handlePhoneChange} required/>
+                            <Input placeholder="phone" type="phone" value={this.state.phone} onChange={this.handlePhoneChange} required />
                           </InputGroup>
                           <p id="phoneError"></p>
                         </FormGroup>

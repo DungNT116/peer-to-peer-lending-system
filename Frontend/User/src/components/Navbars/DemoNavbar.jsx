@@ -25,9 +25,9 @@ import {
 class DemoNavbar extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isLoggedIn: false
-    }
+    // this.state = {
+    //   isLoggedIn: false
+    // }
     this.logout = this.logout.bind(this);
   }
 
@@ -40,14 +40,22 @@ class DemoNavbar extends React.Component {
     let headroom = new Headroom(document.getElementById("navbar-main"));
     // initialise
     headroom.init();
-    if (localStorage.getItem("isLoggedIn") !== null) {
-      await this.setState({
-        isLoggedIn: localStorage.getItem("isLoggedIn")
-      });
-    }
+    // if (localStorage.getItem("isLoggedIn") !== null) {
+    //   await this.setState({
+    //     isLoggedIn: localStorage.getItem("isLoggedIn")
+    //   });
+    // }
   }
 
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   if(this.state.isLoggedIn !== localStorage.getItem("isLoggedIn")) {
+  //     return true;
+  //   }
+  //   return false;
+  // }
+
   render() {
+    console.log(localStorage.getItem("isLoggedIn"))
     return (
       <>
         <header className="header-global">
@@ -57,7 +65,14 @@ class DemoNavbar extends React.Component {
             id="navbar-main"
           >
             <Container>
-              <NavbarBrand className="mr-lg-5" to="/" tag={Link}>
+              <NavbarBrand className="mr-lg-5" to={(() => {
+                  if (localStorage.getItem("isLoggedIn")) {
+                    return "/view-new-request";
+                  } else {
+                    return "/";
+                  }
+                })()} 
+                tag={Link}>
                 <img
                   alt="..."
                   src={require("assets/img/brand/logo-white.png")}
@@ -150,7 +165,8 @@ class DemoNavbar extends React.Component {
                       </div>
                     </DropdownMenu>
                   </UncontrolledDropdown> */}
-                  {(this.state.isLoggedIn) ?
+                  {/* {(this.state.isLoggedIn) ? */}
+                  {(localStorage.getItem("isLoggedIn")) ?
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
                         <i className="ni ni-collection d-lg-none mr-1" />
@@ -169,21 +185,20 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                     : ""}
-                  {(this.state.isLoggedIn) ?
+                  {(localStorage.getItem("isLoggedIn")) ?
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
                         <i className="ni ni-collection d-lg-none mr-1" />
                         <span className="nav-link-inner--text">Lending</span>
                       </DropdownToggle>
                       <DropdownMenu>
-
                         <DropdownItem to="/view-request-list" tag={Link}>
                           View Request
                       </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>
                     : ""}
-                  {(this.state.isLoggedIn) ?
+                  {(localStorage.getItem("isLoggedIn")) ?
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
                         <i className="ni ni-collection d-lg-none mr-1" />
@@ -277,7 +292,7 @@ class DemoNavbar extends React.Component {
                   </NavItem> */}
 
                   <NavItem className="d-none d-lg-block ml-lg-4">
-                    {(this.state.isLoggedIn) ?
+                    {(localStorage.getItem("isLoggedIn")) ?
                       ""
                       :
                       <Button
@@ -293,7 +308,7 @@ class DemoNavbar extends React.Component {
                     </span>
                       </Button>
                     }
-                    {(this.state.isLoggedIn) ?
+                    {(localStorage.getItem("isLoggedIn")) ?
                       <Button
                         className="btn-neutral btn-icon"
                         color="default"

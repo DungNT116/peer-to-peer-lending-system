@@ -56,7 +56,7 @@ class HistoryRequest extends React.Component {
             });
           })
         } else if(result.status === 401) {
-          localStorage.setItem("isLoggedIn", false);
+          localStorage.removeItem("isLoggedIn");
           this.props.history.push('/login-page')
         }
 
@@ -178,11 +178,13 @@ class HistoryRequest extends React.Component {
   }
 }
 
-// const mapStateToProps = (state) => {
-//   return {
-//     tokenReducer: state.tokenReducer
-//   }
-// }
+const mapStateToProps = (state) => {
+  return {
+    request: state.request,
+    // tokenReducer: state.tokenReducer,
+    // paging: state.paging
+  }
+}
 const mapDispatchToProps = (dispatch) => {
   return {
     // setToken: (token) => {
@@ -200,5 +202,5 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 
-// export default connect(mapStateToProps, mapDispatchToProps)(ViewRequestList);
-export default HistoryRequest;
+export default connect(mapStateToProps, mapDispatchToProps)(HistoryRequest);
+// export default HistoryRequest;

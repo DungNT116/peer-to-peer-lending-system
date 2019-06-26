@@ -23,63 +23,63 @@ import ViewRequestNew from "main-views/ViewRequestNew/ViewRequestNew.jsx";
 
 ReactDOM.render(
   <Provider store={store}>
-  <BrowserRouter>
-    <Switch>
-      <Route path="/" exact render={props => <Index {...props} />} />
-      <Route
-        path="/landing-page"
-        exact
-        render={props => <Landing {...props} />}
-      />
-      <Route path="/login-page" exact render={props => <Login {...props} />} />
-      <Route
-        path="/profile-page"
-        exact
-        render={props => <Profile {...props} />}
-      />
-      <Route
-        path="/register-page"
-        exact
-        render={props => <Register {...props} />}
-      />
-      <Route
-        path="/create-request-page"
-        exact
-        render={props => <CreateRequestPage {...props} />}
-      />
-      <Route
-        path="/view-request-list"
-        exact
-        render={props => <ViewRequestList {...props} />}
-      />
-      <Route
-        path="/view-detail-request"
-        exact
-        render={props => <ViewDetailRequest {...props} />}
-      />
-      <Route
-        path="/view-history-request"
-        exact
-        render={props => <HistoryRequest {...props} />}
-      />
-      <Route
-        path="/view-new-request"
-        exact
-        render={props => <ViewRequestNew {...props} />}
-      />
-      <Route
-        path="/apply-paypal"
-        exact
-        render={props => <ApplyPaypal {...props} />}
-      />
-      <Route
-        path="/apply-timeline"
-        exact
-        render={props => <ApplyTimeline {...props} />}
-      />
-      <Redirect to="/" />
-    </Switch>
-  </BrowserRouter>
+    <BrowserRouter>
+      <Switch>
+        <Route path="/" exact render={props => (localStorage.getItem("isLoggedIn")) ? <ViewRequestNew {...props} /> : < Index {...props} />} />
+        <Route
+          path="/landing-page"
+          exact
+          render={props => <Landing {...props} />}
+        />
+        <Route path="/login-page" exact render={props => <Login {...props} />} />
+        <Route
+          path="/profile-page"
+          exact
+          render={props => <Profile {...props} />}
+        />
+        <Route
+          path="/register-page"
+          exact
+          render={props => <Register {...props} />}
+        />
+        <Route
+          path="/create-request-page"
+          exact
+          render={props => <CreateRequestPage {...props} />}
+        />
+        <Route
+          path="/view-request-list"
+          exact
+          render={props => <ViewRequestList {...props} />}
+        />
+        <Route
+          path="/view-detail-request"
+          exact
+          render={props => <ViewDetailRequest {...props} />}
+        />
+        <Route
+          path="/view-history-request"
+          exact
+          render={props => <HistoryRequest {...props} />}
+        />
+        <Route
+          path="/view-new-request"
+          exact
+          render={props => <ViewRequestNew {...props} />}
+        />
+        <Route
+          path="/apply-paypal"
+          exact
+          render={props => <ApplyPaypal {...props} />}
+        />
+        <Route
+          path="/apply-timeline"
+          exact
+          render={props => <ApplyTimeline {...props} />}
+        />
+        <Redirect to="/" />
+      </Switch>
+    </BrowserRouter>
   </Provider>
   ,
   document.getElementById("root")

@@ -20,6 +20,8 @@ import {
   Input
 } from "reactstrap";
 
+import { PayPalButton } from "react-paypal-button-v2";
+import { apiLink, bigchainAPI, client_API } from "../../api.jsx";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
@@ -47,6 +49,44 @@ class ViewDetailRequest extends React.Component {
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     // this.testdaytime = this.testdaytime.bind(this);
   }
+
+  send_tx = () => {
+    let data_tx = {
+      data_tx: {
+        data: {
+          // txId: this.state.txId,
+          // sender: this.state.sender,
+          // receiver: this.state.receiver,
+          // amount: this.state.amount,
+          // createDate: this.state.createDate
+          txId: 'this.state.txId',
+          sender: 'this.state.sender',
+          receiver: 'this.state.receiver',
+          amount: 12,
+          createDate: 'this.state.createDate'
+        }
+      },
+      metadata_tx: {
+        // userId: this.state.userId,
+        // createDate: this.state.createDate
+        userId: 'this.state.userId',
+        createDate: 'this.state.createDate'
+      }
+    };
+    fetch(bigchainAPI + "/send_tx", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data_tx)
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+      });
+  };
+  
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -90,7 +130,7 @@ class ViewDetailRequest extends React.Component {
   }
 
   // testdaytime() {
-    
+
   // }
 
   async makeDeal() {
@@ -145,7 +185,7 @@ class ViewDetailRequest extends React.Component {
     document.getElementById("dueDateText").style.display = "";
 
     document.getElementById("borrowDayText").innerHTML = this.state.borrowDay;
-    if(this.state.borrowDuration < 12) {
+    if (this.state.borrowDuration < 12) {
       document.getElementById("durationText").innerHTML = this.state.borrowDuration * 30 + " days";
     } else {
       document.getElementById("durationText").innerHTML = this.state.borrowDuration + " days";
@@ -284,7 +324,7 @@ class ViewDetailRequest extends React.Component {
                               />
                             </Col>
                             <Col md="4">
-                              <p className="h6" id="dueDateText">{this.convertTimeStampToDate(this.props.request.data.borrowDate +  (86400 * this.props.request.data.duration))}</p>
+                              <p className="h6" id="dueDateText">{this.convertTimeStampToDate(this.props.request.data.borrowDate + (86400 * this.props.request.data.duration))}</p>
                               <Input
                                 id="dueDay"
                                 type="date"
@@ -350,6 +390,28 @@ class ViewDetailRequest extends React.Component {
                             Ban co chac chan se chap nhan yeu cau nay khong
                           </ModalBody>
                           <ModalFooter>
+                            <PayPalButton
+                              amount={12}
+                              onSuccess={(details, data) => {
+                                this.setState({
+                                  txId: details.id,
+                                  createDate: details.create_time,
+                                  status: details.status,
+                                  amount: details.purchase_units[0].amount.value
+                                });
+                                this.send_tx();
+                              }}
+                              style={{
+                                layout: "horizontal",
+                                shape: "pill",
+                                disableFunding: true,
+                                tagline: false,
+                                size: "responsive"
+                              }}
+                              options={{
+                                clientId: client_API
+                              }}
+                            />
                             <Button color="primary" onClick={this.toggleModal}>Yes</Button>{' '}
                             <Button color="secondary" onClick={this.toggleModal}>Cancel</Button>
                           </ModalFooter>

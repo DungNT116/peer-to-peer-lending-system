@@ -26,10 +26,16 @@ import {
 //api link
 import HorizontalTimeline from "react-horizontal-timeline";
 class ApplyTimeline extends React.Component {
+  componentWillMount() {
+
+    //this function will update lending array and payback array in parent component (create request)
+    this.props.onDataChange(this.state.timeline_lending, this.state.timeline_payback);
+  }
   componentDidMount() {
     // document.documentElement.scrollTop = 0;
     // document.scrollingElement.scrollTop = 0;
     // this.refs.main.scrollTop = 0;
+    
   }
   constructor(props) {
     super(props);

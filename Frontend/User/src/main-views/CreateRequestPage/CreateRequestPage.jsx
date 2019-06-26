@@ -33,10 +33,74 @@ class CreateRequestPage extends React.Component {
       borrowDuration: '',
       interestRate: '',
       createDate: '',
+      lendingTimeline: [],
+      paybackTimeline: []
     }
     this.onAmountChange = this.onAmountChange.bind(this);
     this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleDataTimeline = this.handleDataTimeline.bind(this);
+    this.createMileStone = this.createMileStone.bind(this);
+  }
+
+  createMileStone() {
+    let milestones = [];
+    let milestone = {
+      previousDate: '',
+      presentDate: '',
+      type: ''
+  }
+    for (let i = 0; i < this.state.lendingTimeline.length; i++) {
+      const element = this.state.lendingTimeline[i];
+      
+      // console.log(new Date(element.data).getTime() / 1000)
+      var dateToTimestamp = new Date(element.data).getTime() / 1000;
+      
+      if(i === 0) {
+        milestone.presentDate = dateToTimestamp;
+        milestone.previousDate = dateToTimestamp;
+        milestone.type = "lending";
+      } else {
+        const preElement = this.state.lendingTimeline[i-1];
+        var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
+        milestone.presentDate = dateToTimestamp;
+        milestone.previousDate = preDateToTimestamp;
+        milestone.type = "lending";
+      }
+      milestones.push(milestone);
+    }
+    for (let i = 0; i < this.state.paybackTimeline.length; i++) {
+      const element = this.state.paybackTimeline[i];
+      
+      // console.log(new Date(element.data).getTime() / 1000)
+      var dateToTimestamp = new Date(element.data).getTime() / 1000;
+      
+      if(i === 0) {
+        milestone.presentDate = dateToTimestamp;
+        milestone.previousDate = dateToTimestamp;
+        milestone.type = "payback";
+      } else {
+        const preElement = this.state.paybackTimeline[i-1];
+        var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
+        milestone.presentDate = dateToTimestamp;
+        milestone.previousDate = preDateToTimestamp;
+        milestone.type = "payback";
+      }
+      milestones.push(milestone);
+    }
+    console.log(milestones);
+    return milestones;
+  }
+
+  async handleDataTimeline(lendingTimeline, paybackTimeline) {
+    await this.setState({
+      lendingTimeline: lendingTimeline,
+      paybackTimeline: paybackTimeline
+    });
+    // console.log("aaaaTimeline")
+    // console.log(this.state.lendingTimeline)
+    // console.log(this.state.paybackTimeline)
+    this.createMileStone();
   }
 
   onAmountChange(event) {
@@ -69,7 +133,34 @@ class CreateRequestPage extends React.Component {
         // times: 5,
         duration: this.state.borrowDuration,
         interestRate: 18,
-        createDate: this.state.createDate
+        createDate: this.state.createDate,
+        deal: {
+            borrowTime: this.state.lendingTimeline.length,
+            paybackTime: this.state.paybackTimeline.length,
+            milestone: this.createMileStone
+            // [
+            //     {
+            //         previousDate: 11123123123,
+            //         presentDate: 11123123123,
+            //         type: "borrow"
+            //     },
+            //     {
+            //       previousDate: 11123123123,
+            //       presentDate: 1231345646,
+            //       type: "borrow"
+            //   },
+            //     {
+            //         previousDate: 11123123123,
+            //         presentDate: 11123123123,
+            //         type: "payback"
+            //     },
+            //     {
+            //         previousDate: 11123123123,
+            //         presentDate: 12315456488,
+            //         type: "payback"
+            //     }
+            // ]
+        }
       })
 
     }).then(
@@ -78,7 +169,7 @@ class CreateRequestPage extends React.Component {
           alert("create success");
           this.props.history.push('view-new-request');
         } else if(result.status === 401) {
-          localStorage.setItem("isLoggedIn", false);
+          localStorage.removeItem("isLoggedIn");
           this.props.history.push('/login-page')
         }
 
@@ -99,6 +190,7 @@ class CreateRequestPage extends React.Component {
     
   }
   render() {
+    
     return (
       <>
         <DemoNavbar />
@@ -261,7 +353,7 @@ class CreateRequestPage extends React.Component {
                           </Col>
                         </FormGroup> */}
                         {/* <p>TimeLine is here</p> */}
-                        <ApplyTimeline></ApplyTimeline>
+                        <ApplyTimeline onDataChange={this.handleDataTimeline}></ApplyTimeline>
                         <div>
                           {/* <Button
                             type="submit"
