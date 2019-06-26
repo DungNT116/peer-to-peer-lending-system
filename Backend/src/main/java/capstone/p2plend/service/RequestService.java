@@ -185,13 +185,34 @@ public class RequestService {
 		try {
 			Deal deal = new Deal();
 			if (request.getDeal() != null) {
-
 				deal = request.getDeal();
+			} else {
+				return false;
 			}
+
 			List<Milestone> listMilestone = new ArrayList<>();
 			if (request.getDeal().getMilestone() != null) {
-
 				listMilestone.addAll(request.getDeal().getMilestone());
+			} else {
+				return false;
+			}
+
+			int countPayback = 0;
+			int countLend = 0;
+			for (Milestone m : listMilestone) {
+				if (m.getType().equals("payback")) {
+					countPayback++;
+				}
+				if (m.getType().equals("lend")) {
+					countLend++;
+				}
+			}
+
+			if (countPayback != deal.getPaybackTime()) {
+				return false;
+			}
+			if (countLend != deal.getBorrowTime()) {
+				return false;
 			}
 
 			String username = jwtService.getUsernameFromToken(token);
