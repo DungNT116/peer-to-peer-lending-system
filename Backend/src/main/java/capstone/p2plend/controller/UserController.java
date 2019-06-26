@@ -65,7 +65,7 @@ public class UserController {
 	}
 
 	@CrossOrigin
-	@PostMapping(value = "/rest/user/getUser")
+	@GetMapping(value = "/rest/user/getUser")
 	public ResponseEntity<User> getUser(@RequestHeader("Authorization") String token) {
 		HttpStatus httpStatus = null;
 		User result = null;
