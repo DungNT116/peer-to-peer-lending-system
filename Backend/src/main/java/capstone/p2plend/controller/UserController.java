@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,6 +64,20 @@ public class UserController {
 		return new ResponseEntity<String>(result, httpStatus);
 	}
 
+	@CrossOrigin
+	@PostMapping(value = "/rest/user/getUser")
+	public ResponseEntity<User> getUser(@RequestHeader("Authorization") String token) {
+		HttpStatus httpStatus = null;
+		User result = null;
+		try {
+			result = userService.getOneByUsername(token);
+			httpStatus = HttpStatus.OK;
+		} catch (Exception e) {
+			httpStatus = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<User>(result, httpStatus);
+	}
+	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getById")
