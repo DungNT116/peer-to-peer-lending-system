@@ -16,12 +16,61 @@ import {
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
+import { apiLink } from '../../api.jsx';
 class Profile extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: '',
+    firstName: '',
+    lastName: '',
+    loanLimit: 0,
+    email: '',
+    phoneNumber: '',
+    }
+    this.getProfile = this.getProfile.bind(this);
+  }
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
+    this.getProfile();
   }
+
+  getProfile() {
+    fetch(apiLink + "/rest/user/getUser", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": localStorage.getItem("token")
+        // "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      }
+    }).then(
+      (result) => {
+        if (result.status === 200) {
+          // alert("create success");
+          // this.props.history.push('view-new-request');
+          result.json().then((data) => {
+            console.log(data);
+            this.setState({
+              username: data.username,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              loanLimit: data.loanLimit,
+              email: data.email,
+              phoneNumber: data.phoneNumber,
+            })
+          })
+        } else if (result.status === 401) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push('/login-page')
+        }
+
+      }
+    )
+  }
+
   render() {
     const style ={
       profileComponent :{
@@ -200,7 +249,7 @@ class Profile extends React.Component {
                                 </label>
                                 <Input
                                   className="form-control-alternative"
-                                  defaultValue="lucky.jesse"
+                                  value={this.state.username}
                                   id="input-username"
                                   placeholder="Username"
                                   type="text"
@@ -217,6 +266,7 @@ class Profile extends React.Component {
                                 </label>
                                 <Input
                                   className="form-control-alternative"
+                                  value={this.state.email}
                                   id="input-email"
                                   placeholder="jesse@example.com"
                                   type="email"
@@ -235,7 +285,7 @@ class Profile extends React.Component {
                                 </label>
                                 <Input
                                   className="form-control-alternative"
-                                  defaultValue="Lucky"
+                                  value={this.state.firstName}
                                   id="input-first-name"
                                   placeholder="First name"
                                   type="text"
@@ -252,7 +302,7 @@ class Profile extends React.Component {
                                 </label>
                                 <Input
                                   className="form-control-alternative"
-                                  defaultValue="Jesse"
+                                  value={this.state.lastName}
                                   id="input-last-name"
                                   placeholder="Last name"
                                   type="text"

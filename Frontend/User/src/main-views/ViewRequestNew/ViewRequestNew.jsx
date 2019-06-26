@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 // reactstrap components
 import {
   Button,
@@ -17,7 +18,7 @@ import Pagination from "../../views/IndexSections/Pagination.jsx";
 import { apiLink } from '../../api.jsx';
 import SimpleFooter from "components/Footers/SimpleFooter";
 
-class ViewRequestList extends React.Component {
+class ViewRequestNew extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -30,6 +31,11 @@ class ViewRequestList extends React.Component {
     this.deleteRequest = this.deleteRequest.bind(this);
     this.changePage = this.changePage.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
+    this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
+  }
+
+  setDataToDetailPage(id) {
+    this.props.setRequest(id);
   }
 
   changePage(index) {
@@ -101,7 +107,7 @@ class ViewRequestList extends React.Component {
           //reload data
           this.getRequest();
         } else if(result.status === 401) {
-          localStorage.setItem("isLoggedIn", false);
+          localStorage.removeItem("isLoggedIn");
           this.props.history.push('/login-page')
         }
       }
@@ -127,6 +133,13 @@ class ViewRequestList extends React.Component {
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>
         <td>{request.status}</td>
+        <td>
+          <Link to="/view-detail-request">
+            <Button type="button" size="md" color="primary" onClick={() => this.setDataToDetailPage(request)}>
+              <i className="fa fa-dot-circle-o"></i> View Detail
+            </Button>{' '}
+          </Link>
+        </td>
         <td>
           <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.deleteRequest(request.id)}>
             <i className="fa fa-dot-circle-o"></i> Delete
@@ -157,7 +170,7 @@ class ViewRequestList extends React.Component {
                   <Row>
                     <Col lg="10">
                       <h1 className="display-3 text-white">
-                        History New Request{" "}
+                        My Own Request{" "}
                         <span>View your own new request</span>
                       </h1>
                       <p className="lead text-white">
@@ -183,7 +196,8 @@ class ViewRequestList extends React.Component {
                       {/* <th>DueDate</th> */}
                       <th>CreateDate</th>
                       <th>Duration</th>
-                      <th>status</th>
+                      <th>Status</th>
+                      <th>View detail</th>
                       <th>Delete</th>
                     </tr>
                   </thead>
@@ -205,21 +219,23 @@ class ViewRequestList extends React.Component {
   }
 }
 
-// const mapStateToProps = (state) => {
-//   return {
-//     tokenReducer: state.tokenReducer
-//   }
-// }
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     setToken: (token) => {
-//       dispatch({
-//         type: "SET_TOKEN",
-//         payload: token
-//       });
-//     }
-//   }
-// }
+const mapStateToProps = (state) => {
+  return {
+    request: state.request,
+    // tokenReducer: state.tokenReducer,
+    // paging: state.paging
+  }
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setRequest: (id) => {
+      dispatch({
+        type: "SET_REQUEST",
+        payload: id
+      });
+    }
+  }
+}
 
-// export default connect(mapStateToProps, mapDispatchToProps)(ViewRequestList);
-export default ViewRequestList;
+export default connect(mapStateToProps, mapDispatchToProps)(ViewRequestNew);
+// export default ViewRequestList;

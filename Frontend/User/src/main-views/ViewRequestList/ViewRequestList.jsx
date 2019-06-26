@@ -74,7 +74,7 @@ class ViewRequestList extends React.Component {
       (result) => {
         console.log(result);
         if(result.status === 401) {
-          localStorage.setItem("isLoggedIn", false);
+          localStorage.removeItem("isLoggedIn");
           this.props.history.push('/login-page')
         } else 
         if (result.status === 200) {
