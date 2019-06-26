@@ -49,43 +49,65 @@ class CreateRequestPage extends React.Component {
       previousDate: '',
       presentDate: '',
       type: ''
-  }
+    }
     for (let i = 0; i < this.state.lendingTimeline.length; i++) {
       const element = this.state.lendingTimeline[i];
-      
+      console.log(element)
       // console.log(new Date(element.data).getTime() / 1000)
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
-      
-      if(i === 0) {
+      milestone = {
+        previousDate: '',
+        presentDate: '',
+        type: ''
+      }
+      if (i === 0) {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = dateToTimestamp;
-        milestone.type = "lending";
+        milestone.type = "lend";
+        console.log("Milestone 0 : " + milestone.presentDate);
+        console.log("Milestone 0 : " + milestone.previousDate);
+        console.log("Milestone 0 : " + milestone.type);
       } else {
-        const preElement = this.state.lendingTimeline[i-1];
+        const preElement = this.state.lendingTimeline[i - 1];
         var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = preDateToTimestamp;
-        milestone.type = "lending";
+        milestone.type = "lend";
+        console.log("Milestone " + i + " : " + milestone.presentDate);
+        console.log("Milestone " + i + " : " + milestone.previousDate);
+        console.log("Milestone " + i + " : " + milestone.type);
       }
+      // console.log(milestone);
       milestones.push(milestone);
     }
     for (let i = 0; i < this.state.paybackTimeline.length; i++) {
       const element = this.state.paybackTimeline[i];
-      
+
       // console.log(new Date(element.data).getTime() / 1000)
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
-      
-      if(i === 0) {
+      milestone = {
+        previousDate: '',
+        presentDate: '',
+        type: ''
+      }
+      if (i === 0) {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = dateToTimestamp;
         milestone.type = "payback";
+        console.log("Milestone 0 : " + milestone.presentDate);
+        console.log("Milestone 0 : " + milestone.previousDate);
+        console.log("Milestone 0 : " + milestone.type);
       } else {
-        const preElement = this.state.paybackTimeline[i-1];
+        const preElement = this.state.paybackTimeline[i - 1];
         var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = preDateToTimestamp;
         milestone.type = "payback";
+        console.log("Milestone " + i + " : " + milestone.presentDate);
+        console.log("Milestone " + i + " : " + milestone.previousDate);
+        console.log("Milestone " + i + " : " + milestone.type);
       }
+      // console.log(milestone);
       milestones.push(milestone);
     }
     console.log(milestones);
@@ -98,9 +120,9 @@ class CreateRequestPage extends React.Component {
       paybackTimeline: paybackTimeline
     });
     // console.log("aaaaTimeline")
-    // console.log(this.state.lendingTimeline)
-    // console.log(this.state.paybackTimeline)
-    this.createMileStone();
+    console.log(this.state.lendingTimeline)
+    console.log(this.state.paybackTimeline)
+    // this.createMileStone();
   }
 
   onAmountChange(event) {
@@ -135,31 +157,31 @@ class CreateRequestPage extends React.Component {
         interestRate: 18,
         createDate: this.state.createDate,
         deal: {
-            borrowTime: this.state.lendingTimeline.length,
-            paybackTime: this.state.paybackTimeline.length,
-            milestone: this.createMileStone
-            // [
-            //     {
-            //         previousDate: 11123123123,
-            //         presentDate: 11123123123,
-            //         type: "borrow"
-            //     },
-            //     {
-            //       previousDate: 11123123123,
-            //       presentDate: 1231345646,
-            //       type: "borrow"
-            //   },
-            //     {
-            //         previousDate: 11123123123,
-            //         presentDate: 11123123123,
-            //         type: "payback"
-            //     },
-            //     {
-            //         previousDate: 11123123123,
-            //         presentDate: 12315456488,
-            //         type: "payback"
-            //     }
-            // ]
+          borrowTime: this.state.lendingTimeline.length,
+          paybackTime: this.state.paybackTimeline.length,
+          milestone: this.createMileStone()
+          // [
+          //     {
+          //         previousDate: 11123123123,
+          //         presentDate: 11123123123,
+          //         type: "borrow"
+          //     },
+          //     {
+          //       previousDate: 11123123123,
+          //       presentDate: 1231345646,
+          //       type: "borrow"
+          //   },
+          //     {
+          //         previousDate: 11123123123,
+          //         presentDate: 11123123123,
+          //         type: "payback"
+          //     },
+          //     {
+          //         previousDate: 11123123123,
+          //         presentDate: 12315456488,
+          //         type: "payback"
+          //     }
+          // ]
         }
       })
 
@@ -167,8 +189,8 @@ class CreateRequestPage extends React.Component {
       (result) => {
         if (result.status === 200) {
           alert("create success");
-          this.props.history.push('view-new-request');
-        } else if(result.status === 401) {
+          // this.props.history.push('view-new-request');
+        } else if (result.status === 401) {
           localStorage.removeItem("isLoggedIn");
           this.props.history.push('/login-page')
         }
@@ -187,10 +209,10 @@ class CreateRequestPage extends React.Component {
     this.setState({
       createDate: timeStampeDateNow
     })
-    
+
   }
   render() {
-    
+
     return (
       <>
         <DemoNavbar />
@@ -233,13 +255,13 @@ class CreateRequestPage extends React.Component {
               <Card className="card-profile shadow mt--200">
                 {/* <div className="px-4"> */}
                 <Row className="justify-content-center ">
-                <Col>
-                  <h2 className="display-3 text-center">Create your request</h2>
-                  <Card className="bg-gradient-secondary shadow">
-                    <CardBody className="p-lg-5">
-                      <h4 className="mb-1 text-center mb-5">Fill your information into the form</h4>
-                      <Form role="form" onSubmit={this.handleSubmit}>
-                        {/* <FormGroup
+                  <Col>
+                    <h2 className="display-3 text-center">Create your request</h2>
+                    <Card className="bg-gradient-secondary shadow">
+                      <CardBody className="p-lg-5">
+                        <h4 className="mb-1 text-center mb-5">Fill your information into the form</h4>
+                        <Form role="form" onSubmit={this.handleSubmit}>
+                          {/* <FormGroup
                           className={classnames("mt-5", {
                             focused: this.state.nameFocused
                           })}
@@ -257,14 +279,14 @@ class CreateRequestPage extends React.Component {
                             />
                           </InputGroup>
                         </FormGroup> */}
-                        <FormGroup row
-                          className={classnames({
-                            focused: this.state.amountFocused
-                          })}
-                        >
-                          <Col lg="3" md="3">
-                            <Label>
-                              Amount
+                          <FormGroup row
+                            className={classnames({
+                              focused: this.state.amountFocused
+                            })}
+                          >
+                            <Col lg="3" md="3">
+                              <Label>
+                                Amount
                             </Label>
                             </Col>
                             <Col lg="9" md="9">
@@ -278,8 +300,8 @@ class CreateRequestPage extends React.Component {
                                 />
                               </InputGroup>
                             </Col>
-                        </FormGroup>
-                        {/* <FormGroup
+                          </FormGroup>
+                          {/* <FormGroup
                           className={classnames({
                             focused: this.state.borrowDayFocused
                           })}
@@ -296,44 +318,44 @@ class CreateRequestPage extends React.Component {
                             />
                           </InputGroup>
                         </FormGroup> */}
-                        <FormGroup row className={classnames({
-                          focused: this.state.durationFocused
-                        })}>
-                          <Col lg="3" md="3">
-                            <Label htmlFor="duration">Borrow Duration</Label>
-                          </Col>
-                          <Col lg="9" md="9">
-                            <InputGroup className="input-group-alternative">
-                              <Input type="select" name="duration" id="duration"
-                                onFocus={e => this.setState({ durationFocused: true })}
-                                onBlur={e => this.setState({ durationFocused: false })}
-                                onChange={this.onBorrowDurationChange}>
-                                <option value="0">Please select</option>
-                                <option value="1">30 days</option>
-                                <option value="2">90 days</option>
-                                <option value="3">1 Years(365 days)</option>
-                              </Input>
-                            </InputGroup>
-                          </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                        <Col lg="3" md="3">
-                          <Label>
-                            Interest rate
+                          <FormGroup row className={classnames({
+                            focused: this.state.durationFocused
+                          })}>
+                            <Col lg="3" md="3">
+                              <Label htmlFor="duration">Borrow Duration</Label>
+                            </Col>
+                            <Col lg="9" md="9">
+                              <InputGroup className="input-group-alternative">
+                                <Input type="select" name="duration" id="duration"
+                                  onFocus={e => this.setState({ durationFocused: true })}
+                                  onBlur={e => this.setState({ durationFocused: false })}
+                                  onChange={this.onBorrowDurationChange}>
+                                  <option value="0">Please select</option>
+                                  <option value="1">30 days</option>
+                                  <option value="2">90 days</option>
+                                  <option value="3">1 Years(365 days)</option>
+                                </Input>
+                              </InputGroup>
+                            </Col>
+                          </FormGroup>
+                          <FormGroup row>
+                            <Col lg="3" md="3">
+                              <Label>
+                                Interest rate
                           </Label>
-                          </Col>
-                          <Col lg="9" md="9">
-                          <InputGroup className="input-group-alternative">
-                            <Input
-                              type="text"
-                              disabled
-                              value="18% per year"
-                            // onChange={this.onInterestRateChange}
-                            />
-                          </InputGroup>
-                          </Col>
-                        </FormGroup>
-                        {/* <FormGroup row className={classnames({
+                            </Col>
+                            <Col lg="9" md="9">
+                              <InputGroup className="input-group-alternative">
+                                <Input
+                                  type="text"
+                                  disabled
+                                  value="18% per year"
+                                // onChange={this.onInterestRateChange}
+                                />
+                              </InputGroup>
+                            </Col>
+                          </FormGroup>
+                          {/* <FormGroup row className={classnames({
                           focused: this.state.typeFocused
                         })}>
                           <Col lg="3" md="3">
@@ -352,25 +374,25 @@ class CreateRequestPage extends React.Component {
                             </InputGroup>
                           </Col>
                         </FormGroup> */}
-                        {/* <p>TimeLine is here</p> */}
-                        <ApplyTimeline onDataChange={this.handleDataTimeline}></ApplyTimeline>
-                        <div>
-                          {/* <Button
+                          {/* <p>TimeLine is here</p> */}
+                          <ApplyTimeline onDataChange={this.handleDataTimeline}></ApplyTimeline>
+                          <div>
+                            {/* <Button
                             type="submit"
                             className="btn-round"
                             color="info"
                             size="lg">
                             Send Message
                         </Button> */}
-                          <Input type="submit" value="Send" />
+                            <Input type="submit" value="Send" />
 
-                        </div>
+                          </div>
 
-                      </Form>
-                    </CardBody>
-                  </Card>
-                </Col>
-              </Row>
+                        </Form>
+                      </CardBody>
+                    </Card>
+                  </Col>
+                </Row>
                 {/* </div> */}
               </Card>
             </Container>

@@ -200,6 +200,9 @@ class ApplyTimeline extends React.Component {
       await this.setState({
         timeline_lending: timelineCopy
       });
+      //update data in parent (create request)
+      this.props.onDataChange(this.state.timeline_lending, this.state.timeline_payback);
+
       for (let i = 0; i < this.state.backup_timeline_lending.length; i++) {
         document.getElementById(["day-timeline-lending-" + i]).style.display =
           "none";
@@ -395,6 +398,9 @@ class ApplyTimeline extends React.Component {
       await this.setState({
         timeline_payback: timelineCopy
       });
+      //update data in parent (create request)
+      this.props.onDataChange(this.state.timeline_lending, this.state.timeline_payback);
+      
       for (let i = 0; i < this.state.backup_timeline_payback.length; i++) {
         document.getElementById(["day-timeline-payback-" + i]).style.display =
           "none";
