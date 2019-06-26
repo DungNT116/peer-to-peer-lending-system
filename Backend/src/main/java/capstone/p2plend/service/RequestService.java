@@ -68,6 +68,11 @@ public class RequestService {
 			Deal deal = new Deal();
 			deal.setId(r.getDeal().getId());
 			deal.setStatus(r.getDeal().getStatus());
+			
+			if(r.getDeal().getMilestone()!=null) {
+				deal.setMilestone(r.getDeal().getMilestone());
+			}
+			
 			r.setDeal(deal);
 		}
 
@@ -101,6 +106,9 @@ public class RequestService {
 				Deal deal = new Deal();
 				deal.setId(r.getDeal().getId());
 				deal.setStatus(r.getDeal().getStatus());
+				if(r.getDeal().getMilestone()!=null) {
+					deal.setMilestone(r.getDeal().getMilestone());
+				}
 				r.setDeal(deal);
 			}
 		}
@@ -137,6 +145,9 @@ public class RequestService {
 				Deal deal = new Deal();
 				deal.setId(r.getDeal().getId());
 				deal.setStatus(r.getDeal().getStatus());
+				if(r.getDeal().getMilestone()!=null) {
+					deal.setMilestone(r.getDeal().getMilestone());
+				}
 				r.setDeal(deal);
 			}
 		}
@@ -172,6 +183,9 @@ public class RequestService {
 				Deal deal = new Deal();
 				deal.setId(r.getDeal().getId());
 				deal.setStatus(r.getDeal().getStatus());
+				if(r.getDeal().getMilestone()!=null) {
+					deal.setMilestone(r.getDeal().getMilestone());
+				}
 				r.setDeal(deal);
 			}
 		}
