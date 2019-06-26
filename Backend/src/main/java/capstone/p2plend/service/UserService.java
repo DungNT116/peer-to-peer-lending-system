@@ -41,7 +41,7 @@ public class UserService {
 		String password = account.getPassword();
 
 		User checkExist = userRepo.findByUsernameAndPassword(username, password);
-		
+
 		if (checkExist != null && checkExist.getStatus().equals("active")) {
 			return true;
 		}
@@ -49,12 +49,22 @@ public class UserService {
 		return false;
 	}
 
-	public User createAccount(User account) {
+	public String createAccount(User account) {
+
+		User usernameExist = userRepo.findByUsername(account.getUsername());
+		if (usernameExist != null) {
+			return "Username existed";
+		}
+
+		User emailExist = userRepo.findByEmail(account.getEmail());
+		if (emailExist != null) {
+			return "Email existed";
+		}
 
 		account.setRole("ROLE_USER");
 		account.setStatus("active");
-
-		return userRepo.save(account);
+		userRepo.save(account);
+		return "Account successfully created";
 	}
 
 	public boolean activeAccount(int id) {
@@ -87,6 +97,17 @@ public class UserService {
 		return valid;
 	}
 
+	public boolean changeLoanLimit(Integer id, Long loanLimit) {
+		try {
+			User user = userRepo.findById(id).get();
+			user.setLoanLimit(loanLimit);
+			userRepo.save(user);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 	public PageDTO<User> getUsers(int page, int element) {
 		Pageable pageable = PageRequest.of(page - 1, element);
 		Page<User> allUsers = userRepo.findAll(pageable);
@@ -101,7 +122,7 @@ public class UserService {
 		}
 		PageDTO<User> pageDTO = new PageDTO<>();
 		pageDTO.setMaxPage(allUsers.getTotalPages());
-		pageDTO.setData(userList);		
+		pageDTO.setData(userList);
 		return pageDTO;
 	}
 }

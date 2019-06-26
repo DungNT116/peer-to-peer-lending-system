@@ -19,6 +19,7 @@ import {
   Container,
   Row,
   Col,
+  Media
   // UncontrolledTooltip
 } from "reactstrap";
 
@@ -31,7 +32,7 @@ class DemoNavbar extends React.Component {
     this.logout = this.logout.bind(this);
   }
 
-   logout() {
+  logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("isLoggedIn");
   }
@@ -167,6 +168,7 @@ class DemoNavbar extends React.Component {
                   </UncontrolledDropdown> */}
                   {/* {(this.state.isLoggedIn) ? */}
                   {(localStorage.getItem("isLoggedIn")) ?
+                  // {this.state.isLoggedIn ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
                         <i className="ni ni-collection d-lg-none mr-1" />
@@ -175,13 +177,13 @@ class DemoNavbar extends React.Component {
                       <DropdownMenu>
                         <DropdownItem to="/create-request-page" tag={Link}>
                           Create Request
-                      </DropdownItem>
+                        </DropdownItem>
                         <DropdownItem to="/view-history-request" tag={Link}>
                           View History Request
-                      </DropdownItem>
+                        </DropdownItem>
                         <DropdownItem to="/view-new-request" tag={Link}>
                           View New Request
-                      </DropdownItem>
+                        </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>
                     : ""}
@@ -194,107 +196,17 @@ class DemoNavbar extends React.Component {
                       <DropdownMenu>
                         <DropdownItem to="/view-request-list" tag={Link}>
                           View Request
-                      </DropdownItem>
+                        </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>
                     : ""}
-                  {(localStorage.getItem("isLoggedIn")) ?
-                    <UncontrolledDropdown nav>
-                      <DropdownToggle nav>
-                        <i className="ni ni-collection d-lg-none mr-1" />
-                        <span className="nav-link-inner--text">Other</span>
-                      </DropdownToggle>
-                      <DropdownMenu>
-                        <DropdownItem to="/profile-page" tag={Link}>
-                          Profile
-                      </DropdownItem>
-                        <DropdownItem to="/login-page" tag={Link}>
-                          Login
-                      </DropdownItem>
-                        <DropdownItem to="/register-page" tag={Link}>
-                          Register
-                      </DropdownItem>
-                        <DropdownItem to="/apply-paypal" tag={Link}>
-                          Paypal
-                      </DropdownItem>
-                        <DropdownItem to="/apply-timeline" tag={Link}>
-                          Timeline
-                      </DropdownItem>
-                      </DropdownMenu>
-                    </UncontrolledDropdown>
-                    : ""}
-
                 </Nav>
-                <Nav className="align-items-lg-center ml-lg-auto" navbar>
-                  {/* <NavItem>
-                    <NavLink
-                      className="nav-link-icon"
-                      href="https://www.facebook.com/creativetim"
-                      id="tooltip333589074"
-                      target="_blank"
-                    >
-                      <i className="fa fa-facebook-square" />
-                      <span className="nav-link-inner--text d-lg-none ml-2">
-                        Facebook
-                      </span>
-                    </NavLink>
-                    <UncontrolledTooltip delay={0} target="tooltip333589074">
-                      Like us on Facebook
-                    </UncontrolledTooltip>
-                  </NavItem> */}
-                  {/* <NavItem>
-                    <NavLink
-                      className="nav-link-icon"
-                      href="https://www.instagram.com/creativetimofficial"
-                      id="tooltip356693867"
-                      target="_blank"
-                    >
-                      <i className="fa fa-instagram" />
-                      <span className="nav-link-inner--text d-lg-none ml-2">
-                        Instagram
-                      </span>
-                    </NavLink>
-                    <UncontrolledTooltip delay={0} target="tooltip356693867">
-                      Follow us on Instagram
-                    </UncontrolledTooltip>
-                  </NavItem> */}
-                  {/* <NavItem>
-                    <NavLink
-                      className="nav-link-icon"
-                      href="https://twitter.com/creativetim"
-                      id="tooltip184698705"
-                      target="_blank"
-                    >
-                      <i className="fa fa-twitter-square" />
-                      <span className="nav-link-inner--text d-lg-none ml-2">
-                        Twitter
-                      </span>
-                    </NavLink>
-                    <UncontrolledTooltip delay={0} target="tooltip184698705">
-                      Follow us on Twitter
-                    </UncontrolledTooltip>
-                  </NavItem> */}
-                  {/* <NavItem>
-                    <NavLink
-                      className="nav-link-icon"
-                      href="https://github.com/creativetimofficial/argon-design-system-react"
-                      id="tooltip112445449"
-                      target="_blank"
-                    >
-                      <i className="fa fa-github" />
-                      <span className="nav-link-inner--text d-lg-none ml-2">
-                        Github
-                      </span>
-                    </NavLink>
-                    <UncontrolledTooltip delay={0} target="tooltip112445449">
-                      Star us on Github
-                    </UncontrolledTooltip>
-                  </NavItem> */}
-
+                <Nav className="align-items-lg-center navbar-nav-hover ml-lg-auto" navbar>
                   <NavItem className="d-none d-lg-block ml-lg-4">
                     {(localStorage.getItem("isLoggedIn")) ?
+                    (
                       ""
-                      :
+                    ) : (
                       <Button
                         className="btn-neutral btn-icon"
                         color="default"
@@ -307,8 +219,8 @@ class DemoNavbar extends React.Component {
                           Login
                     </span>
                       </Button>
-                    }
-                    {(localStorage.getItem("isLoggedIn")) ?
+                    )}
+                    {/* {(localStorage.getItem("isLoggedIn")) ? (
                       <Button
                         className="btn-neutral btn-icon"
                         color="default"
@@ -321,8 +233,57 @@ class DemoNavbar extends React.Component {
                         <span className="nav-link-inner--text ml-1">
                           Logout
                       </span>
+                        <span className="nav-link-inner--text ml-1">Login</span>
                       </Button>
-                      : ""}
+                    ): ""} */}
+                    {(localStorage.getItem("isLoggedIn")) ? (
+                      <UncontrolledDropdown nav>
+                        <DropdownToggle nav>
+                          <Media className="align-items-center">
+                            <span className="avatar avatar-sm rounded-circle">
+                              <img
+                                alt="..."
+                                src={require("assets/img/theme/team-4-800x800.jpg")}
+                              />
+                            </span>
+                            <Media className="ml-2 d-none d-lg-block">
+                              <span className="mb-0 text-sm font-weight-bold">
+                                Jessica Jones
+                              </span>
+                            </Media>
+                          </Media>
+                        </DropdownToggle>
+
+                        <DropdownMenu>
+                          <DropdownItem className="noti-title" header tag="div">
+                            <h6 className="text-overflow m-0">Welcome!</h6>
+                          </DropdownItem>
+                          <DropdownItem to="/profile-page" tag={Link}>
+                            <i className="ni ni-single-02" />
+                            <span>My profile</span>
+                          </DropdownItem>
+                          <DropdownItem to="/admin/user-profile" tag={Link}>
+                            <i className="ni ni-settings-gear-65" />
+                            <span>Settings</span>
+                          </DropdownItem>
+                          <DropdownItem to="/admin/user-profile" tag={Link}>
+                            <i className="ni ni-calendar-grid-58" />
+                            <span>Activity</span>
+                          </DropdownItem>
+                          <DropdownItem to="/admin/user-profile" tag={Link}>
+                            <i className="ni ni-support-16" />
+                            <span>Support</span>
+                          </DropdownItem>
+                          <DropdownItem divider />
+                          <DropdownItem href="/" onClick={() => this.logout()}>
+                            <i className="ni ni-user-run" />
+                            <span>Logout</span>
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </UncontrolledDropdown>
+                    ) : (
+                      ""
+                    )}
                   </NavItem>
                 </Nav>
               </UncontrolledCollapse>

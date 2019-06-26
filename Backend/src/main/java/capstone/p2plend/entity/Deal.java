@@ -37,12 +37,14 @@ public class Deal {
 	@Column
 	private Integer paybackTime;
 
-	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
+//	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
+	@JsonIgnoreProperties(value = { "deal" })
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "request_id")
 	private Request request;
 
-	@JsonIgnoreProperties(value = { "transaction", "deal" })
+//	@JsonIgnoreProperties(value = { "transaction", "deal" })
+	@JsonIgnoreProperties(value = { "deal" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "deal")
 	private List<Milestone> milestone = new ArrayList<>();
 

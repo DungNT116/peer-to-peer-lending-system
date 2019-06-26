@@ -51,8 +51,8 @@ public class RequestController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/getById")
-	public ResponseEntity<Request> getOne(@RequestBody Request request) {
-		return new ResponseEntity<Request>(requestService.getOneById(request.getId()), HttpStatus.OK);
+	public Request getOne(@RequestBody Request request) {
+		return requestService.getOneById(request.getId());
 	}
 
 	@CrossOrigin
@@ -65,19 +65,35 @@ public class RequestController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/user/allRequest")
-	public PageDTO<Request> findAllExceptUserRequest(@RequestParam Integer page, @RequestParam Integer element,
+	public PageDTO<Request> findAllOtherUserRequest(@RequestParam Integer page, @RequestParam Integer element,
 			@RequestHeader("Authorization") String token) {
-		return requestService.findAllExceptUserRequest(page, element, token);
+		return requestService.findAllOtherUserRequest(page, element, token);
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/request/user/allNewRequest")
+	public PageDTO<Request> findAllOtherUserNewRequest(@RequestParam Integer page, @RequestParam Integer element,
+			@RequestHeader("Authorization") String token) {
+		return requestService.findAllOtherUserRequestSortByDateDesc(page, element, token);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/allRequestHistoryDone")
-	public PageDTO<Request> findAllRequestHistoryDone(@RequestParam Integer page, @RequestParam Integer element,
+	public PageDTO<Request> findAllRequestHistoryStatusDone(@RequestParam Integer page, @RequestParam Integer element,
 			@RequestHeader("Authorization") String token) {
-		return requestService.findUserAllRequestByStatus(page, element, token);
+		return requestService.findUserAllRequestByStatus(page, element, token, "done");
 	}
 
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/request/allRequestHistoryPending")
+	public PageDTO<Request> findAllUserRequestStatusPending(@RequestParam Integer page, @RequestParam Integer element,
+			@RequestHeader("Authorization") String token) {
+		return requestService.findUserAllRequestByStatus(page, element, token, "pending");
+	}
+	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping(value = "/rest/request/approveRequest")

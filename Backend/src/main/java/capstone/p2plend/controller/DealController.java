@@ -6,12 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import capstone.p2plend.entity.Deal;
+import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.service.DealService;
 
 @RestController
@@ -58,6 +60,36 @@ public class DealController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 
+		return status.value();
+	}
+	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@PostMapping(value = "/rest/deal/newDeal")
+	public Integer newTransaction(@RequestBody Deal deal) {
+		HttpStatus status = null;
+		boolean valid = false;
+		valid = dealService.newDeal(deal);
+		if (valid == true) {
+			status = HttpStatus.OK;
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return status.value();
+	}
+	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@PutMapping(value = "/rest/deal/updateDeal")
+	public Integer updateDeal(@RequestBody Deal deal) {
+		HttpStatus status = null;
+		boolean valid = false;
+		valid = dealService.updateDeal(deal);
+		if (valid == true) {
+			status = HttpStatus.OK;
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
 		return status.value();
 	}
 }

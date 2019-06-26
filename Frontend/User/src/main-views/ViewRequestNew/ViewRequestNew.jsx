@@ -170,7 +170,7 @@ class ViewRequestNew extends React.Component {
                   <Row>
                     <Col lg="10">
                       <h1 className="display-3 text-white">
-                        History New Request{" "}
+                        My Own Request{" "}
                         <span>View your own new request</span>
                       </h1>
                       <p className="lead text-white">
