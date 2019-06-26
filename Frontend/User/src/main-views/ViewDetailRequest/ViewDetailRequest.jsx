@@ -25,6 +25,7 @@ import { apiLink, bigchainAPI, client_API } from "../../api.jsx";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
+import ApplyTimeline from "../ApplyTimeline/ApplyTimeline";
 
 class ViewDetailRequest extends React.Component {
   constructor(props) {
@@ -36,7 +37,9 @@ class ViewDetailRequest extends React.Component {
       borrowDay: '',
       dueDay: '',
       borrowDuration: '',
-      typeOfContact: ''
+      typeOfContact: '',
+      dbDataLendingTimeline: [],
+      dbDataPayBackTimeline: []
     };
 
     this.toggleModal = this.toggleModal.bind(this);
@@ -47,7 +50,47 @@ class ViewDetailRequest extends React.Component {
     this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
     this.onTypeOfContactChange = this.onTypeOfContactChange.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
-    // this.testdaytime = this.testdaytime.bind(this);
+    this.handleDataTimeline = this.handleDataTimeline.bind(this);
+    this.changeMilestoneToTimelineData = this.changeMilestoneToTimelineData.bind(this);
+  }
+
+  changeMilestoneToTimelineData() {
+    console.log(this.props.request.data.deal.milestone);
+    let milestone = this.props.request.data.deal.milestone;
+    let timelineData = {lendingTimeline : [], payBackTimeline: []};
+    let lendingTimeline = [];
+    let payBackTimeline = [];
+    let milestoneTimeline = { data: '', status: '' };
+    for (let i = 0; i < milestone.length; i++) {
+      const element = milestone[i];
+      milestoneTimeline = { data: '', status: '' };
+      milestoneTimeline.data = this.convertTimeStampToDate(element.presentDate);
+      milestoneTimeline.status = "data is nothing";
+      if (element.type === "lend") {
+        lendingTimeline.push(milestoneTimeline);
+      } else {
+        payBackTimeline.push(milestoneTimeline);
+      }
+    }
+    timelineData.lendingTimeline = lendingTimeline;
+    timelineData.payBackTimeline = payBackTimeline;
+    // this.setState({
+    //   dbDataLendingTimeline: lendingTimeline,
+    //   dbDataPayBackTimeline: payBackTimeline
+    // })
+    // console.log(timelineData);
+    return timelineData;
+  }
+
+  async handleDataTimeline(lendingTimeline, paybackTimeline) {
+    await this.setState({
+      lendingTimeline: lendingTimeline,
+      paybackTimeline: paybackTimeline
+    });
+    // console.log("aaaaTimeline")
+    console.log(this.state.lendingTimeline)
+    console.log(this.state.paybackTimeline)
+    // this.createMileStone();
   }
 
   send_tx = () => {
@@ -86,11 +129,13 @@ class ViewDetailRequest extends React.Component {
         console.log(data);
       });
   };
-  
+
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
+
+    this.changeMilestoneToTimelineData();
 
     //change timestamp to date String and vice versa
     // var date = "07/22/2018";
@@ -219,8 +264,10 @@ class ViewDetailRequest extends React.Component {
   }
 
   render() {
+
     return (
       <>
+
         <DemoNavbar />
         <main className="profile-page" ref="main">
           <section className="section-profile-cover section-shaped my-0">
@@ -349,7 +396,8 @@ class ViewDetailRequest extends React.Component {
                               <p className="h6">{Math.round((this.props.request.data.amount * (this.props.request.data.duration / 30) * 1.5 / 100) * 1000) / 1000} VND</p>
                             </Col>
                           </FormGroup>
-                          <FormGroup>
+                          <ApplyTimeline onDataChange={this.handleDataTimeline} setTimelineData={this.changeMilestoneToTimelineData}></ApplyTimeline>
+                          {/* <FormGroup>
                             <Col lg="12">
                               <h5 className="h5 text-success font-weight-bold mb-4">
                                 TimeLine
@@ -377,7 +425,7 @@ class ViewDetailRequest extends React.Component {
                                 <Progress max="100" value="60" />
                               </div>
                             </Col>
-                          </FormGroup>
+                          </FormGroup> */}
                         </Form>
                         <CardFooter className="text-center">
                           <Button type="submit" id="dealButton" size="md" color="primary" onClick={this.makeDeal} disabled={this.state.editable}><i className="fa fa-dot-circle-o"></i> Make Deal</Button>{' '}
