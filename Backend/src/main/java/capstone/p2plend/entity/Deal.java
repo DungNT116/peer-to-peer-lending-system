@@ -3,6 +3,7 @@ package capstone.p2plend.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -45,7 +46,7 @@ public class Deal {
 
 //	@JsonIgnoreProperties(value = { "transaction", "deal" })
 	@JsonIgnoreProperties(value = { "deal" })
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "deal")
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "deal")
 	private List<Milestone> milestone = new ArrayList<>();
 
 	public Integer getId() {
