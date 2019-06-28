@@ -70,7 +70,11 @@ public class RequestService {
 			deal.setStatus(r.getDeal().getStatus());
 
 			if (r.getDeal().getMilestone() != null) {
-				deal.setMilestone(r.getDeal().getMilestone());
+				List<Milestone> listMilestone = r.getDeal().getMilestone();
+				for(Milestone m : listMilestone) {
+					m.setTransaction(null);
+				}
+				deal.setMilestone(listMilestone);
 			}
 
 			r.setDeal(deal);
@@ -107,7 +111,11 @@ public class RequestService {
 				deal.setId(r.getDeal().getId());
 				deal.setStatus(r.getDeal().getStatus());
 				if (r.getDeal().getMilestone() != null) {
-					deal.setMilestone(r.getDeal().getMilestone());
+					List<Milestone> listMilestone = r.getDeal().getMilestone();
+					for(Milestone m : listMilestone) {
+						m.setTransaction(null);
+					}
+					deal.setMilestone(listMilestone);
 				}
 				r.setDeal(deal);
 			}
@@ -146,7 +154,11 @@ public class RequestService {
 				deal.setId(r.getDeal().getId());
 				deal.setStatus(r.getDeal().getStatus());
 				if (r.getDeal().getMilestone() != null) {
-					deal.setMilestone(r.getDeal().getMilestone());
+					List<Milestone> listMilestone = r.getDeal().getMilestone();
+					for(Milestone m : listMilestone) {
+						m.setTransaction(null);
+					}
+					deal.setMilestone(listMilestone);
 				}
 				r.setDeal(deal);
 			}
@@ -184,7 +196,11 @@ public class RequestService {
 				deal.setId(r.getDeal().getId());
 				deal.setStatus(r.getDeal().getStatus());
 				if (r.getDeal().getMilestone() != null) {
-					deal.setMilestone(r.getDeal().getMilestone());
+					List<Milestone> listMilestone = r.getDeal().getMilestone();
+					for(Milestone m : listMilestone) {
+						m.setTransaction(null);
+					}
+					deal.setMilestone(listMilestone);
 				}
 				r.setDeal(deal);
 			}
@@ -195,6 +211,48 @@ public class RequestService {
 		return pageDTO;
 	}
 
+	public PageDTO<Request> findAllRequestByStatusWithLenderOrBorrower(Integer page, Integer element, String token, String status){
+		String username = jwtService.getUsernameFromToken(token);
+		User account = accountRepo.findByUsername(username);
+		Pageable pageable = PageRequest.of(page - 1, element, Sort.by("create_date").descending());
+		Page<Request> listRq = requestRepo.findAllRequestByStatusWithLenderOrBorrower(pageable, status, account.getId(), account.getId());
+		for (Request r : listRq) {
+			if (r.getBorrower() != null) {
+				User borrower = new User();
+				borrower.setId(r.getBorrower().getId());
+				borrower.setUsername(r.getBorrower().getUsername());
+				borrower.setFirstName(r.getBorrower().getFirstName());
+				borrower.setLastName(r.getBorrower().getLastName());
+				r.setBorrower(borrower);
+			}
+			if (r.getLender() != null) {
+				User lender = new User();
+				lender.setId(r.getLender().getId());
+				lender.setUsername(r.getLender().getUsername());
+				lender.setFirstName(r.getLender().getFirstName());
+				lender.setLastName(r.getLender().getLastName());
+				r.setLender(lender);
+			}
+			if (r.getDeal() != null) {
+				Deal deal = new Deal();
+				deal.setId(r.getDeal().getId());
+				deal.setStatus(r.getDeal().getStatus());
+				if (r.getDeal().getMilestone() != null) {
+					List<Milestone> listMilestone = r.getDeal().getMilestone();
+					for(Milestone m : listMilestone) {
+						m.setTransaction(null);
+					}
+					deal.setMilestone(listMilestone);
+				}
+				r.setDeal(deal);
+			}
+		}		
+		PageDTO<Request> pageDTO = new PageDTO<>();
+		pageDTO.setMaxPage(listRq.getTotalPages());
+		pageDTO.setData(listRq.getContent());
+		return pageDTO;
+	}
+	
 	public boolean createRequest(Request request, String token) {
 		try {
 			Deal deal = new Deal();
@@ -244,25 +302,6 @@ public class RequestService {
 				m.setDeal(dealObj);
 				milestoneRepo.saveAndFlush(m);
 			}
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	public boolean approveRequest(int id, String token) {
-		try {
-			Request existRequest = requestRepo.findById(id).get();
-			String username = jwtService.getUsernameFromToken(token);
-			User account = accountRepo.findByUsername(username);
-			existRequest.setLender(account);
-//			Deal deal = existRequest.getDeal();
-//			deal.setStatus("transitioning");
-
-			existRequest.setStatus("dealing");
-
-			requestRepo.save(existRequest);
-
 			return true;
 		} catch (Exception e) {
 			return false;

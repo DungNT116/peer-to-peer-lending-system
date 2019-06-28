@@ -88,27 +88,26 @@ public class RequestController {
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/request/all_request_trading_by_borrower_or_lender")
+	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithLenderOrBorrower(
+			@RequestParam Integer page, @RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		PageDTO<Request> result = null;
+		HttpStatus httpStatus = null;
+		try {
+			result = requestService.findAllRequestByStatusWithLenderOrBorrower(page, element, token, "trading");
+		} catch (Exception ex) {
+			result = null;
+			httpStatus = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/allRequestHistoryPending")
 	public PageDTO<Request> findAllUserRequestStatusPending(@RequestParam Integer page, @RequestParam Integer element,
 			@RequestHeader("Authorization") String token) {
 		return requestService.findUserAllRequestByStatus(page, element, token, "pending");
-	}
-	
-	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@PostMapping(value = "/rest/request/approveRequest")
-	public Integer approveRequest(@RequestBody Request request, @RequestHeader("Authorization") String token) {
-		HttpStatus status = null;
-		boolean valid = false;
-		valid = requestService.approveRequest(request.getId(), token);
-
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
-		}
-
-		return status.value();
 	}
 
 	@CrossOrigin
