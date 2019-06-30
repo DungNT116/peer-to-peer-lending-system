@@ -95,6 +95,7 @@ public class RequestController {
 		HttpStatus httpStatus = null;
 		try {
 			result = requestService.findAllRequestByStatusWithLenderOrBorrower(page, element, token, "trading");
+			httpStatus = HttpStatus.OK;
 		} catch (Exception ex) {
 			result = null;
 			httpStatus = HttpStatus.BAD_REQUEST;
