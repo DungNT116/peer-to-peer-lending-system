@@ -35,7 +35,7 @@ public class DealController {
 		HttpStatus status = null;
 		boolean valid = false;
 
-		valid = dealService.acceptDeal(deal, token);
+		valid = dealService.makeDeal(deal, token);
 
 		if (valid == true) {
 			status = HttpStatus.OK;
