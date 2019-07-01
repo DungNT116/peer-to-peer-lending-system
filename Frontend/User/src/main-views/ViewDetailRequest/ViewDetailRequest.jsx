@@ -1,5 +1,5 @@
 import React from "react";
-import { connect } from 'react-redux';
+import { connect } from "react-redux";
 
 // reactstrap components
 import {
@@ -34,10 +34,10 @@ class ViewDetailRequest extends React.Component {
       modal: false,
       timeout: 300,
       editable: false,
-      borrowDay: '',
-      dueDay: '',
-      borrowDuration: '',
-      typeOfContact: '',
+      borrowDay: "",
+      dueDay: "",
+      borrowDuration: "",
+      typeOfContact: "",
       dbDataLendingTimeline: [],
       dbDataPayBackTimeline: []
     };
@@ -51,20 +51,22 @@ class ViewDetailRequest extends React.Component {
     this.onTypeOfContactChange = this.onTypeOfContactChange.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.handleDataTimeline = this.handleDataTimeline.bind(this);
-    this.changeMilestoneToTimelineData = this.changeMilestoneToTimelineData.bind(this);
+    this.changeMilestoneToTimelineData = this.changeMilestoneToTimelineData.bind(
+      this
+    );
   }
 
   changeMilestoneToTimelineData() {
     console.log(this.props.request.data.deal.milestone);
     let milestone = this.props.request.data.deal.milestone;
-    let timelineData = {lendingTimeline : [], payBackTimeline: []};
+    let timelineData = { lendingTimeline: [], payBackTimeline: [] };
     let lendingTimeline = [];
     let payBackTimeline = [];
-    let milestoneTimeline = { data: '', status: '' };
+    let milestoneTimeline = { data: "", status: "" };
     for (let i = 0; i < milestone.length; i++) {
       const element = milestone[i];
-      milestoneTimeline = { data: '', status: '' };
-      milestoneTimeline.data = this.convertTimeStampToDate(element.presentDate);
+      milestoneTimeline = { data: "", status: "" };
+      milestoneTimeline.data = this.formatDate(this.convertTimeStampToDate(element.presentDate));
       milestoneTimeline.status = "data is nothing";
       if (element.type === "lend") {
         lendingTimeline.push(milestoneTimeline);
@@ -88,8 +90,8 @@ class ViewDetailRequest extends React.Component {
       paybackTimeline: paybackTimeline
     });
     // console.log("aaaaTimeline")
-    console.log(this.state.lendingTimeline)
-    console.log(this.state.paybackTimeline)
+    console.log(this.state.lendingTimeline);
+    console.log(this.state.paybackTimeline);
     // this.createMileStone();
   }
 
@@ -102,18 +104,18 @@ class ViewDetailRequest extends React.Component {
           // receiver: this.state.receiver,
           // amount: this.state.amount,
           // createDate: this.state.createDate
-          txId: 'this.state.txId',
-          sender: 'this.state.sender',
-          receiver: 'this.state.receiver',
+          txId: "this.state.txId",
+          sender: "this.state.sender",
+          receiver: "this.state.receiver",
           amount: 12,
-          createDate: 'this.state.createDate'
+          createDate: "this.state.createDate"
         }
       },
       metadata_tx: {
         // userId: this.state.userId,
         // createDate: this.state.createDate
-        userId: 'this.state.userId',
-        createDate: 'this.state.createDate'
+        userId: "this.state.userId",
+        createDate: "this.state.createDate"
       }
     };
     fetch(bigchainAPI + "/send_tx", {
@@ -164,7 +166,17 @@ class ViewDetailRequest extends React.Component {
     document.getElementById("duration").style.display = "none";
     document.getElementById("dueDay").style.display = "none";
   }
+  formatDate(date) {
+    var d = new Date(date),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
 
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+  }
   convertTimeStampToDate(date) {
     var timestampToDate = new Date(date * 1000);
     return timestampToDate.toLocaleDateString();
@@ -231,9 +243,11 @@ class ViewDetailRequest extends React.Component {
 
     document.getElementById("borrowDayText").innerHTML = this.state.borrowDay;
     if (this.state.borrowDuration < 12) {
-      document.getElementById("durationText").innerHTML = this.state.borrowDuration * 30 + " days";
+      document.getElementById("durationText").innerHTML =
+        this.state.borrowDuration * 30 + " days";
     } else {
-      document.getElementById("durationText").innerHTML = this.state.borrowDuration + " days";
+      document.getElementById("durationText").innerHTML =
+        this.state.borrowDuration + " days";
     }
     document.getElementById("dueDateText").innerHTML = this.state.dueDay;
   }
@@ -241,12 +255,12 @@ class ViewDetailRequest extends React.Component {
   onBorrowDayChange(event) {
     this.setState({
       borrowDay: new Date(event.target.value).toLocaleDateString()
-    })
+    });
   }
   onDueDayChange(event) {
     this.setState({
       dueDay: new Date(event.target.value).toLocaleDateString()
-    })
+    });
   }
 
   onBorrowDurationChange(event) {
@@ -254,20 +268,18 @@ class ViewDetailRequest extends React.Component {
     var text = event.target[index].innerText.split(" ")[0];
     this.setState({
       borrowDuration: text
-    })
+    });
   }
 
   onTypeOfContactChange(event) {
     this.setState({
       typeOfContact: event.target.value
-    })
+    });
   }
 
   render() {
-
     return (
       <>
-
         <DemoNavbar />
         <main className="profile-page" ref="main">
           <section className="section-profile-cover section-shaped my-0">
@@ -311,13 +323,21 @@ class ViewDetailRequest extends React.Component {
                   <div className="mt-5 py-5 border-top">
                     <Row className="justify-content-center">
                       <Col lg="12">
-                        <Form action="" method="post" encType="multipart/form-data" className="form-horizontal">
+                        <Form
+                          action=""
+                          method="post"
+                          encType="multipart/form-data"
+                          className="form-horizontal"
+                        >
                           <FormGroup row className="py-2">
                             <Col lg="3" md="3">
                               <Label className="h6">Borrower Name</Label>
                             </Col>
                             <Col xs="12" md="9" lg="9">
-                              <p className="h6">{this.props.request.data.borrower.firstName} {this.props.request.data.borrower.lastName}</p>
+                              <p className="h6">
+                                {this.props.request.data.borrower.firstName}{" "}
+                                {this.props.request.data.borrower.lastName}
+                              </p>
                             </Col>
                           </FormGroup>
                           <FormGroup row className="py-2">
@@ -325,7 +345,14 @@ class ViewDetailRequest extends React.Component {
                               <Label className="h6">Total amount</Label>
                             </Col>
                             <Col xs="12" md="9">
-                              <p className="h6">{this.props.request.data.amount + (this.props.request.data.amount * (this.props.request.data.duration / 30) * 1.5 / 100)} VND</p>
+                              <p className="h6">
+                                {this.props.request.data.amount +
+                                  (this.props.request.data.amount *
+                                    (this.props.request.data.duration / 30) *
+                                    1.5) /
+                                    100}{" "}
+                                VND
+                              </p>
                             </Col>
                           </FormGroup>
                           <FormGroup row className="py-2">
@@ -333,7 +360,9 @@ class ViewDetailRequest extends React.Component {
                               <Label className="h6">Borrow Amount</Label>
                             </Col>
                             <Col xs="12" md="9">
-                              <p className="h6">{this.props.request.data.amount} VND</p>
+                              <p className="h6">
+                                {this.props.request.data.amount} VND
+                              </p>
                             </Col>
                           </FormGroup>
                           <FormGroup row className="py-2">
@@ -349,8 +378,13 @@ class ViewDetailRequest extends React.Component {
                           </FormGroup>
                           <FormGroup row className="py-2">
                             <Col md="4">
-                              <p className="h6" id="durationText">{this.props.request.data.duration} days</p>
-                              <Input type="select" name="duration" id="duration"
+                              <p className="h6" id="durationText">
+                                {this.props.request.data.duration} days
+                              </p>
+                              <Input
+                                type="select"
+                                name="duration"
+                                id="duration"
                                 disabled={!this.state.editable}
                                 onChange={this.onBorrowDurationChange}
                               >
@@ -362,7 +396,11 @@ class ViewDetailRequest extends React.Component {
                               </Input>
                             </Col>
                             <Col md="4">
-                              <p className="h6" id="borrowDayText">{this.convertTimeStampToDate(this.props.request.data.borrowDate)}</p>
+                              <p className="h6" id="borrowDayText">
+                                {this.convertTimeStampToDate(
+                                  this.props.request.data.borrowDate
+                                )}
+                              </p>
                               <Input
                                 id="borrowDay"
                                 type="date"
@@ -371,7 +409,12 @@ class ViewDetailRequest extends React.Component {
                               />
                             </Col>
                             <Col md="4">
-                              <p className="h6" id="dueDateText">{this.convertTimeStampToDate(this.props.request.data.borrowDate + (86400 * this.props.request.data.duration))}</p>
+                              <p className="h6" id="dueDateText">
+                                {this.convertTimeStampToDate(
+                                  this.props.request.data.borrowDate +
+                                    86400 * this.props.request.data.duration
+                                )}
+                              </p>
                               <Input
                                 id="dueDay"
                                 type="date"
@@ -393,10 +436,22 @@ class ViewDetailRequest extends React.Component {
                               <Label className="h6">Interest Received</Label>
                             </Col>
                             <Col xs="12" md="9">
-                              <p className="h6">{Math.round((this.props.request.data.amount * (this.props.request.data.duration / 30) * 1.5 / 100) * 1000) / 1000} VND</p>
+                              <p className="h6">
+                                {Math.round(
+                                  ((this.props.request.data.amount *
+                                    (this.props.request.data.duration / 30) *
+                                    1.5) /
+                                    100) *
+                                    1000
+                                ) / 1000}{" "}
+                                VND
+                              </p>
                             </Col>
                           </FormGroup>
-                          <ApplyTimeline onDataChange={this.handleDataTimeline} setTimelineData={this.changeMilestoneToTimelineData}></ApplyTimeline>
+                          <ApplyTimeline
+                            onDataChange={this.handleDataTimeline}
+                            setTimelineData={this.changeMilestoneToTimelineData}
+                          />
                           {/* <FormGroup>
                             <Col lg="12">
                               <h5 className="h5 text-success font-weight-bold mb-4">
@@ -428,12 +483,45 @@ class ViewDetailRequest extends React.Component {
                           </FormGroup> */}
                         </Form>
                         <CardFooter className="text-center">
-                          <Button type="submit" id="dealButton" size="md" color="primary" onClick={this.makeDeal} disabled={this.state.editable}><i className="fa fa-dot-circle-o"></i> Make Deal</Button>{' '}
-                          <Button type="submit" id="saveDealButton" size="md" color="primary" onClick={this.saveDeal} disabled={!this.state.editable}><i className="fa fa-dot-circle-o"></i> Save Deal</Button>{' '}
-                          <Button type="submit" id="acceptButton" size="md" color="primary" onClick={this.toggleModal} disabled={this.state.editable}><i className="fa fa-dot-circle-o"></i> Accept</Button>{' '}
+                          <Button
+                            type="submit"
+                            id="dealButton"
+                            size="md"
+                            color="primary"
+                            onClick={this.makeDeal}
+                            disabled={this.state.editable}
+                          >
+                            <i className="fa fa-dot-circle-o" /> Make Deal
+                          </Button>{" "}
+                          <Button
+                            type="submit"
+                            id="saveDealButton"
+                            size="md"
+                            color="primary"
+                            onClick={this.saveDeal}
+                            disabled={!this.state.editable}
+                          >
+                            <i className="fa fa-dot-circle-o" /> Save Deal
+                          </Button>{" "}
+                          <Button
+                            type="submit"
+                            id="acceptButton"
+                            size="md"
+                            color="primary"
+                            onClick={this.toggleModal}
+                            disabled={this.state.editable}
+                          >
+                            <i className="fa fa-dot-circle-o" /> Accept
+                          </Button>{" "}
                         </CardFooter>
-                        <Modal isOpen={this.state.modal} toggle={this.toggleModal} className={this.props.className}>
-                          <ModalHeader toggle={this.toggleModal}>Xac Nhan yeu cau vay muon</ModalHeader>
+                        <Modal
+                          isOpen={this.state.modal}
+                          toggle={this.toggleModal}
+                          className={this.props.className}
+                        >
+                          <ModalHeader toggle={this.toggleModal}>
+                            Xac Nhan yeu cau vay muon
+                          </ModalHeader>
                           <ModalBody>
                             Ban co chac chan se chap nhan yeu cau nay khong
                           </ModalBody>
@@ -460,8 +548,15 @@ class ViewDetailRequest extends React.Component {
                                 clientId: client_API
                               }}
                             />
-                            <Button color="primary" onClick={this.toggleModal}>Yes</Button>{' '}
-                            <Button color="secondary" onClick={this.toggleModal}>Cancel</Button>
+                            <Button color="primary" onClick={this.toggleModal}>
+                              Yes
+                            </Button>{" "}
+                            <Button
+                              color="secondary"
+                              onClick={this.toggleModal}
+                            >
+                              Cancel
+                            </Button>
                           </ModalFooter>
                         </Modal>
                       </Col>
@@ -478,12 +573,11 @@ class ViewDetailRequest extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     request: state.request,
     tokenReducer: state.tokenReducer
-  }
-}
+  };
+};
 
 export default connect(mapStateToProps)(ViewDetailRequest);
-

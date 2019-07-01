@@ -27,30 +27,39 @@ import {
 import HorizontalTimeline from "react-horizontal-timeline";
 class ApplyTimeline extends React.Component {
   async componentWillMount() {
-
     //this function will update lending array and payback array in parent component (create request)
-    this.props.onDataChange(this.state.timeline_lending, this.state.timeline_payback);
+    this.props.onDataChange(
+      this.state.timeline_lending,
+      this.state.timeline_payback
+    );
 
-    if(this.props.setTimelineData !== undefined) {
+    if (this.props.setTimelineData !== undefined) {
       let timelineData = this.props.setTimelineData();
-      console.log(timelineData)
+      console.log(timelineData);
       // = {lendingTimeline : [], payBackTimeline: []};
       // await this.setState({
       //   timelineData: this.props.setTimelineData()});
       // console.log(this.state.timelineData);
+      // for (let i = 0; i < timelineData.lendingTimeline.length; i++) {
+      //   const element = timelineData.lendingTimeline[i];
+      //   element.data = this.formatDate(element.data);
+
+      // }
+      // for (let i = 0; i < timelineData.payBackTimeline.length; i++) {
+      //   const element = timelineData.payBackTimeline[i];
+      //   element.data = this.formatDate(element.data);
+
+      // }
       await this.setState({
         timeline_lending: timelineData.lendingTimeline,
         timeline_payback: timelineData.payBackTimeline
-      })
+      });
     }
-    
   }
   componentDidMount() {
     // document.documentElement.scrollTop = 0;
     // document.scrollingElement.scrollTop = 0;
     // this.refs.main.scrollTop = 0;
-
-    
   }
   constructor(props) {
     super(props);
@@ -217,7 +226,10 @@ class ApplyTimeline extends React.Component {
         timeline_lending: timelineCopy
       });
       //update data in parent (create request)
-      this.props.onDataChange(this.state.timeline_lending, this.state.timeline_payback);
+      this.props.onDataChange(
+        this.state.timeline_lending,
+        this.state.timeline_payback
+      );
 
       for (let i = 0; i < this.state.backup_timeline_lending.length; i++) {
         document.getElementById(["day-timeline-lending-" + i]).style.display =
@@ -233,23 +245,24 @@ class ApplyTimeline extends React.Component {
       document.getElementById("cancelButtonLending").style.display = "none";
       document.getElementById("horizontalLendingTimeline").style.display = "";
       document.getElementById("dropdownChooseLending").style.display = "";
+
+      // synchonize last milestone lending with first milestone payback
+      if (this.state.backup_timeline_payback.length <= 2) {
+        let payback = [...this.state.timeline_payback];
+        payback[0].data = this.state.backup_timeline_lending[
+          this.state.backup_timeline_lending.length - 1
+        ].data;
+        payback[1].data = this.formatDate(
+          new Date(
+            (new Date(payback[0].data).getTime() / 1000 +
+              86400 * this.state.duration) *
+              1000
+          ).toLocaleDateString()
+        );
+        this.setState({ timeline_payback: payback });
+      }
     } else {
       window.alert("Duplicate date in milestone"); // popup show Error
-    }
-    // synchonize last milestone lending with first milestone payback
-    if (this.state.backup_timeline_payback.length <= 2) {
-      let payback = [...this.state.timeline_payback];
-      payback[0].data = this.state.backup_timeline_lending[
-        this.state.backup_timeline_lending.length - 1
-      ].data;
-      payback[1].data = this.formatDate(
-        new Date(
-          (new Date(payback[0].data).getTime() / 1000 +
-            86400 * this.state.duration) *
-            1000
-        ).toLocaleDateString()
-      );
-      this.setState({ timeline_payback: payback });
     }
   }
   cancelTimeLineLending() {
@@ -415,8 +428,11 @@ class ApplyTimeline extends React.Component {
         timeline_payback: timelineCopy
       });
       //update data in parent (create request)
-      this.props.onDataChange(this.state.timeline_lending, this.state.timeline_payback);
-      
+      this.props.onDataChange(
+        this.state.timeline_lending,
+        this.state.timeline_payback
+      );
+
       for (let i = 0; i < this.state.backup_timeline_payback.length; i++) {
         document.getElementById(["day-timeline-payback-" + i]).style.display =
           "none";
