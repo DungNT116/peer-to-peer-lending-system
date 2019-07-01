@@ -88,13 +88,13 @@ public class RequestController {
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/request/all_request_trading_by_borrower_or_lender")
-	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithLenderOrBorrower(
+	@GetMapping(value = "/rest/request/all_request_dealing_by_borrower_or_lender")
+	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusDealingWithLenderOrBorrower(
 			@RequestParam Integer page, @RequestParam Integer element, @RequestHeader("Authorization") String token) {
 		PageDTO<Request> result = null;
 		HttpStatus httpStatus = null;
 		try {
-			result = requestService.findAllRequestByStatusWithLenderOrBorrower(page, element, token, "trading");
+			result = requestService.findAllRequestByStatusWithLenderOrBorrower(page, element, token, "dealing");
 			httpStatus = HttpStatus.OK;
 		} catch (Exception ex) {
 			result = null;
@@ -103,6 +103,40 @@ public class RequestController {
 		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
 	}
 
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/request/all_request_trading_by_borrower")
+	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithBorrower(
+			@RequestParam Integer page, @RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		PageDTO<Request> result = null;
+		HttpStatus httpStatus = null;
+		try {
+			result = requestService.findAllRequestByStatusWithBorrower(page, element, token, "trading");
+			httpStatus = HttpStatus.OK;
+		} catch (Exception ex) {
+			result = null;
+			httpStatus = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
+	}
+	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/request/all_request_trading_by_lender")
+	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithLender(
+			@RequestParam Integer page, @RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		PageDTO<Request> result = null;
+		HttpStatus httpStatus = null;
+		try {
+			result = requestService.findAllRequestByStatusWithLender(page, element, token, "trading");
+			httpStatus = HttpStatus.OK;
+		} catch (Exception ex) {
+			result = null;
+			httpStatus = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
+	}
+	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/allRequestHistoryPending")

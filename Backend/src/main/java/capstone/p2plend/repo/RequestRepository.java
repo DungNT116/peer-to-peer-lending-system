@@ -18,6 +18,14 @@ public interface RequestRepository extends JpaRepository<Request, Integer> {
 			@Param("status") String status);
 
 	@Query(value = "SELECT * FROM request WHERE status = :status AND (borrower_id = :borrowerId OR lender_id = :lenderId)", nativeQuery = true)
-	Page<Request> findAllRequestByStatusWithLenderOrBorrower(Pageable pageable, @Param("status") String status, @Param("borrowerId") Integer borrowerId,
+	Page<Request> findAllRequestByStatusWithLenderOrBorrower(Pageable pageable, @Param("status") String status,
+			@Param("borrowerId") Integer borrowerId, @Param("lenderId") Integer lenderId);
+
+	@Query(value = "SELECT * FROM request WHERE status = :status AND lender_id = :lenderId", nativeQuery = true)
+	Page<Request> findAllRequestByStatusWithLender(Pageable pageable, @Param("status") String status,
 			@Param("lenderId") Integer lenderId);
+
+	@Query(value = "SELECT * FROM request WHERE status = :status AND borrower_id = :borrowerId", nativeQuery = true)
+	Page<Request> findAllRequestByStatusWithBorrower(Pageable pageable, @Param("status") String status,
+			@Param("borrowerId") Integer borrowerId);
 }
