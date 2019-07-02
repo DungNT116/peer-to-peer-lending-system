@@ -3,7 +3,7 @@ INSERT INTO user (username, password, email, role, first_name, last_name, status
 INSERT INTO user (username, password, email, role, first_name, last_name, status, phone_number, loan_limit) VALUES ('user2', 'pass2', 'mail2', 'ROLE_USER', 'dung', 'nt', 'active', '0405060704', 2000);
 
 INSERT INTO request (borrower_id, lender_id, amount, borrow_date, duration, interest_rate, create_date, status) VALUES (3, 2, 40, 3453463634, 120, 18, 345345345, 'done');
-INSERT INTO request (borrower_id, amount, duration, interest_rate, create_date, status) VALUES (2, 100, 123123123, 30, 18, 1235235235, 'pending');
+INSERT INTO request (borrower_id, amount, duration, interest_rate, create_date, status) VALUES (2, 100, 30, 18, 1235235235, 'pending');
 INSERT INTO request (borrower_id, amount, duration, interest_rate, create_date, status) VALUES (3, 50, 60, 18, 234234234, 'pending');
 INSERT INTO request (borrower_id, amount, duration, interest_rate, create_date, status) VALUES (2, 20, 90, 18, 54645645645, 'pending');
 

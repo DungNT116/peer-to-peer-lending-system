@@ -72,13 +72,9 @@ public class DealService {
 			existDeal.setStatus("dealing");
 			existDeal.setBorrowTime(deal.getBorrowTime());
 			existDeal.setPaybackTime(deal.getPaybackTime());
-			List<Milestone> milestones = existDeal.getMilestone();
-			for (Milestone m : milestones) {
-				milestoneRepo.deleteById(m.getId());
-			}
+			existDeal.setMilestone(null);
+//			DealdealRepo.saveAndFlush(existDeal);			
 			
-			
-
 			for (Milestone m : listMilestone) {
 				m.setDeal(existDeal);
 			}
@@ -113,7 +109,8 @@ public class DealService {
 			if (request.getLender() == null) {
 				request.setLender(user);
 			}
-
+			requestRepo.saveAndFlush(request);
+			
 			return true;
 		} catch (Exception e) {
 			return false;
