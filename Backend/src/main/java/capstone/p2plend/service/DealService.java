@@ -28,7 +28,7 @@ public class DealService {
 
 	@Autowired
 	MilestoneRepository milestoneRepo;
-	
+
 	@Autowired
 	JwtService jwtService;
 
@@ -36,24 +36,24 @@ public class DealService {
 		try {
 
 			dealRepo.saveAndFlush(deal);
-			
+
 			return true;
 		} catch (Exception e) {
 			return false;
 		}
 	}
-	
+
 	public boolean updateDeal(Deal deal) {
 		try {
 
 			dealRepo.saveAndFlush(deal);
-			
+
 			return true;
 		} catch (Exception e) {
 			return false;
 		}
 	}
-	
+
 	public List<Deal> findAll() {
 		return dealRepo.findAll();
 	}
@@ -65,30 +65,33 @@ public class DealService {
 	public boolean makeDeal(Deal deal, String token) {
 		try {
 			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);			
+			User user = userRepo.findByUsername(username);
 			List<Milestone> listMilestone = deal.getMilestone();
-			
-			
+
 			Deal existDeal = dealRepo.findById(deal.getId()).get();
 			existDeal.setStatus("dealing");
 			existDeal.setBorrowTime(deal.getBorrowTime());
 			existDeal.setPaybackTime(deal.getPaybackTime());
 			List<Milestone> milestones = existDeal.getMilestone();
-			milestoneRepo.deleteAll(milestones);			
-					
-			for(Milestone m : listMilestone) {
+			for (Milestone m : milestones) {
+				milestoneRepo.deleteById(m.getId());
+			}
+			
+			
+
+			for (Milestone m : listMilestone) {
 				m.setDeal(existDeal);
 			}
 			existDeal.setMilestone(listMilestone);
 			Deal savedDeal = dealRepo.saveAndFlush(existDeal);
-			
+
 			Request existRequest = savedDeal.getRequest();
-			if(existRequest.getLender() == null) {
+			if (existRequest.getLender() == null) {
 				existRequest.setLender(user);
-			}			
+			}
 			existRequest.setStatus("dealing");
-			requestRepo.saveAndFlush(existRequest);									
-			
+			requestRepo.saveAndFlush(existRequest);
+
 			return true;
 		} catch (Exception e) {
 			return false;
@@ -99,19 +102,18 @@ public class DealService {
 		try {
 			String username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
-			
+
 			Deal dealExist = dealRepo.findById(deal.getId()).get();
 			dealExist.setStatus("accepted");
 			dealRepo.saveAndFlush(dealExist);
-			
+
 			Request request = dealExist.getRequest();
 			request.setStatus("trading");
 			request.setBorrowDate(deal.getRequest().getBorrowDate());
-			if(request.getLender() == null) {
+			if (request.getLender() == null) {
 				request.setLender(user);
 			}
-			
-						
+
 			return true;
 		} catch (Exception e) {
 			return false;
