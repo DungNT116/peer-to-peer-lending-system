@@ -72,7 +72,11 @@ public class DealService {
 			existDeal.setStatus("dealing");
 			existDeal.setBorrowTime(deal.getBorrowTime());
 			existDeal.setPaybackTime(deal.getPaybackTime());
-			existDeal.setMilestone(null);
+			
+			List<Milestone> lstMs = existDeal.getMilestone();
+			for(Milestone m : lstMs) {
+				milestoneRepo.deleteMilestoneByDealId(m.getDeal().getId());	
+			}			
 			
 			for (Milestone m : listMilestone) {
 				m.setDeal(existDeal);
