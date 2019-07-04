@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler", "roles", "authorities" })
 @Entity
-@Table(name = "user")
+@Table(name = "User")
 public class User {
 
 	@Id
@@ -42,7 +42,7 @@ public class User {
 
 	@Column
 	private Long loanLimit;
-	
+
 	@Column
 	private String role;
 
@@ -55,12 +55,10 @@ public class User {
 	@Column
 	private String status;
 
-//	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
 	@JsonIgnoreProperties(value = { "borrower", "lender" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "borrower")
 	private List<Request> borrowRequest = new ArrayList<>();
 
-//	@JsonIgnoreProperties(value = { "borrower", "lender", "deal" })
 	@JsonIgnoreProperties(value = { "borrower", "lender" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lender")
 	private List<Request> lendRequest = new ArrayList<>();;
@@ -119,6 +117,14 @@ public class User {
 		this.lastName = lastName;
 	}
 
+	public Long getLoanLimit() {
+		return loanLimit;
+	}
+
+	public void setLoanLimit(Long loanLimit) {
+		this.loanLimit = loanLimit;
+	}
+
 	public String getRole() {
 		return role;
 	}
@@ -166,14 +172,5 @@ public class User {
 	public void setLendRequest(List<Request> lendRequest) {
 		this.lendRequest = lendRequest;
 	}
-
-	public Long getLoanLimit() {
-		return loanLimit;
-	}
-
-	public void setLoanLimit(Long loanLimit) {
-		this.loanLimit = loanLimit;
-	}
-
 
 }

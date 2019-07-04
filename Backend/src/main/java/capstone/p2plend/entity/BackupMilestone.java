@@ -1,6 +1,5 @@
 package capstone.p2plend.entity;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -9,7 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -18,8 +16,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 @Entity
-@Table(name = "Milestone")
-public class Milestone {
+@Table(name = "BackupMilestone")
+public class BackupMilestone {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,14 +35,10 @@ public class Milestone {
 	@Column
 	private Float percent;
 
-	@JsonIgnoreProperties(value = { "milestone" })
-	@OneToOne(mappedBy = "milestone", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Transaction transaction;
-
-	@JsonIgnoreProperties(value = { "milestone" })
+	@JsonIgnoreProperties(value = { "backupMilestone" })
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "deal_id")
-	private Deal deal;
+	@JoinColumn(name = "backup_deal_id")
+	private BackupDeal backupDeal;
 
 	public Integer getId() {
 		return id;
@@ -86,20 +80,12 @@ public class Milestone {
 		this.percent = percent;
 	}
 
-	public Transaction getTransaction() {
-		return transaction;
+	public BackupDeal getBackupDeal() {
+		return backupDeal;
 	}
 
-	public void setTransaction(Transaction transaction) {
-		this.transaction = transaction;
-	}
-
-	public Deal getDeal() {
-		return deal;
-	}
-
-	public void setDeal(Deal deal) {
-		this.deal = deal;
+	public void setBackupDeal(BackupDeal backupDeal) {
+		this.backupDeal = backupDeal;
 	}
 
 }

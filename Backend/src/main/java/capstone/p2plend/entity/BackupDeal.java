@@ -21,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 @Entity
-@Table(name = "Deal")
-public class Deal {
+@Table(name = "BackupDeal")
+public class BackupDeal {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,18 +38,14 @@ public class Deal {
 	@Column
 	private Integer paybackTime;
 
-	@JsonIgnoreProperties(value = { "deal" })
+	@JsonIgnoreProperties(value = { "backupDeal" })
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "request_id")
-	private Request request;
+	@JoinColumn(name = "deal_id")
+	private Deal deal;
 
-	@JsonIgnoreProperties(value = { "deal" })
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "deal")
-	private List<Milestone> milestone = new ArrayList<>();
-
-	@JsonIgnoreProperties(value = { "deal" })
-	@OneToOne(mappedBy = "deal", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private BackupDeal backupDeal;
+	@JsonIgnoreProperties(value = { "backupDeal" })
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "backupDeal")
+	private List<BackupMilestone> backupMilestone = new ArrayList<>();
 
 	public Integer getId() {
 		return id;
@@ -83,28 +79,20 @@ public class Deal {
 		this.paybackTime = paybackTime;
 	}
 
-	public Request getRequest() {
-		return request;
+	public Deal getDeal() {
+		return deal;
 	}
 
-	public void setRequest(Request request) {
-		this.request = request;
+	public void setDeal(Deal deal) {
+		this.deal = deal;
 	}
 
-	public List<Milestone> getMilestone() {
-		return milestone;
+	public List<BackupMilestone> getBackupMilestone() {
+		return backupMilestone;
 	}
 
-	public void setMilestone(List<Milestone> milestone) {
-		this.milestone = milestone;
-	}
-
-	public BackupDeal getBackupDeal() {
-		return backupDeal;
-	}
-
-	public void setBackupDeal(BackupDeal backupDeal) {
-		this.backupDeal = backupDeal;
+	public void setBackupMilestone(List<BackupMilestone> backupMilestone) {
+		this.backupMilestone = backupMilestone;
 	}
 
 }
