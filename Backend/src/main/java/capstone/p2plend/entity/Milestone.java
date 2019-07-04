@@ -34,6 +34,9 @@ public class Milestone {
 	@Column
 	private String type;
 
+	@Column
+	private Float percent;
+
 //	@Column(name = "transaction_id", insertable = false, updatable = false)
 //	private Integer transactionId;
 
@@ -82,6 +85,14 @@ public class Milestone {
 		this.type = type;
 	}
 
+	public Float getPercent() {
+		return percent;
+	}
+
+	public void setPercent(Float percent) {
+		this.percent = percent;
+	}
+
 	public Transaction getTransaction() {
 		return transaction;
 	}
@@ -98,6 +109,4 @@ public class Milestone {
 		this.deal = deal;
 	}
 
-	
-	
 }
