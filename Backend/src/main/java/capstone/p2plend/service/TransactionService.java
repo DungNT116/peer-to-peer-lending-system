@@ -50,13 +50,11 @@ public class TransactionService {
 				return false;
 			}
 
-			Transaction existTransaction = transactionRepo
-					.findTransactionByMilestone_Id(transaction.getMilestone().getId());
-			
-			if(existTransaction!=null) {
+			Milestone existMilestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
+			if(existMilestone.getTransaction() != null) {
 				return false;
 			}
-
+			
 			Milestone milestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
 
 			transaction.setMilestone(milestone);

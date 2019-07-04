@@ -40,7 +40,7 @@ public class Deal {
 
 	@JsonIgnoreProperties(value = { "deal" })
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "request_id")
+	@JoinColumn(name = "request_id", referencedColumnName = "id")
 	private Request request;
 
 	@JsonIgnoreProperties(value = { "deal" })

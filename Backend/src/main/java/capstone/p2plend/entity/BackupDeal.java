@@ -40,7 +40,7 @@ public class BackupDeal {
 
 	@JsonIgnoreProperties(value = { "backupDeal" })
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "deal_id")
+	@JoinColumn(name = "deal_id", referencedColumnName = "id")
 	private Deal deal;
 
 	@JsonIgnoreProperties(value = { "backupDeal" })

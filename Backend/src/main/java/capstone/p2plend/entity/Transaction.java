@@ -41,7 +41,7 @@ public class Transaction {
 
 	@JsonIgnoreProperties(value = { "transaction" })
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "milestone_id")
+	@JoinColumn(name = "milestone_id", referencedColumnName = "id")
 	private Milestone milestone;
 
 	public Integer getId() {
