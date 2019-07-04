@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.entity.Transaction;
+import capstone.p2plend.repo.MilestoneRepository;
 import capstone.p2plend.repo.TransactionRepository;
 
 @Service
@@ -15,12 +17,14 @@ public class TransactionService {
 	@Autowired
 	TransactionRepository transactionRepo;
 
+	@Autowired
+	MilestoneRepository milestoneRepo;
+
 	public List<Transaction> getTopTransactionOrderByCreateDateDesc() {
 
-		
 		List<Transaction> listTrans = transactionRepo.findTop20ByOrderByCreateDateDesc();
-		
-		List<Transaction> transactions = new ArrayList<>();		
+
+		List<Transaction> transactions = new ArrayList<>();
 		for (Transaction t : listTrans) {
 			Transaction transaction = new Transaction();
 			transaction.setId(t.getId());
@@ -38,6 +42,24 @@ public class TransactionService {
 	public boolean newTransaction(Transaction transaction) {
 		try {
 
+			if (transaction.getId() != null) {
+				return false;
+			}
+
+			if (transaction.getMilestone().getId() == null) {
+				return false;
+			}
+
+			Transaction existTransaction = transactionRepo
+					.findTransactionByMilestone_Id(transaction.getMilestone().getId());
+			
+			if(existTransaction!=null) {
+				return false;
+			}
+
+			Milestone milestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
+
+			transaction.setMilestone(milestone);
 			transactionRepo.saveAndFlush(transaction);
 
 			return true;

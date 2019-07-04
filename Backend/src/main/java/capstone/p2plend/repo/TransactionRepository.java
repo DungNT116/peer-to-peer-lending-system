@@ -11,4 +11,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
 //	@Query(value = "SELECT * FROM transaction ORDER BY create_date DESC LIMIT 20", nativeQuery = true)
 	List<Transaction> findTop20ByOrderByCreateDateDesc();
 
+	Transaction findTransactionByMilestone_Id(Integer id);
 }
