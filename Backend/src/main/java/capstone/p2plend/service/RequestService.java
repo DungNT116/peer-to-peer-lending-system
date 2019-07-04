@@ -77,6 +77,9 @@ public class RequestService {
 						Transaction transaction = new Transaction();
 						transaction.setStatus(m.getTransaction().getStatus());
 						m.setTransaction(transaction);
+					} else {
+						Transaction transaction = new Transaction();
+						m.setTransaction(transaction);
 					}
 				}
 				deal.setMilestone(listMilestone);
@@ -121,6 +124,9 @@ public class RequestService {
 						if (m.getTransaction() != null) {
 							Transaction transaction = new Transaction();
 							transaction.setStatus(m.getTransaction().getStatus());
+							m.setTransaction(transaction);
+						} else {
+							Transaction transaction = new Transaction();
 							m.setTransaction(transaction);
 						}
 					}
@@ -169,6 +175,9 @@ public class RequestService {
 							Transaction transaction = new Transaction();
 							transaction.setStatus(m.getTransaction().getStatus());
 							m.setTransaction(transaction);
+						} else {
+							Transaction transaction = new Transaction();
+							m.setTransaction(transaction);
 						}
 					}
 					deal.setMilestone(listMilestone);
@@ -214,6 +223,9 @@ public class RequestService {
 						if (m.getTransaction() != null) {
 							Transaction transaction = new Transaction();
 							transaction.setStatus(m.getTransaction().getStatus());
+							m.setTransaction(transaction);
+						} else {
+							Transaction transaction = new Transaction();
 							m.setTransaction(transaction);
 						}
 					}
@@ -263,6 +275,9 @@ public class RequestService {
 							Transaction transaction = new Transaction();
 							transaction.setStatus(m.getTransaction().getStatus());
 							m.setTransaction(transaction);
+						} else {
+							Transaction transaction = new Transaction();
+							m.setTransaction(transaction);
 						}
 					}
 					deal.setMilestone(listMilestone);
@@ -310,6 +325,9 @@ public class RequestService {
 							Transaction transaction = new Transaction();
 							transaction.setStatus(m.getTransaction().getStatus());
 							m.setTransaction(transaction);
+						} else {
+							Transaction transaction = new Transaction();
+							m.setTransaction(transaction);
 						}
 					}
 					deal.setMilestone(listMilestone);
@@ -356,6 +374,9 @@ public class RequestService {
 						if (m.getTransaction() != null) {
 							Transaction transaction = new Transaction();
 							transaction.setStatus(m.getTransaction().getStatus());
+							m.setTransaction(transaction);
+						} else {
+							Transaction transaction = new Transaction();
 							m.setTransaction(transaction);
 						}
 					}

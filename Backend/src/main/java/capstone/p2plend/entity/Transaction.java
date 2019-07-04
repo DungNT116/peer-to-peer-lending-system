@@ -32,6 +32,7 @@ public class Transaction {
 	@Column
 	private Integer amount;
 
+	@JsonInclude(JsonInclude.Include.ALWAYS)
 	@Column
 	private String status;
 
