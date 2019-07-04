@@ -72,10 +72,12 @@ public class RequestService {
 
 			if (r.getDeal().getMilestone() != null) {
 				List<Milestone> listMilestone = r.getDeal().getMilestone();
-				for(Milestone m : listMilestone) {
-					Transaction transaction = new Transaction();
-					transaction.setStatus(m.getTransaction().getStatus());
-					m.setTransaction(transaction);
+				for (Milestone m : listMilestone) {
+					if (m.getTransaction() != null) {
+						Transaction transaction = new Transaction();
+						transaction.setStatus(m.getTransaction().getStatus());
+						m.setTransaction(transaction);
+					}
 				}
 				deal.setMilestone(listMilestone);
 			}
@@ -115,10 +117,12 @@ public class RequestService {
 				deal.setStatus(r.getDeal().getStatus());
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
-					for(Milestone m : listMilestone) {
-						Transaction transaction = new Transaction();
-						transaction.setStatus(m.getTransaction().getStatus());
-						m.setTransaction(transaction);
+					for (Milestone m : listMilestone) {
+						if (m.getTransaction() != null) {
+							Transaction transaction = new Transaction();
+							transaction.setStatus(m.getTransaction().getStatus());
+							m.setTransaction(transaction);
+						}
 					}
 					deal.setMilestone(listMilestone);
 				}
@@ -160,10 +164,12 @@ public class RequestService {
 				deal.setStatus(r.getDeal().getStatus());
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
-					for(Milestone m : listMilestone) {
-						Transaction transaction = new Transaction();
-						transaction.setStatus(m.getTransaction().getStatus());
-						m.setTransaction(transaction);
+					for (Milestone m : listMilestone) {
+						if (m.getTransaction() != null) {
+							Transaction transaction = new Transaction();
+							transaction.setStatus(m.getTransaction().getStatus());
+							m.setTransaction(transaction);
+						}
 					}
 					deal.setMilestone(listMilestone);
 				}
@@ -204,10 +210,12 @@ public class RequestService {
 				deal.setStatus(r.getDeal().getStatus());
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
-					for(Milestone m : listMilestone) {
-						Transaction transaction = new Transaction();
-						transaction.setStatus(m.getTransaction().getStatus());
-						m.setTransaction(transaction);
+					for (Milestone m : listMilestone) {
+						if (m.getTransaction() != null) {
+							Transaction transaction = new Transaction();
+							transaction.setStatus(m.getTransaction().getStatus());
+							m.setTransaction(transaction);
+						}
 					}
 					deal.setMilestone(listMilestone);
 				}
@@ -220,11 +228,13 @@ public class RequestService {
 		return pageDTO;
 	}
 
-	public PageDTO<Request> findAllRequestByStatusWithLenderOrBorrower(Integer page, Integer element, String token, String status){
+	public PageDTO<Request> findAllRequestByStatusWithLenderOrBorrower(Integer page, Integer element, String token,
+			String status) {
 		String username = jwtService.getUsernameFromToken(token);
 		User account = accountRepo.findByUsername(username);
 		Pageable pageable = PageRequest.of(page - 1, element, Sort.by("create_date").descending());
-		Page<Request> listRq = requestRepo.findAllRequestByStatusWithLenderOrBorrower(pageable, status, account.getId(), account.getId());
+		Page<Request> listRq = requestRepo.findAllRequestByStatusWithLenderOrBorrower(pageable, status, account.getId(),
+				account.getId());
 		for (Request r : listRq) {
 			if (r.getBorrower() != null) {
 				User borrower = new User();
@@ -248,23 +258,26 @@ public class RequestService {
 				deal.setStatus(r.getDeal().getStatus());
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
-					for(Milestone m : listMilestone) {
-						Transaction transaction = new Transaction();
-						transaction.setStatus(m.getTransaction().getStatus());
-						m.setTransaction(transaction);
+					for (Milestone m : listMilestone) {
+						if (m.getTransaction() != null) {
+							Transaction transaction = new Transaction();
+							transaction.setStatus(m.getTransaction().getStatus());
+							m.setTransaction(transaction);
+						}
 					}
 					deal.setMilestone(listMilestone);
 				}
 				r.setDeal(deal);
 			}
-		}		
+		}
 		PageDTO<Request> pageDTO = new PageDTO<>();
 		pageDTO.setMaxPage(listRq.getTotalPages());
 		pageDTO.setData(listRq.getContent());
 		return pageDTO;
 	}
-	
-	public PageDTO<Request> findAllRequestByStatusWithLender(Integer page, Integer element, String token, String status){
+
+	public PageDTO<Request> findAllRequestByStatusWithLender(Integer page, Integer element, String token,
+			String status) {
 		String username = jwtService.getUsernameFromToken(token);
 		User account = accountRepo.findByUsername(username);
 		Pageable pageable = PageRequest.of(page - 1, element, Sort.by("create_date").descending());
@@ -292,23 +305,26 @@ public class RequestService {
 				deal.setStatus(r.getDeal().getStatus());
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
-					for(Milestone m : listMilestone) {
-						Transaction transaction = new Transaction();
-						transaction.setStatus(m.getTransaction().getStatus());
-						m.setTransaction(transaction);
+					for (Milestone m : listMilestone) {
+						if (m.getTransaction() != null) {
+							Transaction transaction = new Transaction();
+							transaction.setStatus(m.getTransaction().getStatus());
+							m.setTransaction(transaction);
+						}
 					}
 					deal.setMilestone(listMilestone);
 				}
 				r.setDeal(deal);
 			}
-		}		
+		}
 		PageDTO<Request> pageDTO = new PageDTO<>();
 		pageDTO.setMaxPage(listRq.getTotalPages());
 		pageDTO.setData(listRq.getContent());
 		return pageDTO;
 	}
-	
-	public PageDTO<Request> findAllRequestByStatusWithBorrower(Integer page, Integer element, String token, String status){
+
+	public PageDTO<Request> findAllRequestByStatusWithBorrower(Integer page, Integer element, String token,
+			String status) {
 		String username = jwtService.getUsernameFromToken(token);
 		User account = accountRepo.findByUsername(username);
 		Pageable pageable = PageRequest.of(page - 1, element, Sort.by("create_date").descending());
@@ -336,22 +352,24 @@ public class RequestService {
 				deal.setStatus(r.getDeal().getStatus());
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
-					for(Milestone m : listMilestone) {
-						Transaction transaction = new Transaction();
-						transaction.setStatus(m.getTransaction().getStatus());
-						m.setTransaction(transaction);
+					for (Milestone m : listMilestone) {
+						if (m.getTransaction() != null) {
+							Transaction transaction = new Transaction();
+							transaction.setStatus(m.getTransaction().getStatus());
+							m.setTransaction(transaction);
+						}
 					}
 					deal.setMilestone(listMilestone);
 				}
 				r.setDeal(deal);
 			}
-		}		
+		}
 		PageDTO<Request> pageDTO = new PageDTO<>();
 		pageDTO.setMaxPage(listRq.getTotalPages());
 		pageDTO.setData(listRq.getContent());
 		return pageDTO;
 	}
-	
+
 	public boolean createRequest(Request request, String token) {
 		try {
 			Deal deal = new Deal();
