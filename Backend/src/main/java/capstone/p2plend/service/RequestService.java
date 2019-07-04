@@ -15,6 +15,7 @@ import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.Deal;
 import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.entity.Request;
+import capstone.p2plend.entity.Transaction;
 import capstone.p2plend.repo.UserRepository;
 import capstone.p2plend.repo.DealRepository;
 import capstone.p2plend.repo.MilestoneRepository;
@@ -72,7 +73,9 @@ public class RequestService {
 			if (r.getDeal().getMilestone() != null) {
 				List<Milestone> listMilestone = r.getDeal().getMilestone();
 				for(Milestone m : listMilestone) {
-					m.setTransaction(null);
+					Transaction transaction = new Transaction();
+					transaction.setStatus(m.getTransaction().getStatus());
+					m.setTransaction(transaction);
 				}
 				deal.setMilestone(listMilestone);
 			}
@@ -113,7 +116,9 @@ public class RequestService {
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
 					for(Milestone m : listMilestone) {
-						m.setTransaction(null);
+						Transaction transaction = new Transaction();
+						transaction.setStatus(m.getTransaction().getStatus());
+						m.setTransaction(transaction);
 					}
 					deal.setMilestone(listMilestone);
 				}
@@ -156,7 +161,9 @@ public class RequestService {
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
 					for(Milestone m : listMilestone) {
-						m.setTransaction(null);
+						Transaction transaction = new Transaction();
+						transaction.setStatus(m.getTransaction().getStatus());
+						m.setTransaction(transaction);
 					}
 					deal.setMilestone(listMilestone);
 				}
@@ -198,7 +205,9 @@ public class RequestService {
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
 					for(Milestone m : listMilestone) {
-						m.setTransaction(null);
+						Transaction transaction = new Transaction();
+						transaction.setStatus(m.getTransaction().getStatus());
+						m.setTransaction(transaction);
 					}
 					deal.setMilestone(listMilestone);
 				}
@@ -240,7 +249,9 @@ public class RequestService {
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
 					for(Milestone m : listMilestone) {
-						m.setTransaction(null);
+						Transaction transaction = new Transaction();
+						transaction.setStatus(m.getTransaction().getStatus());
+						m.setTransaction(transaction);
 					}
 					deal.setMilestone(listMilestone);
 				}
@@ -282,7 +293,9 @@ public class RequestService {
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
 					for(Milestone m : listMilestone) {
-						m.setTransaction(null);
+						Transaction transaction = new Transaction();
+						transaction.setStatus(m.getTransaction().getStatus());
+						m.setTransaction(transaction);
 					}
 					deal.setMilestone(listMilestone);
 				}
@@ -324,7 +337,9 @@ public class RequestService {
 				if (r.getDeal().getMilestone() != null) {
 					List<Milestone> listMilestone = r.getDeal().getMilestone();
 					for(Milestone m : listMilestone) {
-						m.setTransaction(null);
+						Transaction transaction = new Transaction();
+						transaction.setStatus(m.getTransaction().getStatus());
+						m.setTransaction(transaction);
 					}
 					deal.setMilestone(listMilestone);
 				}
