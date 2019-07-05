@@ -2,6 +2,7 @@ package capstone.p2plend.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.BackingStoreException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,11 +13,15 @@ import org.springframework.stereotype.Service;
 
 import capstone.p2plend.entity.User;
 import capstone.p2plend.dto.PageDTO;
+import capstone.p2plend.entity.BackupDeal;
+import capstone.p2plend.entity.BackupMilestone;
 import capstone.p2plend.entity.Deal;
 import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.entity.Request;
 import capstone.p2plend.entity.Transaction;
 import capstone.p2plend.repo.UserRepository;
+import capstone.p2plend.repo.BackupDealRepository;
+import capstone.p2plend.repo.BackupMilestoneRepository;
 import capstone.p2plend.repo.DealRepository;
 import capstone.p2plend.repo.MilestoneRepository;
 import capstone.p2plend.repo.RequestRepository;
@@ -35,6 +40,12 @@ public class RequestService {
 
 	@Autowired
 	MilestoneRepository milestoneRepo;
+	
+	@Autowired
+	BackupDealRepository backupDealRepo;
+	
+	@Autowired
+	BackupMilestoneRepository backupMilestoneRepo;
 
 	@Autowired
 	JwtService jwtService;
@@ -400,9 +411,9 @@ public class RequestService {
 				return false;
 			}
 
-			List<Milestone> listMilestone = new ArrayList<>();
+			List<Milestone> listMilestone = new ArrayList<>();			
 			if (request.getDeal().getMilestone() != null) {
-				listMilestone.addAll(request.getDeal().getMilestone());
+				listMilestone.addAll(request.getDeal().getMilestone());			
 			} else {
 				return false;
 			}
@@ -435,11 +446,38 @@ public class RequestService {
 			deal.setStatus("pending");
 			deal.setRequest(reObj);
 			Deal dealObj = dealRepo.saveAndFlush(deal);
-
+			
+			BackupDeal backupDealObj = new BackupDeal();
+			backupDealObj.setBorrowTime(dealObj.getBorrowTime());
+			backupDealObj.setPaybackTime(dealObj.getPaybackTime());
+			backupDealObj.setStatus(dealObj.getStatus());
+			backupDealObj.setDeal(dealObj);
+			backupDealObj = backupDealRepo.saveAndFlush(backupDealObj);
+			
 			for (Milestone m : listMilestone) {
 				m.setDeal(dealObj);
 				milestoneRepo.saveAndFlush(m);
 			}
+			
+			List<BackupMilestone> listBackupMilestone = new ArrayList<>();
+			for(Milestone m : listMilestone) {
+				BackupMilestone backupMilestone = new BackupMilestone();
+				backupMilestone.setPercent(m.getPercent());
+				backupMilestone.setPresentDate(m.getPresentDate());
+				backupMilestone.setPreviousDate(m.getPreviousDate());
+				backupMilestone.setType(m.getType());
+			}
+			
+			for (Milestone m : listMilestone) {
+				m.setDeal(dealObj);
+				milestoneRepo.saveAndFlush(m);								
+			}
+			
+			for (BackupMilestone bm : listBackupMilestone) {
+				bm.setBackupDeal(backupDealObj);
+				backupMilestoneRepo.saveAndFlush(bm);								
+			}
+			
 			return true;
 		} catch (Exception e) {
 			return false;
