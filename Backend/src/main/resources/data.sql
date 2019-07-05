@@ -12,6 +12,11 @@ INSERT INTO deal (status, borrow_time, payback_time, request_id) VALUES ('pendin
 INSERT INTO deal (status, borrow_time, payback_time, request_id) VALUES ('pending', 1, 1, 3);
 INSERT INTO deal (status, borrow_time, payback_time, request_id) VALUES ('pending', 1, 1, 4);
 
+INSERT INTO backup_deal (status, borrow_time, payback_time, deal_id) VALUES ('done', 1, 1, 1);
+INSERT INTO backup_deal (status, borrow_time, payback_time, deal_id) VALUES ('pending', 1, 1, 2);
+INSERT INTO backup_deal (status, borrow_time, payback_time, deal_id) VALUES ('pending', 1, 1, 3);
+INSERT INTO backup_deal (status, borrow_time, payback_time, deal_id) VALUES ('pending', 1, 1, 4);
+
 INSERT INTO milestone(previous_date, present_date, type, deal_id) VALUES (345345345, 345345345, 'lend', 1);
 INSERT INTO milestone(previous_date, present_date, type, deal_id) VALUES (345345345, 345345345, 'payback', 1);
 INSERT INTO milestone(previous_date, present_date, type, deal_id) VALUES (345345345, 345345345, 'lend', 2);
@@ -20,6 +25,15 @@ INSERT INTO milestone(previous_date, present_date, type, deal_id) VALUES (345345
 INSERT INTO milestone(previous_date, present_date, type, deal_id) VALUES (345345345, 345345345, 'payback', 3);
 INSERT INTO milestone(previous_date, present_date, type, deal_id) VALUES (345345345, 345345345, 'lend', 4);
 INSERT INTO milestone(previous_date, present_date, type, deal_id) VALUES (345345345, 345345345, 'payback', 4);
+
+INSERT INTO backup_milestone(previous_date, present_date, type, backup_deal_id) VALUES (345345345, 345345345, 'lend', 1);
+INSERT INTO backup_milestone(previous_date, present_date, type, backup_deal_id) VALUES (345345345, 345345345, 'payback', 1);
+INSERT INTO backup_milestone(previous_date, present_date, type, backup_deal_id) VALUES (345345345, 345345345, 'lend', 2);
+INSERT INTO backup_milestone(previous_date, present_date, type, backup_deal_id) VALUES (345345345, 345345345, 'payback', 2);
+INSERT INTO backup_milestone(previous_date, present_date, type, backup_deal_id) VALUES (345345345, 345345345, 'lend', 3);
+INSERT INTO backup_milestone(previous_date, present_date, type, backup_deal_id) VALUES (345345345, 345345345, 'payback', 3);
+INSERT INTO backup_milestone(previous_date, present_date, type, backup_deal_id) VALUES (345345345, 345345345, 'lend', 4);
+INSERT INTO backup_milestone(previous_date, present_date, type, backup_deal_id) VALUES (345345345, 345345345, 'payback', 4);
 
 INSERT INTO transaction(amount, create_date, receiver, sender, status, milestone_id) VALUES (40, 345345345, 'user2', 'user1', 'lend', 1);
 INSERT INTO transaction(amount, create_date, receiver, sender, status, milestone_id) VALUES (40, 345345345, 'user1', 'user2', 'payback', 2);
