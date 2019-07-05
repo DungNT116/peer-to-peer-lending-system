@@ -8,27 +8,15 @@ import { Link } from 'react-router-dom';
 import { SET_PAGE_NUMBER } from "../../redux/action/types";
 // reactstrap components
 import {
-  // Badge,
   Button,
-  // Card,
-  // CardBody,
-  // CardImg,
-  // FormGroup,
-  // Input,
-  // InputGroupAddon,
-  // InputGroupText,
-  // InputGroup,
   Container,
   Row,
   Col,
-  // Label,
-  // Form,
   Table
 } from "reactstrap";
 
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
-// import CardsFooter from "components/Footers/CardsFooter.jsx";
 
 import Pagination from "../../views/IndexSections/Pagination.jsx";
 //api link
@@ -36,7 +24,6 @@ import { apiLink } from '../../api.jsx';
 import SimpleFooter from "components/Footers/SimpleFooter";
 
 // index page sections
-// import Download from "../../views/IndexSections/Download.jsx";
 
 class ViewRequestList extends React.Component {
   constructor(props) {
@@ -89,12 +76,13 @@ class ViewRequestList extends React.Component {
 
       }
     )
-    // event.preventDefault();
-    // this.props.history.push('/')
   }
 
   setDataToDetailPage(id) {
     this.props.setRequest(id);
+    this.props.setIsHistory(true);
+    this.props.setIsViewDetail(true);
+    this.props.setIsHistoryDetail(false);
   }
 
   componentWillMount() {
@@ -105,15 +93,6 @@ class ViewRequestList extends React.Component {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
-    // console.log(localStorage.getItem("token"));
-    
-    //change timestamp to date String and vice versa
-    // var date = "07/22/2018";
-    // var dateToTimestamp = Math.round(new Date(date).getTime() / 1000);
-    // var timestampToDate = new Date(dateToTimestamp * 1000);
-
-    // console.log("dateToTimestamp: " + dateToTimestamp);
-    // console.log("timestampToDate: " +timestampToDate.toLocaleDateString())
   }
 
   convertTimeStampToDate(date) {
@@ -122,6 +101,7 @@ class ViewRequestList extends React.Component {
   }
   
   render() {
+    console.log(this.state.requests)
     const listItems = this.state.requests.map((request, index) =>
       <tr key={index}>
         <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
@@ -214,8 +194,6 @@ class ViewRequestList extends React.Component {
 const mapStateToProps = (state) => {
   return {
     request: state.request,
-    // tokenReducer: state.tokenReducer,
-    // paging: state.paging
   }
 }
 const mapDispatchToProps = (dispatch) => {
@@ -225,14 +203,31 @@ const mapDispatchToProps = (dispatch) => {
         type: "SET_REQUEST",
         payload: id
       });
+    },
+    setIsTrading: (status) => {
+      dispatch({
+        type: "SET_IS_TRADING",
+        payload: status
+      });
+    },
+    setIsViewDetail: (status) => {
+      dispatch({
+        type: "SET_IS_VIEWDETAIL",
+        payload: status
+      });
+    },
+    setIsHistory: (status) => {
+      dispatch({
+        type: "SET_IS_HISTORY",
+        payload: status
+      });
+    },
+    setIsHistoryDetail: (status) => {
+      dispatch({
+        type: "SET_IS_HISTORY_DETAIL",
+        payload: status
+      });
     }
-    // ,
-    // setPage: (page) => {
-    //   dispatch({
-    //     type: "SET_PAGE_NUMBER",
-    //     payload: page
-    //   });
-    // }
   }
 }
 

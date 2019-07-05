@@ -68,12 +68,15 @@ class CreateRequestPage extends React.Component {
       milestone = {
         previousDate: '',
         presentDate: '',
+        percent: '',
         type: ''
       }
       if (i === 0) {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = dateToTimestamp;
         milestone.type = "lend";
+        milestone.percent = element.percent;
+        console.log("Milestone 0 : " + milestone.percent);
         console.log("Milestone 0 : " + milestone.presentDate);
         console.log("Milestone 0 : " + milestone.previousDate);
         console.log("Milestone 0 : " + milestone.type);
@@ -83,6 +86,8 @@ class CreateRequestPage extends React.Component {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = preDateToTimestamp;
         milestone.type = "lend";
+        milestone.percent = element.percent;
+        console.log("Milestone 0 : " + milestone.percent);
         console.log("Milestone " + i + " : " + milestone.presentDate);
         console.log("Milestone " + i + " : " + milestone.previousDate);
         console.log("Milestone " + i + " : " + milestone.type);
@@ -98,12 +103,15 @@ class CreateRequestPage extends React.Component {
       milestone = {
         previousDate: '',
         presentDate: '',
+        percent: '',
         type: ''
       }
       if (i === 0) {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = dateToTimestamp;
         milestone.type = "payback";
+        milestone.percent = element.percent;
+        console.log("Milestone 0 : " + milestone.percent);
         console.log("Milestone 0 : " + milestone.presentDate);
         console.log("Milestone 0 : " + milestone.previousDate);
         console.log("Milestone 0 : " + milestone.type);
@@ -113,6 +121,8 @@ class CreateRequestPage extends React.Component {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = preDateToTimestamp;
         milestone.type = "payback";
+        milestone.percent = element.percent;
+        console.log("Milestone 0 : " + milestone.percent);
         console.log("Milestone " + i + " : " + milestone.presentDate);
         console.log("Milestone " + i + " : " + milestone.previousDate);
         console.log("Milestone " + i + " : " + milestone.type);
@@ -211,7 +221,9 @@ class CreateRequestPage extends React.Component {
     this.setState({
       createDate: timeStampeDateNow
     })
-
+    this.props.setIsHistory(false);
+    this.props.setIsViewDetail(true);
+    this.props.setIsHistoryDetail(false);
   }
   render() {
 
@@ -343,21 +355,45 @@ class CreateRequestPage extends React.Component {
   }
 }
 
-// const mapStateToProps = (state) => {
-//   return {
-//     tokenReducer: state.tokenReducer
-//   }
-// }
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     setToken: (token) => {
-//       dispatch({
-//         type: "SET_TOKEN",
-//         payload: token
-//       });
-//     }
-//   }
-// }
 
-// export default connect(mapStateToProps, mapDispatchToProps)(CreateRequestPage);
-export default (CreateRequestPage);
+const mapStateToProps = (state) => {
+  return {
+    request: state.request,
+  }
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setRequest: (id) => {
+      dispatch({
+        type: "SET_REQUEST",
+        payload: id
+      });
+    },
+    setIsTrading: (status) => {
+      dispatch({
+        type: "SET_IS_TRADING",
+        payload: status
+      });
+    },
+    setIsViewDetail: (status) => {
+      dispatch({
+        type: "SET_IS_VIEWDETAIL",
+        payload: status
+      });
+    },
+    setIsHistory: (status) => {
+      dispatch({
+        type: "SET_IS_HISTORY",
+        payload: status
+      });
+    },
+    setIsHistoryDetail: (status) => {
+      dispatch({
+        type: "SET_IS_HISTORY_DETAIL",
+        payload: status
+      });
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateRequestPage);

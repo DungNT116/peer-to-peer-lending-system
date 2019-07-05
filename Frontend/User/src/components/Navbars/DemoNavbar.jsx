@@ -57,7 +57,7 @@ class DemoNavbar extends React.Component {
   // }
 
   render() {
-    console.log(localStorage.getItem("isLoggedIn"))
+    // console.log(localStorage.getItem("isLoggedIn"))
     return (
       <>
         <header className="header-global">
