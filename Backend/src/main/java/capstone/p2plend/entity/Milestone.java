@@ -34,6 +34,7 @@ public class Milestone {
 	@Column
 	private String type;
 
+	@JsonInclude(JsonInclude.Include.ALWAYS)
 	@Column
 	private Float percent;
 
