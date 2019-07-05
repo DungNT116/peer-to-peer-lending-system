@@ -132,6 +132,7 @@ public class DealService {
 			
 			Request request = deal.getRequest();
 			request.setLender(null);
+			request.setStatus("pending");
 			requestRepo.saveAndFlush(request);
 			
 			List<Milestone> lstMs = deal.getMilestone();
