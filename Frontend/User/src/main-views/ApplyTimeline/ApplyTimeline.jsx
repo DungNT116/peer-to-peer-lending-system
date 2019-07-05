@@ -42,15 +42,14 @@ class ApplyTimeline extends React.Component {
         timeline_lending: timelineData.lendingTimeline,
         timeline_payback: timelineData.payBackTimeline
       })
+      console.log(this.state.timeline_lending)
+      console.log(this.state.timeline_payback)
     }
-    
   }
-  componentDidMount() {
+  async componentDidMount() {
     // document.documentElement.scrollTop = 0;
     // document.scrollingElement.scrollTop = 0;
     // this.refs.main.scrollTop = 0;
-
-    
   }
   constructor(props) {
     super(props);
@@ -529,7 +528,7 @@ class ApplyTimeline extends React.Component {
       curPaybackId,
       prevPaybackId
     } = this.state;
-    const curLendingStatus = this.state.timeline_lending[curLendingId].status;
+    // const curLendingStatus = this.state.timeline_lending[curLendingId].status;
     const prevLendingStatus =
       prevLendingId >= 0
         ? this.state.timeline_lending[prevLendingId].status
@@ -674,7 +673,7 @@ class ApplyTimeline extends React.Component {
               >
                 {this.createLendingTimeline()}
               </div>
-              <div className="text-center">{curLendingStatus}</div>
+              {/* <div className="text-center">{curLendingStatus}</div> */}
             </div>
           </CardBody>
         </Row>

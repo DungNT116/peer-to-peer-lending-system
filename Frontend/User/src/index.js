@@ -20,6 +20,7 @@ import ViewRequestList from "main-views/ViewRequestList/ViewRequestList.jsx";
 import ViewDetailRequest from "main-views/ViewDetailRequest/ViewDetailRequest.jsx";
 import HistoryRequest from "main-views/HistoryRequest/HistoryRequest.jsx";
 import ViewRequestNew from "main-views/ViewRequestNew/ViewRequestNew.jsx";
+import ViewRequestTrading from "main-views/ViewRequestTrading/ViewRequestTrading";
 
 ReactDOM.render(
   <Provider store={store}>
@@ -76,6 +77,11 @@ ReactDOM.render(
           path="/apply-timeline"
           exact
           render={props => <ApplyTimeline {...props} />}
+        />
+        <Route
+          path="/view-request-trading"
+          exact
+          render={props => <ViewRequestTrading {...props} />}
         />
         <Redirect to="/" />
       </Switch>
