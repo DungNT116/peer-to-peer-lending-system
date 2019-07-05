@@ -340,7 +340,8 @@ class Register extends React.Component {
                           </Col>
                         </Row>
                         <div className="text-center my-4">
-                          <Input type="submit" value="Create account" />
+                          {/* <Input type="submit" value="Create account" /> */}
+                          <Button type="submit" size="md" color="primary">Create Account</Button>
                           {/* <Button
                             className="mt-4"
                             color="primary"

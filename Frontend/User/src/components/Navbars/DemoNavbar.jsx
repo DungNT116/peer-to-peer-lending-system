@@ -35,6 +35,7 @@ class DemoNavbar extends React.Component {
   logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("user");
   }
 
   async componentDidMount() {
@@ -184,6 +185,9 @@ class DemoNavbar extends React.Component {
                         <DropdownItem to="/view-new-request" tag={Link}>
                           View New Request
                         </DropdownItem>
+                        <DropdownItem to="/view-request-trading" tag={Link}>
+                          View Request Trading
+                        </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>
                     : ""}
@@ -220,22 +224,23 @@ class DemoNavbar extends React.Component {
                     </span>
                       </Button>
                     )}
-                    {/* {(localStorage.getItem("isLoggedIn")) ? (
+                    {(localStorage.getItem("isLoggedIn")) ?
+                    (
+                      ""
+                    ) : (
                       <Button
                         className="btn-neutral btn-icon"
                         color="default"
-                        href="/"
-                        onClick={() => this.logout()}
+                        href="/register-page"
                       >
                         <span className="btn-inner--icon">
                           <i className="fa fa-user mr-2" />
                         </span>
                         <span className="nav-link-inner--text ml-1">
-                          Logout
-                      </span>
-                        <span className="nav-link-inner--text ml-1">Login</span>
+                          register
+                    </span>
                       </Button>
-                    ): ""} */}
+                    )}
                     {(localStorage.getItem("isLoggedIn")) ? (
                       <UncontrolledDropdown nav>
                         <DropdownToggle nav>

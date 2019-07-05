@@ -45,18 +45,15 @@ class ApplyTimeline extends React.Component {
         timeline_lending: timelineData.lendingTimeline,
         timeline_payback: timelineData.payBackTimeline
       });
-      console.log(timelineData.lendingTimeline);
-      console.log(timelineData.payBackTimeline);
     }
 
     if (this.props.rawMilestone !== undefined) {
       await this.setState({
         rawMilestone: this.props.rawMilestone
       });
-      console.log(this.state.rawMilestone);
     }
   }
-  componentDidMount() {
+  async componentDidMount() {
     // document.documentElement.scrollTop = 0;
     // document.scrollingElement.scrollTop = 0;
     // this.refs.main.scrollTop = 0;
@@ -670,7 +667,7 @@ class ApplyTimeline extends React.Component {
       curPaybackId,
       prevPaybackId
     } = this.state;
-    const curLendingStatus = this.state.timeline_lending[curLendingId].status;
+    // const curLendingStatus = this.state.timeline_lending[curLendingId].status;
     const prevLendingStatus =
       prevLendingId >= 0
         ? this.state.timeline_lending[prevLendingId].status

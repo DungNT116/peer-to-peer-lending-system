@@ -27,6 +27,9 @@ import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
 import ApplyTimeline from "../ApplyTimeline/ApplyTimeline";
 
+import  { Redirect } from 'react-router-dom'
+
+
 class ViewDetailRequest extends React.Component {
   constructor(props) {
     super(props);
@@ -34,10 +37,17 @@ class ViewDetailRequest extends React.Component {
       modal: false,
       timeout: 300,
       editable: false,
+<<<<<<< HEAD
       borrowDay: "",
       dueDay: "",
       borrowDuration: "",
       typeOfContact: "",
+=======
+      createDay: '',
+      dueDay: '',
+      borrowDuration: '',
+      typeOfContact: '',
+>>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
       dbDataLendingTimeline: [],
       dbDataPayBackTimeline: []
     };
@@ -45,15 +55,195 @@ class ViewDetailRequest extends React.Component {
     this.toggleModal = this.toggleModal.bind(this);
     this.makeDeal = this.makeDeal.bind(this);
     this.saveDeal = this.saveDeal.bind(this);
-    this.onBorrowDayChange = this.onBorrowDayChange.bind(this);
+    this.onCreateDayChange = this.onCreateDayChange.bind(this);
     this.onDueDayChange = this.onDueDayChange.bind(this);
     this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
     this.onTypeOfContactChange = this.onTypeOfContactChange.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.handleDataTimeline = this.handleDataTimeline.bind(this);
+<<<<<<< HEAD
     this.changeMilestoneToTimelineData = this.changeMilestoneToTimelineData.bind(
       this
     );
+=======
+    this.changeMilestoneToTimelineData = this.changeMilestoneToTimelineData.bind(this);
+    this.formatDate = this.formatDate.bind(this);
+    this.saveNewDealInformationToDB = this.saveNewDealInformationToDB.bind(this);
+    this.createMileStone = this.createMileStone.bind(this);
+    this.acceptDeal = this.acceptDeal.bind(this);
+    this.validRedux = this.validRedux.bind(this);
+  }
+
+  validRedux() {
+    // console.log(this.props.request.data.amount)
+    console.log(Object.keys(this.props.request.data).length === 0)
+    if (Object.keys(this.props.request.data).length === 0) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push('/login-page');
+
+          // reload page to go to login page
+          window.location.reload();
+          // return <Redirect to='/login-page'  />
+          // this.props.history.push('/path')
+        }
+  }
+  // componentWillMount() {
+  //   console.log(this.props.request.data)
+  //   if (this.props.request.data.length === 0) {
+  //     // localStorage.removeItem("isLoggedIn");
+  //     // this.props.history.push('/login-page')
+  //     // return <Redirect to='/login-page'  />
+  //     // this.props.history.push('/path')
+  //   }
+  // }
+
+  acceptDeal() {
+    fetch(apiLink + "/rest/deal/acceptDeal", {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        id: this.props.request.data.deal.id,
+        request: {
+          borrowDate: Math.round(new Date().getTime() / 1000)
+        }
+      })
+
+    }).then(
+      (result) => {
+        if (result.status === 200) {
+          alert("create success");
+          this.props.history.push('/view-request-trading');
+        } else if (result.status === 401) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push('/login-page')
+        }
+      }
+    )
+
+  }
+
+  createMileStone() {
+    let milestones = [];
+    let milestone = {
+      previousDate: '',
+      presentDate: '',
+      type: '',
+
+    }
+    for (let i = 0; i < this.state.lendingTimeline.length; i++) {
+      const element = this.state.lendingTimeline[i];
+      console.log(element)
+      // console.log(new Date(element.data).getTime() / 1000)
+      var dateToTimestamp = new Date(element.data).getTime() / 1000;
+      milestone = {
+        previousDate: '',
+        presentDate: '',
+        type: ''
+      }
+      if (i === 0) {
+        milestone.presentDate = dateToTimestamp;
+        milestone.previousDate = dateToTimestamp;
+        milestone.type = "lend";
+        console.log("Milestone 0 : " + milestone.presentDate);
+        console.log("Milestone 0 : " + milestone.previousDate);
+        console.log("Milestone 0 : " + milestone.type);
+      } else {
+        const preElement = this.state.lendingTimeline[i - 1];
+        var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
+        milestone.presentDate = dateToTimestamp;
+        milestone.previousDate = preDateToTimestamp;
+        milestone.type = "lend";
+        console.log("Milestone " + i + " : " + milestone.presentDate);
+        console.log("Milestone " + i + " : " + milestone.previousDate);
+        console.log("Milestone " + i + " : " + milestone.type);
+      }
+      // console.log(milestone);
+      milestones.push(milestone);
+    }
+    for (let i = 0; i < this.state.paybackTimeline.length; i++) {
+      const element = this.state.paybackTimeline[i];
+
+      // console.log(new Date(element.data).getTime() / 1000)
+      var dateToTimestamp = new Date(element.data).getTime() / 1000;
+      milestone = {
+        previousDate: '',
+        presentDate: '',
+        type: ''
+      }
+      if (i === 0) {
+        milestone.presentDate = dateToTimestamp;
+        milestone.previousDate = dateToTimestamp;
+        milestone.type = "payback";
+        console.log("Milestone 0 : " + milestone.presentDate);
+        console.log("Milestone 0 : " + milestone.previousDate);
+        console.log("Milestone 0 : " + milestone.type);
+      } else {
+        const preElement = this.state.paybackTimeline[i - 1];
+        var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
+        milestone.presentDate = dateToTimestamp;
+        milestone.previousDate = preDateToTimestamp;
+        milestone.type = "payback";
+        console.log("Milestone " + i + " : " + milestone.presentDate);
+        console.log("Milestone " + i + " : " + milestone.previousDate);
+        console.log("Milestone " + i + " : " + milestone.type);
+      }
+      // console.log(milestone);
+      milestones.push(milestone);
+    }
+    console.log(milestones);
+    return milestones;
+  }
+
+  saveNewDealInformationToDB() {
+    console.log(this.state.lendingTimeline)
+    console.log(this.state.paybackTimeline)
+    // console.log( this.state.lendingTimeline.length)
+    // console.log( this.state.paybackTimeline.length)
+
+    //     console.log( this.createMileStone())
+    fetch(apiLink + "/rest/deal/makeDeal", {
+      method: 'PUT',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        id: this.props.request.data.deal.id,
+        borrowTime: this.state.lendingTimeline.length,
+        paybackTime: this.state.paybackTimeline.length,
+        milestone: this.createMileStone()
+      })
+
+    }).then(
+      (result) => {
+        console.log(result);
+        if (result.status === 401) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push('/login-page')
+        } else
+          if (result.status === 200) {
+            // alert("create success");
+            console.log("success")
+          }
+
+      }
+    )
+  }
+
+  formatDate(date) {
+    var d = new Date(date),
+      month = "" + (d.getMonth() + 1),
+      day = "" + d.getDate(),
+      year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+>>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
   }
 
   changeMilestoneToTimelineData() {
@@ -65,7 +255,11 @@ class ViewDetailRequest extends React.Component {
     let milestoneTimeline = { data: "", status: "" };
     for (let i = 0; i < milestone.length; i++) {
       const element = milestone[i];
+<<<<<<< HEAD
       milestoneTimeline = { data: "", status: "" };
+=======
+      milestoneTimeline = { data: '', status: '' };
+>>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
       milestoneTimeline.data = this.formatDate(this.convertTimeStampToDate(element.presentDate));
       milestoneTimeline.status = "data is nothing";
       if (element.type === "lend") {
@@ -76,6 +270,8 @@ class ViewDetailRequest extends React.Component {
     }
     timelineData.lendingTimeline = lendingTimeline;
     timelineData.payBackTimeline = payBackTimeline;
+    console.log(lendingTimeline)
+    console.log(payBackTimeline)
     // this.setState({
     //   dbDataLendingTimeline: lendingTimeline,
     //   dbDataPayBackTimeline: payBackTimeline
@@ -96,6 +292,38 @@ class ViewDetailRequest extends React.Component {
   }
 
   send_tx = () => {
+    // http://capstone.ppls.cf:5000/search_transaction_by_metadata
+    let numberOfTransaction = 0;
+    let user = localStorage.getItem("user");
+    fetch(bigchainAPI + "/search_transaction_by_metadata", {
+      method: 'POST',
+      // headers: {
+      //   "Content-Type": "application/json",
+      //   "Authorization": localStorage.getItem("token")
+      //   // "Authorization": this.props.tokenReducer.token
+      //   // 'Access-Control-Allow-Origin': '*'
+      // },
+      body: JSON.stringify({
+        userId: user
+      })
+
+    }).then(
+      (result) => {
+        result.json().then((data) => {
+          numberOfTransaction = data.length;
+          console.log(numberOfTransaction)
+          console.log(data.length)
+        })
+        // if (result.status === 200) {
+        //   alert("create success");
+        //   this.props.history.push('view-new-request');
+        // } else if (result.status === 401) {
+        //   localStorage.removeItem("isLoggedIn");
+        //   this.props.history.push('/login-page')
+        // }
+      }
+    )
+
     let data_tx = {
       data_tx: {
         data: {
@@ -104,20 +332,36 @@ class ViewDetailRequest extends React.Component {
           // receiver: this.state.receiver,
           // amount: this.state.amount,
           // createDate: this.state.createDate
+<<<<<<< HEAD
           txId: "this.state.txId",
           sender: "this.state.sender",
           receiver: "this.state.receiver",
           amount: 12,
           createDate: "this.state.createDate"
+=======
+
+          //change amount later
+          txId: 'tx_' + user + "_0000" + (numberOfTransaction + 1),
+          sender: user,
+          receiver: this.props.request.data.borrower.username,
+          amount: 12,
+          createDate: new Date()
+>>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
         }
       },
       metadata_tx: {
         // userId: this.state.userId,
         // createDate: this.state.createDate
+<<<<<<< HEAD
         userId: "this.state.userId",
         createDate: "this.state.createDate"
+=======
+        userId: user,
+        createDate: new Date()
+>>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
       }
     };
+
     fetch(bigchainAPI + "/send_tx", {
       method: "POST",
       headers: {
@@ -129,6 +373,7 @@ class ViewDetailRequest extends React.Component {
       .then(response => response.json())
       .then(data => {
         console.log(data);
+        this.acceptDeal();
       });
   };
 
@@ -136,7 +381,6 @@ class ViewDetailRequest extends React.Component {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
-
     this.changeMilestoneToTimelineData();
 
     //change timestamp to date String and vice versa
@@ -156,15 +400,16 @@ class ViewDetailRequest extends React.Component {
     // console.log("dateToTimestamp: " + dateToTimestamp);
     // console.log("timestampToDate: " +timestampToDate.toLocaleDateString())
 
-    // document.getElementById("borrowDay").value = "2014-02-09";
+    // document.getElementById("createDay").value = "2014-02-09";
     // document.getElementById("dueDay").value = "2014-02-09";
-    // document.getElementById("borrowDay").value = this.convertTimeStampToDate(this.props.request.data.amount);
+    // document.getElementById("createDay").value = this.convertTimeStampToDate(this.props.request.data.amount);
     // document.getElementById("dueDay").value = "2014-02-09";
     document.getElementById("saveDealButton").style.display = "none";
     // document.getElementById("duration").value = 1;
-    document.getElementById("borrowDay").style.display = "none";
+    // document.getElementById("createDay").style.display = "none";
     document.getElementById("duration").style.display = "none";
     document.getElementById("dueDay").style.display = "none";
+
   }
   formatDate(date) {
     var d = new Date(date),
@@ -185,21 +430,16 @@ class ViewDetailRequest extends React.Component {
   toggleModal() {
     this.setState({ modal: !this.state.modal });
   }
-
-  // testdaytime() {
-
-  // }
-
   async makeDeal() {
     await this.setState({
       editable: !this.state.editable,
       //when load data from api, set default data for edit field
       //when save deal p tags will have data, if we dont set it
       //p tags will have no data, if we doesnt change anything
-      borrowDay: "2014-02-09",
+      createDay: this.convertTimeStampToDate(this.props.request.data.createDate),
       borrowDuration: this.props.request.data.duration / 30,
       // typeOfContact: 1,
-      dueDay: "2014-02-09"
+      dueDay: this.convertTimeStampToDate(new Date().getTime() / 1000 + (86400 * this.props.request.data.duration))
     });
     //button visiable and invisible
     document.getElementById("dealButton").style.display = "none";
@@ -207,24 +447,28 @@ class ViewDetailRequest extends React.Component {
     document.getElementById("saveDealButton").style.display = "";
 
     //display field to edit data
-    document.getElementById("borrowDay").style.display = "";
+    // document.getElementById("createDay").style.display = "";
     document.getElementById("duration").style.display = "";
     document.getElementById("dueDay").style.display = "";
 
     //hidden p tags
-    document.getElementById("borrowDayText").style.display = "none";
+    // document.getElementById("createDayText").style.display = "none";
     document.getElementById("durationText").style.display = "none";
     document.getElementById("dueDateText").style.display = "none";
 
     //select default value
-    document.getElementById("borrowDay").value = this.state.borrowDay;
-    document.getElementById("dueDay").value = this.state.dueDay;
-    // document.getElementById("borrowDay").value = this.convertTimeStampToDate(this.state.borrowDay);
+    // document.getElementById("createDay").value = this.formatDate(this.state.createDay);
+    document.getElementById("dueDay").value = this.formatDate(this.state.dueDay);
+    // document.getElementById("createDay").value = this.convertTimeStampToDate(this.state.createDay);
     // document.getElementById("dueDay").value = this.convertTimeStampToDate(this.state.dueDay);
     document.getElementById("duration").value = this.state.borrowDuration;
   }
 
   saveDeal() {
+    //save db
+    this.saveNewDealInformationToDB();
+
+    //set up view again
     this.setState({ editable: !this.state.editable });
     //button
     document.getElementById("dealButton").style.display = "";
@@ -232,16 +476,16 @@ class ViewDetailRequest extends React.Component {
     document.getElementById("saveDealButton").style.display = "none";
 
     //hidden field to edit data
-    document.getElementById("borrowDay").style.display = "none";
+    // document.getElementById("createDay").style.display = "none";
     document.getElementById("duration").style.display = "none";
     document.getElementById("dueDay").style.display = "none";
 
     //display p tags
-    document.getElementById("borrowDayText").style.display = "";
+    // document.getElementById("createDayText").style.display = "";
     document.getElementById("durationText").style.display = "";
     document.getElementById("dueDateText").style.display = "";
 
-    document.getElementById("borrowDayText").innerHTML = this.state.borrowDay;
+    // document.getElementById("createDayText").innerHTML = this.state.createDay;
     if (this.state.borrowDuration < 12) {
       document.getElementById("durationText").innerHTML =
         this.state.borrowDuration * 30 + " days";
@@ -250,12 +494,19 @@ class ViewDetailRequest extends React.Component {
         this.state.borrowDuration + " days";
     }
     document.getElementById("dueDateText").innerHTML = this.state.dueDay;
+
+
   }
 
-  onBorrowDayChange(event) {
+  onCreateDayChange(event) {
     this.setState({
+<<<<<<< HEAD
       borrowDay: new Date(event.target.value).toLocaleDateString()
     });
+=======
+      createDay: new Date(event.target.value).toLocaleDateString()
+    })
+>>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
   }
   onDueDayChange(event) {
     this.setState({
@@ -280,6 +531,10 @@ class ViewDetailRequest extends React.Component {
   render() {
     return (
       <>
+<<<<<<< HEAD
+=======
+        {this.validRedux()}
+>>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
         <DemoNavbar />
         <main className="profile-page" ref="main">
           <section className="section-profile-cover section-shaped my-0">
@@ -366,9 +621,10 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                           </FormGroup>
                           <FormGroup row className="py-2">
-                            <Col md="4">
+                            <Col md="3">
                               <Label className="h6">Borrow Duration</Label>
                             </Col>
+<<<<<<< HEAD
                             <Col md="4">
                               <Label className="h6">Borrow Day</Label>
                             </Col>
@@ -385,39 +641,92 @@ class ViewDetailRequest extends React.Component {
                                 type="select"
                                 name="duration"
                                 id="duration"
+=======
+                            <Col xs="12" md="9">
+                              <p className="h6" id="durationText">{this.props.request.data.duration} days</p>
+                              <Input type="select" name="duration" id="duration"
+                                style={{
+                                  width: '30%'
+                                }}
+>>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
                                 disabled={!this.state.editable}
                                 onChange={this.onBorrowDurationChange}
                               >
                                 <option value="0">Please select</option>
                                 <option value="1">30 days</option>
                                 <option value="2">60 days</option>
-                                <option value="2">90 days</option>
+                                <option value="3">90 days</option>
                                 <option value="12">1 Years(360 days)</option>
                               </Input>
                             </Col>
+                          </FormGroup>
+                          <FormGroup row className="py-2">
                             <Col md="4">
+<<<<<<< HEAD
                               <p className="h6" id="borrowDayText">
                                 {this.convertTimeStampToDate(
                                   this.props.request.data.borrowDate
                                 )}
                               </p>
                               <Input
+=======
+                              <Label className="h6">Borrow Day</Label>
+                            </Col>
+                            <Col md="4">
+                              <Label className="h6">Create Day</Label>
+                            </Col>
+                            <Col md="4">
+                              <Label className="h6">Due Day</Label>
+                            </Col>
+                          </FormGroup>
+
+                          <FormGroup row className="py-2">
+                            {this.props.request.data.borrowDate ? (
+                              <Col md="4">
+                                <p className="h6" style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  height: '100%'
+                                }} id="createDayText">{this.convertTimeStampToDate(this.props.request.data.borrowDate)}</p>
+                              </Col>) : (
+                                <Col md="4">
+                                  <p className="h6" style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    height: '100%'
+                                  }} id="createDayText"> Not Yet</p>
+                                </Col>)}
+                            <Col md="4" >
+                              <p className="h6" style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                height: '100%'
+                              }} id="borrowDayText">{this.convertTimeStampToDate(this.props.request.data.createDate)}</p>
+                              {/* <Input
+>>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
                                 id="borrowDay"
                                 type="date"
                                 disabled={!this.state.editable}
-                                onChange={this.onBorrowDayChange}
-                              />
+                                // onChange={this.onCreateDayChange}
+                              /> */}
                             </Col>
                             <Col md="4">
+<<<<<<< HEAD
                               <p className="h6" id="dueDateText">
                                 {this.convertTimeStampToDate(
                                   this.props.request.data.borrowDate +
                                     86400 * this.props.request.data.duration
                                 )}
                               </p>
+=======
+                              <p className="h6" id="dueDateText">{this.convertTimeStampToDate(new Date().getTime() / 1000 + (86400 * this.props.request.data.duration))}</p>
+>>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
                               <Input
                                 id="dueDay"
                                 type="date"
+                                style={{
+                                  width: '80%'
+                                }}
                                 disabled={!this.state.editable}
                                 onChange={this.onDueDayChange}
                               />
