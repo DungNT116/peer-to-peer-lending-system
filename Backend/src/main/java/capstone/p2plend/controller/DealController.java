@@ -65,6 +65,25 @@ public class DealController {
 
 		return status.value();
 	}
+	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@PutMapping(value = "/rest/deal/cancelDeal")
+	public Integer cancelDeal(@RequestBody Deal deal) {
+		HttpStatus status = null;
+		boolean valid = false;
+		
+		valid = dealService.cancelDeal(deal.getId());
+		
+		if (valid == true) {
+			status = HttpStatus.OK;
+			
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		
+		return status.value();
+	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
