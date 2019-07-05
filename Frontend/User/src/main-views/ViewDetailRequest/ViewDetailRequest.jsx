@@ -451,6 +451,7 @@ class ViewDetailRequest extends React.Component {
                           <ApplyTimeline
                             onDataChange={this.handleDataTimeline}
                             setTimelineData={this.changeMilestoneToTimelineData}
+                            rawMilestone={this.props.request.data.deal.milestone}
                           />
                           {/* <FormGroup>
                             <Col lg="12">
