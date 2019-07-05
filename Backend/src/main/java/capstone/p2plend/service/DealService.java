@@ -147,6 +147,7 @@ public class DealService {
 				milestone.setPresentDate(bm.getPresentDate());
 				milestone.setPreviousDate(bm.getPreviousDate());
 				milestone.setType(bm.getType());
+				milestone.setDeal(savedDeal);
 				newLstMilestone.add(milestone);
 			}
 			savedDeal.setMilestone(newLstMilestone);

@@ -466,6 +466,7 @@ public class RequestService {
 				backupMilestone.setPresentDate(m.getPresentDate());
 				backupMilestone.setPreviousDate(m.getPreviousDate());
 				backupMilestone.setType(m.getType());
+				listBackupMilestone.add(backupMilestone);
 			}
 			
 			for (Milestone m : listMilestone) {
