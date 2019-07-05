@@ -37,17 +37,10 @@ class ViewDetailRequest extends React.Component {
       modal: false,
       timeout: 300,
       editable: false,
-<<<<<<< HEAD
-      borrowDay: "",
-      dueDay: "",
-      borrowDuration: "",
-      typeOfContact: "",
-=======
       createDay: '',
       dueDay: '',
       borrowDuration: '',
       typeOfContact: '',
->>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
       dbDataLendingTimeline: [],
       dbDataPayBackTimeline: []
     };
@@ -61,11 +54,6 @@ class ViewDetailRequest extends React.Component {
     this.onTypeOfContactChange = this.onTypeOfContactChange.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.handleDataTimeline = this.handleDataTimeline.bind(this);
-<<<<<<< HEAD
-    this.changeMilestoneToTimelineData = this.changeMilestoneToTimelineData.bind(
-      this
-    );
-=======
     this.changeMilestoneToTimelineData = this.changeMilestoneToTimelineData.bind(this);
     this.formatDate = this.formatDate.bind(this);
     this.saveNewDealInformationToDB = this.saveNewDealInformationToDB.bind(this);
@@ -243,7 +231,6 @@ class ViewDetailRequest extends React.Component {
     if (day.length < 2) day = "0" + day;
 
     return [year, month, day].join("-");
->>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
   }
 
   changeMilestoneToTimelineData() {
@@ -255,11 +242,7 @@ class ViewDetailRequest extends React.Component {
     let milestoneTimeline = { data: "", status: "" };
     for (let i = 0; i < milestone.length; i++) {
       const element = milestone[i];
-<<<<<<< HEAD
-      milestoneTimeline = { data: "", status: "" };
-=======
       milestoneTimeline = { data: '', status: '' };
->>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
       milestoneTimeline.data = this.formatDate(this.convertTimeStampToDate(element.presentDate));
       milestoneTimeline.status = "data is nothing";
       if (element.type === "lend") {
@@ -332,13 +315,6 @@ class ViewDetailRequest extends React.Component {
           // receiver: this.state.receiver,
           // amount: this.state.amount,
           // createDate: this.state.createDate
-<<<<<<< HEAD
-          txId: "this.state.txId",
-          sender: "this.state.sender",
-          receiver: "this.state.receiver",
-          amount: 12,
-          createDate: "this.state.createDate"
-=======
 
           //change amount later
           txId: 'tx_' + user + "_0000" + (numberOfTransaction + 1),
@@ -346,19 +322,13 @@ class ViewDetailRequest extends React.Component {
           receiver: this.props.request.data.borrower.username,
           amount: 12,
           createDate: new Date()
->>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
         }
       },
       metadata_tx: {
         // userId: this.state.userId,
         // createDate: this.state.createDate
-<<<<<<< HEAD
-        userId: "this.state.userId",
-        createDate: "this.state.createDate"
-=======
         userId: user,
         createDate: new Date()
->>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
       }
     };
 
@@ -500,13 +470,8 @@ class ViewDetailRequest extends React.Component {
 
   onCreateDayChange(event) {
     this.setState({
-<<<<<<< HEAD
-      borrowDay: new Date(event.target.value).toLocaleDateString()
-    });
-=======
       createDay: new Date(event.target.value).toLocaleDateString()
     })
->>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
   }
   onDueDayChange(event) {
     this.setState({
@@ -531,10 +496,7 @@ class ViewDetailRequest extends React.Component {
   render() {
     return (
       <>
-<<<<<<< HEAD
-=======
         {this.validRedux()}
->>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
         <DemoNavbar />
         <main className="profile-page" ref="main">
           <section className="section-profile-cover section-shaped my-0">
@@ -624,31 +586,12 @@ class ViewDetailRequest extends React.Component {
                             <Col md="3">
                               <Label className="h6">Borrow Duration</Label>
                             </Col>
-<<<<<<< HEAD
-                            <Col md="4">
-                              <Label className="h6">Borrow Day</Label>
-                            </Col>
-                            <Col md="4">
-                              <Label className="h6">Due Day</Label>
-                            </Col>
-                          </FormGroup>
-                          <FormGroup row className="py-2">
-                            <Col md="4">
-                              <p className="h6" id="durationText">
-                                {this.props.request.data.duration} days
-                              </p>
-                              <Input
-                                type="select"
-                                name="duration"
-                                id="duration"
-=======
                             <Col xs="12" md="9">
                               <p className="h6" id="durationText">{this.props.request.data.duration} days</p>
                               <Input type="select" name="duration" id="duration"
                                 style={{
                                   width: '30%'
                                 }}
->>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
                                 disabled={!this.state.editable}
                                 onChange={this.onBorrowDurationChange}
                               >
@@ -662,14 +605,6 @@ class ViewDetailRequest extends React.Component {
                           </FormGroup>
                           <FormGroup row className="py-2">
                             <Col md="4">
-<<<<<<< HEAD
-                              <p className="h6" id="borrowDayText">
-                                {this.convertTimeStampToDate(
-                                  this.props.request.data.borrowDate
-                                )}
-                              </p>
-                              <Input
-=======
                               <Label className="h6">Borrow Day</Label>
                             </Col>
                             <Col md="4">
@@ -703,7 +638,6 @@ class ViewDetailRequest extends React.Component {
                                 height: '100%'
                               }} id="borrowDayText">{this.convertTimeStampToDate(this.props.request.data.createDate)}</p>
                               {/* <Input
->>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
                                 id="borrowDay"
                                 type="date"
                                 disabled={!this.state.editable}
@@ -711,16 +645,7 @@ class ViewDetailRequest extends React.Component {
                               /> */}
                             </Col>
                             <Col md="4">
-<<<<<<< HEAD
-                              <p className="h6" id="dueDateText">
-                                {this.convertTimeStampToDate(
-                                  this.props.request.data.borrowDate +
-                                    86400 * this.props.request.data.duration
-                                )}
-                              </p>
-=======
                               <p className="h6" id="dueDateText">{this.convertTimeStampToDate(new Date().getTime() / 1000 + (86400 * this.props.request.data.duration))}</p>
->>>>>>> 10a8cf233d5e9631a195e60ae2984515be12ea8b
                               <Input
                                 id="dueDay"
                                 type="date"
