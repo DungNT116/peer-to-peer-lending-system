@@ -4,15 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import capstone.p2plend.dto.PageDTO;
+import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.entity.Transaction;
+import capstone.p2plend.repo.MilestoneRepository;
 import capstone.p2plend.repo.TransactionRepository;
 
 @Service
@@ -21,12 +17,14 @@ public class TransactionService {
 	@Autowired
 	TransactionRepository transactionRepo;
 
+	@Autowired
+	MilestoneRepository milestoneRepo;
+
 	public List<Transaction> getTopTransactionOrderByCreateDateDesc() {
 
-		
 		List<Transaction> listTrans = transactionRepo.findTop20ByOrderByCreateDateDesc();
-		
-		List<Transaction> transactions = new ArrayList<>();		
+
+		List<Transaction> transactions = new ArrayList<>();
 		for (Transaction t : listTrans) {
 			Transaction transaction = new Transaction();
 			transaction.setId(t.getId());
@@ -44,6 +42,22 @@ public class TransactionService {
 	public boolean newTransaction(Transaction transaction) {
 		try {
 
+			if (transaction.getId() != null) {
+				return false;
+			}
+
+			if (transaction.getMilestone().getId() == null) {
+				return false;
+			}
+
+			Milestone existMilestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
+			if(existMilestone.getTransaction() != null) {
+				return false;
+			}
+			
+			Milestone milestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
+
+			transaction.setMilestone(milestone);
 			transactionRepo.saveAndFlush(transaction);
 
 			return true;

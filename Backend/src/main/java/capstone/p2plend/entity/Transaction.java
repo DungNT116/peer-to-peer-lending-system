@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 @Entity
-@Table(name = "transaction")
+@Table(name = "Transaction")
 public class Transaction {
 
 	@Id
@@ -32,16 +32,16 @@ public class Transaction {
 	@Column
 	private Integer amount;
 
+	@JsonInclude(JsonInclude.Include.ALWAYS)
 	@Column
 	private String status;
 
 	@Column
 	private Long createDate;
 
-//	@JsonIgnoreProperties(value = { "transaction", "deal" })
 	@JsonIgnoreProperties(value = { "transaction" })
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "milestone_id")
+	@JoinColumn(name = "milestone_id", referencedColumnName = "id")
 	private Milestone milestone;
 
 	public Integer getId() {

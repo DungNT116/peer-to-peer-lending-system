@@ -19,18 +19,37 @@ public class UserService {
 	@Autowired
 	UserRepository userRepo;
 
+	@Autowired
+	JwtService jwtService;
+	
 	public List<User> findAll() {
 		return userRepo.findAll();
 	}
 
 	public User getOneById(int id) {
-		User account = userRepo.findById(id).get();
-		account.setPassword(null);
-		account.setBorrowRequest(null);
-		account.setLendRequest(null);
+		User user = userRepo.findById(id).get();
+		User account = new User();
+		account.setUsername(user.getUsername());
+		account.setFirstName(user.getFirstName());
+		account.setLastName(user.getLastName());
+		account.setEmail(user.getEmail());
+		account.setPhoneNumber(user.getPhoneNumber());
 		return account;
 	}
 
+	public User getOneByUsername(String token) {		
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
+		User account = new User();
+		account.setUsername(user.getUsername());
+		account.setFirstName(user.getFirstName());
+		account.setLastName(user.getLastName());
+		account.setEmail(user.getEmail());
+		account.setPhoneNumber(user.getPhoneNumber());
+		account.setLoanLimit(user.getLoanLimit());
+		return account;
+	}
+	
 	public User findUsername(String username) {
 		return userRepo.findByUsername(username);
 	}

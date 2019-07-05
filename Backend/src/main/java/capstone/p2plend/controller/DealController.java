@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import capstone.p2plend.entity.Deal;
-import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.service.DealService;
 
 @RestController
@@ -21,7 +20,7 @@ public class DealController {
 
 	@Autowired
 	DealService dealService;
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/deal/getById")
@@ -35,7 +34,28 @@ public class DealController {
 	public Integer makeDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
+
 		valid = dealService.makeDeal(deal, token);
+
+		if (valid == true) {
+			status = HttpStatus.OK;
+
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+
+		return status.value();
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@PutMapping(value = "/rest/deal/acceptDeal")
+	public Integer acceptDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
+		HttpStatus status = null;
+		boolean valid = false;
+		
+		valid = dealService.acceptDeal(deal, token);
+
 		if (valid == true) {
 			status = HttpStatus.OK;
 
@@ -48,21 +68,23 @@ public class DealController {
 	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@PutMapping(value = "/rest/deal/acceptDeal")
-	public Integer acceptDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
+	@PutMapping(value = "/rest/deal/cancelDeal")
+	public Integer cancelDeal(@RequestBody Deal deal) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = dealService.acceptDeal(deal, token);
+		
+		valid = dealService.cancelDeal(deal.getId());
+		
 		if (valid == true) {
 			status = HttpStatus.OK;
-
+			
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-
+		
 		return status.value();
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping(value = "/rest/deal/newDeal")
@@ -77,7 +99,7 @@ public class DealController {
 		}
 		return status.value();
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/deal/updateDeal")

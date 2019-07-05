@@ -5,8 +5,24 @@ import Register from "views/examples/Register.jsx";
 import Login from "views/examples/Login.jsx";
 import Tables from "views/examples/Tables.jsx";
 import Icons from "views/examples/Icons.jsx";
+import UserList from "views/UserList.jsx";
+import UserProfile from "views/UserProfile.jsx";
 
 var routes = [
+  {
+    path: "/userList",
+    name: "User List",
+    icon: "ni ni-circle-08 text-primary",
+    component: UserList,
+    layout: "/admin"
+  },
+  {
+    path: "/userProfile",
+    name: "Ignore this",
+    icon: "ni ni-active-40 text-primary",
+    component: UserProfile,
+    layout: "/admin"
+  },
   {
     path: "/index",
     name: "Dashboard",
