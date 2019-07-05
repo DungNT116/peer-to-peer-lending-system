@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 // reactstrap components
 import {
   Card, CardHeader, CardBody, FormGroup, Form, Input, InputGroupAddon,
-  InputGroupText, InputGroup, Container, Row, Col
+  InputGroupText, InputGroup, Container, Row, Col, Button
 } from "reactstrap";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
@@ -68,7 +68,7 @@ class Login extends React.Component {
             // header.appendChild(meta);
             localStorage.setItem("token", data);
             localStorage.setItem("isLoggedIn", true);
-
+            localStorage.setItem("user", this.state.username);
             this.props.history.push('view-request-list');
           }
           if (result.status !== 200) {
@@ -173,7 +173,7 @@ class Login extends React.Component {
                           <p style={{ color: "red" }} id="loginError"></p>
                         </div>
                         <div className="text-center my-4">
-                          <Input type="submit" value="Sign in" className="text-light" />
+                          <Button type="submit" size="md" color="primary">Sign In</Button>
                         </div>
                       </Form>
                     </CardBody>
@@ -191,8 +191,7 @@ class Login extends React.Component {
                     <Col className="text-right" xs="6">
                       <a
                         className="text-white"
-                        href="#pablo"
-                        onClick={e => e.preventDefault()}
+                        href="/register-page"
                       >
                         <small>Create new account</small>
                       </a>

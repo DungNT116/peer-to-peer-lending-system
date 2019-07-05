@@ -1,206 +1,217 @@
 import React from "react";
+
+// nodejs library that concatenates classes
+// import classnames from "classnames";
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+
+import { SET_PAGE_NUMBER } from "../../redux/action/types";
 // reactstrap components
 import {
+  // Badge,
   Button,
+  // Card,
+  // CardBody,
+  // CardImg,
+  // FormGroup,
+  // Input,
+  // InputGroupAddon,
+  // InputGroupText,
+  // InputGroup,
   Container,
   Row,
   Col,
+  // Label,
+  // Form,
   Table
 } from "reactstrap";
 
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
-import Pagination from "../../views/IndexSections/Pagination.jsx";
+// import CardsFooter from "components/Footers/CardsFooter.jsx";
 
+import Pagination from "../../views/IndexSections/Pagination.jsx";
 //api link
 import { apiLink } from '../../api.jsx';
 import SimpleFooter from "components/Footers/SimpleFooter";
 
-class ViewRequestNew extends React.Component {
+// index page sections
+// import Download from "../../views/IndexSections/Download.jsx";
+
+class ViewRequestTrading extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      newRequests: [],
-      newPage: 1,
-      newMaxPage: 0,
-      dealingRequests: [],
-      dealingPage: 1,
-      dealingMaxPage: 0,
+      borrowRequests: [],
+      lendRequests: [],
+      borrowPage: 1,
+      lendPage: 1,
       pageSize: 5,
+      borrowMaxPage: 0,
+      lendMaxPage: 0,
     }
     this.getRequest = this.getRequest.bind(this);
-    this.deleteRequest = this.deleteRequest.bind(this);
-    this.changeNewPage = this.changeNewPage.bind(this);
-    this.changeDealingPage = this.changeDealingPage.bind(this);
-    this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
+    this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
+    this.changeLendPage = this.changeLendPage.bind(this);
+    this.changeBorrowPage = this.changeBorrowPage.bind(this);
+    this.splitRequestIntoTwoList = this.splitRequestIntoTwoList.bind(this);
+  }
+
+  splitRequestIntoTwoList(data, borrow, lend) {
+    let user = localStorage.getItem("user");
+    for (let i = 0; i < data.length; i++) {
+      const element = data[i];
+      if(element.borrower.username === user) {
+        borrow.push(element);
+      } else if(element.lender.username === user) {
+        lend.push(element);
+      }
+    }
+  }
+
+  changeLendPage(index) {
+    this.setState({
+      lendPage: index
+    })
+  }
+
+  changeBorrowPage(index) {
+    this.setState({
+      borrowPage: index
+    })
+  }
+
+  getRequest() {
+    //   /rest/request/all_request_trading_by_lender
+    let lendPageParam = encodeURIComponent(this.state.lendPage);
+    let borrowPageParam = encodeURIComponent(this.state.borrowPage);
+    let pageSizeParam = encodeURIComponent(this.state.pageSize);
+    fetch(apiLink + "/rest/request/all_request_trading_by_lender?page=" + lendPageParam + "&element=" + pageSizeParam, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": localStorage.getItem("token")
+        // "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      },
+    }).then(
+      (result) => {
+        console.log(result);
+        if(result.status === 401) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push('/login-page')
+        } else 
+        if (result.status === 200) {
+          // alert("create success");
+          result.json().then((data) => {
+            this.setState({ 
+              lendRequests: data.data,
+              lendMaxPage: data.maxPage
+            });
+          })
+          console.log("success")
+        }
+
+      }
+    )
+
+    fetch(apiLink + "/rest/request/all_request_trading_by_borrower?page=" + borrowPageParam + "&element=" + pageSizeParam, {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": localStorage.getItem("token")
+        // "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      },
+    }).then(
+      (result) => {
+        console.log(result);
+        if(result.status === 401) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push('/login-page')
+        } else 
+        if (result.status === 200) {
+          // alert("create success");
+          result.json().then((data) => {
+            this.setState({ 
+              borrowRequests: data.data,
+              borrowMaxPage: data.maxPage
+            });
+          })
+          console.log("success")
+        }
+
+      }
+    )
+    // event.preventDefault();
+    // this.props.history.push('/')
   }
 
   setDataToDetailPage(id) {
     this.props.setRequest(id);
   }
 
-  changeNewPage(index) {
-    this.setState({
-      newPage: index
-    })
-  }
-
-  changeDealingPage(index) {
-    this.setState({
-      dealingPage: index
-    })
-  }
-
-  getRequest() {
-    let newPageParam = encodeURIComponent(this.state.newPage);
-    let dealingPageParam = encodeURIComponent(this.state.dealingPage);
-    let pageSizeParam = encodeURIComponent(this.state.pageSize);
-    fetch(apiLink + "/rest/request/allRequestHistoryPending?page=" + newPageParam + "&element=" +  pageSizeParam, {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": localStorage.getItem("token")
-        // "Authorization": this.props.tokenReducer.token
-        // 'Access-Control-Allow-Origin': '*'
-      },
-    }).then(
-      (result) => { 
-        if (result.status === 200) {
-          // console.log("create success");
-          result.json().then((data) => {
-            this.setState({
-              newRequests: data.data,
-              newMaxPage: data.maxPage
-            });
-          })
-        } else if(result.status === 401) {
-          localStorage.setItem("isLoggedIn", false);
-          this.props.history.push('/login-page')
-        }
-      }
-    )
-
-    fetch(apiLink + "/rest/request/all_request_dealing_by_borrower_or_lender?page=" + dealingPageParam + "&element=" +  pageSizeParam, {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": localStorage.getItem("token")
-        // "Authorization": this.props.tokenReducer.token
-        // 'Access-Control-Allow-Origin': '*'
-      },
-    }).then(
-      (result) => { 
-        if (result.status === 200) {
-          // console.log("create success");
-          result.json().then((data) => {
-            // console.log(data.data);
-            this.setState({
-              dealingRequests: data.data,
-              dealingMaxPage: data.maxPage
-            });
-          })
-        } else if(result.status === 401) {
-          localStorage.setItem("isLoggedIn", false);
-          this.props.history.push('/login-page')
-        }
-      }
-    )
-    // event.preventDefault();
-    // this.props.history.push('/')
-  }
-
-  convertTimeStampToDate(date) {
-    var timestampToDate = new Date(date * 1000);
-    return timestampToDate.toLocaleDateString();
-  }
-
-  deleteRequest(id) {
-
-    fetch(apiLink + "/rest/request/delete", {
-      method: 'DELETE',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": localStorage.getItem("token")
-        // "Authorization": this.props.tokenReducer.token
-        // 'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({
-        id: id
-      })
-
-    }).then(
-      (result) => {
-        if (result.status === 200) {
-          alert("delete success");
-          //reload data
-          this.getRequest();
-        } else if(result.status === 401) {
-          localStorage.removeItem("isLoggedIn");
-          this.props.history.push('/login-page')
-        }
-      }
-    )
-    // event.preventDefault();
-    // this.props.history.push('/')
+  componentWillMount() {
+    this.getRequest();
   }
 
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
-    this.getRequest();
+    // console.log(localStorage.getItem("token"));
+    
+    //change timestamp to date String and vice versa
+    // var date = "07/22/2018";
+    // var dateToTimestamp = Math.round(new Date(date).getTime() / 1000);
+    // var timestampToDate = new Date(dateToTimestamp * 1000);
+
+    // console.log("dateToTimestamp: " + dateToTimestamp);
+    // console.log("timestampToDate: " +timestampToDate.toLocaleDateString())
   }
+
+  convertTimeStampToDate(date) {
+    var timestampToDate = new Date(date * 1000);
+    return timestampToDate.toLocaleDateString();
+  }
+  
   render() {
-    const newListItems = this.state.newRequests.map((request) =>
-      <tr>
+    const lendListItems = this.state.lendRequests.map((request, index) =>
+      <tr key={index}>
         <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
           {request.id}
         </Col></td>
         <td>{request.amount} VND</td>
-        {/* <td>{request.dueDate}</td> */}
+        <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>
-        <td>{request.status}</td>
         <td>
           <Link to="/view-detail-request">
-            <Button type="button" size="md" color="primary" onClick={() => this.setDataToDetailPage(request)}>
+            <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.setDataToDetailPage(request)}>
               <i className="fa fa-dot-circle-o"></i> View Detail
             </Button>{' '}
           </Link>
-        </td>
-        <td>
-          <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.deleteRequest(request.id)}>
-            <i className="fa fa-dot-circle-o"></i> Delete
-            </Button>{' '}
         </td>
       </tr>
     );
 
-    const dealingListItems = this.state.dealingRequests.map((request) =>
-      <tr>
+    const borrowListItems = this.state.borrowRequests.map((request, index) =>
+      <tr key={index}>
         <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
           {request.id}
         </Col></td>
         <td>{request.amount} VND</td>
-        {/* <td>{request.dueDate}</td> */}
+        <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>
-        <td>{request.status}</td>
         <td>
           <Link to="/view-detail-request">
-            <Button type="button" size="md" color="primary" onClick={() => this.setDataToDetailPage(request)}>
+            <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.setDataToDetailPage(request)}>
               <i className="fa fa-dot-circle-o"></i> View Detail
             </Button>{' '}
           </Link>
         </td>
-        {/* <td>
-          <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.deleteRequest(request.id)}>
-            <i className="fa fa-dot-circle-o"></i> Delete
-            </Button>{' '}
-        </td> */}
       </tr>
     );
     return (
@@ -226,11 +237,11 @@ class ViewRequestNew extends React.Component {
                   <Row>
                     <Col lg="10">
                       <h1 className="display-3 text-white">
-                        My Own Request{" "}
-                        <span>View your own new request</span>
+                        View Request Trading{" "}
+                        <span>View request trading </span>
                       </h1>
                       <p className="lead text-white">
-                        View your new borrow request more easier. Every where, every times, ...
+                        View status borrow and lend request
                       </p>
                     </Col>
                   </Row>
@@ -243,58 +254,58 @@ class ViewRequestNew extends React.Component {
 
           <section className="section section-lg">
             <Container>
-            <h4>Pending request</h4>
+            <h4>Borrow</h4>
               <Row className="justify-content-center text-center">
+                
                 <Table>
                   <thead>
                     <tr>
                       <th>Id</th>
                       <th>Amount</th>
-                      {/* <th>DueDate</th> */}
+                      <th>user</th>
                       <th>CreateDate</th>
                       <th>Duration</th>
-                      <th>Status</th>
-                      <th>View detail</th>
-                      <th>Delete</th>
+                      <th>View Detail</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {newListItems}
+                    {borrowListItems}
                   </tbody>
                 </Table>
+
               </Row>
               <Row className="align-items-center justify-content-center text-center">
-              <Pagination maxPage={this.state.newMaxPage} currentPage={this.state.newPage}
-                 onChange={this.getRequest} changePage={this.changeNewPage}/>
+                <Pagination maxPage={this.state.borrowMaxPage} currentPage={this.state.borrowPage}
+                 onChange={this.getRequest} changePage={this.changeBorrowPage}/>
               </Row>
             </Container>
           </section>
 
           <section className="section section-lg">
             <Container>
-            <h4>Dealing request</h4>
+            <h4>Lend</h4>
               <Row className="justify-content-center text-center">
+                
                 <Table>
                   <thead>
                     <tr>
                       <th>Id</th>
                       <th>Amount</th>
-                      {/* <th>DueDate</th> */}
+                      <th>user</th>
                       <th>CreateDate</th>
                       <th>Duration</th>
-                      <th>Status</th>
-                      <th>View detail</th>
-                      {/* <th>Delete</th> */}
+                      <th>View Detail</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {dealingListItems}
+                    {lendListItems}
                   </tbody>
                 </Table>
+
               </Row>
               <Row className="align-items-center justify-content-center text-center">
-              <Pagination maxPage={this.state.dealingMaxPage} currentPage={this.state.dealingPage}
-                 onChange={this.getRequest} changePage={this.changeDealingPage}/>
+                <Pagination maxPage={this.state.lendMaxPage} currentPage={this.state.lendPage}
+                 onChange={this.getRequest} changePage={this.changeLendPage}/>
               </Row>
             </Container>
           </section>
@@ -320,8 +331,14 @@ const mapDispatchToProps = (dispatch) => {
         payload: id
       });
     }
+    // ,
+    // setPage: (page) => {
+    //   dispatch({
+    //     type: "SET_PAGE_NUMBER",
+    //     payload: page
+    //   });
+    // }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ViewRequestNew);
-// export default ViewRequestList;
+export default connect(mapStateToProps, mapDispatchToProps)(ViewRequestTrading);
