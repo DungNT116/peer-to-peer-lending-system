@@ -130,6 +130,10 @@ public class DealService {
 			BackupDeal backupDeal = deal.getBackupDeal();
 			List<BackupMilestone> lstBackupMilestone = backupDeal.getBackupMilestone();
 			
+			Request request = deal.getRequest();
+			request.setLender(null);
+			requestRepo.saveAndFlush(request);
+			
 			List<Milestone> lstMs = deal.getMilestone();
 			for(Milestone m : lstMs) {
 				milestoneRepo.deleteMilestoneByDealId(m.getDeal().getId());	
