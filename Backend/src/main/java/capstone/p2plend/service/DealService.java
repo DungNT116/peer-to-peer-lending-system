@@ -1,10 +1,13 @@
 package capstone.p2plend.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import capstone.p2plend.entity.BackupDeal;
+import capstone.p2plend.entity.BackupMilestone;
 import capstone.p2plend.entity.Deal;
 import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.entity.Request;
@@ -113,6 +116,41 @@ public class DealService {
 				request.setLender(user);
 			}
 			requestRepo.saveAndFlush(request);
+			
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	
+	public boolean cancelDeal(int id) {
+		try {
+			
+			Deal deal = dealRepo.findById(id).get();
+			BackupDeal backupDeal = deal.getBackupDeal();
+			List<BackupMilestone> lstBackupMilestone = backupDeal.getBackupMilestone();
+			
+			List<Milestone> lstMs = deal.getMilestone();
+			for(Milestone m : lstMs) {
+				milestoneRepo.deleteMilestoneByDealId(m.getDeal().getId());	
+			}
+			
+			deal.setBorrowTime(backupDeal.getBorrowTime());
+			deal.setPaybackTime(backupDeal.getPaybackTime());
+			deal.setStatus(backupDeal.getStatus());
+			Deal savedDeal = dealRepo.saveAndFlush(deal);
+			
+			List<Milestone> newLstMilestone = new ArrayList<>();
+			for(BackupMilestone bm : lstBackupMilestone) {
+				Milestone milestone = new Milestone();
+				milestone.setPercent(bm.getPercent());
+				milestone.setPresentDate(bm.getPresentDate());
+				milestone.setPreviousDate(bm.getPreviousDate());
+				milestone.setType(bm.getType());
+				newLstMilestone.add(milestone);
+			}
+			savedDeal.setMilestone(newLstMilestone);
+			dealRepo.saveAndFlush(deal);
 			
 			return true;
 		} catch (Exception e) {
