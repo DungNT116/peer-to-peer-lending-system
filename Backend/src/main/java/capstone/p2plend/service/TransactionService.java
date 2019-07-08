@@ -51,11 +51,17 @@ public class TransactionService {
 			}
 
 			Milestone existMilestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
-			if(existMilestone.getTransaction() != null) {
+			if (existMilestone.getTransaction() != null) {
 				return false;
 			}
-			
+
 			Milestone milestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
+
+			if (transaction.getAmount() == null || transaction.getCreateDate() == null || transaction.getIdTrx() == null
+					|| transaction.getReceiver() == null || transaction.getSender() == null
+					|| transaction.getStatus() == null) {
+				return false;
+			}
 
 			transaction.setMilestone(milestone);
 			transactionRepo.saveAndFlush(transaction);
