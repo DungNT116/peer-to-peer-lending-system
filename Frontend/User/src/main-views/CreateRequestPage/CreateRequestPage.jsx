@@ -57,6 +57,7 @@ class CreateRequestPage extends React.Component {
     let milestone = {
       previousDate: '',
       presentDate: '',
+      percent: '',
       type: '',
 
     }
