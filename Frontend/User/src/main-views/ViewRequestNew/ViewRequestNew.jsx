@@ -64,8 +64,8 @@ class ViewRequestNew extends React.Component {
     } else {
       this.props.setIsHistoryDetail(true);
     }
-    this.props.setIsHistory(false);
-    this.props.setIsViewDetail(false);
+    this.props.setIsHistory(true);
+    this.props.setIsViewDetail(true);
     this.props.setIsTrading(false);
     localStorage.setItem("previousPage", window.location.pathname);
   }
