@@ -40,7 +40,10 @@ class ApplyTimeline extends React.Component {
     if (this.props.setTimelineData !== undefined) {
       let timelineData = this.props.setTimelineData();
       console.log(timelineData);
-
+      this.props.onDataChange(
+        timelineData.lendingTimeline,
+        timelineData.payBackTimeline
+      );
       await this.setState({
         timeline_lending: timelineData.lendingTimeline,
         timeline_payback: timelineData.payBackTimeline

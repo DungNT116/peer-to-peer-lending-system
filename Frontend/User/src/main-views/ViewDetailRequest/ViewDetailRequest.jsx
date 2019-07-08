@@ -45,7 +45,9 @@ class ViewDetailRequest extends React.Component {
       isTrading: false,
       isHistory: false,
       isViewDetail: false,
-      data_tx: {}
+      data_tx: {},
+      lendingTimeline: [],
+      paybackTimeline: []
     };
 
     this.toggleModal = this.toggleModal.bind(this);
@@ -287,13 +289,14 @@ class ViewDetailRequest extends React.Component {
     let timelineData = { lendingTimeline: [], payBackTimeline: [] };
     let lendingTimeline = [];
     let payBackTimeline = [];
-    let milestoneTimeline = { data: "", status: "" };
+    let milestoneTimeline = { data: "", status: "", percent: ""};
     for (let i = 0; i < milestone.length; i++) {
       const element = milestone[i];
-      milestoneTimeline = { data: "", status: "" };
+      milestoneTimeline = { data: "", status: "", percent: ""};
       milestoneTimeline.data = this.formatDate(
         this.convertTimeStampToDate(element.presentDate)
       );
+      milestoneTimeline.percent = element.percent;
       milestoneTimeline.status = "data is nothing";
       if (element.type === "lend") {
         lendingTimeline.push(milestoneTimeline);
