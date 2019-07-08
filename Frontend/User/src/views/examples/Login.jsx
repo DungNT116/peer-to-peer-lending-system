@@ -115,7 +115,7 @@ class Login extends React.Component {
     if(localStorage.getItem("isLoggedIn") === null && localStorage.getItem("token") === null) {
       this.props.history.push("/")
     } else {
-      localStorage.removeItem("token");
+      // localStorage.removeItem("token");
       localStorage.removeItem("isLoggedIn");
     }
   }

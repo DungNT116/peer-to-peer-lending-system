@@ -33,7 +33,7 @@ class DemoNavbar extends React.Component {
   }
 
   logout() {
-    localStorage.removeItem("token");
+    // localStorage.removeItem("token");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("user");
   }
