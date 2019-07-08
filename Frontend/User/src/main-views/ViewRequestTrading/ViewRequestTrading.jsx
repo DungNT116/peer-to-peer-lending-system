@@ -5,7 +5,6 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { SET_PAGE_NUMBER } from "../../redux/action/types";
 // reactstrap components
 import {
   Button,
