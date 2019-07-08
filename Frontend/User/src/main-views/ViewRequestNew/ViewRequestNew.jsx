@@ -30,12 +30,44 @@ class ViewRequestNew extends React.Component {
     this.changeDealingPage = this.changeDealingPage.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
+    this.cancelRequest = this.cancelRequest.bind(this);
   }
 
-  setDataToDetailPage(id) {
+  cancelRequest(id) {
+    fetch(apiLink + "/rest/deal/cancelDeal", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token")
+        // "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      },
+      body: JSON.stringify({
+        id: id
+      })
+    }).then(result => {
+      if (result.status === 200) {
+        // alert("delete success");
+        //reload data
+        this.getRequest();
+      } else if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login-page");
+      }
+    });
+  }
+
+  setDataToDetailPage(id, where) {
     this.props.setRequest(id);
-    
-    this.props.setIsHistoryDetail(false);
+    if(where === "dealing") {
+      this.props.setIsHistoryDetail(false);
+    } else {
+      this.props.setIsHistoryDetail(true);
+    }
+    this.props.setIsHistory(false);
+    this.props.setIsViewDetail(false);
+    this.props.setIsTrading(false);
+    localStorage.setItem("previousPage", window.location.pathname);
   }
 
   changeNewPage(index) {
@@ -175,7 +207,7 @@ class ViewRequestNew extends React.Component {
               type="button"
               size="md"
               color="primary"
-              onClick={() => this.setDataToDetailPage(request)}
+              onClick={() => this.setDataToDetailPage(request, "pending")}
             >
               <i className="fa fa-dot-circle-o" /> View Detail
             </Button>{" "}
@@ -213,17 +245,17 @@ class ViewRequestNew extends React.Component {
               type="button"
               size="md"
               color="primary"
-              onClick={() => this.setDataToDetailPage(request)}
+              onClick={() => this.setDataToDetailPage(request, "dealing")}
             >
               <i className="fa fa-dot-circle-o" /> View Detail
             </Button>{" "}
           </Link>
         </td>
-        {/* <td>
-          <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.deleteRequest(request.id)}>
-            <i className="fa fa-dot-circle-o"></i> Delete
+        <td>
+          <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.cancelRequest(request.id)}>
+            <i className="fa fa-dot-circle-o"></i> Cancel Deal
             </Button>{' '}
-        </td> */}
+        </td>
       </tr>
     ));
     return (
@@ -308,7 +340,7 @@ class ViewRequestNew extends React.Component {
                       <th>Duration</th>
                       <th>Status</th>
                       <th>View detail</th>
-                      {/* <th>Delete</th> */}
+                      <th>Cancel</th>
                     </tr>
                   </thead>
                   <tbody>{dealingListItems}</tbody>

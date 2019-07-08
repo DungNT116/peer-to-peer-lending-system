@@ -81,8 +81,10 @@ class ViewRequestList extends React.Component {
   setDataToDetailPage(id) {
     this.props.setRequest(id);
     this.props.setIsHistory(true);
+    this.props.setIsTrading(false);
     this.props.setIsViewDetail(true);
     this.props.setIsHistoryDetail(false);
+    localStorage.setItem("previousPage", window.location.pathname);
   }
 
   componentWillMount() {

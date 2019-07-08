@@ -51,8 +51,13 @@ class Register extends React.Component {
   }
 
   componentWillMount() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("isLoggedIn");
+    //isLoggedIn = true go back to homepage (prevent go to login page when isLoggedIn = true)
+    if (localStorage.getItem("isLoggedIn")) {
+      this.props.history.push("/")
+    } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("isLoggedIn");
+    }
   }
   componentDidMount() {
     document.documentElement.scrollTop = 0;
