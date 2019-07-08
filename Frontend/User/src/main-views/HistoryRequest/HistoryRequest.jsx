@@ -76,7 +76,8 @@ class HistoryRequest extends React.Component {
     this.props.setIsHistory(true);
     this.props.setIsViewDetail(true);
     this.props.setIsHistoryDetail(true);
-    
+    this.props.setIsTrading(false);
+    localStorage.setItem("previousPage", window.location.pathname);
   }
 
   changePage(index) {

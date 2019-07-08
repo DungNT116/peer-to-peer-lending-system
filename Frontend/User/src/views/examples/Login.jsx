@@ -20,14 +20,37 @@ class Login extends React.Component {
     super(props);
     this.state = {
       username: '',
-      password: '',
-      // savedToken: ''
+      password: ''
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
-    // this.setToken = this.setToken.bind(this);
+    this.getUsername = this.getUsername.bind(this);
+  }
+
+  getUsername() {
+    fetch(apiLink + "/rest/user/getUser", {
+      method: 'GET',
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": localStorage.getItem("token")
+        // "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      }
+    }).then(
+      (result) => {
+        if (result.status === 200) {
+          result.json().then((data) => {
+            localStorage.setItem("profile", data.firstName + " " + data.lastName)
+          })
+        } else if (result.status === 401) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push('/login-page')
+        }
+
+      }
+    )
   }
 
   handleNameChange(event) {
@@ -69,6 +92,7 @@ class Login extends React.Component {
             localStorage.setItem("token", data);
             localStorage.setItem("isLoggedIn", true);
             localStorage.setItem("user", this.state.username);
+            this.getUsername();
             this.props.history.push('view-request-list');
           }
           if (result.status !== 200) {
@@ -86,12 +110,14 @@ class Login extends React.Component {
   }
 
   componentWillMount() {
-    // var token = localStorage.getItem("token");
-    // if (token !== null) {
-
-    // }
-    localStorage.removeItem("token");
-    localStorage.removeItem("isLoggedIn");
+    // console.log(localStorage.getItem("isLoggedIn"))
+    //isLoggedIn = true go back to homepage (prevent go to login page when isLoggedIn = true)
+    if(localStorage.getItem("isLoggedIn") === null && localStorage.getItem("token") === null) {
+      this.props.history.push("/")
+    } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("isLoggedIn");
+    }
   }
 
   componentDidMount() {

@@ -8,21 +8,10 @@ import { Link } from "react-router-dom";
 import { SET_PAGE_NUMBER } from "../../redux/action/types";
 // reactstrap components
 import {
-  // Badge,
   Button,
-  // Card,
-  // CardBody,
-  // CardImg,
-  // FormGroup,
-  // Input,
-  // InputGroupAddon,
-  // InputGroupText,
-  // InputGroup,
   Container,
   Row,
   Col,
-  // Label,
-  // Form,
   Table
 } from "reactstrap";
 
@@ -34,9 +23,6 @@ import Pagination from "../../views/IndexSections/Pagination.jsx";
 //api link
 import { apiLink } from "../../api.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter";
-
-// index page sections
-// import Download from "../../views/IndexSections/Download.jsx";
 
 class ViewRequestTrading extends React.Component {
   constructor(props) {
@@ -149,7 +135,7 @@ class ViewRequestTrading extends React.Component {
     this.props.setIsViewDetail(false);
     this.props.setIsHistoryDetail(true);
     this.props.setIsTrading(true);
-    
+    localStorage.setItem("previousPage", window.location.pathname);
   }
 
   componentWillMount() {

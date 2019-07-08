@@ -115,13 +115,10 @@ class ViewDetailRequest extends React.Component {
     // console.log(this.props.request.data.amount)
     console.log(Object.keys(this.props.request.data).length === 0);
     if (Object.keys(this.props.request.data).length === 0) {
-      localStorage.removeItem("isLoggedIn");
-      this.props.history.push("/login-page");
-
+      // localStorage.removeItem("isLoggedIn");
+      this.props.history.push(localStorage.getItem("previousPage"));
       // reload page to go to login page
       window.location.reload();
-      // return <Redirect to='/login-page'  />
-      // this.props.history.push('/path')
     }
   }
   // componentWillMount() {
@@ -791,7 +788,7 @@ class ViewDetailRequest extends React.Component {
                               </ModalBody>
                               <ModalFooter>
                                 <PayPalButton
-                                  amount={12}
+                                  amount={this.props.request.data.amount * this.props.request.data.deal.milestone[1].percent}
                                   onSuccess={(details, data) => {
                                     this.setState({
                                       data_tx: {
