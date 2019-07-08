@@ -27,6 +27,9 @@ public class Transaction {
 	private String sender;
 
 	@Column
+	private String idTrx;
+	
+	@Column
 	private String receiver;
 
 	@Column
@@ -98,6 +101,14 @@ public class Transaction {
 
 	public void setMilestone(Milestone milestone) {
 		this.milestone = milestone;
+	}
+
+	public String getIdTrx() {
+		return idTrx;
+	}
+
+	public void setIdTrx(String idTrx) {
+		this.idTrx = idTrx;
 	}
 
 }
