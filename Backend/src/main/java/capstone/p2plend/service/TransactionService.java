@@ -33,6 +33,7 @@ public class TransactionService {
 			transaction.setCreateDate(t.getCreateDate());
 			transaction.setAmount(t.getAmount());
 			transaction.setStatus(t.getStatus());
+			transaction.setIdTrx(t.getIdTrx());
 			transactions.add(transaction);
 		}
 
