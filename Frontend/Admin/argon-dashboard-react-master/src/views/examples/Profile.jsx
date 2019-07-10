@@ -10,6 +10,9 @@ import {
   Form,
   Input,
   Container,
+  Collapse,
+  CardFooter,
+  Badge,
   Row,
   Col
 } from "reactstrap";
@@ -17,7 +20,75 @@ import {
 import UserHeader from "components/Headers/UserHeader.jsx";
 
 class Profile extends React.Component {
+
+
+  constructor(props) {
+    super(props);
+    this.onEntering = this.onEntering.bind(this);
+    this.onEntered = this.onEntered.bind(this);
+    this.onExiting = this.onExiting.bind(this);
+    this.onExited = this.onExited.bind(this);
+    this.toggle = this.toggle.bind(this);
+    this.toggleAccordion = this.toggleAccordion.bind(this);
+    this.toggleCustom = this.toggleCustom.bind(this);
+    this.toggleFade = this.toggleFade.bind(this);
+    this.state = {
+      collapse: false,
+      accordion: [true, false, false],
+      custom: [true, false],
+      status: 'Closed',
+      fadeIn: true,
+      timeout: 300,
+    };
+  }
+
+  onEntering() {
+    this.setState({ status: 'Opening...' });
+  }
+
+  onEntered() {
+    this.setState({ status: 'Opened' });
+  }
+
+  onExiting() {
+    this.setState({ status: 'Closing...' });
+  }
+
+  onExited() {
+    this.setState({ status: 'Closed' });
+  }
+
+  toggle() {
+    this.setState({ collapse: !this.state.collapse });
+  }
+
+  toggleAccordion(tab) {
+
+    const prevState = this.state.accordion;
+    const state = prevState.map((x, index) => tab === index ? !x : false);
+
+    this.setState({
+      accordion: state,
+    });
+  }
+
+  toggleCustom(tab) {
+
+    const prevState = this.state.custom;
+    const state = prevState.map((x, index) => tab === index ? !x : false);
+
+    this.setState({
+      custom: state,
+    });
+  }
+
+  toggleFade() {
+    this.setState({ fadeIn: !this.state.fadeIn });
+  }
+
+
   render() {
+    const widthCollapse = '80%';
     return (
       <>
         <UserHeader />
@@ -67,46 +138,15 @@ class Profile extends React.Component {
                       <div className="card-profile-stats d-flex justify-content-center mt-md-5">
                         <div>
                           <span className="heading">22</span>
-                          <span className="description">Friends</span>
+                          <span className="description">Transaction made</span>
                         </div>
                         <div>
                           <span className="heading">10</span>
-                          <span className="description">Photos</span>
-                        </div>
-                        <div>
-                          <span className="heading">89</span>
-                          <span className="description">Comments</span>
+                          <span className="description">Current Request</span>
                         </div>
                       </div>
                     </div>
                   </Row>
-                  <div className="text-center">
-                    <h3>
-                      Jessica Jones
-                      <span className="font-weight-light">, 27</span>
-                    </h3>
-                    <div className="h5 font-weight-300">
-                      <i className="ni location_pin mr-2" />
-                      Bucharest, Romania
-                    </div>
-                    <div className="h5 mt-4">
-                      <i className="ni business_briefcase-24 mr-2" />
-                      Solution Manager - Creative Tim Officer
-                    </div>
-                    <div>
-                      <i className="ni education_hat mr-2" />
-                      University of Computer Science
-                    </div>
-                    <hr className="my-4" />
-                    <p>
-                      Ryan — the name taken by Melbourne-raised, Brooklyn-based
-                      Nick Murphy — writes, performs and records all of his own
-                      music.
-                    </p>
-                    <a href="#pablo" onClick={e => e.preventDefault()}>
-                      Show more
-                    </a>
-                  </div>
                 </CardBody>
               </Card>
             </Col>
@@ -144,13 +184,8 @@ class Profile extends React.Component {
                             >
                               Username
                             </label>
-                            <Input
-                              className="form-control-alternative"
-                              defaultValue="lucky.jesse"
-                              id="input-username"
-                              placeholder="Username"
-                              type="text"
-                            />
+                            <br />
+                            <span className="description">User1</span>
                           </FormGroup>
                         </Col>
                         <Col lg="6">
@@ -161,12 +196,8 @@ class Profile extends React.Component {
                             >
                               Email address
                             </label>
-                            <Input
-                              className="form-control-alternative"
-                              id="input-email"
-                              placeholder="jesse@example.com"
-                              type="email"
-                            />
+                            <br />
+                            <span className="description">Email@gmail.com</span>
                           </FormGroup>
                         </Col>
                       </Row>
@@ -179,13 +210,8 @@ class Profile extends React.Component {
                             >
                               First name
                             </label>
-                            <Input
-                              className="form-control-alternative"
-                              defaultValue="Lucky"
-                              id="input-first-name"
-                              placeholder="First name"
-                              type="text"
-                            />
+                            <br />
+                            <span className="description">Loc</span>
                           </FormGroup>
                         </Col>
                         <Col lg="6">
@@ -196,13 +222,8 @@ class Profile extends React.Component {
                             >
                               Last name
                             </label>
-                            <Input
-                              className="form-control-alternative"
-                              defaultValue="Jesse"
-                              id="input-last-name"
-                              placeholder="Last name"
-                              type="text"
-                            />
+                            <br />
+                            <span className="description">Nguyen Van</span>
                           </FormGroup>
                         </Col>
                       </Row>
@@ -222,13 +243,11 @@ class Profile extends React.Component {
                             >
                               Address
                             </label>
-                            <Input
-                              className="form-control-alternative"
-                              defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                              id="input-address"
-                              placeholder="Home Address"
-                              type="text"
-                            />
+                            <br />
+                            <span className="description">
+                              Đường D1, Khu Công Nghệ Cao, Phường Tân Phú, Quận
+                              9, Hồ Chí Minh 715650
+                            </span>
                           </FormGroup>
                         </Col>
                       </Row>
@@ -241,13 +260,8 @@ class Profile extends React.Component {
                             >
                               City
                             </label>
-                            <Input
-                              className="form-control-alternative"
-                              defaultValue="New York"
-                              id="input-city"
-                              placeholder="City"
-                              type="text"
-                            />
+                            <br />
+                            <span className="description">Hồ Chí Minh</span>
                           </FormGroup>
                         </Col>
                         <Col lg="4">
@@ -258,13 +272,8 @@ class Profile extends React.Component {
                             >
                               Country
                             </label>
-                            <Input
-                              className="form-control-alternative"
-                              defaultValue="United States"
-                              id="input-country"
-                              placeholder="Country"
-                              type="text"
-                            />
+                            <br />
+                            <span className="description">Viet Nam</span>
                           </FormGroup>
                         </Col>
                         <Col lg="4">
@@ -275,31 +284,124 @@ class Profile extends React.Component {
                             >
                               Postal code
                             </label>
-                            <Input
-                              className="form-control-alternative"
-                              id="input-postal-code"
-                              placeholder="Postal code"
-                              type="number"
-                            />
+                            <br />
+                            <span className="description">715650</span>
                           </FormGroup>
                         </Col>
                       </Row>
                     </div>
                     <hr className="my-4" />
                     {/* Description */}
-                    <h6 className="heading-small text-muted mb-4">About me</h6>
+                    <h6 className="heading-small text-muted mb-4">
+                      Info Need to attend
+                    </h6>
                     <div className="pl-lg-4">
-                      <FormGroup>
-                        <label>About Me</label>
-                        <Input
-                          className="form-control-alternative"
-                          placeholder="A few words about you ..."
-                          rows="4"
-                          defaultValue="A beautiful Dashboard for Bootstrap 4. It is Free and
-                          Open Source."
-                          type="textarea"
-                        />
-                      </FormGroup>
+                      <Row>
+                        
+
+                     
+              
+           
+                <div id="accordion" style={{width:'95%'}}>
+                  <Card className="mb-0">
+                    <CardHeader id="headingOne">
+                      <Button block color="link" className="text-left m-0 p-0" onClick={() => this.toggleAccordion(0)} aria-expanded={this.state.accordion[0]} aria-controls="collapseOne">
+                        <h5 className="m-0 p-0">Id card</h5>
+                      </Button>
+                    </CardHeader>
+                    <Collapse isOpen={this.state.accordion[0]} data-parent="#accordion" id="collapseOne" aria-labelledby="headingOne">
+                      <CardBody>
+                        <Row>
+                      <Col lg="6">
+                          <img src="https://www.idcreator.com/media/sc/id-card-templates/drone_pilots_license_2_featured.png" />
+                        </Col>
+                        <Col lg="6">
+                          <select name="cars">
+                            <option value="">$100.000</option>
+                            <option value="">$200.000</option>
+                            <option value="">$300.000</option>
+                            <option value="">$400.000</option>
+                          </select>
+                        </Col>
+                        </Row>
+                        <Row>
+                        <Col lg="4">
+                          <FormGroup>
+                            <label>Id Card</label>
+                            <Input
+                              className="form-control-alternative"
+                              id="input-postal-code"
+                              placeholder="12390849128"
+                              type="number"
+                            />
+                          </FormGroup>
+                        </Col>
+                        <Col lg="4">
+                          <FormGroup>
+                            <label>Name on card</label>
+                            <Input
+                              className="form-control-alternative"
+                              id="input-postal-code"
+                              placeholder="Tran Van A"
+                            />
+                          </FormGroup>
+                        </Col>
+                        <Col lg="4">
+                          <FormGroup>
+                            <label>Create Date</label>
+                            <Input
+                              className="form-control-alternative"
+                              id="input-postal-code"
+                              placeholder="Wednesday, December 25"
+                            />
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                        
+                      </CardBody>
+                    </Collapse>
+                  </Card>
+                  <Card className="mb-0">
+                    <CardHeader id="headingTwo">
+                      <Button block color="link" className="text-left m-0 p-0" onClick={() => this.toggleAccordion(1)} aria-expanded={this.state.accordion[1]} aria-controls="collapseTwo">
+                        <h5 className="m-0 p-0">Collapsible Group Item #2</h5>
+                      </Button>
+                    </CardHeader>
+                    <Collapse isOpen={this.state.accordion[1]} data-parent="#accordion" id="collapseTwo">
+                      <CardBody>
+                        2. Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non
+                        cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird
+                        on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred
+                        nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft
+                        beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                      </CardBody>
+                    </Collapse>
+                  </Card>
+                  <Card className="mb-0">
+                    <CardHeader id="headingThree">
+                      <Button block color="link" className="text-left m-0 p-0" onClick={() => this.toggleAccordion(2)} aria-expanded={this.state.accordion[2]} aria-controls="collapseThree">
+                        <h5 className="m-0 p-0">Collapsible Group Item #3</h5>
+                      </Button>
+                    </CardHeader>
+                    <Collapse isOpen={this.state.accordion[2]} data-parent="#accordion" id="collapseThree">
+                      <CardBody>
+                        3. Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non
+                        cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird
+                        on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred
+                        nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft
+                        beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                      </CardBody>
+                    </Collapse>
+                  </Card>
+                </div>          
+            
+
+                        
+                      </Row>
+                      
+                      <Button color="success" type="button">
+                        Summit
+                      </Button>
                     </div>
                   </Form>
                 </CardBody>
