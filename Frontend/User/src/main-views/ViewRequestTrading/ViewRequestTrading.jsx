@@ -1,7 +1,7 @@
 import React from "react";
 
 // nodejs library that concatenates classes
-// import classnames from "classnames";
+import classnames from "classnames";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -12,7 +12,14 @@ import {
   Container,
   Row,
   Col,
-  Table
+  Table,
+  NavItem,
+  NavLink,
+  Nav,
+  Card,
+  CardBody,
+  TabContent,
+  TabPane
 } from "reactstrap";
 
 // core components
@@ -30,11 +37,17 @@ class ViewRequestTrading extends React.Component {
     this.state = {
       borrowRequests: [],
       lendRequests: [],
+      
       borrowPage: 1,
-      lendPage: 1,
-      pageSize: 5,
+      lendPage: 1,      
+
       borrowMaxPage: 0,
-      lendMaxPage: 0
+      lendMaxPage: 0,
+
+      pageSize: 5,
+
+      iconTabs: 1,
+      plainTabs: 1
     };
     this.getRequest = this.getRequest.bind(this);
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
@@ -43,7 +56,12 @@ class ViewRequestTrading extends React.Component {
     this.changeBorrowPage = this.changeBorrowPage.bind(this);
   }
 
-
+  toggleNavs = (e, state, index) => {
+    e.preventDefault();
+    this.setState({
+      [state]: index
+    });
+  };
 
   changeLendPage(index) {
     this.setState({
@@ -180,10 +198,10 @@ class ViewRequestTrading extends React.Component {
               type="button"
               id="dealButton"
               size="md"
-              color="primary"
+              className="btn btn-outline-primary"
               onClick={() => this.setDataToDetailPage(request)}
             >
-              <i className="fa fa-dot-circle-o" /> View Detail
+               View Detail
             </Button>{" "}
           </Link>
         </td>
@@ -207,10 +225,10 @@ class ViewRequestTrading extends React.Component {
               type="button"
               id="dealButton"
               size="md"
-              color="primary"
+              className="btn btn-outline-primary"
               onClick={() => this.setDataToDetailPage(request)}
             >
-              <i className="fa fa-dot-circle-o" /> View Detail
+               View Detail
             </Button>{" "}
           </Link>
         </td>
@@ -222,8 +240,8 @@ class ViewRequestTrading extends React.Component {
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}
-            <section className="section section-lg section-shaped">
-              <div className="shape shape-style-1 shape-default">
+            <section className="section section-lg section-shaped bg-gradient-info">
+              {/* <div className="shape shape-style-1 shape-default">
                 <span />
                 <span />
                 <span />
@@ -233,7 +251,7 @@ class ViewRequestTrading extends React.Component {
                 <span />
                 <span />
                 <span />
-              </div>
+              </div> */}
               <Container className="py-lg-md d-flex">
                 <div className="col px-0">
                   <Row>
@@ -252,10 +270,51 @@ class ViewRequestTrading extends React.Component {
             {/* 1st Hero Variation */}
           </div>
 
-          <section className="section section-lg">
+          <section className="section section-lg mt--200">
             <Container>
-              <h4>Borrow</h4>
-              <Row className="justify-content-center text-center">
+              <Row className="justify-content-center">
+                <Col className="mt-5 mt-lg-0" lg="12">
+                  {/* Menu */}
+                  <div className="nav-wrapper">
+                    <Nav
+                      className="nav-fill flex-column flex-md-row"
+                      id="tabs-icons-text"
+                      pills
+                      role="tablist"
+                    >
+                      <NavItem>
+                        <NavLink
+                          aria-selected={this.state.plainTabs === 1}
+                          className={classnames("mb-sm-3 mb-md-0", {
+                            active: this.state.plainTabs === 1
+                          })}
+                          onClick={e => this.toggleNavs(e, "plainTabs", 1)}
+                          href="#pablo"
+                          role="tab"
+                        >
+                          Borrow
+                  </NavLink>
+                      </NavItem>
+                      <NavItem>
+                        <NavLink
+                          aria-selected={this.state.plainTabs === 2}
+                          className={classnames("mb-sm-3 mb-md-0", {
+                            active: this.state.plainTabs === 2
+                          })}
+                          onClick={e => this.toggleNavs(e, "plainTabs", 2)}
+                          href="#pablo"
+                          role="tab"
+                        >
+                          Lend
+                  </NavLink>
+                      </NavItem>
+                    </Nav>
+                  </div>
+                  <Card className="shadow">
+                    <CardBody>
+                      <TabContent activeTab={"plainTabs" + this.state.plainTabs}>
+                        <TabPane tabId="plainTabs1">
+                        <Row className="justify-content-center text-center">
                 <Table>
                   <thead>
                     <tr>
@@ -278,13 +337,9 @@ class ViewRequestTrading extends React.Component {
                   changePage={this.changeBorrowPage}
                 />
               </Row>
-            </Container>
-          </section>
-
-          <section className="section section-lg">
-            <Container>
-              <h4>Lend</h4>
-              <Row className="justify-content-center text-center">
+                        </TabPane>
+                        <TabPane tabId="plainTabs2">
+                        <Row className="justify-content-center text-center">
                 <Table>
                   <thead>
                     <tr>
@@ -306,6 +361,12 @@ class ViewRequestTrading extends React.Component {
                   onChange={this.getRequest}
                   changePage={this.changeLendPage}
                 />
+              </Row>
+                        </TabPane>
+                      </TabContent>
+                    </CardBody>
+                  </Card>
+                </Col>
               </Row>
             </Container>
           </section>

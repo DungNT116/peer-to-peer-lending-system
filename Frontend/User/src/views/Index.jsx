@@ -127,8 +127,9 @@ class Index extends React.Component {
           {/* <Icons /> */}
           {/* <Login /> */}
           {/* <Download /> */}
-          <section className="section section-sm">
-            <Container>
+          <section className="section section-sm ">
+            <Container >
+            {/* <CustomControls /> */}
               <Row className="justify-content-center text-center">
                 <p className="h3">
                   History Transactions
@@ -148,39 +149,7 @@ class Index extends React.Component {
                     </tr>
                   </thead>
                   <tbody>
-                    {listItems}
-                    {/* <tr>
-                      <td>1</td>
-                      <td>DungNT</td>
-                      <td>MinhLN</td>
-                      <td>1000 VND</td>
-                      <td>05/06/2019</td>
-                      <td>Completed</td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>DungNT</td>
-                      <td>LocHV</td>
-                      <td>1000 VND</td>
-                      <td>05/06/2019</td>
-                      <td>Completed</td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>LocHV</td>
-                      <td>MinhLN</td>
-                      <td>1000 VND</td>
-                      <td>05/06/2019</td>
-                      <td>Completed</td>
-                    </tr>
-                    <tr>
-                      <td>4</td>
-                      <td>DungNT</td>
-                      <td>LocHV</td>
-                      <td>1000 VND</td>
-                      <td>05/06/2019</td>
-                      <td>Completed</td>
-                    </tr> */}
+                    {listItems}                    
                   </tbody>
 
                 </Table>

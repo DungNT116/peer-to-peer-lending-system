@@ -147,8 +147,8 @@ class Login extends React.Component {
 
         <DemoNavbar />
         <main ref="main">
-          <section className="section section-shaped section-lg">
-            <div className="shape shape-style-1 shape-default">
+          <section className="section section-shaped section-lg bg-gradient-info">
+            {/* <div className="shape shape-style-1 shape-default">
               <span />
               <span />
               <span />
@@ -157,7 +157,7 @@ class Login extends React.Component {
               <span />
               <span />
               <span />
-            </div>
+            </div> */}
             <Container className="pt-lg-md">
               <Row className="justify-content-center">
                 <Col lg="5">
@@ -199,7 +199,7 @@ class Login extends React.Component {
                           <p style={{ color: "red" }} id="loginError"></p>
                         </div>
                         <div className="text-center my-4">
-                          <Button type="submit" size="md" color="primary">Sign In</Button>
+                          <Button type="submit" size="md" outline color="primary">Sign In</Button>
                         </div>
                       </Form>
                     </CardBody>

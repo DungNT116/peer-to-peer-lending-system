@@ -39,6 +39,7 @@ class Register extends React.Component {
       validLastname: false,
       validEmail: false,
       validPhone: false,
+      isDisable: true
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -53,7 +54,7 @@ class Register extends React.Component {
   componentWillMount() {
     // console.log(localStorage.getItem("isLoggedIn"))
     //isLoggedIn = true go back to homepage (prevent go to login page when isLoggedIn = true)
-    if(localStorage.getItem("isLoggedIn") === null && localStorage.getItem("token") === null) {
+    if (localStorage.getItem("isLoggedIn") === null && localStorage.getItem("token") === null) {
       this.props.history.push("/")
     } else {
       // localStorage.removeItem("token");
@@ -154,7 +155,6 @@ class Register extends React.Component {
       });
     }
   }
-
   handleSubmit(event) {
     if (this.state.validEmail === true && this.state.validFirstname === true
       && this.state.validLastname === true && this.state.validPhone === true
@@ -193,8 +193,8 @@ class Register extends React.Component {
       <>
         <DemoNavbar />
         <main ref="main">
-          <section className="section section-shaped section-lg">
-            <div className="shape shape-style-1 bg-gradient-default">
+          <section className="section section-shaped section-lg bg-gradient-info">
+            {/* <div className="shape shape-style-1 bg-gradient-default">
               <span />
               <span />
               <span />
@@ -203,46 +203,11 @@ class Register extends React.Component {
               <span />
               <span />
               <span />
-            </div>
+            </div> */}
             <Container className="pt-lg-md">
               <Row className="justify-content-center">
                 <Col lg="7">
                   <Card className="bg-secondary shadow border-0">
-                    {/* <CardHeader className="bg-white pb-5">
-                      <div className="text-muted text-center mb-3">
-                        <small>Sign up with</small>
-                      </div>
-                      <div className="text-center">
-                        <Button
-                          className="btn-neutral btn-icon mr-4"
-                          color="default"
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
-                        >
-                          <span className="btn-inner--icon mr-1">
-                            <img
-                              alt="..."
-                              src={require("assets/img/icons/common/github.svg")}
-                            />
-                          </span>
-                          <span className="btn-inner--text">Github</span>
-                        </Button>
-                        <Button
-                          className="btn-neutral btn-icon ml-1"
-                          color="default"
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
-                        >
-                          <span className="btn-inner--icon mr-1">
-                            <img
-                              alt="..."
-                              src={require("assets/img/icons/common/google.svg")}
-                            />
-                          </span>
-                          <span className="btn-inner--text">Google</span>
-                        </Button>
-                      </div>
-                    </CardHeader> */}
                     <CardBody>
                       <div className="text-center text-muted mb-4">
                         <h3>Sign up</h3>
@@ -347,7 +312,8 @@ class Register extends React.Component {
                         </Row>
                         <div className="text-center my-4">
                           {/* <Input type="submit" value="Create account" /> */}
-                          <Button type="submit" size="md" color="primary">Create Account</Button>
+                          <Button type="submit" size="md" outline color="primary" 
+                          >Create Account</Button>
                           {/* <Button
                             className="mt-4"
                             color="primary"

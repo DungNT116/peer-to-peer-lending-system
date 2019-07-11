@@ -56,6 +56,21 @@ class ApplyTimeline extends React.Component {
       });
       console.log(this.state.rawMilestone);
     }
+
+    if (this.props.isLendMany !== undefined) {
+      await this.setState({
+        isLendMany: this.props.isLendMany,
+        isLendOnce: !this.props.isLendMany
+      })
+    }
+
+    if (this.props.isPayMany !== undefined) {
+      await this.setState({
+        isPaybackMany: this.props.isPayMany,
+        isPaybackOnce: !this.props.isPayMany
+      })
+    }
+
   }
   async componentDidMount() {
     // document.documentElement.scrollTop = 0;
@@ -125,7 +140,7 @@ class ApplyTimeline extends React.Component {
           data: this.formatDate(
             new Date(
               (new Date(Date.now()).getTime() / 1000 + 86400 * duration * 2) *
-                1000
+              1000
             ).toLocaleDateString()
           ),
           percent: 1.0,
@@ -203,7 +218,7 @@ class ApplyTimeline extends React.Component {
               ).getTime() /
                 1000 +
                 86400 * this.state.duration) *
-                1000
+              1000
             ).toLocaleDateString()
           ),
           percent:
@@ -239,7 +254,7 @@ class ApplyTimeline extends React.Component {
     }
     //Sort and check duplicate before saving
     for (let i = 0; i < timelineCopy.length; i++) {
-      timelineCopy.sort(function(day1, day2) {
+      timelineCopy.sort(function (day1, day2) {
         if (new Date(day1.data) - new Date(day2.data) == 0) {
           isDuplicate = true;
         }
@@ -291,7 +306,7 @@ class ApplyTimeline extends React.Component {
           new Date(
             (new Date(payback[0].data).getTime() / 1000 +
               86400 * this.state.duration) *
-              1000
+            1000
           ).toLocaleDateString()
         );
         this.setState({ timeline_payback: payback });
@@ -388,7 +403,7 @@ class ApplyTimeline extends React.Component {
   toggleModalCheckTimelineLending() {
     this.setState({ modalLending: !this.state.modalLending });
   }
-  toggleModalCheckTimelinePayback(){
+  toggleModalCheckTimelinePayback() {
     this.setState({ modalPayback: !this.state.modalPayback });
   }
   checkTimeline(typePayment) {
@@ -471,7 +486,7 @@ class ApplyTimeline extends React.Component {
               ).getTime() /
                 1000 +
                 86400 * this.state.duration) *
-                1000
+              1000
             ).toLocaleDateString()
           ),
           status: "ABC"
@@ -506,7 +521,7 @@ class ApplyTimeline extends React.Component {
     }
     //Sort and check duplicate before saving
     for (let i = 0; i < timelinePaybackCopy.length; i++) {
-      timelinePaybackCopy.sort(function(day1, day2) {
+      timelinePaybackCopy.sort(function (day1, day2) {
         if (new Date(day1.data) - new Date(day2.data) == 0) {
           isDuplicate = true;
         }
@@ -533,7 +548,7 @@ class ApplyTimeline extends React.Component {
                   ).getTime() /
                     1000 +
                     86400 * this.state.duration) *
-                    1000
+                  1000
                 ).toLocaleDateString()
               );
             }
@@ -700,9 +715,9 @@ class ApplyTimeline extends React.Component {
     console.log(data_transaction);
     console.log("saveeeeeeeeee")
     let idMilestone = -1
-    if(this.state.typePayment !== "" && this.state.typePayment == "lend"){
+    if (this.state.typePayment !== "" && this.state.typePayment == "lend") {
       idMilestone = this.state.curDateLending.id;
-    }else {
+    } else {
       idMilestone = this.state.curDatePayback.id;
     }
     console.log(idMilestone);
@@ -771,50 +786,51 @@ class ApplyTimeline extends React.Component {
               isHistory ? (
                 ""
               ) : (
-                <div id="dropdownChooseLending">
-                  <Label>
-                    Type Lending Timeline <span>&nbsp;&nbsp;&nbsp;</span>{" "}
-                  </Label>
-                  <UncontrolledDropdown>
-                    <DropdownToggle caret color="secondary">
-                      Choose Type
-                    </DropdownToggle>
-                    <DropdownMenu>
-                      <DropdownItem
-                        href="#pablo"
-                        onClick={e => {
-                          if (this.state.timeline_lending.length > 2) {
-                            window.alert("Timeline have over 2 milestones.");
-                          } else {
+                  <div id="dropdownChooseLending">
+                    <Label>
+                      Type Lending Timeline <span>&nbsp;&nbsp;&nbsp;</span>{" "}
+                    </Label>
+                    <UncontrolledDropdown>
+                      <DropdownToggle caret color="secondary">
+
+                        {isLendMany ? (<span>Lend Many</span>) : (<span>Lend Once</span>)}
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        <DropdownItem
+                          href="#pablo"
+                          onClick={e => {
+                            if (this.state.timeline_lending.length > 2) {
+                              window.alert("Timeline have over 2 milestones.");
+                            } else {
+                              this.setState({
+                                isLendOnce: true,
+                                isLendMany: false
+                              });
+                            }
+                            e.preventDefault();
+                          }}
+                        >
+                          Lend Once
+                      </DropdownItem>
+                        <DropdownItem
+                          href="#pablo"
+                          onClick={e => {
                             this.setState({
-                              isLendOnce: true,
-                              isLendMany: false
+                              isLendOnce: false,
+                              isLendMany: true
                             });
-                          }
-                          e.preventDefault();
-                        }}
-                      >
-                        Lend Once
+                            e.preventDefault();
+                          }}
+                        >
+                          Lend Many
                       </DropdownItem>
-                      <DropdownItem
-                        href="#pablo"
-                        onClick={e => {
-                          this.setState({
-                            isLendOnce: false,
-                            isLendMany: true
-                          });
-                          e.preventDefault();
-                        }}
-                      >
-                        Lend Many
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                </div>
-              )
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                  </div>
+                )
             ) : (
-              ""
-            )}
+                ""
+              )}
             {this.state.backup_timeline_lending.map((data, index) => (
               <Row key={index}>
                 <Col md="4">
@@ -831,11 +847,12 @@ class ApplyTimeline extends React.Component {
                     // type="submit"
                     id={"delete-milestone-lending-" + index}
                     size="md"
+                    outline
                     color="danger"
                     style={{ display: "none" }}
                     onClick={() => this.deleteMilestoneLending(index)}
                   >
-                    Delete
+                    <i className="fa fa-remove"></i> Delete
                   </Button>{" "}
                 </Col>
               </Row>
@@ -846,6 +863,7 @@ class ApplyTimeline extends React.Component {
                 // type="submit"
                 id="addMilestoneLending"
                 size="md"
+                outline
                 color="primary"
                 style={{ display: "none" }}
                 onClick={() => this.addMilestoneLending()}
@@ -853,25 +871,27 @@ class ApplyTimeline extends React.Component {
                 <i className="fa fa-dot-circle-o" /> Add Milestone
               </Button>
             ) : (
-              ""
-            )}
+                ""
+              )}
             {/* Lend - Save button */}
             <Button
               // type="submit"
               id="saveTimelineLending"
               size="md"
+              outline
               color="primary"
               style={{ display: "none" }}
               onClick={() => this.saveTimeLineLending()}
             >
-              <i className="fa fa-dot-circle-o" /> Save Timeline
+              <i className="ni ni-cloud-download-95" /> Save Timeline
             </Button>{" "}
             {/* Lend - Cancel Button */}
             <Button
               // type="submit"
               id="cancelButtonLending"
               size="md"
-              color="primary"
+              outline
+              color="warning"
               style={{ display: "none" }}
               onClick={() => this.cancelTimeLineLending()}
             >
@@ -882,25 +902,25 @@ class ApplyTimeline extends React.Component {
                 isHistory ? (
                   ""
                 ) : (
-                  <div>
-                    <Label>
-                      Lending Timeline <span>&nbsp;&nbsp;&nbsp;</span>
-                    </Label>
-                    <Button
-                      // type="submit"
-                      id="changeTimeline"
-                      size="sm"
-                      outline
-                      color="primary"
-                      onClick={() => this.changeTimeLineLending()}
-                    >
-                      Change timeline lending
+                    <div>
+                      <Label>
+                        Lending Timeline <span>&nbsp;&nbsp;&nbsp;</span>
+                      </Label>
+                      <Button
+                        // type="submit"
+                        id="changeTimeline"
+                        size="sm"
+                        outline
+                        color="primary"
+                        onClick={() => this.changeTimeLineLending()}
+                      >
+                        Change timeline lending
                     </Button>
-                  </div>
-                )
+                    </div>
+                  )
               ) : (
-                ""
-              )}
+                  ""
+                )}
               <div>
                 {isTrading ? (
                   <div>
@@ -989,64 +1009,64 @@ class ApplyTimeline extends React.Component {
                                   {this.state.isMilestoneLendingPaid ? (
                                     <p>Milestone is Paid</p>
                                   ) : (
-                                    <Col>
-                                      <PayPalButton
-                                        amount={12}
-                                        onSuccess={(details, data) => {
-                                          this.setState({
-                                            data_tx: {
-                                              txId: details.id,
-                                              createDate: new Date(),
-                                              status: details.status,
-                                              amount:
-                                                details.purchase_units[0].amount
-                                                  .value
-                                            }
-                                          });
-                                          this.send_tx();
-                                        }}
-                                        style={{
-                                          layout: "horizontal",
-                                          shape: "pill",
-                                          disableFunding: true,
-                                          tagline: false,
-                                          size: "responsive"
-                                        }}
-                                        options={{
-                                          clientId: client_API
-                                        }}
-                                      />
-                                    </Col>
-                                  )}
+                                      <Col>
+                                        <PayPalButton
+                                          amount={12}
+                                          onSuccess={(details, data) => {
+                                            this.setState({
+                                              data_tx: {
+                                                txId: details.id,
+                                                createDate: new Date(),
+                                                status: details.status,
+                                                amount:
+                                                  details.purchase_units[0].amount
+                                                    .value
+                                              }
+                                            });
+                                            this.send_tx();
+                                          }}
+                                          style={{
+                                            layout: "horizontal",
+                                            shape: "pill",
+                                            disableFunding: true,
+                                            tagline: false,
+                                            size: "responsive"
+                                          }}
+                                          options={{
+                                            clientId: client_API
+                                          }}
+                                        />
+                                      </Col>
+                                    )}
                                 </FormGroup>
                               </div>
                             ) : (
-                              <FormGroup row>
-                                <p>Today is not in Timeline</p>
-                              </FormGroup>
-                            )}
+                                <FormGroup row>
+                                  <p>Today is not in Timeline</p>
+                                </FormGroup>
+                              )}
                           </ModalBody>
                         </Modal>
                       </Col>
                     </FormGroup>
                   </div>
                 ) : (
-                  <div>
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "100px",
-                        margin: "0 auto",
-                        marginTop: "20px",
-                        fontSize: "13px"
-                      }}
-                    >
-                      {this.createLendingTimeline()}
-                    </div>
+                    <div>
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "100px",
+                          margin: "0 auto",
+                          marginTop: "20px",
+                          fontSize: "13px"
+                        }}
+                      >
+                        {this.createLendingTimeline()}
+                      </div>
 
-                    <div className="text-center">{curLendingStatus}</div>
-                  </div>
-                )}
+                      <div className="text-center">{curLendingStatus}</div>
+                    </div>
+                  )}
               </div>
             </div>
           </CardBody>
@@ -1060,50 +1080,51 @@ class ApplyTimeline extends React.Component {
               isHistory ? (
                 ""
               ) : (
-                <div id="dropdownChoosePayback">
-                  <Label>
-                    Type Payback Timeline <span>&nbsp;&nbsp;&nbsp;</span>{" "}
-                  </Label>
-                  <UncontrolledDropdown>
-                    <DropdownToggle caret color="secondary">
-                      Choose Type
-                    </DropdownToggle>
-                    <DropdownMenu>
-                      <DropdownItem
-                        href="#pablo"
-                        onClick={e => {
-                          if (this.state.timeline_payback.length > 2) {
-                            window.alert("Timeline have over 2 milestones.");
-                          } else {
+                  <div id="dropdownChoosePayback">
+                    <Label>
+                      Type Payback Timeline <span>&nbsp;&nbsp;&nbsp;</span>{" "}
+                    </Label>
+                    <UncontrolledDropdown>
+                      <DropdownToggle caret color="secondary">
+                        {isPaybackMany ? (<span>Lend Many</span>) : (<span>Lend Once</span>)}
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        <DropdownItem
+                          href="#pablo"
+                          onClick={e => {
+                            if (this.state.timeline_payback.length > 2) {
+                              window.alert("Timeline have over 2 milestones.");
+                            } else {
+                              this.setState({
+                                isPaybackOnce: true,
+                                isPaybackMany: false
+                              });
+                            }
+                            e.preventDefault();
+                          }}
+                        >
+                          Payback Once
+                      </DropdownItem>
+                        <DropdownItem
+                          href="#pablo"
+                          onClick={e => {
                             this.setState({
-                              isPaybackOnce: true,
-                              isPaybackMany: false
+                              isPaybackOnce: false,
+                              isPaybackMany: true
                             });
-                          }
-                          e.preventDefault();
-                        }}
-                      >
-                        Payback Once
+                            e.preventDefault();
+                          }}
+                        >
+                          Payback Many
                       </DropdownItem>
-                      <DropdownItem
-                        href="#pablo"
-                        onClick={e => {
-                          this.setState({
-                            isPaybackOnce: false,
-                            isPaybackMany: true
-                          });
-                          e.preventDefault();
-                        }}
-                      >
-                        Payback Many
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                </div>
-              )
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+
+                  </div>
+                )
             ) : (
-              ""
-            )}
+                ""
+              )}
             {this.state.backup_timeline_payback.map((data, index) => (
               <Row key={index}>
                 <Col md="4">
@@ -1120,11 +1141,12 @@ class ApplyTimeline extends React.Component {
                     // type="submit"
                     id={"delete-milestone-payback-" + index}
                     size="md"
+                    outline
                     color="danger"
                     style={{ display: "none" }}
                     onClick={() => this.deleteMilestonePayback(index)}
                   >
-                    Delete
+                    <i className="fa fa-remove"></i> Delete
                   </Button>{" "}
                 </Col>
               </Row>
@@ -1142,24 +1164,26 @@ class ApplyTimeline extends React.Component {
                 <i className="fa fa-dot-circle-o" /> Add Milestone
               </Button>
             ) : (
-              ""
-            )}
+                ""
+              )}
             {/* Payback - Save button */}
             <Button
               // type="submit"
               id="saveTimelinePayback"
               size="md"
+              outline
               color="primary"
               style={{ display: "none" }}
               onClick={() => this.savePaybackTimeLine()}
             >
-              <i className="fa fa-dot-circle-o" /> Save Timeline
+              <i className="ni ni-cloud-download-95" /> Save Timeline
             </Button>{" "}
             {/* Payback - Cancel Button */}
             <Button
               // type="submit"
               id="cancelButtonPayback"
               size="md"
+              outline
               color="primary"
               style={{ display: "none" }}
               onClick={() => this.cancelPaybackTimeLine()}
@@ -1171,25 +1195,25 @@ class ApplyTimeline extends React.Component {
                 isHistory ? (
                   ""
                 ) : (
-                  <div>
-                    <Label>
-                      Payback Timeline <span>&nbsp;&nbsp;&nbsp;</span>
-                    </Label>
-                    <Button
-                      // type="submit"
-                      id="changeTimeline"
-                      size="sm"
-                      outline
-                      color="primary"
-                      onClick={() => this.changePaybackTimeLine()}
-                    >
-                      Change timeline payback
+                    <div>
+                      <Label>
+                        Payback Timeline <span>&nbsp;&nbsp;&nbsp;</span>
+                      </Label>
+                      <Button
+                        // type="submit"
+                        id="changeTimeline"
+                        size="sm"
+                        outline
+                        color="primary"
+                        onClick={() => this.changePaybackTimeLine()}
+                      >
+                        Change timeline payback
                     </Button>
-                  </div>
-                )
+                    </div>
+                  )
               ) : (
-                ""
-              )}
+                  ""
+                )}
               {isTrading ? (
                 <div>
                   <FormGroup row className="py-2">
@@ -1208,74 +1232,74 @@ class ApplyTimeline extends React.Component {
                       <div className="text-center">{curPaybackStatus}</div>
                     </Col>
                     <Col md="3">
-                    <Button
-                          id="acceptButton"
-                          size="md"
-                          color="primary"
-                          onClick={() => {
-                            this.checkTimeline("payback");
-                            this.toggleModalCheckTimelinePayback();
-                          }}
-                          disabled={this.state.editable}
-                          style={styleCheckTimeline}
-                        >
-                          <i className="fa" /> Check Timeline
+                      <Button
+                        id="acceptButton"
+                        size="md"
+                        color="primary"
+                        onClick={() => {
+                          this.checkTimeline("payback");
+                          this.toggleModalCheckTimelinePayback();
+                        }}
+                        disabled={this.state.editable}
+                        style={styleCheckTimeline}
+                      >
+                        <i className="fa" /> Check Timeline
                         </Button>
-                        <Modal
-                          isOpen={this.state.modalPayback}
-                          toggle={() => this.toggleModalCheckTimelinePayback()}
-                          className={this.props.className}
+                      <Modal
+                        isOpen={this.state.modalPayback}
+                        toggle={() => this.toggleModalCheckTimelinePayback()}
+                        className={this.props.className}
+                      >
+                        <ModalHeader
+                          toggle={() =>
+                            this.toggleModalCheckTimelinePayback()
+                          }
                         >
-                          <ModalHeader
-                            toggle={() =>
-                              this.toggleModalCheckTimelinePayback()
-                            }
-                          >
-                            Xac Nhan yeu cau vay muon
+                          Xac Nhan yeu cau vay muon
                           </ModalHeader>
-                          <ModalBody>
-                            <FormGroup row>
-                              <Col md="6">
-                                <Label className="h6">Today</Label>
-                              </Col>
-                              <Col md="6">
-                                <Label className="h6">
-                                  {this.convertTimeStampToDate(
-                                    this.convertDateToTimestamp(new Date())
-                                  )}
-                                </Label>
-                              </Col>
-                            </FormGroup>
-                            {this.state.isInMilestonePayback ? (
-                              <div>
-                                <FormGroup row>
-                                  <Col md="6">
-                                    <Label className="h6">
-                                      Milestone start
+                        <ModalBody>
+                          <FormGroup row>
+                            <Col md="6">
+                              <Label className="h6">Today</Label>
+                            </Col>
+                            <Col md="6">
+                              <Label className="h6">
+                                {this.convertTimeStampToDate(
+                                  this.convertDateToTimestamp(new Date())
+                                )}
+                              </Label>
+                            </Col>
+                          </FormGroup>
+                          {this.state.isInMilestonePayback ? (
+                            <div>
+                              <FormGroup row>
+                                <Col md="6">
+                                  <Label className="h6">
+                                    Milestone start
                                     </Label>
-                                  </Col>
-                                  <Col md="6">
-                                    <Label className="h6">Milestone end</Label>
-                                  </Col>
-                                </FormGroup>
-                                <FormGroup row>
-                                  <Col md="6">
-                                    <p>
-                                      {this.convertTimeStampToDate(
-                                        this.state.curDatePayback.previousDate
-                                      )}
-                                    </p>
-                                  </Col>
-                                  <Col md="6">
-                                    <p>
-                                      {this.convertTimeStampToDate(
-                                        this.state.curDatePayback.presentDate
-                                      )}
-                                    </p>
-                                  </Col>
-                                  {this.state.isMilestonePaybackPaid ? (
-                                    <p>Milestone is Paid</p>
-                                  ) : (
+                                </Col>
+                                <Col md="6">
+                                  <Label className="h6">Milestone end</Label>
+                                </Col>
+                              </FormGroup>
+                              <FormGroup row>
+                                <Col md="6">
+                                  <p>
+                                    {this.convertTimeStampToDate(
+                                      this.state.curDatePayback.previousDate
+                                    )}
+                                  </p>
+                                </Col>
+                                <Col md="6">
+                                  <p>
+                                    {this.convertTimeStampToDate(
+                                      this.state.curDatePayback.presentDate
+                                    )}
+                                  </p>
+                                </Col>
+                                {this.state.isMilestonePaybackPaid ? (
+                                  <p>Milestone is Paid</p>
+                                ) : (
                                     <Col>
                                       <PayPalButton
                                         amount={12}
@@ -1305,35 +1329,35 @@ class ApplyTimeline extends React.Component {
                                       />
                                     </Col>
                                   )}
-                                </FormGroup>
-                              </div>
-                            ) : (
+                              </FormGroup>
+                            </div>
+                          ) : (
                               <FormGroup row>
                                 <p>Today is not in Timeline</p>
                               </FormGroup>
                             )}
-                          </ModalBody>
-                        </Modal>
+                        </ModalBody>
+                      </Modal>
 
                     </Col>
                   </FormGroup>
                 </div>
               ) : (
-                <div>
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "100px",
-                      margin: "0 auto",
-                      marginTop: "20px",
-                      fontSize: "13px"
-                    }}
-                  >
-                    {this.createPaybackTimeline()}
+                  <div>
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "100px",
+                        margin: "0 auto",
+                        marginTop: "20px",
+                        fontSize: "13px"
+                      }}
+                    >
+                      {this.createPaybackTimeline()}
+                    </div>
+                    <div className="text-center">{curPaybackStatus}</div>
                   </div>
-                  <div className="text-center">{curPaybackStatus}</div>
-                </div>
-              )}
+                )}
             </div>
           </CardBody>
         </Row>

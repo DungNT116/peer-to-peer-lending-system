@@ -47,7 +47,9 @@ class ViewDetailRequest extends React.Component {
       isViewDetail: false,
       data_tx: {},
       lendingTimeline: [],
-      paybackTimeline: []
+      paybackTimeline: [],
+      isLendMany: false,
+      isPayMany: false
     };
 
     this.toggleModal = this.toggleModal.bind(this);
@@ -123,15 +125,6 @@ class ViewDetailRequest extends React.Component {
       window.location.reload();
     }
   }
-  // componentWillMount() {
-  //   console.log(this.props.request.data)
-  //   if (this.props.request.data.length === 0) {
-  //     // localStorage.removeItem("isLoggedIn");
-  //     // this.props.history.push('/login-page')
-  //     // return <Redirect to='/login-page'  />
-  //     // this.props.history.push('/path')
-  //   }
-  // }
 
   acceptDeal() {
     fetch(apiLink + "/rest/deal/acceptDeal", {
@@ -243,10 +236,7 @@ class ViewDetailRequest extends React.Component {
   saveNewDealInformationToDB() {
     console.log(this.state.lendingTimeline);
     console.log(this.state.paybackTimeline);
-    // console.log( this.state.lendingTimeline.length)
-    // console.log( this.state.paybackTimeline.length)
 
-    //     console.log( this.createMileStone())
     fetch(apiLink + "/rest/deal/makeDeal", {
       method: "PUT",
       headers: {
@@ -285,25 +275,41 @@ class ViewDetailRequest extends React.Component {
 
   changeMilestoneToTimelineData() {
     console.log(this.props.request.data.deal.milestone);
+    let numberOfLendingMilestones = 0;
+    let numberOfPayBackMilestones = 0;
     let milestone = this.props.request.data.deal.milestone;
     let timelineData = { lendingTimeline: [], payBackTimeline: [] };
     let lendingTimeline = [];
     let payBackTimeline = [];
-    let milestoneTimeline = { data: "", status: "", percent: ""};
+    let milestoneTimeline = { data: "", status: "", percent: "" };
     for (let i = 0; i < milestone.length; i++) {
       const element = milestone[i];
-      milestoneTimeline = { data: "", status: "", percent: ""};
+      milestoneTimeline = { data: "", status: "", percent: "" };
       milestoneTimeline.data = this.formatDate(
         this.convertTimeStampToDate(element.presentDate)
       );
       milestoneTimeline.percent = element.percent;
       milestoneTimeline.status = "data is nothing";
       if (element.type === "lend") {
+        numberOfLendingMilestones++;
         lendingTimeline.push(milestoneTimeline);
       } else {
+        numberOfPayBackMilestones++;
         payBackTimeline.push(milestoneTimeline);
       }
     }
+    if (numberOfLendingMilestones > 2) {
+      this.setState({
+        isLendMany: true
+      })
+    }
+
+    if (numberOfPayBackMilestones > 2) {
+      this.setState({
+        isPayMany: true
+      })
+    }
+
     timelineData.lendingTimeline = lendingTimeline;
     timelineData.payBackTimeline = payBackTimeline;
     console.log(lendingTimeline);
@@ -396,17 +402,7 @@ class ViewDetailRequest extends React.Component {
     document.getElementById("duration").style.display = "none";
     document.getElementById("dueDay").style.display = "none";
   }
-  formatDate(date) {
-    var d = new Date(date),
-      month = "" + (d.getMonth() + 1),
-      day = "" + d.getDate(),
-      year = d.getFullYear();
 
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
-
-    return [year, month, day].join("-");
-  }
   convertTimeStampToDate(date) {
     var timestampToDate = new Date(date * 1000);
     return timestampToDate.toLocaleDateString();
@@ -459,7 +455,7 @@ class ViewDetailRequest extends React.Component {
   saveDeal() {
     //set UI timeline
     this.props.setIsHistory(true);
-    
+
     //save db
     this.saveNewDealInformationToDB();
 
@@ -523,9 +519,9 @@ class ViewDetailRequest extends React.Component {
         {this.validRedux()}
         <DemoNavbar />
         <main className="profile-page" ref="main">
-          <section className="section-profile-cover section-shaped my-0">
+          <section className="section-profile-cover section-shaped my-0 bg-gradient-info">
             {/* Circles background */}
-            <div className="shape shape-style-1 shape-default alpha-4">
+            {/* <div className="shape shape-style-1 shape-default alpha-4">
               <span />
               <span />
               <span />
@@ -533,7 +529,7 @@ class ViewDetailRequest extends React.Component {
               <span />
               <span />
               <span />
-            </div>
+            </div> */}
             {/* SVG separator */}
             <div className="separator separator-bottom separator-skew">
               <svg
@@ -591,7 +587,7 @@ class ViewDetailRequest extends React.Component {
                                   (this.props.request.data.amount *
                                     (this.props.request.data.duration / 30) *
                                     1.5) /
-                                    100}{" "}
+                                  100}{" "}
                                 VND
                               </p>
                             </Col>
@@ -624,11 +620,12 @@ class ViewDetailRequest extends React.Component {
                                 disabled={!this.state.editable}
                                 onChange={this.onBorrowDurationChange}
                               >
-                                <option value="0">Please select</option>
+                                <option value="" disabled>Please select</option>
                                 <option value="1">30 days</option>
-                                <option value="2">60 days</option>
                                 <option value="3">90 days</option>
-                                <option value="12">1 Years(360 days)</option>
+                                <option value="6">180 days</option>
+                                <option value="9">270 days</option>
+                                <option value="12">360 days</option>
                               </Input>
                             </Col>
                           </FormGroup>
@@ -640,7 +637,7 @@ class ViewDetailRequest extends React.Component {
                               <Label className="h6">Create Day</Label>
                             </Col>
                             <Col md="4">
-                              <Label className="h6">Due Day</Label>
+                              <Label className="h6">Payment Deadline</Label>
                             </Col>
                           </FormGroup>
 
@@ -662,21 +659,21 @@ class ViewDetailRequest extends React.Component {
                                 </p>
                               </Col>
                             ) : (
-                              <Col md="4">
-                                <p
-                                  className="h6"
-                                  style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    height: "100%"
-                                  }}
-                                  id="createDayText"
-                                >
-                                  {" "}
-                                  Not Yet
+                                <Col md="4">
+                                  <p
+                                    className="h6"
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      height: "100%"
+                                    }}
+                                    id="createDayText"
+                                  >
+                                    {" "}
+                                    Not Yet
                                 </p>
-                              </Col>
-                            )}
+                                </Col>
+                              )}
                             <Col md="4">
                               <p
                                 className="h6"
@@ -702,7 +699,7 @@ class ViewDetailRequest extends React.Component {
                               <p className="h6" id="dueDateText">
                                 {this.convertTimeStampToDate(
                                   new Date().getTime() / 1000 +
-                                    86400 * this.props.request.data.duration
+                                  86400 * this.props.request.data.duration
                                 )}
                               </p>
                               <Input
@@ -735,7 +732,7 @@ class ViewDetailRequest extends React.Component {
                                     (this.props.request.data.duration / 30) *
                                     1.5) /
                                     100) *
-                                    1000
+                                  1000
                                 ) / 1000}{" "}
                                 VND
                               </p>
@@ -750,6 +747,8 @@ class ViewDetailRequest extends React.Component {
                             isTrading={this.state.isTrading}
                             isViewDetail={this.state.isViewDetail}
                             isHistory={this.state.isHistory}
+                            isLendMany={this.state.isLendMany}
+                            isPayMany={this.state.isPayMany}
                             borrowerUser={this.props.request.data.borrower.username}
                             goToViewRequestTrading={() => this.goToViewRequestTrading()}
                           />
@@ -757,92 +756,93 @@ class ViewDetailRequest extends React.Component {
                         {isHistoryDetail ? (
                           ""
                         ) : (
-                          <div>
-                            <CardFooter className="text-center">
-                              <Button
-                                type="submit"
-                                id="dealButton"
-                                size="md"
-                                color="primary"
-                                onClick={() => this.makeDeal()}
-                                disabled={this.state.editable}
-                              >
-                                <i className="fa fa-dot-circle-o" /> Make Deal
+                            <div>
+                              <CardFooter className="text-center">
+                                <Button
+                                  type="submit"
+                                  id="dealButton"
+                                  size="md"
+                                  className="btn btn-outline-primary"
+                                  onClick={() => this.makeDeal()}
+                                  disabled={this.state.editable}
+                                >
+                                  <i className="fa fa-dot-circle-o" /> Make Deal
                               </Button>{" "}
-                              <Button
-                                type="submit"
-                                id="saveDealButton"
-                                size="md"
-                                color="primary"
-                                onClick={() => this.saveDeal()}
-                                disabled={!this.state.editable}
-                              >
-                                <i className="fa fa-dot-circle-o" /> Save Deal
+                                <Button
+                                  type="submit"
+                                  id="saveDealButton"
+                                  size="md"
+                                  className="btn btn-outline-primary"
+                                  onClick={() => this.saveDeal()}
+                                  disabled={!this.state.editable}
+                                >
+                                  <i className="ni ni-cloud-download-95" /> Save Deal
                               </Button>{" "}
-                              <Button
-                                type="submit"
-                                id="acceptButton"
-                                size="md"
-                                color="primary"
-                                onClick={this.toggleModal}
-                                disabled={this.state.editable}
-                              >
-                                <i className="fa fa-dot-circle-o" /> Accept
+                                <Button
+                                  type="submit"
+                                  id="acceptButton"
+                                  size="md"
+                                  className="btn btn-outline-primary"
+                                  onClick={this.toggleModal}
+                                  disabled={this.state.editable}
+                                >
+                                  <i className="ni ni-check-bold" /> Accept
                               </Button>{" "}
-                            </CardFooter>
-                            <Modal
-                              isOpen={this.state.modal}
-                              toggle={this.toggleModal}
-                              className={this.props.className}
-                            >
-                              <ModalHeader toggle={this.toggleModal}>
-                                Xac Nhan yeu cau vay muon
+                              </CardFooter>
+                              <Modal
+                                isOpen={this.state.modal}
+                                toggle={this.toggleModal}
+                                className={this.props.className}
+                              >
+                                <ModalHeader toggle={this.toggleModal}>
+                                  Xac Nhan yeu cau vay muon
                               </ModalHeader>
-                              <ModalBody>
-                                Ban co chac chan se chap nhan yeu cau nay khong
+                                <ModalBody>
+                                  Ban co chac chan se chap nhan yeu cau nay khong
                               </ModalBody>
-                              <ModalFooter>
-                                <PayPalButton
-                                  amount={this.props.request.data.amount * this.props.request.data.deal.milestone[1].percent}
-                                  onSuccess={(details, data) => {
-                                    this.setState({
-                                      data_tx: {
-                                        txId: details.id,
-                                        createDate: new Date,
-                                        status: details.status,
-                                        amount:
-                                          details.purchase_units[0].amount.value
-                                      }
-                                    });
-                                    this.send_tx();
-                                  }}
-                                  style={{
-                                    layout: "horizontal",
-                                    shape: "pill",
-                                    disableFunding: true,
-                                    tagline: false,
-                                    size: "responsive"
-                                  }}
-                                  options={{
-                                    clientId: client_API
-                                  }}
-                                />
-                                <Button
-                                  color="primary"
-                                  onClick={this.toggleModal}
-                                >
-                                  Yes
+                                <ModalFooter>
+                                  <PayPalButton
+                                    amount={this.props.request.data.amount * this.props.request.data.deal.milestone[1].percent}
+                                    onSuccess={(details, data) => {
+                                      this.setState({
+                                        data_tx: {
+                                          txId: details.id,
+                                          createDate: new Date,
+                                          status: details.status,
+                                          amount:
+                                            details.purchase_units[0].amount.value
+                                        }
+                                      });
+                                      this.send_tx();
+                                      this.toggleModal();
+                                    }}
+                                    style={{
+                                      layout: "horizontal",
+                                      shape: "pill",
+                                      disableFunding: true,
+                                      tagline: false,
+                                      size: "responsive"
+                                    }}
+                                    options={{
+                                      clientId: client_API
+                                    }}
+                                  />
+                                  <Button
+                                    color="primary"
+                                    onClick={this.toggleModal}
+                                  >
+                                    Yes
                                 </Button>{" "}
-                                <Button
-                                  color="secondary"
-                                  onClick={this.toggleModal}
-                                >
-                                  Cancel
+                                  <Button
+                                    color="secondary"
+                                    onClick={this.toggleModal}
+                                  >
+                                    Cancel
                                 </Button>
-                              </ModalFooter>
-                            </Modal>
-                          </div>
-                        )}
+                                </ModalFooter>
+                              </Modal>
+                            </div>
+                          )}
                       </Col>
                     </Row>
                   </div>
