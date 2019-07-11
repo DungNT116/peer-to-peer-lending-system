@@ -6,7 +6,6 @@ import { connect } from "react-redux";
 // reactstrap components
 import {
   // Badge,
-  Button,
   Card,
   CardBody,
   FormGroup,
@@ -23,7 +22,7 @@ import {
 import DemoNavbar from "../../components/Navbars/DemoNavbar";
 import { PayPalButton } from "react-paypal-button-v2";
 //api link
-import { apiLink, bigchainAPI, client_API } from "../../api.jsx";
+import {bigchainAPI, client_API } from "../../api.jsx";
 class ApplyPaypal extends React.Component {
   componentDidMount() {
     document.documentElement.scrollTop = 0;

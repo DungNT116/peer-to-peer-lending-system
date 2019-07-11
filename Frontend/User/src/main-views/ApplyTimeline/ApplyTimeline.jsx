@@ -1,24 +1,20 @@
 import React from "react";
 
 // nodejs library that concatenates classes
-import classnames from "classnames";
 import { connect } from "react-redux";
 // reactstrap components
 import {
   // Badge,
   Button,
-  Card,
   CardBody,
   FormGroup,
   Input,
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFooter,
   Row,
   Col,
   Label,
-  Form,
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
@@ -92,7 +88,6 @@ class ApplyTimeline extends React.Component {
       //lending state
       curLendingId: 0,
       prevLendingId: -1,
-      editable: false,
       isLendOnce: true,
       isLendMany: false,
       modalLending: false,
@@ -254,8 +249,8 @@ class ApplyTimeline extends React.Component {
     }
     //Sort and check duplicate before saving
     for (let i = 0; i < timelineCopy.length; i++) {
-      timelineCopy.sort(function (day1, day2) {
-        if (new Date(day1.data) - new Date(day2.data) == 0) {
+      timelineCopy.sort(function(day1, day2) {
+        if (new Date(day1.data) - new Date(day2.data) === 0) {
           isDuplicate = true;
         }
         return new Date(day1.data) - new Date(day2.data);
@@ -521,8 +516,8 @@ class ApplyTimeline extends React.Component {
     }
     //Sort and check duplicate before saving
     for (let i = 0; i < timelinePaybackCopy.length; i++) {
-      timelinePaybackCopy.sort(function (day1, day2) {
-        if (new Date(day1.data) - new Date(day2.data) == 0) {
+      timelinePaybackCopy.sort(function(day1, day2) {
+        if (new Date(day1.data) - new Date(day2.data) === 0) {
           isDuplicate = true;
         }
         return new Date(day1.data) - new Date(day2.data);
@@ -536,7 +531,7 @@ class ApplyTimeline extends React.Component {
           let j = i - 1;
           const elementPayback = timelinePaybackCopy[j];
           elementPayback.data = elementLending.data;
-          if (i == timelineLendingCopy.length) {
+          if (i === timelineLendingCopy.length) {
             for (let k = j + 1; k < timelinePaybackCopy.length; k++) {
               const elementK = timelinePaybackCopy[k];
               elementK.data = this.formatDate(
@@ -706,16 +701,12 @@ class ApplyTimeline extends React.Component {
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data);
         this.saveTransaction(data, data_transaction);
       });
   };
   saveTransaction(data, data_transaction) {
-    console.log(data);
-    console.log(data_transaction);
-    console.log("saveeeeeeeeee")
     let idMilestone = -1
-    if (this.state.typePayment !== "" && this.state.typePayment == "lend") {
+    if(this.state.typePayment !== "" && this.state.typePayment ==="lend"){
       idMilestone = this.state.curDateLending.id;
     } else {
       idMilestone = this.state.curDatePayback.id;
@@ -732,6 +723,7 @@ class ApplyTimeline extends React.Component {
         receiver: data_transaction.data_tx.data.receiver,
         amount: Number(data_transaction.data_tx.data.amount),
         status: data.status,
+        idTrx: data.id, 
         createDate: this.convertDateToTimestamp(
           data_transaction.data_tx.data.createDate
         ),
@@ -757,17 +749,17 @@ class ApplyTimeline extends React.Component {
       prevPaybackId
     } = this.state;
     const curLendingStatus = this.state.timeline_lending[curLendingId].status;
-    const prevLendingStatus =
-      prevLendingId >= 0
-        ? this.state.timeline_lending[prevLendingId].status
-        : "";
+    // const prevLendingStatus =
+    //   prevLendingId >= 0
+    //     ? this.state.timeline_lending[prevLendingId].status
+    //     : "";
     const isLendMany = this.state.isLendMany;
 
     const curPaybackStatus = this.state.timeline_payback[curPaybackId].status;
-    const prevPaybackStatus =
-      prevPaybackId >= 0
-        ? this.state.timeline_payback[prevPaybackId].status
-        : "";
+    // const prevPaybackStatus =
+    //   prevPaybackId >= 0
+    //     ? this.state.timeline_payback[prevPaybackId].status
+    //     : "";
     const isPaybackMany = this.state.isPaybackMany;
 
     const isTrading = this.props.viewDetail.isTrading;

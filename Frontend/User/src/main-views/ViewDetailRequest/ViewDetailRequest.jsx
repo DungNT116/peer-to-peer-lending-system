@@ -99,6 +99,7 @@ class ViewDetailRequest extends React.Component {
         receiver: data_transaction.data_tx.data.receiver,
         amount: Number(data_transaction.data_tx.data.amount),
         status: data.status,
+        idTrx: data.id, 
         createDate: this.convertDateToTimestamp(data_transaction.data_tx.data.createDate),
         milestone: {
           id: Number(this.props.request.data.deal.milestone[1].id)
@@ -162,7 +163,6 @@ class ViewDetailRequest extends React.Component {
     for (let i = 0; i < this.state.lendingTimeline.length; i++) {
       const element = this.state.lendingTimeline[i];
       console.log(element)
-      // console.log(new Date(element.data).getTime() / 1000)
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
         previousDate: '',
@@ -175,10 +175,6 @@ class ViewDetailRequest extends React.Component {
         milestone.previousDate = dateToTimestamp;
         milestone.type = "lend";
         milestone.percent = element.percent;
-        console.log("Milestone 0 : " + milestone.percent);
-        console.log("Milestone 0 : " + milestone.presentDate);
-        console.log("Milestone 0 : " + milestone.previousDate);
-        console.log("Milestone 0 : " + milestone.type);
       } else {
         const preElement = this.state.lendingTimeline[i - 1];
         var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
@@ -186,18 +182,12 @@ class ViewDetailRequest extends React.Component {
         milestone.previousDate = preDateToTimestamp;
         milestone.type = "lend";
         milestone.percent = element.percent;
-        console.log("Milestone 0 : " + milestone.percent);
-        console.log("Milestone " + i + " : " + milestone.presentDate);
-        console.log("Milestone " + i + " : " + milestone.previousDate);
-        console.log("Milestone " + i + " : " + milestone.type);
       }
       // console.log(milestone);
       milestones.push(milestone);
     }
     for (let i = 0; i < this.state.paybackTimeline.length; i++) {
       const element = this.state.paybackTimeline[i];
-
-      // console.log(new Date(element.data).getTime() / 1000)
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
         previousDate: '',
@@ -210,10 +200,6 @@ class ViewDetailRequest extends React.Component {
         milestone.previousDate = dateToTimestamp;
         milestone.type = "payback";
         milestone.percent = element.percent;
-        console.log("Milestone 0 : " + milestone.percent);
-        console.log("Milestone 0 : " + milestone.presentDate);
-        console.log("Milestone 0 : " + milestone.previousDate);
-        console.log("Milestone 0 : " + milestone.type);
       } else {
         const preElement = this.state.paybackTimeline[i - 1];
         var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
@@ -221,12 +207,7 @@ class ViewDetailRequest extends React.Component {
         milestone.previousDate = preDateToTimestamp;
         milestone.type = "payback";
         milestone.percent = element.percent;
-        console.log("Milestone 0 : " + milestone.percent);
-        console.log("Milestone " + i + " : " + milestone.presentDate);
-        console.log("Milestone " + i + " : " + milestone.previousDate);
-        console.log("Milestone " + i + " : " + milestone.type);
       }
-      // console.log(milestone);
       milestones.push(milestone);
     }
     console.log(milestones);
@@ -236,7 +217,6 @@ class ViewDetailRequest extends React.Component {
   saveNewDealInformationToDB() {
     console.log(this.state.lendingTimeline);
     console.log(this.state.paybackTimeline);
-
     fetch(apiLink + "/rest/deal/makeDeal", {
       method: "PUT",
       headers: {

@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 
 // nodejs library that concatenates classes
 import classnames from "classnames";
@@ -10,7 +9,6 @@ import {
   CardBody,
   FormGroup,
   Input,
-  InputGroup,
   Container,
   Row,
   Col,
