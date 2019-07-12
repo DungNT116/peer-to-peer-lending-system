@@ -63,6 +63,20 @@ public class UserController {
 		}
 		return new ResponseEntity<String>(result, httpStatus);
 	}
+	
+	@CrossOrigin
+	@PostMapping(value = "/rest/user/checkUser")
+	public ResponseEntity<String> checkUser(@RequestHeader("Authorization") String token) {
+		HttpStatus httpStatus = null;
+		String result = "";
+		try {
+			result = userService.checkUser(token);
+			httpStatus = HttpStatus.OK;
+		} catch (Exception e) {
+			httpStatus = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<String>(result, httpStatus);
+	}
 
 	@CrossOrigin
 	@GetMapping(value = "/rest/user/getUser")

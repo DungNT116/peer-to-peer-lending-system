@@ -21,9 +21,23 @@ public class UserService {
 
 	@Autowired
 	JwtService jwtService;
-	
+
 	public List<User> findAll() {
 		return userRepo.findAll();
+	}
+
+	public String checkUser(String token) {
+		try {
+			String username = null;
+			username = jwtService.getUsernameFromToken(token);
+			User user = userRepo.findByUsername(username);
+			if(user != null) {
+				return username;
+			}
+			return "";
+		} catch (Exception e) {
+			return "";
+		}		
 	}
 
 	public User getOneById(int id) {
@@ -37,7 +51,7 @@ public class UserService {
 		return account;
 	}
 
-	public User getOneByUsername(String token) {		
+	public User getOneByUsername(String token) {
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
 		User account = new User();
@@ -49,7 +63,7 @@ public class UserService {
 		account.setLoanLimit(user.getLoanLimit());
 		return account;
 	}
-	
+
 	public User findUsername(String username) {
 		return userRepo.findByUsername(username);
 	}

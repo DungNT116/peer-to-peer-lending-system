@@ -28,7 +28,7 @@ public class Transaction {
 
 	@Column
 	private String idTrx;
-	
+
 	@Column
 	private String receiver;
 
@@ -46,6 +46,9 @@ public class Transaction {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "milestone_id", referencedColumnName = "id")
 	private Milestone milestone;
+
+	public Transaction() {
+	}
 
 	public Integer getId() {
 		return id;

@@ -9,6 +9,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -62,6 +64,10 @@ public class User {
 	@JsonIgnoreProperties(value = { "borrower", "lender" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lender")
 	private List<Request> lendRequest = new ArrayList<>();;
+
+	@JsonIgnoreProperties(value = { "user" })
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	private List<Document> document = new ArrayList<>();;
 
 	public User() {
 	}
@@ -171,6 +177,14 @@ public class User {
 
 	public void setLendRequest(List<Request> lendRequest) {
 		this.lendRequest = lendRequest;
+	}
+
+	public List<Document> getDocument() {
+		return document;
+	}
+
+	public void setDocument(List<Document> document) {
+		this.document = document;
 	}
 
 }

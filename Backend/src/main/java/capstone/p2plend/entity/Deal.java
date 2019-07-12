@@ -48,8 +48,11 @@ public class Deal {
 	private List<Milestone> milestone = new ArrayList<>();
 
 	@JsonIgnoreProperties(value = { "deal" })
-	@OneToOne(mappedBy = "deal", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "deal")
 	private BackupDeal backupDeal;
+
+	public Deal() {
+	}
 
 	public Integer getId() {
 		return id;
