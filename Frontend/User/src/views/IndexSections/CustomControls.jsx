@@ -43,9 +43,9 @@ class CustomControls extends React.Component {
     return (
       <>
         <Row>
-          <Col lg="3" md="6">
+          {/* <Col lg="3" md="6"> */}
             {/* Checkboxes */}
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <small className="text-uppercase font-weight-bold">
                 Checkboxes
               </small>
@@ -95,9 +95,9 @@ class CustomControls extends React.Component {
               </label>
             </div>
           </Col>
-          <Col className="mt-4 mt-md-0" lg="3" sm="6">
+          <Col className="mt-4 mt-md-0" lg="3" sm="6"> */}
             {/* Radio buttons */}
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <small className="text-uppercase font-weight-bold">Radios</small>
             </div>
             <div className="custom-control custom-radio mb-3">
@@ -148,10 +148,10 @@ class CustomControls extends React.Component {
                 <span>Disabled checkbox</span>
               </label>
             </div>
-          </Col>
+          </Col> */}
           <Col className="mt-4 mt-md-0" lg="3" sm="6">
             {/* Toggle buttons */}
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <small className="text-uppercase font-weight-bold">
                 Toggle buttons
               </small>
@@ -169,7 +169,7 @@ class CustomControls extends React.Component {
           <Col className="mt-4 mt-md-0" lg="3" sm="6">
             <div className="mb-3">
               <small className="text-uppercase font-weight-bold">Sliders</small>
-            </div>
+            </div> */}
             {/* Simple slider */}
             <div className="input-slider-container">
               <div className="slider" ref="slider1" />

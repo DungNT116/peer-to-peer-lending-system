@@ -105,8 +105,8 @@ class HistoryRequest extends React.Component {
         <td>{request.status}</td>
         <td>
           <Link to="/view-detail-request">
-            <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.setDataToDetailPage(request)}>
-              <i className="fa fa-dot-circle-o"></i> View Detail
+            <Button type="button" id="dealButton" size="md" className="btn btn-outline-primary" onClick={() => this.setDataToDetailPage(request)}>
+               View Detail
             </Button>{' '}
           </Link>
         </td>
@@ -118,8 +118,8 @@ class HistoryRequest extends React.Component {
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}
-            <section className="section section-lg section-shaped">
-              <div className="shape shape-style-1 shape-default">
+            <section className="section section-lg section-shaped bg-gradient-info">
+              {/* <div className="shape shape-style-1 shape-default">
                 <span />
                 <span />
                 <span />
@@ -129,7 +129,7 @@ class HistoryRequest extends React.Component {
                 <span />
                 <span />
                 <span />
-              </div>
+              </div> */}
               <Container className="py-lg-md d-flex">
                 <div className="col px-0">
                   <Row>

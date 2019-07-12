@@ -166,8 +166,40 @@ class Index extends React.Component {
         <DemoNavbar />
         <main ref="main">
           <Hero />
-          <section className="section section-sm">
+          {/* <Buttons />
+          <Inputs />
+          <section className="section">
             <Container>
+              <CustomControls />
+              <Menus />
+            </Container>
+          </section> */}
+          {/* <Navbars /> */}
+          {/* <section className="section section-components">
+            <Container>
+              <Tabs />
+              <Row className="row-grid justify-content-between align-items-center mt-lg">
+                <Progress />
+                <Pagination />
+              </Row>
+              <Row className="row-grid justify-content-between">
+                <Pills />
+                <Labels />
+              </Row>
+              <Alerts />
+              <Typography />
+              <Modals />
+              <Datepicker />
+              <TooltipPopover />
+            </Container>
+          </section> */}
+          {/* <Carousel /> */}
+          {/* <Icons /> */}
+          {/* <Login /> */}
+          {/* <Download /> */}
+          <section className="section section-sm ">
+            <Container >
+            {/* <CustomControls /> */}
               <Row className="justify-content-center text-center">
                 <p className="h3">History Transactions</p>
               </Row>
