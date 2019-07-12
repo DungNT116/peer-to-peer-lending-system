@@ -232,8 +232,8 @@ class CreateRequestPage extends React.Component {
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}
-            <section className="section section-lg section-shaped">
-              <div className="shape shape-style-1 shape-default">
+            <section className="section section-lg section-shaped bg-gradient-info">
+              {/* <div className="shape shape-style-1 shape-default">
                 <span />
                 <span />
                 <span />
@@ -243,7 +243,7 @@ class CreateRequestPage extends React.Component {
                 <span />
                 <span />
                 <span />
-              </div>
+              </div> */}
               <Container className="py-lg-md d-flex">
                 <div className="col px-0">
                   <Row>
@@ -310,8 +310,10 @@ class CreateRequestPage extends React.Component {
                                   onChange={this.onBorrowDurationChange} required defaultValue="">
                                   <option value="" disabled>Please select</option>
                                   <option value="1">30 days</option>
-                                  <option value="2">90 days</option>
-                                  <option value="3">1 Years(365 days)</option>
+                                  <option value="3">90 days</option>
+                                  <option value="6">180 days</option>
+                                  <option value="9">270 days</option>
+                                  <option value="12">360 days</option>
                                 </Input>
                               <p id="durationError"></p>
                             </Col>
@@ -335,7 +337,7 @@ class CreateRequestPage extends React.Component {
                             onDataChange={this.handleDataTimeline}></ApplyTimeline>
                           <div className="text-center my-4">
                             {/* <Input type="submit" value="Send" /> */}
-                            <Button type="submit" size="md" color="primary">Create Request</Button>
+                            <Button type="submit" size="md" className="btn btn-outline-primary">Create Request</Button>
                           </div>
 
                         </Form>

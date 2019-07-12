@@ -2,7 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 // reactstrap components
-import { Button, Container, Row, Col, Table } from "reactstrap";
+import { Button, Container, Row, Col, Table, NavLink, Card, CardBody, TabContent, TabPane, Nav, NavItem } from "reactstrap";
+import classnames from "classnames";
 
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
@@ -11,6 +12,8 @@ import Pagination from "../../views/IndexSections/Pagination.jsx";
 //api link
 import { apiLink } from "../../api.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter";
+import { SET_IS_LEND_MANY } from "redux/action/types";
+import { SET_IS_PAY_MANY } from "redux/action/types";
 
 class ViewRequestNew extends React.Component {
   constructor(props) {
@@ -19,10 +22,15 @@ class ViewRequestNew extends React.Component {
       newRequests: [],
       newPage: 1,
       newMaxPage: 0,
+
       dealingRequests: [],
       dealingPage: 1,
       dealingMaxPage: 0,
-      pageSize: 5
+
+      pageSize: 5,
+
+      iconTabs: 1,
+      plainTabs: 1
     };
     this.getRequest = this.getRequest.bind(this);
     this.deleteRequest = this.deleteRequest.bind(this);
@@ -32,6 +40,13 @@ class ViewRequestNew extends React.Component {
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
     this.cancelRequest = this.cancelRequest.bind(this);
   }
+
+  toggleNavs = (e, state, index) => {
+    e.preventDefault();
+    this.setState({
+      [state]: index
+    });
+  };
 
   cancelRequest(id) {
     fetch(apiLink + "/rest/deal/cancelDeal", {
@@ -59,7 +74,7 @@ class ViewRequestNew extends React.Component {
 
   setDataToDetailPage(id, where) {
     this.props.setRequest(id);
-    if(where === "dealing") {
+    if (where === "dealing") {
       this.props.setIsHistoryDetail(false);
     } else {
       this.props.setIsHistoryDetail(true);
@@ -87,10 +102,10 @@ class ViewRequestNew extends React.Component {
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
     fetch(
       apiLink +
-        "/rest/request/allRequestHistoryPending?page=" +
-        newPageParam +
-        "&element=" +
-        pageSizeParam,
+      "/rest/request/allRequestHistoryPending?page=" +
+      newPageParam +
+      "&element=" +
+      pageSizeParam,
       {
         method: "GET",
         headers: {
@@ -117,10 +132,10 @@ class ViewRequestNew extends React.Component {
 
     fetch(
       apiLink +
-        "/rest/request/all_request_dealing_by_borrower_or_lender?page=" +
-        dealingPageParam +
-        "&element=" +
-        pageSizeParam,
+      "/rest/request/all_request_dealing_by_borrower_or_lender?page=" +
+      dealingPageParam +
+      "&element=" +
+      pageSizeParam,
       {
         method: "GET",
         headers: {
@@ -187,7 +202,7 @@ class ViewRequestNew extends React.Component {
     this.getRequest();
   }
   render() {
-    
+
     console.log(this.state.newRequests);
     const newListItems = this.state.newRequests.map(request => (
       <tr>
@@ -206,10 +221,10 @@ class ViewRequestNew extends React.Component {
             <Button
               type="button"
               size="md"
-              color="primary"
+              className="btn btn-outline-primary"
               onClick={() => this.setDataToDetailPage(request, "pending")}
             >
-              <i className="fa fa-dot-circle-o" /> View Detail
+               View Detail
             </Button>{" "}
           </Link>
         </td>
@@ -218,10 +233,10 @@ class ViewRequestNew extends React.Component {
             type="button"
             id="dealButton"
             size="md"
-            color="primary"
+            className="btn btn-outline-danger"
             onClick={() => this.deleteRequest(request.id)}
           >
-            <i className="fa fa-dot-circle-o" /> Delete
+            <i className="fa fa-remove" /> Delete
           </Button>{" "}
         </td>
       </tr>
@@ -242,18 +257,19 @@ class ViewRequestNew extends React.Component {
         <td>
           <Link to="/view-detail-request">
             <Button
+              className="btn btn-outline-primary"
               type="button"
               size="md"
-              color="primary"
+              // color="primary"
               onClick={() => this.setDataToDetailPage(request, "dealing")}
             >
-              <i className="fa fa-dot-circle-o" /> View Detail
+               View Detail
             </Button>{" "}
           </Link>
         </td>
         <td>
-          <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.cancelRequest(request.id)}>
-            <i className="fa fa-dot-circle-o"></i> Cancel Deal
+          <Button type="button" id="dealButton" size="md" className="btn btn-outline-danger" onClick={() => this.cancelRequest(request.id)}>
+            <i className="fa fa-remove"></i> Cancel Deal
             </Button>{' '}
         </td>
       </tr>
@@ -264,8 +280,8 @@ class ViewRequestNew extends React.Component {
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}
-            <section className="section section-lg section-shaped">
-              <div className="shape shape-style-1 shape-default">
+            <section className="section section-lg section-shaped bg-gradient-info">
+              {/* <div className="shape shape-style-1 shape-default">
                 <span />
                 <span />
                 <span />
@@ -275,7 +291,7 @@ class ViewRequestNew extends React.Component {
                 <span />
                 <span />
                 <span />
-              </div>
+              </div> */}
               <Container className="py-lg-md d-flex">
                 <div className="col px-0">
                   <Row>
@@ -292,67 +308,107 @@ class ViewRequestNew extends React.Component {
                 </div>
               </Container>
             </section>
-            {/* 1st Hero Variation */}
           </div>
 
-          <section className="section section-lg">
+          <section className="section section-lg mt--200">
             <Container>
-              <h4>Pending request</h4>
-              <Row className="justify-content-center text-center">
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Id</th>
-                      <th>Amount</th>
-                      {/* <th>DueDate</th> */}
-                      <th>CreateDate</th>
-                      <th>Duration</th>
-                      <th>Status</th>
-                      <th>View detail</th>
-                      <th>Delete</th>
-                    </tr>
-                  </thead>
-                  <tbody>{newListItems}</tbody>
-                </Table>
-              </Row>
-              <Row className="align-items-center justify-content-center text-center">
-                <Pagination
-                  maxPage={this.state.newMaxPage}
-                  currentPage={this.state.newPage}
-                  onChange={this.getRequest}
-                  changePage={this.changeNewPage}
-                />
-              </Row>
-            </Container>
-          </section>
-
-          <section className="section section-lg">
-            <Container>
-              <h4>Dealing request</h4>
-              <Row className="justify-content-center text-center">
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Id</th>
-                      <th>Amount</th>
-                      {/* <th>DueDate</th> */}
-                      <th>CreateDate</th>
-                      <th>Duration</th>
-                      <th>Status</th>
-                      <th>View detail</th>
-                      <th>Cancel</th>
-                    </tr>
-                  </thead>
-                  <tbody>{dealingListItems}</tbody>
-                </Table>
-              </Row>
-              <Row className="align-items-center justify-content-center text-center">
-                <Pagination
-                  maxPage={this.state.dealingMaxPage}
-                  currentPage={this.state.dealingPage}
-                  onChange={this.getRequest}
-                  changePage={this.changeDealingPage}
-                />
+              <Row className="justify-content-center">
+                <Col className="mt-5 mt-lg-0" lg="12">
+                  {/* Menu */}
+                  <div className="nav-wrapper">
+                    <Nav
+                      className="nav-fill flex-column flex-md-row"
+                      id="tabs-icons-text"
+                      pills
+                      role="tablist"
+                    >
+                      <NavItem>
+                        <NavLink
+                          aria-selected={this.state.plainTabs === 1}
+                          className={classnames("mb-sm-3 mb-md-0", {
+                            active: this.state.plainTabs === 1
+                          })}
+                          onClick={e => this.toggleNavs(e, "plainTabs", 1)}
+                          href="#pablo"
+                          role="tab"
+                        >
+                          Pending Request
+                  </NavLink>
+                      </NavItem>
+                      <NavItem>
+                        <NavLink
+                          aria-selected={this.state.plainTabs === 2}
+                          className={classnames("mb-sm-3 mb-md-0", {
+                            active: this.state.plainTabs === 2
+                          })}
+                          onClick={e => this.toggleNavs(e, "plainTabs", 2)}
+                          href="#pablo"
+                          role="tab"
+                        >
+                          Dealing Request
+                  </NavLink>
+                      </NavItem>
+                    </Nav>
+                  </div>
+                  <Card className="shadow">
+                    <CardBody>
+                      <TabContent activeTab={"plainTabs" + this.state.plainTabs}>
+                        <TabPane tabId="plainTabs1">
+                          <Row className="justify-content-center text-center">
+                            <Table>
+                              <thead>
+                                <tr>
+                                  <th>Id</th>
+                                  <th>Amount</th>
+                                  <th>CreateDate</th>
+                                  <th>Duration</th>
+                                  <th>Status</th>
+                                  <th>View detail</th>
+                                  <th>Delete</th>
+                                </tr>
+                              </thead>
+                              <tbody>{newListItems}</tbody>
+                            </Table>
+                          </Row>
+                          <Row className="align-items-center justify-content-center text-center">
+                            <Pagination
+                              maxPage={this.state.newMaxPage}
+                              currentPage={this.state.newPage}
+                              onChange={this.getRequest}
+                              changePage={this.changeNewPage}
+                            />
+                          </Row>
+                        </TabPane>
+                        <TabPane tabId="plainTabs2">
+                          <Row className="justify-content-center text-center">
+                            <Table>
+                              <thead>
+                                <tr>
+                                  <th>Id</th>
+                                  <th>Amount</th>
+                                  <th>CreateDate</th>
+                                  <th>Duration</th>
+                                  <th>Status</th>
+                                  <th>View detail</th>
+                                  <th>Cancel</th>
+                                </tr>
+                              </thead>
+                              <tbody>{dealingListItems}</tbody>
+                            </Table>
+                          </Row>
+                          <Row className="align-items-center justify-content-center text-center">
+                            <Pagination
+                              maxPage={this.state.dealingMaxPage}
+                              currentPage={this.state.dealingPage}
+                              onChange={this.getRequest}
+                              changePage={this.changeDealingPage}
+                            />
+                          </Row>
+                        </TabPane>
+                      </TabContent>
+                    </CardBody>
+                  </Card>
+                </Col>
               </Row>
             </Container>
           </section>
@@ -399,6 +455,18 @@ const mapDispatchToProps = dispatch => {
     setIsHistoryDetail: (status) => {
       dispatch({
         type: "SET_IS_HISTORY_DETAIL",
+        payload: status
+      });
+    },
+    setIsLendMany: (status) => {
+      dispatch({
+        type: SET_IS_LEND_MANY,
+        payload: status
+      });
+    },
+    setIsPayMany: (status) => {
+      dispatch({
+        type: SET_IS_PAY_MANY,
         payload: status
       });
     }
