@@ -99,7 +99,8 @@ class Login extends React.Component {
             event.preventDefault();
             // alert(data);
             if (data === "Wrong userId and password")
-              document.getElementById("loginError").innerHTML = "<small>username or password is incorrect<br/> please try again</small>";
+              document.getElementById("loginError").innerHTML = 
+              "<div class='alert alert-danger' role='alert'><strong>Username or password is incorrect!</strong><br/> Please try again!</div>";
           }
         });
       }
@@ -167,7 +168,7 @@ class Login extends React.Component {
                     </CardHeader>
                     <CardBody className="">
                       <div className="text-center text-muted">
-                        <p>sign in here</p>
+                        <p>Sign in here</p>
                       </div>
                       <Form role="form" onSubmit={this.handleSubmit}>
                         <FormGroup className="mb-3">
