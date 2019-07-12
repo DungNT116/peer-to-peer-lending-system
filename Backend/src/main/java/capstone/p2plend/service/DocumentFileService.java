@@ -3,12 +3,12 @@ package capstone.p2plend.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import capstone.p2plend.repo.DocumentImageRepository;
+import capstone.p2plend.repo.DocumentFileRepository;
 
 @Service
-public class DocumentImageService {
+public class DocumentFileService {
 
 	@Autowired
-	DocumentImageRepository docImgRepo;
+	DocumentFileRepository docImgRepo;
 	
 }

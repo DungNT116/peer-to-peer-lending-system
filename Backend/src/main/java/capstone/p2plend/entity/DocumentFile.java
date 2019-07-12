@@ -27,23 +27,29 @@ import capstone.p2plend.enums.DocumentType;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 @Entity
-@Table(name = "DocumentImage")
-public class DocumentImage {
+@Table(name = "DocumentFile")
+public class DocumentFile {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@Lob
-	@Column(name = "image", columnDefinition = "BLOB")
-	private byte[] image;
+	@Column
+	private String fileName;
 
-	@JsonIgnoreProperties(value = { "documentImage" })
+	@Column
+	private String fileType;
+
+	@Lob
+	@Column(name = "data", columnDefinition = "BLOB")
+	private byte[] data;
+
+	@JsonIgnoreProperties(value = { "documentFile" })
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "document_id")
 	private Document document;
 
-	public DocumentImage() {
+	public DocumentFile() {
 	}
 
 	public Integer getId() {
@@ -54,12 +60,28 @@ public class DocumentImage {
 		this.id = id;
 	}
 
-	public byte[] getImage() {
-		return image;
+	public String getFileName() {
+		return fileName;
 	}
 
-	public void setImage(byte[] image) {
-		this.image = image;
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getFileType() {
+		return fileType;
+	}
+
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
+	}
+
+	public byte[] getData() {
+		return data;
+	}
+
+	public void setData(byte[] data) {
+		this.data = data;
 	}
 
 	public Document getDocument() {

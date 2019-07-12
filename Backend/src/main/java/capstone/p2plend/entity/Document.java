@@ -48,7 +48,7 @@ public class Document {
 
 	@JsonIgnoreProperties(value = { "document" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "document")
-	private List<DocumentImage> documentImage = new ArrayList<>();
+	private List<DocumentFile> documentFile = new ArrayList<>();
 
 	public Document() {
 	}
@@ -85,12 +85,12 @@ public class Document {
 		this.user = user;
 	}
 
-	public List<DocumentImage> getDocumentImage() {
-		return documentImage;
+	public List<DocumentFile> getDocumentFile() {
+		return documentFile;
 	}
 
-	public void setDocumentImage(List<DocumentImage> documentImage) {
-		this.documentImage = documentImage;
+	public void setDocumentFile(List<DocumentFile> documentFile) {
+		this.documentFile = documentFile;
 	}
 
 }
