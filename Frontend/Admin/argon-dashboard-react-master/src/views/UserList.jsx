@@ -47,7 +47,6 @@ class Tables extends React.Component {
                       <th scope="col">Last Name</th>
                       <th scope="col">Create Date</th>
                       <th scope="col">Status</th>
-                      <th scope="col">Action</th>
                       <th scope="col" />
                     </tr>
                   </thead>
@@ -69,7 +68,7 @@ class Tables extends React.Component {
                           Active
                         </Badge>
                       </td>
-                      <td>Confirm Id Card</td>
+                      {/* <td>Confirm Id Card</td> */}
                       <td className="text-right">
                         <Button
                           aria-pressed={true}
