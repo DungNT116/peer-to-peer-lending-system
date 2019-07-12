@@ -1,22 +1,30 @@
 import React from "react";
 
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 // reactstrap components
 import {
   Button,
   Container,
   Row,
   Col,
-  Table
+  Table,
+  NavLink,
+  Card,
+  CardBody,
+  TabContent,
+  TabPane,
+  Nav,
+  NavItem
 } from "reactstrap";
 
+import classnames from "classnames";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import Pagination from "../../views/IndexSections/Pagination.jsx";
 
 //api link
-import { apiLink } from '../../api.jsx';
+import { apiLink } from "../../api.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter";
 
 class HistoryRequest extends React.Component {
@@ -27,41 +35,52 @@ class HistoryRequest extends React.Component {
       page: 1,
       pageSize: 5,
       maxPage: 0,
-    }
+      iconTabs: 1,
+      plainTabs: 1
+    };
     this.getRequest = this.getRequest.bind(this);
     this.changePage = this.changePage.bind(this);
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
   }
-
+  toggleNavs = (e, state, index) => {
+    e.preventDefault();
+    this.setState({
+      [state]: index
+    });
+  };
   getRequest() {
     let pageParam = encodeURIComponent(this.state.page);
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
-    fetch(apiLink + "/rest/request/allRequestHistoryDone?page=" + pageParam + "&element=" + pageSizeParam, {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": localStorage.getItem("token")
-        // "Authorization": this.props.tokenReducer.token
-        // 'Access-Control-Allow-Origin': '*'
-      },
-    }).then(
-      (result) => { 
-        if (result.status === 200) {
-          // alert("create success");
-          result.json().then((data) => {
-            this.setState({
-              historyRequests: data.data,
-              maxPage: data.maxPage
-            });
-          })
-        } else if(result.status === 401) {
-          localStorage.removeItem("isLoggedIn");
-          this.props.history.push('/login-page')
+    fetch(
+      apiLink +
+        "/rest/request/allRequestHistoryDone?page=" +
+        pageParam +
+        "&element=" +
+        pageSizeParam,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token")
+          // "Authorization": this.props.tokenReducer.token
+          // 'Access-Control-Allow-Origin': '*'
         }
-
       }
-    )
+    ).then(result => {
+      if (result.status === 200) {
+        // alert("create success");
+        result.json().then(data => {
+          this.setState({
+            historyRequests: data.data,
+            maxPage: data.maxPage
+          });
+        });
+      } else if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login-page");
+      }
+    });
     // event.preventDefault();
     // this.props.history.push('/')
   }
@@ -83,7 +102,7 @@ class HistoryRequest extends React.Component {
   changePage(index) {
     this.setState({
       page: index
-    })
+    });
   }
 
   componentDidMount() {
@@ -93,11 +112,13 @@ class HistoryRequest extends React.Component {
     this.getRequest();
   }
   render() {
-    const listItems = this.state.historyRequests.map((request) =>
+    const listItems = this.state.historyRequests.map(request => (
       <tr>
-        <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
-          {request.id}
-        </Col></td>
+        <td>
+          <Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
+            {request.id}
+          </Col>
+        </td>
         <td>{request.amount} VND</td>
         {/* <td>{request.dueDate}</td> */}
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
@@ -105,13 +126,19 @@ class HistoryRequest extends React.Component {
         <td>{request.status}</td>
         <td>
           <Link to="/view-detail-request">
-            <Button type="button" id="dealButton" size="md" className="btn btn-outline-primary" onClick={() => this.setDataToDetailPage(request)}>
-               View Detail
-            </Button>{' '}
+            <Button
+              type="button"
+              id="dealButton"
+              size="md"
+              className="btn btn-outline-primary"
+              onClick={() => this.setDataToDetailPage(request)}
+            >
+              View Detail
+            </Button>{" "}
           </Link>
         </td>
       </tr>
-    );
+    ));
     return (
       <>
         <DemoNavbar />
@@ -139,7 +166,8 @@ class HistoryRequest extends React.Component {
                         <span>View your own history request</span>
                       </h1>
                       <p className="lead text-white">
-                        View borrow request more easier. Every where, every times, ...
+                        View borrow request more easier. Every where, every
+                        times, ...
                       </p>
                     </Col>
                   </Row>
@@ -149,31 +177,62 @@ class HistoryRequest extends React.Component {
             {/* 1st Hero Variation */}
           </div>
 
-
-          <section className="section section-lg">
+          <section className="section section-lg mt--200">
             <Container>
-              <Row className="justify-content-center text-center">
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Id</th>
-                      <th>Amount</th>
-                      {/* <th>DueDate</th> */}
-                      <th>CreateDate</th>
-                      <th>Duration</th>
-                      <th>status</th>
-                      <th>detail</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {listItems}
-                  </tbody>
-                </Table>
-              </Row>
-              <Row className="align-items-center justify-content-center text-center">
-                <Pagination maxPage={this.state.maxPage} currentPage={this.state.page}
-                  onChange={this.getRequest} changePage={this.changePage} />
-              </Row>
+              <div className="nav-wrapper">
+                <Nav
+                  className="nav-fill flex-column flex-md-row"
+                  id="tabs-icons-text"
+                  pills
+                  role="tablist"
+                >
+                  <NavItem>
+                    <NavLink
+                      aria-selected={this.state.plainTabs === 1}
+                      className={classnames("mb-sm-6 mb-md-0", {
+                        active: this.state.plainTabs === 1
+                      })}
+                      onClick={e => this.toggleNavs(e, "plainTabs", 1)}
+                      href="#pablo"
+                      role="tab"
+                    >
+                      History Request
+                    </NavLink>
+                  </NavItem>
+                </Nav>
+              </div>
+              <Card className="shadow">
+                <CardBody>
+                  <TabContent activeTab={"plainTabs" + this.state.plainTabs}>
+                    <TabPane tabId="plainTabs1">
+                      <Row className="justify-content-center text-center">
+                        <Table>
+                          <thead>
+                            <tr>
+                              <th>Id</th>
+                              <th>Amount</th>
+                              {/* <th>DueDate</th> */}
+                              <th>CreateDate</th>
+                              <th>Duration</th>
+                              <th>status</th>
+                              <th>detail</th>
+                            </tr>
+                          </thead>
+                          <tbody>{listItems}</tbody>
+                        </Table>
+                      </Row>
+                      <Row className="align-items-center justify-content-center text-center">
+                        <Pagination
+                          maxPage={this.state.maxPage}
+                          currentPage={this.state.page}
+                          onChange={this.getRequest}
+                          changePage={this.changePage}
+                        />
+                      </Row>
+                    </TabPane>
+                  </TabContent>
+                </CardBody>
+              </Card>
             </Container>
           </section>
         </main>
@@ -183,46 +242,48 @@ class HistoryRequest extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
-    request: state.request,
-  }
-}
-const mapDispatchToProps = (dispatch) => {
+    request: state.request
+  };
+};
+const mapDispatchToProps = dispatch => {
   return {
-    setRequest: (id) => {
+    setRequest: id => {
       dispatch({
         type: "SET_REQUEST",
         payload: id
       });
     },
-    setIsTrading: (status) => {
+    setIsTrading: status => {
       dispatch({
         type: "SET_IS_TRADING",
         payload: status
       });
     },
-    setIsViewDetail: (status) => {
+    setIsViewDetail: status => {
       dispatch({
         type: "SET_IS_VIEWDETAIL",
         payload: status
       });
     },
-    setIsHistory: (status) => {
+    setIsHistory: status => {
       dispatch({
         type: "SET_IS_HISTORY",
         payload: status
       });
     },
-    setIsHistoryDetail: (status) => {
+    setIsHistoryDetail: status => {
       dispatch({
         type: "SET_IS_HISTORY_DETAIL",
         payload: status
       });
     }
-    
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(HistoryRequest);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HistoryRequest);
 // export default HistoryRequest;

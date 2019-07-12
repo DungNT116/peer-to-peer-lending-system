@@ -2,7 +2,20 @@ import React from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 // reactstrap components
-import { Button, Container, Row, Col, Table, NavLink, Card, CardBody, TabContent, TabPane, Nav, NavItem } from "reactstrap";
+import {
+  Button,
+  Container,
+  Row,
+  Col,
+  Table,
+  NavLink,
+  Card,
+  CardBody,
+  TabContent,
+  TabPane,
+  Nav,
+  NavItem
+} from "reactstrap";
 import classnames from "classnames";
 
 // core components
@@ -102,10 +115,10 @@ class ViewRequestNew extends React.Component {
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
     fetch(
       apiLink +
-      "/rest/request/allRequestHistoryPending?page=" +
-      newPageParam +
-      "&element=" +
-      pageSizeParam,
+        "/rest/request/allRequestHistoryPending?page=" +
+        newPageParam +
+        "&element=" +
+        pageSizeParam,
       {
         method: "GET",
         headers: {
@@ -132,10 +145,10 @@ class ViewRequestNew extends React.Component {
 
     fetch(
       apiLink +
-      "/rest/request/all_request_dealing_by_borrower_or_lender?page=" +
-      dealingPageParam +
-      "&element=" +
-      pageSizeParam,
+        "/rest/request/all_request_dealing_by_borrower_or_lender?page=" +
+        dealingPageParam +
+        "&element=" +
+        pageSizeParam,
       {
         method: "GET",
         headers: {
@@ -202,7 +215,6 @@ class ViewRequestNew extends React.Component {
     this.getRequest();
   }
   render() {
-
     console.log(this.state.newRequests);
     const newListItems = this.state.newRequests.map(request => (
       <tr>
@@ -224,7 +236,7 @@ class ViewRequestNew extends React.Component {
               className="btn btn-outline-primary"
               onClick={() => this.setDataToDetailPage(request, "pending")}
             >
-               View Detail
+              View Detail
             </Button>{" "}
           </Link>
         </td>
@@ -263,14 +275,20 @@ class ViewRequestNew extends React.Component {
               // color="primary"
               onClick={() => this.setDataToDetailPage(request, "dealing")}
             >
-               View Detail
+              View Detail
             </Button>{" "}
           </Link>
         </td>
         <td>
-          <Button type="button" id="dealButton" size="md" className="btn btn-outline-danger" onClick={() => this.cancelRequest(request.id)}>
-            <i className="fa fa-remove"></i> Cancel Deal
-            </Button>{' '}
+          <Button
+            type="button"
+            id="dealButton"
+            size="md"
+            className="btn btn-outline-danger"
+            onClick={() => this.cancelRequest(request.id)}
+          >
+            <i className="fa fa-remove" /> Cancel Deal
+          </Button>{" "}
         </td>
       </tr>
     ));
@@ -333,7 +351,7 @@ class ViewRequestNew extends React.Component {
                           role="tab"
                         >
                           Pending Request
-                  </NavLink>
+                        </NavLink>
                       </NavItem>
                       <NavItem>
                         <NavLink
@@ -346,13 +364,15 @@ class ViewRequestNew extends React.Component {
                           role="tab"
                         >
                           Dealing Request
-                  </NavLink>
+                        </NavLink>
                       </NavItem>
                     </Nav>
                   </div>
                   <Card className="shadow">
                     <CardBody>
-                      <TabContent activeTab={"plainTabs" + this.state.plainTabs}>
+                      <TabContent
+                        activeTab={"plainTabs" + this.state.plainTabs}
+                      >
                         <TabPane tabId="plainTabs1">
                           <Row className="justify-content-center text-center">
                             <Table>
@@ -428,43 +448,43 @@ const mapStateToProps = state => {
 };
 const mapDispatchToProps = dispatch => {
   return {
-    setRequest: (id) => {
+    setRequest: id => {
       dispatch({
         type: "SET_REQUEST",
         payload: id
       });
     },
-    setIsTrading: (status) => {
+    setIsTrading: status => {
       dispatch({
         type: "SET_IS_TRADING",
         payload: status
       });
     },
-    setIsViewDetail: (status) => {
+    setIsViewDetail: status => {
       dispatch({
         type: "SET_IS_VIEWDETAIL",
         payload: status
       });
     },
-    setIsHistory: (status) => {
+    setIsHistory: status => {
       dispatch({
         type: "SET_IS_HISTORY",
         payload: status
       });
     },
-    setIsHistoryDetail: (status) => {
+    setIsHistoryDetail: status => {
       dispatch({
         type: "SET_IS_HISTORY_DETAIL",
         payload: status
       });
     },
-    setIsLendMany: (status) => {
+    setIsLendMany: status => {
       dispatch({
         type: SET_IS_LEND_MANY,
         payload: status
       });
     },
-    setIsPayMany: (status) => {
+    setIsPayMany: status => {
       dispatch({
         type: SET_IS_PAY_MANY,
         payload: status

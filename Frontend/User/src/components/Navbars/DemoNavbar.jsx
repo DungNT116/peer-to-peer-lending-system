@@ -67,14 +67,17 @@ class DemoNavbar extends React.Component {
             id="navbar-main"
           >
             <Container>
-              <NavbarBrand className="mr-lg-5" to={(() => {
+              <NavbarBrand
+                className="mr-lg-5"
+                to={(() => {
                   if (localStorage.getItem("isLoggedIn")) {
                     return "/view-new-request";
                   } else {
                     return "/";
                   }
-                })()} 
-                tag={Link}>
+                })()}
+                tag={Link}
+              >
                 <img
                   alt="..."
                   src={require("assets/img/brand/logo-white.png")}
@@ -168,8 +171,8 @@ class DemoNavbar extends React.Component {
                     </DropdownMenu>
                   </UncontrolledDropdown> */}
                   {/* {(this.state.isLoggedIn) ? */}
-                  {(localStorage.getItem("isLoggedIn")) ?
-                  // {this.state.isLoggedIn ? (
+                  {localStorage.getItem("isLoggedIn") ? (
+                    // {this.state.isLoggedIn ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
                         <i className="ni ni-collection d-lg-none mr-1" />
@@ -182,16 +185,15 @@ class DemoNavbar extends React.Component {
                         <DropdownItem to="/view-history-request" tag={Link}>
                           View History Request
                         </DropdownItem>
-                        <DropdownItem to="/view-new-request" tag={Link}>
-                          View New Request
-                        </DropdownItem>
                         <DropdownItem to="/view-request-trading" tag={Link}>
                           View Request Trading
                         </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>
-                    : ""}
-                  {(localStorage.getItem("isLoggedIn")) ?
+                  ) : (
+                    ""
+                  )}
+                  {localStorage.getItem("isLoggedIn") ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
                         <i className="ni ni-collection d-lg-none mr-1" />
@@ -203,12 +205,33 @@ class DemoNavbar extends React.Component {
                         </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>
-                    : ""}
+                  ) : (
+                    ""
+                  )}
+                  {localStorage.getItem("isLoggedIn") ? (
+                    <UncontrolledDropdown nav>
+                      <DropdownToggle nav>
+                        <i className="ni ni-collection d-lg-none mr-1" />
+                        <span className="nav-link-inner--text">
+                          My Requests
+                        </span>
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        <DropdownItem to="/view-new-request" tag={Link}>
+                          View Own Request
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </UncontrolledDropdown>
+                  ) : (
+                    ""
+                  )}
                 </Nav>
-                <Nav className="align-items-lg-center navbar-nav-hover ml-lg-auto" navbar>
+                <Nav
+                  className="align-items-lg-center navbar-nav-hover ml-lg-auto"
+                  navbar
+                >
                   <NavItem className="d-none d-lg-block ml-lg-4">
-                    {(localStorage.getItem("isLoggedIn")) ?
-                    (
+                    {localStorage.getItem("isLoggedIn") ? (
                       ""
                     ) : (
                       <Button
@@ -219,13 +242,10 @@ class DemoNavbar extends React.Component {
                         <span className="btn-inner--icon">
                           <i className="fa fa-user mr-2" />
                         </span>
-                        <span className="nav-link-inner--text ml-1">
-                          Login
-                    </span>
+                        <span className="nav-link-inner--text ml-1">Login</span>
                       </Button>
                     )}
-                    {(localStorage.getItem("isLoggedIn")) ?
-                    (
+                    {localStorage.getItem("isLoggedIn") ? (
                       ""
                     ) : (
                       <Button
@@ -238,10 +258,10 @@ class DemoNavbar extends React.Component {
                         </span>
                         <span className="nav-link-inner--text ml-1">
                           register
-                    </span>
+                        </span>
                       </Button>
                     )}
-                    {(localStorage.getItem("isLoggedIn")) ? (
+                    {localStorage.getItem("isLoggedIn") ? (
                       <UncontrolledDropdown nav>
                         <DropdownToggle nav>
                           <Media className="align-items-center">
