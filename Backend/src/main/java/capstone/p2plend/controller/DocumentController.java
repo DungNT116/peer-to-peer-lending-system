@@ -70,4 +70,19 @@ public class DocumentController {
 		return status.value();
 	}
 	
+	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN" })
+	@GetMapping("/rest/admin/document/getAllUnvalidDocument")
+	public ResponseEntity<List<Document>> getAllUnvalidDocument() {
+		HttpStatus httpStatus = null;
+		List<Document> result = null;
+		try {
+			result = docService.getAllUnvalidDocument();
+			httpStatus = HttpStatus.OK;
+		} catch (Exception e) {
+			httpStatus = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<List<Document>>(result, httpStatus);
+	}
 }

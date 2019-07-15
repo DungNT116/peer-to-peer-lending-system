@@ -117,5 +117,20 @@ public class DocumentService {
 			return false;
 		}
 	}
+	
+	public List<Document> getAllUnvalidDocument(){
+		try {
+			
+			List<Document> lstDoc = docRepo.findAllNullDocument();
+			for(Document d : lstDoc) {
+				d.setUser(null);
+			}
+			
+			return lstDoc;
+			
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 }
