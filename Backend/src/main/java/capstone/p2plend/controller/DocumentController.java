@@ -58,4 +58,19 @@ public class DocumentController {
 		return new ResponseEntity<List<Document>>(result, httpStatus);
 	}
 
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN" })
+	@PostMapping("/rest/admin/document/validDocument")
+	public Integer validDocument(@RequestBody Document document) {
+		HttpStatus status = null;
+		boolean valid = false;
+		valid = docService.validDocumentId(document);
+		if (valid == true) {
+			status = HttpStatus.OK;
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return status.value();
+	}
+	
 }
