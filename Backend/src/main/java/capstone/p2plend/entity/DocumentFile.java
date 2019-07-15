@@ -1,5 +1,6 @@
 package capstone.p2plend.entity;
 
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +41,7 @@ public class DocumentFile {
 	@Column
 	private String fileType;
 
-	@Lob
-	@Column(name = "data", columnDefinition = "BLOB")
+	@Column(columnDefinition = "LONGBLOB")
 	private byte[] data;
 
 	@JsonIgnoreProperties(value = { "documentFile" })

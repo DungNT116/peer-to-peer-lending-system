@@ -34,12 +34,12 @@ public class Document {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
+	@JsonInclude(JsonInclude.Include.ALWAYS)
 	@Column
 	private String documentId;
 
-	@Enumerated(EnumType.STRING)
 	@Column
-	private DocumentType documentType;
+	private String documentType;
 
 	@JsonIgnoreProperties(value = { "document" })
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -69,11 +69,11 @@ public class Document {
 		this.documentId = documentId;
 	}
 
-	public DocumentType getDocumentType() {
+	public String getDocumentType() {
 		return documentType;
 	}
 
-	public void setDocumentType(DocumentType documentType) {
+	public void setDocumentType(String documentType) {
 		this.documentType = documentType;
 	}
 

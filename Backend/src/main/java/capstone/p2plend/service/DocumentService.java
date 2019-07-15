@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.DocumentFile;
 import capstone.p2plend.entity.User;
+import capstone.p2plend.enums.DocumentType;
 import capstone.p2plend.repo.DocumentFileRepository;
 import capstone.p2plend.repo.DocumentRepository;
 import capstone.p2plend.repo.UserRepository;
@@ -23,35 +24,49 @@ public class DocumentService {
 
 	@Autowired
 	DocumentFileRepository docFileRepo;
-
+	
 	@Autowired
 	JwtService jwtService;
 
 	@Autowired
 	UserRepository userRepo;
 
-	public boolean uploadDocument(Document document, String token, MultipartFile[] mf) {
+	public boolean uploadDocument(String documentType, String token, MultipartFile[] mf) {
 		try {
 			String username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
-			if (document.getDocumentType() == null) {
+			if (documentType == null) {
 				return false;
 			}
-			document.setUser(user);
-			Document savedDoc = docRepo.saveAndFlush(document);
+			Document iDoc = new Document();
+			DocumentType dt = DocumentType.valueOf(documentType.toUpperCase());			
+			switch (dt) {
+			case ID:
+				iDoc.setDocumentType("Identity Card");
+				break;
+			case PASSPORT:
+				iDoc.setDocumentType("Passport");
+				break;
+			case DRIVINGlICENCE:
+				iDoc.setDocumentType("Driving Licence");
+				break;
+			default:
+				return false;
+			}			
+			iDoc.setUser(user);
+			Document savedDoc = docRepo.saveAndFlush(iDoc);
 
 			int totalFile = mf.length;
-			List<DocumentFile> lstDocImg = new ArrayList<>();
 			for (int i = 0; i < totalFile; i++) {
 
-//				String fileName = StringUtils.cleanPath(mf[i].getOriginalFilename());
+				String fileName = StringUtils.cleanPath(mf[i].getOriginalFilename());
 //				if (fileName.contains("..")) {
 //					return false;
 ////		                throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
 //				}
 				DocumentFile df = new DocumentFile();
-//				df.setFileName(fileName);
-//				df.setFileType(mf[i].getContentType());
+				df.setFileName(fileName);
+				df.setFileType(mf[i].getContentType());
 				df.setData(mf[i].getBytes());
 				df.setDocument(savedDoc);
 				docFileRepo.saveAndFlush(df);
@@ -62,6 +77,21 @@ public class DocumentService {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+	
+	public List<Document> getUserDocument(String token) {
+		try {
+			String username = jwtService.getUsernameFromToken(token);
+			User user = userRepo.findByUsername(username);
+			List<Document> lstDoc = user.getDocument();
+			for(Document d : lstDoc) {
+				d.setUser(null);
+			}
+			return lstDoc;
+		} catch (Exception e) {
+			return null;
+		}
+		
 	}
 
 	public boolean validDocumentId(Document document) {

@@ -1,11 +1,14 @@
 package capstone.p2plend.controller;
 
+import java.util.List;
+
 import org.apache.tomcat.util.http.fileupload.UploadContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,11 +30,11 @@ public class DocumentController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping("/rest/document/uploadFile")
-	public Integer uploadFile(@RequestBody Document document, @RequestHeader("Authorization") String token,
-			@RequestPart("file") MultipartFile[] file) {
+	public Integer uploadFile(@RequestParam("documentType") String documentType,
+			@RequestHeader("Authorization") String token, @RequestParam("file") MultipartFile[] file) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = docService.uploadDocument(document, token, file);
+		valid = docService.uploadDocument(documentType, token, file);
 		if (valid == true) {
 			status = HttpStatus.OK;
 		} else {
@@ -40,6 +43,19 @@ public class DocumentController {
 		return status.value();
 	}
 
-	
-	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping("/rest/document/getUserDocument")
+	public ResponseEntity<List<Document>> getUserDocument(@RequestHeader("Authorization") String token) {
+		HttpStatus httpStatus = null;
+		List<Document> result = null;
+		try {
+			result = docService.getUserDocument(token);
+			httpStatus = HttpStatus.OK;
+		} catch (Exception e) {
+			httpStatus = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<List<Document>>(result, httpStatus);
+	}
+
 }
