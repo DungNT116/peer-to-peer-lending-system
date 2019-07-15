@@ -24,7 +24,7 @@ public class DocumentService {
 
 	@Autowired
 	DocumentFileRepository docFileRepo;
-	
+
 	@Autowired
 	JwtService jwtService;
 
@@ -39,20 +39,20 @@ public class DocumentService {
 				return false;
 			}
 			Document iDoc = new Document();
-			DocumentType dt = DocumentType.valueOf(documentType.toUpperCase());			
+			DocumentType dt = DocumentType.valueOf(documentType.toUpperCase());
 			switch (dt) {
 			case ID:
 				iDoc.setDocumentType("Identity Card");
 				break;
-			case PASSPORT:
+			case PP:
 				iDoc.setDocumentType("Passport");
 				break;
-			case DRIVINGlICENCE:
+			case DL:
 				iDoc.setDocumentType("Driving Licence");
 				break;
 			default:
 				return false;
-			}			
+			}
 			iDoc.setUser(user);
 			Document savedDoc = docRepo.saveAndFlush(iDoc);
 
@@ -78,20 +78,20 @@ public class DocumentService {
 			return false;
 		}
 	}
-	
+
 	public List<Document> getUserDocument(String token) {
 		try {
 			String username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
 			List<Document> lstDoc = user.getDocument();
-			for(Document d : lstDoc) {
+			for (Document d : lstDoc) {
 				d.setUser(null);
 			}
 			return lstDoc;
 		} catch (Exception e) {
 			return null;
 		}
-		
+
 	}
 
 	public boolean validDocumentId(Document document) {
@@ -101,9 +101,18 @@ public class DocumentService {
 				return false;
 			}
 
+			//Receive document with id and docId
+			Document findDoc = docRepo.findByDocumentIdAndDocumentType(document.getDocumentId(),
+					docRepo.findById(document.getId()).get().getDocumentType());
+			
+			if(findDoc != null) {
+				return false;
+			}
+
 			Document existDoc = docRepo.findById(document.getId()).get();
 			existDoc.setDocumentId(document.getDocumentId());
-
+			docRepo.saveAndFlush(existDoc);
+			
 			return true;
 		} catch (Exception e) {
 			return false;
