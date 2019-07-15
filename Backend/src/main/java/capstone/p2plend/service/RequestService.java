@@ -2,7 +2,6 @@ package capstone.p2plend.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.BackingStoreException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

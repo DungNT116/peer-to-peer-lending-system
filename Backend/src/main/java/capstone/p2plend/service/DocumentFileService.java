@@ -1,17 +1,11 @@
 package capstone.p2plend.service;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.DocumentFile;
-import capstone.p2plend.entity.User;
 import capstone.p2plend.repo.DocumentFileRepository;
 
 @Service

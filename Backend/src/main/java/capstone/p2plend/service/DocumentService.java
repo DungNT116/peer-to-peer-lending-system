@@ -1,6 +1,5 @@
 package capstone.p2plend.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
