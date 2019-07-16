@@ -119,11 +119,11 @@ public class UserController {
 
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
-	@PutMapping(value = "/rest/user/activeUser")
-	public Integer approveAccount(@RequestBody User user) {
+	@PutMapping(value = "/rest/admin/user/activateUser")
+	public Integer activateAccount(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = userService.activeAccount(user.getId());
+		valid = userService.activateAccount(user.getId());
 		if (valid == true) {
 			status = HttpStatus.OK;
 		} else {
@@ -151,7 +151,7 @@ public class UserController {
 	
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
-	@PutMapping(value = "/rest/user/approveUser")
+	@PutMapping(value = "/rest/admin/user/deactivateUser")
 	public Integer deactivateAccount(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
@@ -166,8 +166,8 @@ public class UserController {
 	}
 	
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/user/users")
+	@Secured({ "ROLE_ADMIN" })
+	@GetMapping(value = "/rest/admin/user/getUsers")
 	public PageDTO<User> listUser(@RequestParam Integer page, @RequestParam Integer element) {
 		return userService.getUsers(page, element);
 	}

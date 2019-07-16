@@ -31,13 +31,13 @@ public class UserService {
 			String username = null;
 			username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
-			if(user != null) {
+			if (user != null) {
 				return username;
 			}
 			return "";
 		} catch (Exception e) {
 			return "";
-		}		
+		}
 	}
 
 	public User getOneById(int id) {
@@ -100,7 +100,7 @@ public class UserService {
 		return "Account successfully created";
 	}
 
-	public boolean activeAccount(int id) {
+	public boolean activateAccount(int id) {
 		boolean valid = false;
 		try {
 			User account = userRepo.findById(id).get();
@@ -146,12 +146,15 @@ public class UserService {
 		Page<User> allUsers = userRepo.findAll(pageable);
 		List<User> userList = new ArrayList<>();
 		for (User u : allUsers) {
-			User user = new User();
-			user.setId(u.getId());
-			user.setUsername(u.getUsername());
-			user.setFirstName(u.getFirstName());
-			user.setLastName(u.getLastName());
-			userList.add(user);
+			if (!u.getRole().equals("ROLE_ADMIN")) {
+				User user = new User();
+				user.setId(u.getId());
+				user.setUsername(u.getUsername());
+				user.setFirstName(u.getFirstName());
+				user.setLastName(u.getLastName());
+				user.setStatus(u.getStatus());
+				userList.add(user);
+			}
 		}
 		PageDTO<User> pageDTO = new PageDTO<>();
 		pageDTO.setMaxPage(allUsers.getTotalPages());
