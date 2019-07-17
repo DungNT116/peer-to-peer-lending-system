@@ -23,7 +23,7 @@ class AdminNavbar extends React.Component {
         >
           <Container className="px-4">
             <NavbarBrand to="/" tag={Link}>
-              <img alt="..." src={require("assets/img/brand/argon-react-white.png")} />
+              <img alt="..." src={require("assets/img/brand/logo-white.png")} />
             </NavbarBrand>
             <button className="navbar-toggler" id="navbar-collapse-main">
               <span className="navbar-toggler-icon" />
@@ -35,7 +35,7 @@ class AdminNavbar extends React.Component {
                     <Link to="/">
                       <img
                         alt="..."
-                        src={require("assets/img/brand/argon-react.png")}
+                        src={require("assets/img/brand/logo-white.png")}
                       />
                     </Link>
                   </Col>
@@ -51,7 +51,7 @@ class AdminNavbar extends React.Component {
                 </Row>
               </div>
               <Nav className="ml-auto" navbar>
-                <NavItem>
+                {/* <NavItem>
                   <NavLink className="nav-link-icon" to="/" tag={Link}>
                     <i className="ni ni-planet" />
                     <span className="nav-link-inner--text">Dashboard</span>
@@ -66,8 +66,8 @@ class AdminNavbar extends React.Component {
                     <i className="ni ni-circle-08" />
                     <span className="nav-link-inner--text">Register</span>
                   </NavLink>
-                </NavItem>
-                <NavItem>
+                </NavItem> */}
+                {/* <NavItem>
                   <NavLink
                     className="nav-link-icon"
                     to="/auth/login"
@@ -76,8 +76,8 @@ class AdminNavbar extends React.Component {
                     <i className="ni ni-key-25" />
                     <span className="nav-link-inner--text">Login</span>
                   </NavLink>
-                </NavItem>
-                <NavItem>
+                </NavItem> */}
+                {/* <NavItem>
                   <NavLink
                     className="nav-link-icon"
                     to="/admin/user-profile"
@@ -86,7 +86,7 @@ class AdminNavbar extends React.Component {
                     <i className="ni ni-single-02" />
                     <span className="nav-link-inner--text">Profile</span>
                   </NavLink>
-                </NavItem>
+                </NavItem> */}
               </Nav>
             </UncontrolledCollapse>
           </Container>
