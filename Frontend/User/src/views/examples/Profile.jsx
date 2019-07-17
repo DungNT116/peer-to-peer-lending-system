@@ -243,15 +243,15 @@ class Profile extends React.Component {
                               <FormGroup>
                                 <label
                                   className="form-control-label"
-                                  htmlFor="input-username"
+                                  htmlFor="input-phonenumber"
                                 >
-                                  Username
+                                  Phone Number
                                 </label>
+                                <p>{this.state.phoneNumber}</p>
                                 <Input
                                   className="form-control-alternative"
-                                  value={this.state.username}
-                                  id="input-username"
-                                  placeholder="Username"
+                                  value={this.state.phoneNumber}
+                                  id="input-phonenumber"
                                   type="text"
                                 />
                               </FormGroup>
@@ -264,11 +264,11 @@ class Profile extends React.Component {
                                 >
                                   Email address
                                 </label>
+                                <p>{this.state.email}</p>
                                 <Input
                                   className="form-control-alternative"
                                   value={this.state.email}
                                   id="input-email"
-                                  placeholder="jesse@example.com"
                                   type="email"
                                 />
                               </FormGroup>
@@ -283,6 +283,7 @@ class Profile extends React.Component {
                                 >
                                   First name
                                 </label>
+                                <p>{this.state.firstName}</p>
                                 <Input
                                   className="form-control-alternative"
                                   value={this.state.firstName}
@@ -300,6 +301,7 @@ class Profile extends React.Component {
                                 >
                                   Last name
                                 </label>
+                                <p>{this.state.lastName}</p>
                                 <Input
                                   className="form-control-alternative"
                                   value={this.state.lastName}
@@ -312,91 +314,12 @@ class Profile extends React.Component {
                           </Row>
                         </div>
                         <hr className="my-4" />
-                        {/* Address */}
-                        <h6 className="heading-small text-muted mb-4">
-                          Contact information
-                        </h6>
-                        <div className="pl-lg-4">
-                          <Row>
-                            <Col md="12">
-                              <FormGroup>
-                                <label
-                                  className="form-control-label"
-                                  htmlFor="input-address"
-                                >
-                                  Address
-                                </label>
-                                <Input
-                                  className="form-control-alternative"
-                                  defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                                  id="input-address"
-                                  placeholder="Home Address"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col lg="4">
-                              <FormGroup>
-                                <label
-                                  className="form-control-label"
-                                  htmlFor="input-city"
-                                >
-                                  City
-                                </label>
-                                <Input
-                                  className="form-control-alternative"
-                                  defaultValue="New York"
-                                  id="input-city"
-                                  placeholder="City"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col lg="4">
-                              <FormGroup>
-                                <label
-                                  className="form-control-label"
-                                  htmlFor="input-country"
-                                >
-                                  Country
-                                </label>
-                                <Input
-                                  className="form-control-alternative"
-                                  defaultValue="United States"
-                                  id="input-country"
-                                  placeholder="Country"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col lg="4">
-                              <FormGroup>
-                                <label
-                                  className="form-control-label"
-                                  htmlFor="input-country"
-                                >
-                                  Postal code
-                                </label>
-                                <Input
-                                  className="form-control-alternative"
-                                  id="input-postal-code"
-                                  placeholder="Postal code"
-                                  type="number"
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                        </div>
-                        <hr className="my-4" />
                         {/* Description */}
                         <h6 className="heading-small text-muted mb-4">
                           About me
                         </h6>
                         <div className="pl-lg-4">
                           <FormGroup>
-                            <label>About Me</label>
                             <Input
                               className="form-control-alternative"
                               placeholder="A few words about you ..."

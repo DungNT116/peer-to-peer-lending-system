@@ -33,13 +33,13 @@ class ViewDetailRequest extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      saveDealModal: false,
       modal: false,
       timeout: 300,
       editable: false,
       createDay: "",
       dueDay: "",
       borrowDuration: "",
-      typeOfContact: "",
       dbDataLendingTimeline: [],
       dbDataPayBackTimeline: [],
       isTrading: false,
@@ -51,14 +51,13 @@ class ViewDetailRequest extends React.Component {
       isLendMany: false,
       isPayMany: false
     };
-
     this.toggleModal = this.toggleModal.bind(this);
+    this.toggleSaveDealModal = this.toggleSaveDealModal.bind(this);
     this.makeDeal = this.makeDeal.bind(this);
     this.saveDeal = this.saveDeal.bind(this);
     this.onCreateDayChange = this.onCreateDayChange.bind(this);
     this.onDueDayChange = this.onDueDayChange.bind(this);
     this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
-    this.onTypeOfContactChange = this.onTypeOfContactChange.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.handleDataTimeline = this.handleDataTimeline.bind(this);
     this.changeMilestoneToTimelineData = this.changeMilestoneToTimelineData.bind(
@@ -74,6 +73,12 @@ class ViewDetailRequest extends React.Component {
     this.saveTransaction = this.saveTransaction.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
     this.goToViewRequestTrading = this.goToViewRequestTrading.bind(this);
+  }
+
+  toggleSaveDealModal() {
+    this.setState({
+      saveDealModal: !this.state.saveDealModal
+    })
   }
 
   goToViewRequestTrading() {
@@ -433,6 +438,9 @@ class ViewDetailRequest extends React.Component {
   }
 
   saveDeal() {
+    //hide save deal modal
+    this.toggleSaveDealModal();
+
     //set UI timeline
     this.props.setIsHistory(true);
 
@@ -483,12 +491,6 @@ class ViewDetailRequest extends React.Component {
     var text = event.target[index].innerText.split(" ")[0];
     this.setState({
       borrowDuration: text
-    });
-  }
-
-  onTypeOfContactChange(event) {
-    this.setState({
-      typeOfContact: event.target.value
     });
   }
 
@@ -753,7 +755,7 @@ class ViewDetailRequest extends React.Component {
                                   id="saveDealButton"
                                   size="md"
                                   className="btn btn-outline-primary"
-                                  onClick={() => this.saveDeal()}
+                                  onClick={this.toggleSaveDealModal}
                                   disabled={!this.state.editable}
                                 >
                                   <i className="ni ni-cloud-download-95" /> Save Deal
@@ -769,6 +771,35 @@ class ViewDetailRequest extends React.Component {
                                   <i className="ni ni-check-bold" /> Accept
                               </Button>{" "}
                               </CardFooter>
+                              {/* save deal */}
+                              <Modal
+                                isOpen={this.state.saveDealModal}
+                                toggle={this.toggleSaveDealModal}
+                                className={this.props.className}
+                              >
+                                <ModalHeader toggle={this.toggleSaveDealModal}>
+                                  Xac Nhan yeu cau vay muon
+                              </ModalHeader>
+                                <ModalBody>
+                                  Ban co chac chan se chap nhan yeu cau nay khong
+                              </ModalBody>
+                                <ModalFooter>
+                                  <Button
+                                    color="primary"
+                                    onClick={() => this.saveDeal()}
+                                  >
+                                    Yes
+                                </Button>{" "}
+                                  <Button
+                                    color="secondary"
+                                    onClick={this.toggleSaveDealModal}
+                                  >
+                                    Cancel
+                                </Button>
+                                </ModalFooter>
+                              </Modal>
+
+                              {/* accept modal */}
                               <Modal
                                 isOpen={this.state.modal}
                                 toggle={this.toggleModal}

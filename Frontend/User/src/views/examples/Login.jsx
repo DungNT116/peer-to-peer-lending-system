@@ -113,7 +113,7 @@ class Login extends React.Component {
   componentWillMount() {
     // console.log(localStorage.getItem("isLoggedIn"))
     //isLoggedIn = true go back to homepage (prevent go to login page when isLoggedIn = true)
-    if(localStorage.getItem("isLoggedIn") === null && localStorage.getItem("token") === null) {
+    if(localStorage.getItem("isLoggedIn") !== null && localStorage.getItem("token") !== null) {
       this.props.history.push("/")
     } else {
       // localStorage.removeItem("token");
