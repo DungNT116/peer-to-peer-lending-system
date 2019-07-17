@@ -18,6 +18,7 @@ import java.util.List;
 
 import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.User;
+import capstone.p2plend.payload.LoginRespone;
 import capstone.p2plend.service.UserService;
 import capstone.p2plend.service.JwtService;
 
@@ -32,24 +33,30 @@ public class UserController {
 
 	@CrossOrigin
 	@PostMapping(value = "/rest/login")
-	public ResponseEntity<String> login(HttpServletRequest request, @RequestBody User account) {
-		String result = "";
+	public ResponseEntity<LoginRespone> login(HttpServletRequest request, @RequestBody User account) {
+		LoginRespone result;
+		String message;
 		HttpStatus httpStatus = null;
+		User user = userService.checkLogin(account);
 		try {
-			if (userService.checkLogin(account)) {
-				result = jwtService.generateTokenLogin(account.getUsername());
+			if (user != null) {
+				String token = jwtService.generateTokenLogin(account.getUsername());
+				message = "login successful";
+				result = new LoginRespone(token, user.getUsername(), user.getRole(), message);
 				httpStatus = HttpStatus.OK;
 			} else {
-				result = "Wrong userId and password";
+				message = "Wrong userId and password";
+				result = new LoginRespone(null, null, null, message);
 				httpStatus = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception ex) {
-			result = "Server Error";
+			message = "Server Error";
+			result = new LoginRespone(null, null, null, message);
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<String>(result, httpStatus);
+		return new ResponseEntity<LoginRespone>(result, httpStatus);
 	}
-	
+
 	@CrossOrigin
 	@PostMapping(value = "/rest/user/createUser")
 	public ResponseEntity<String> createAccount(@RequestBody User user) {
@@ -63,7 +70,7 @@ public class UserController {
 		}
 		return new ResponseEntity<String>(result, httpStatus);
 	}
-	
+
 	@CrossOrigin
 	@PostMapping(value = "/rest/user/checkUser")
 	public ResponseEntity<String> checkUser(@RequestHeader("Authorization") String token) {
@@ -91,14 +98,14 @@ public class UserController {
 		}
 		return new ResponseEntity<User>(result, httpStatus);
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getById")
 	public User getOne(@RequestBody User user) {
 		return userService.getOneById(user.getId());
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/users")
@@ -132,7 +139,7 @@ public class UserController {
 
 		return status.value();
 	}
-	
+
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
 	@PutMapping(value = "/rest/user/loanLimit")
@@ -148,7 +155,7 @@ public class UserController {
 
 		return status.value();
 	}
-	
+
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
 	@PutMapping(value = "/rest/admin/user/deactivateUser")
@@ -164,7 +171,7 @@ public class UserController {
 
 		return status.value();
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@GetMapping(value = "/rest/admin/user/getUsers")

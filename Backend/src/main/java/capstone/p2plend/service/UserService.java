@@ -68,7 +68,7 @@ public class UserService {
 		return userRepo.findByUsername(username);
 	}
 
-	public boolean checkLogin(User account) {
+	public User checkLogin(User account) {
 
 		String username = account.getUsername();
 		String password = account.getPassword();
@@ -76,10 +76,10 @@ public class UserService {
 		User checkExist = userRepo.findByUsernameAndPassword(username, password);
 
 		if (checkExist != null && checkExist.getStatus().equals("active")) {
-			return true;
+			return checkExist;
 		}
 
-		return false;
+		return null;
 	}
 
 	public String createAccount(User account) {
