@@ -11,25 +11,78 @@ import {
   CardBody,
   FormGroup,
   Form,
-  Input
+  Input,
+  Collapse
 } from "reactstrap";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
-import { apiLink } from '../../api.jsx';
+import { apiLink } from "../../api.jsx";
 class Profile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
-    firstName: '',
-    lastName: '',
-    loanLimit: 0,
-    email: '',
-    phoneNumber: '',
-    }
+      username: "",
+      firstName: "",
+      lastName: "",
+      loanLimit: 0,
+      email: "",
+      phoneNumber: "",
+
+      collapse: false,
+      accordion: [true, false, false],
+      custom: [true, false],
+      status: "Closed",
+      fadeIn: true,
+      timeout: 300
+    };
     this.getProfile = this.getProfile.bind(this);
+    this.toggle = this.toggle.bind(this);
+    this.toggleAccordion = this.toggleAccordion.bind(this);
+    this.toggleCustom = this.toggleCustom.bind(this);
+    this.toggleFade = this.toggleFade.bind(this);
   }
+
+  onEntering() {
+    this.setState({ status: "Opening..." });
+  }
+
+  onEntered() {
+    this.setState({ status: "Opened" });
+  }
+
+  onExiting() {
+    this.setState({ status: "Closing..." });
+  }
+
+  onExited() {
+    this.setState({ status: "Closed" });
+  }
+
+  toggle() {
+    this.setState({ collapse: !this.state.collapse });
+  }
+
+  toggleAccordion(tab) {
+    const prevState = this.state.accordion;
+    const state = prevState.map((x, index) => (tab === index ? !x : false));
+    this.setState({
+      accordion: state
+    });
+  }
+
+  toggleCustom(tab) {
+    const prevState = this.state.custom;
+    const state = prevState.map((x, index) => (tab === index ? !x : false));
+    this.setState({
+      custom: state
+    });
+  }
+
+  toggleFade() {
+    this.setState({ fadeIn: !this.state.fadeIn });
+  }
+
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -39,49 +92,46 @@ class Profile extends React.Component {
 
   getProfile() {
     fetch(apiLink + "/rest/user/getUser", {
-      method: 'GET',
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": localStorage.getItem("token")
+        Authorization: localStorage.getItem("token")
         // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       }
-    }).then(
-      (result) => {
-        if (result.status === 200) {
-          // alert("create success");
-          // this.props.history.push('view-new-request');
-          result.json().then((data) => {
-            console.log(data);
-            this.setState({
-              username: data.username,
-              firstName: data.firstName,
-              lastName: data.lastName,
-              loanLimit: data.loanLimit,
-              email: data.email,
-              phoneNumber: data.phoneNumber,
-            })
-          })
-        } else if (result.status === 401) {
-          localStorage.removeItem("isLoggedIn");
-          this.props.history.push('/login-page')
-        }
-
+    }).then(result => {
+      if (result.status === 200) {
+        // alert("create success");
+        // this.props.history.push('view-new-request');
+        result.json().then(data => {
+          console.log(data);
+          this.setState({
+            username: data.username,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            loanLimit: data.loanLimit,
+            email: data.email,
+            phoneNumber: data.phoneNumber
+          });
+        });
+      } else if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login-page");
       }
-    )
+    });
   }
 
   render() {
-    const style ={
-      profileComponent :{
-        position:'relative',
-        top: -250,
+    const style = {
+      profileComponent: {
+        position: "relative",
+        top: -250
       },
-      myAccount : {
-        position: 'relative',
-        top: -150,
+      myAccount: {
+        position: "relative",
+        top: -150
       }
-    }
+    };
     return (
       <>
         <DemoNavbar />
@@ -114,8 +164,9 @@ class Profile extends React.Component {
             </div>
           </section>
           <section className="section">
-          
-            <Container className="mt--7" style={style.profileComponent} > {/* fluid */}
+            <Container className="mt--7" style={style.profileComponent}>
+              {" "}
+              {/* fluid */}
               <Row>
                 <Col className="order-xl-1 mb-5 mb-xl-0" xl="4">
                   <Card className="card-profile shadow">
@@ -174,11 +225,19 @@ class Profile extends React.Component {
                         </div>
                       </Row>
                       <div className="text-center">
+                        <Button
+                          color="primary"
+                          href="#pablo"
+                          onClick={e => e.preventDefault()}
+                          size="sm"
+                        >
+                          Change Avatar
+                        </Button>
                         <h3>
-                          Jessica Jones
-                          <span className="font-weight-light">, 27</span>
+                          {this.state.firstName + " " + this.state.lastName}
+                          {/* <span className="font-weight-light">, 27</span> */}
                         </h3>
-                        <div className="h5 font-weight-300">
+                        {/* <div className="h5 font-weight-300">
                           <i className="ni location_pin mr-2" />
                           Bucharest, Romania
                         </div>
@@ -189,7 +248,7 @@ class Profile extends React.Component {
                         <div>
                           <i className="ni education_hat mr-2" />
                           University of Computer Science
-                        </div>
+                        </div> */}
                         <hr className="my-4" />
                         <p>
                           Ryan — the name taken by Melbourne-raised,
@@ -330,6 +389,82 @@ class Profile extends React.Component {
                             />
                           </FormGroup>
                         </div>
+                        <Card className="mb-0">
+                          <CardHeader id="headingTwo">
+                            <Button
+                              block
+                              color="link"
+                              className="text-left m-0 p-0"
+                              onClick={() => this.toggleAccordion(1)}
+                              aria-expanded={this.state.accordion[1]}
+                              aria-controls="collapseTwo"
+                            >
+                              <h5 className="m-0 p-0">
+                                Collapsible Group Item #2
+                              </h5>
+                            </Button>
+                          </CardHeader>
+                          <Collapse
+                            isOpen={this.state.accordion[1]}
+                            data-parent="#accordion"
+                            id="collapseTwo"
+                          >
+                            <CardBody>
+                              2. Anim pariatur cliche reprehenderit, enim
+                              eiusmod high life accusamus terry richardson ad
+                              squid. 3 wolf moon officia aute, non cupidatat
+                              skateboard dolor brunch. Food truck quinoa
+                              nesciunt laborum eiusmod. Brunch 3 wolf moon
+                              tempor, sunt aliqua put a bird on it squid
+                              single-origin coffee nulla assumenda shoreditch
+                              et. Nihil anim keffiyeh helvetica, craft beer
+                              labore wes anderson cred nesciunt sapiente ea
+                              proident. Ad vegan excepteur butcher vice lomo.
+                              Leggings occaecat craft beer farm-to-table, raw
+                              denim aesthetic synth nesciunt you probably
+                              haven't heard of them accusamus labore sustainable
+                              VHS.
+                            </CardBody>
+                          </Collapse>
+                        </Card>
+                        <Card className="mb-0">
+                          <CardHeader id="headingThree">
+                            <Button
+                              block
+                              color="link"
+                              className="text-left m-0 p-0"
+                              onClick={() => this.toggleAccordion(2)}
+                              aria-expanded={this.state.accordion[2]}
+                              aria-controls="collapseThree"
+                            >
+                              <h5 className="m-0 p-0">
+                                Collapsible Group Item #3
+                              </h5>
+                            </Button>
+                          </CardHeader>
+                          <Collapse
+                            isOpen={this.state.accordion[2]}
+                            data-parent="#accordion"
+                            id="collapseThree"
+                          >
+                            <CardBody>
+                              3. Anim pariatur cliche reprehenderit, enim
+                              eiusmod high life accusamus terry richardson ad
+                              squid. 3 wolf moon officia aute, non cupidatat
+                              skateboard dolor brunch. Food truck quinoa
+                              nesciunt laborum eiusmod. Brunch 3 wolf moon
+                              tempor, sunt aliqua put a bird on it squid
+                              single-origin coffee nulla assumenda shoreditch
+                              et. Nihil anim keffiyeh helvetica, craft beer
+                              labore wes anderson cred nesciunt sapiente ea
+                              proident. Ad vegan excepteur butcher vice lomo.
+                              Leggings occaecat craft beer farm-to-table, raw
+                              denim aesthetic synth nesciunt you probably
+                              haven't heard of them accusamus labore sustainable
+                              VHS.
+                            </CardBody>
+                          </Collapse>
+                        </Card>
                       </Form>
                     </CardBody>
                   </Card>

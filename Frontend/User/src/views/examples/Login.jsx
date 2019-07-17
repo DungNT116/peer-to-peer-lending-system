@@ -66,7 +66,6 @@ class Login extends React.Component {
   // }
 
   handleSubmit(event) {
-    console.log(this.state.username + " " + this.state.password);
     fetch(apiLink + "/rest/login", {
       method: 'POST',
       headers: {
