@@ -64,7 +64,7 @@ class Hero extends React.Component {
                           size="lg"
                         >
                           <span className="btn-inner--icon mr-1">
-                            <i className="ni ni-cloud-download-95" />
+                            <i className="ni ni-key-25" />
                           </span>
                           <span className="btn-inner--text">
                             Sign up to Join

@@ -18,7 +18,20 @@ import {
   Media
 } from "reactstrap";
 
+
 class AdminNavbar extends React.Component {
+  constructor(props) {
+    super(props);
+    // this.state = {
+    //   isLoggedIn: false
+    // }
+    this.logout = this.logout.bind(this);
+  }
+  logout() {
+    // localStorage.removeItem("token");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("user");
+  }
   render() {
     return (
       <>
@@ -54,16 +67,16 @@ class AdminNavbar extends React.Component {
                     </span>
                     <Media className="ml-2 d-none d-lg-block">
                       <span className="mb-0 text-sm font-weight-bold">
-                        Jessica Jones
+                      {localStorage.getItem("profile")}
                       </span>
                     </Media>
                   </Media>
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-menu-arrow" right>
                   <DropdownItem className="noti-title" header tag="div">
-                    <h6 className="text-overflow m-0">Welcome!</h6>
+                    <h6 className="text-overflow m-0">Welcome {localStorage.getItem("user")}!</h6>
                   </DropdownItem>
-                  <DropdownItem to="/admin/user-profile" tag={Link}>
+                  {/* <DropdownItem to="/admin/user-profile" tag={Link}>
                     <i className="ni ni-single-02" />
                     <span>My profile</span>
                   </DropdownItem>
@@ -78,9 +91,9 @@ class AdminNavbar extends React.Component {
                   <DropdownItem to="/admin/user-profile" tag={Link}>
                     <i className="ni ni-support-16" />
                     <span>Support</span>
-                  </DropdownItem>
-                  <DropdownItem divider />
-                  <DropdownItem href="#pablo" onClick={e => e.preventDefault()}>
+                  </DropdownItem> */}
+                  {/* <DropdownItem divider /> */}
+                  <DropdownItem href="#pablo" onClick={() => this.logout()}>
                     <i className="ni ni-user-run" />
                     <span>Logout</span>
                   </DropdownItem>

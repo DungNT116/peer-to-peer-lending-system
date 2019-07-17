@@ -93,7 +93,7 @@ class DemoNavbar extends React.Component {
                       <Link to="/">
                         <img
                           alt="..."
-                          src={require("assets/img/brand/argon-react.png")}
+                          src={require("assets/img/brand/logo-white.png")}
                         />
                       </Link>
                     </Col>
@@ -254,7 +254,7 @@ class DemoNavbar extends React.Component {
                         href="/register-page"
                       >
                         <span className="btn-inner--icon">
-                          <i className="fa fa-user mr-2" />
+                          <i className="ni ni-key-25 mr-2" />
                         </span>
                         <span className="nav-link-inner--text ml-1">
                           register
@@ -287,7 +287,7 @@ class DemoNavbar extends React.Component {
                             <i className="ni ni-single-02" />
                             <span>My profile</span>
                           </DropdownItem>
-                          <DropdownItem to="/admin/user-profile" tag={Link}>
+                          {/* <DropdownItem to="/admin/user-profile" tag={Link}>
                             <i className="ni ni-settings-gear-65" />
                             <span>Settings</span>
                           </DropdownItem>
@@ -298,7 +298,7 @@ class DemoNavbar extends React.Component {
                           <DropdownItem to="/admin/user-profile" tag={Link}>
                             <i className="ni ni-support-16" />
                             <span>Support</span>
-                          </DropdownItem>
+                          </DropdownItem> */}
                           <DropdownItem divider />
                           <DropdownItem href="/" onClick={() => this.logout()}>
                             <i className="ni ni-user-run" />
