@@ -52,6 +52,11 @@ public class DocumentService {
 			default:
 				return false;
 			}
+			Document checkExistDocument = docRepo.findUserDocument(iDoc.getDocumentType(), user.getId());
+			if(checkExistDocument != null) {
+				return false;
+			}
+			
 			iDoc.setUser(user);
 			Document savedDoc = docRepo.saveAndFlush(iDoc);
 
