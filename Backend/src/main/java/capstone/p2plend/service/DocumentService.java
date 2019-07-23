@@ -3,12 +3,17 @@ package capstone.p2plend.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.DocumentFile;
+import capstone.p2plend.entity.Request;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.enums.DocumentType;
 import capstone.p2plend.repo.DocumentFileRepository;
@@ -123,10 +128,10 @@ public class DocumentService {
 		}
 	}
 	
-	public List<Document> getAllUnvalidDocument(){
+	public PageDTO<Document> getAllUnvalidDocument(Integer page, Integer element){
 		try {
-			
-			List<Document> lstDoc = docRepo.findAllNullDocument();
+			Pageable pageable = PageRequest.of(page - 1, element);
+			Page<Document> lstDoc = docRepo.findAllNullDocument(pageable);
 			for(Document d : lstDoc) {
 				User user = new User();
 				user.setUsername(d.getUser().getUsername());
@@ -135,7 +140,11 @@ public class DocumentService {
 				d.setUser(user);
 			}
 			
-			return lstDoc;
+			PageDTO<Document> pageDTO = new PageDTO<>();
+			pageDTO.setMaxPage(lstDoc.getTotalPages());
+			pageDTO.setData(lstDoc.getContent());
+			
+			return pageDTO;
 			
 		} catch (Exception e) {
 			return null;

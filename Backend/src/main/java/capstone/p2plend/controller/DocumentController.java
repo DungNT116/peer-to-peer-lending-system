@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.Document;
 import capstone.p2plend.service.DocumentService;
 
@@ -74,15 +75,15 @@ public class DocumentController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@GetMapping("/rest/admin/document/getAllUnvalidDocument")
-	public ResponseEntity<List<Document>> getAllUnvalidDocument() {
+	public ResponseEntity<PageDTO<Document>> getAllUnvalidDocument(@RequestParam Integer page, @RequestParam Integer element) {
 		HttpStatus httpStatus = null;
-		List<Document> result = null;
+		PageDTO<Document> result = null;
 		try {
-			result = docService.getAllUnvalidDocument();
+			result = docService.getAllUnvalidDocument(page, element);
 			httpStatus = HttpStatus.OK;
 		} catch (Exception e) {
 			httpStatus = HttpStatus.BAD_REQUEST;
 		}
-		return new ResponseEntity<List<Document>>(result, httpStatus);
+		return new ResponseEntity<PageDTO<Document>>(result, httpStatus);
 	}
 }
