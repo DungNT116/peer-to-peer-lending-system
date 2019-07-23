@@ -128,7 +128,11 @@ public class DocumentService {
 			
 			List<Document> lstDoc = docRepo.findAllNullDocument();
 			for(Document d : lstDoc) {
-				d.setUser(null);
+				User user = new User();
+				user.setUsername(d.getUser().getUsername());
+				user.setFirstName(d.getUser().getFirstName());
+				user.setLastName(d.getUser().getLastName());
+				d.setUser(user);
 			}
 			
 			return lstDoc;
