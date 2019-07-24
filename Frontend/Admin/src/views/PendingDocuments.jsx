@@ -24,6 +24,7 @@ import Header from "components/Headers/Header.jsx";
 import { PulseLoader } from "react-spinners";
 import { apiLink } from "../api";
 
+import { css } from "@emotion/core";
 class PendingDocuments extends React.Component {
   constructor(props) {
     super(props);
@@ -53,7 +54,7 @@ class PendingDocuments extends React.Component {
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
     fetch(
       apiLink +
-        "/rest/admin/document/getAllUnvalidDocument?page=" +
+        "/rest/admin/document/getAllInvalidDocument?page=" +
         pageParam +
         "&element=" +
         pageSizeParam,
@@ -102,6 +103,27 @@ class PendingDocuments extends React.Component {
     });
   };
   render() {
+    const override = css`
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      padding-left: 0;
+    `;
+    const style = {
+      profileComponent: {
+        position: "relative",
+        top: -250
+      },
+      myAccount: {
+        position: "relative",
+        top: -150
+      },
+      sameSizeWithParent: {
+        width: "100%",
+        height: "100%"
+      }
+    };
     const listPendingDocs = this.state.pendingDocs.map((doc, index) => (
       <tr key={index}>
         <td>
@@ -137,7 +159,7 @@ class PendingDocuments extends React.Component {
           {/* Table */}
           <Row>
             <div className="col">
-              <Card className="shadow">
+              <Card className="shadow" style={style.sameSizeWithParent}>
                 <CardHeader className="border-0">
                   <h3 className="mb-0">List Pending Documents </h3>
                 </CardHeader>
@@ -154,6 +176,7 @@ class PendingDocuments extends React.Component {
                   <tbody>{listPendingDocs}</tbody>
                 </Table>
                 <PulseLoader
+                  css={override}
                   sizeUnit={"px"}
                   size={15}
                   color={"#123abc"}
@@ -161,54 +184,6 @@ class PendingDocuments extends React.Component {
                 />
                 <CardFooter className="py-4">
                   <nav aria-label="...">
-                    {/* <Pagination
-                      className="pagination justify-content-end mb-0"
-                      listClassName="justify-content-end mb-0"
-                    >
-                      <PaginationItem className="disabled">
-                        <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
-                          tabIndex="-1"
-                        >
-                          <i className="fas fa-angle-left" />
-                          <span className="sr-only">Previous</span>
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem className="active">
-                        <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
-                        >
-                          1
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
-                        >
-                          2 <span className="sr-only">(current)</span>
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
-                        >
-                          3
-                        </PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink
-                          href="#pablo"
-                          onClick={e => e.preventDefault()}
-                        >
-                          <i className="fas fa-angle-right" />
-                          <span className="sr-only">Next</span>
-                        </PaginationLink>
-                      </PaginationItem>
-                    </Pagination> */}
                     <Row className="align-items-center justify-content-center text-center">
                       <Pagination
                         maxPage={this.state.maxPage}
