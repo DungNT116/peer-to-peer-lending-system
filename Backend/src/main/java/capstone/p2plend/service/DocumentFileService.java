@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.DocumentFile;
+import capstone.p2plend.entity.User;
 import capstone.p2plend.repo.DocumentFileRepository;
 
 @Service
@@ -45,13 +47,21 @@ public class DocumentFileService {
 		try {
 
 			List<DocumentFile> lstDocFile = docFileRepo.findDocumentFiles(id);
-			
-			for(DocumentFile df : lstDocFile) {
-				df.setDocument(null);
+
+			for (DocumentFile df : lstDocFile) {
+				User user = df.getDocument().getUser();
+				Document document = new Document();
+
+				User attachUser = new User();
+				attachUser.setUsername(user.getUsername());
+				attachUser.setFirstName(user.getFirstName());
+				attachUser.setLastName(user.getLastName());
+				document.setUser(attachUser);
+				df.setDocument(document);
 			}
-					
+
 			return lstDocFile;
-			
+
 		} catch (Exception e) {
 			return null;
 		}
