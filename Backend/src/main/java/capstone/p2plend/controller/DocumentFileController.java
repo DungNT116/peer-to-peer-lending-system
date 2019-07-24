@@ -51,12 +51,12 @@ public class DocumentFileController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping("/rest/documentFile/getDocumentFiles")
-	public ResponseEntity<List<DocumentFile>> getDocumentFiles(@RequestBody Document document) {
+	public ResponseEntity<List<DocumentFile>> getDocumentFiles(@RequestParam("id") Integer id) {
 		
 		HttpStatus httpStatus = null;
 		List<DocumentFile> result = null;
 		try {
-			result = dfService.getDocumentFiles(document.getId());
+			result = dfService.getDocumentFiles(id);
 			httpStatus = HttpStatus.OK;
 		} catch (Exception e) {
 			httpStatus = HttpStatus.BAD_REQUEST;
