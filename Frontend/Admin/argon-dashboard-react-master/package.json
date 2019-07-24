@@ -56,6 +56,7 @@
     "react-google-maps": "9.4.5",
     "react-router-dom": "4.3.1",
     "react-scripts": "2.1.8",
+    "react-spinners": "^0.5.13",
     "reactstrap": "7.1.0"
   },
   "devDependencies": {

@@ -20,6 +20,7 @@ import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import Hero from "./IndexSections/Hero.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter";
 import { apiLink, bigchainAPI } from "api";
+import { BeatLoader } from "react-spinners";
 
 class Index extends React.Component {
   constructor(props) {
@@ -28,7 +29,8 @@ class Index extends React.Component {
       transactions: [],
       modalValid: false,
       position: 0,
-      validTx: {}
+      validTx: {},
+      loading: true
     };
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
@@ -74,7 +76,11 @@ class Index extends React.Component {
     this.setState({
       validTx: {
         idTrx: "",
-        status: ""
+        status: "",
+        sender: false,
+        receiver: false,
+        amount: false,
+        createDate: false
       }
     });
     fetch(bigchainAPI + "/search_transaction_by_id", {
@@ -87,15 +93,69 @@ class Index extends React.Component {
       })
     }).then(result => {
       result.json().then(data => {
+        let dateCreate = new Date(data.asset.data.createDate);
         setTimeout(
           function() {
-            let dateCreate = new Date(data.asset.data.createDate);
+            if (data.asset.data.sender === transactionInput.sender) {
+              this.setState({
+                validTx: {
+                  ...this.state.validTx,
+                  sender: true
+                }
+              });
+            }
+          }.bind(this),
+          1000
+        );
+        setTimeout(
+          function() {
+            if (data.asset.data.receiver === transactionInput.receiver) {
+              this.setState({
+                validTx: {
+                  ...this.state.validTx,
+                  receiver: true
+                }
+              });
+            }
+          }.bind(this),
+          2000
+        );
+        setTimeout(
+          function() {
+            if (Number(data.asset.data.amount) === transactionInput.amount) {
+              this.setState({
+                validTx: {
+                  ...this.state.validTx,
+                  amount: true
+                }
+              });
+            }
+          }.bind(this),
+          3000
+        );
+        setTimeout(
+          function() {
             if (
-              data.asset.data.sender === transactionInput.sender &&
-              data.asset.data.receiver === transactionInput.receiver &&
-              Number(data.asset.data.amount) === transactionInput.amount &&
               Math.round(dateCreate.getTime() / 1000) ===
-                transactionInput.createDate
+              transactionInput.createDate
+            ) {
+              this.setState({
+                validTx: {
+                  ...this.state.validTx,
+                  createDate: true
+                }
+              });
+            }
+          }.bind(this),
+          4000
+        );
+        setTimeout(
+          function() {
+            if (
+              this.state.validTx.sender == true &&
+              this.state.validTx.receiver == true &&
+              this.state.validTx.amount == true &&
+              this.state.validTx.createDate == true
             ) {
               this.setState({
                 validTx: {
@@ -112,7 +172,7 @@ class Index extends React.Component {
               });
             }
           }.bind(this),
-          1000
+          4500
         );
       });
     });
@@ -120,7 +180,16 @@ class Index extends React.Component {
   render() {
     const listItems = this.state.transactions.map((transaction, index) => (
       <tr key={index}>
-        <td style={{ width: 50, overflowX: "hidden" }}>{transaction.idTrx}</td>
+        <td
+          style={{
+            width: 200,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "inline-block"
+          }}
+        >
+          {transaction.idTrx}
+        </td>
         <td>{transaction.sender}</td>
         <td>{transaction.receiver}</td>
         <td>{transaction.amount} VND</td>
@@ -148,14 +217,96 @@ class Index extends React.Component {
               Valid transaction
             </ModalHeader>
             <ModalBody>
-              <FormGroup row className="py-2">
-                <Col md="6">ID Transaction</Col>
-                <Col md="6">Status</Col>
-              </FormGroup>
-              <FormGroup row className="py-2">
-                <Col md="6">{this.state.validTx.idTrx}</Col>
-                <Col md="6">{this.state.validTx.status}</Col>
-              </FormGroup>
+              {this.state.validTx.idTrx == "" ? (
+                <div>
+                  <FormGroup row className="py-2">
+                    <Col md="6">Check Sender</Col>
+                    <Col md="6">
+                      {this.state.validTx.sender ? (
+                        <i
+                          class="ni ni-check-bold"
+                          style={{ color: "green" }}
+                        />
+                      ) : (
+                        <BeatLoader
+                          sizeUnit={"px"}
+                          size={10}
+                          color={"#123abc"}
+                          loading={this.state["loading-sender"]}
+                        />
+                      )}
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row className="py-2">
+                    <Col md="6">Check Receiver</Col>
+                    <Col md="6">
+                      {this.state.validTx.receiver ? (
+                        <i
+                          class="ni ni-check-bold"
+                          style={{ color: "green" }}
+                        />
+                      ) : (
+                        <BeatLoader
+                          sizeUnit={"px"}
+                          size={10}
+                          color={"#123abc"}
+                          loading={this.state["loading-receiver"]}
+                        />
+                      )}
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row className="py-2">
+                    <Col md="6">Check Amount</Col>
+                    <Col md="6">
+                      {this.state.validTx.amount ? (
+                        <i
+                          class="ni ni-check-bold"
+                          style={{ color: "green" }}
+                        />
+                      ) : (
+                        <BeatLoader
+                          sizeUnit={"px"}
+                          size={10}
+                          color={"#123abc"}
+                          loading={this.state["loading-amount"]}
+                        />
+                      )}
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row className="py-2">
+                    <Col md="6">Check Create Date</Col>
+                    <Col md="6">
+                      {this.state.validTx.createDate ? (
+                        <i
+                          class="ni ni-check-bold"
+                          style={{ color: "green" }}
+                        />
+                      ) : (
+                        <BeatLoader
+                          sizeUnit={"px"}
+                          size={10}
+                          color={"#123abc"}
+                          loading={this.state["loading-createDate"]}
+                        />
+                      )}
+                    </Col>
+                  </FormGroup>
+                </div>
+              ) : (
+                <div>
+                  <FormGroup row className="py-2">
+                    <Col md="6">ID Transaction</Col>
+                    <Col md="6">Status</Col>
+                  </FormGroup>
+                  <FormGroup row className="py-2">
+                    <Col md="6">{this.state.validTx.idTrx}</Col>
+                    <Col md="6">
+                      {this.state.validTx.status}
+                      <i class="ni ni-check-bold" style={{ color: "green",fontSize: "20px" }} />
+                    </Col>
+                  </FormGroup>
+                </div>
+              )}
             </ModalBody>
           </Modal>
         </td>
@@ -166,40 +317,9 @@ class Index extends React.Component {
         <DemoNavbar />
         <main ref="main">
           <Hero />
-          {/* <Buttons />
-          <Inputs />
-          <section className="section">
-            <Container>
-              <CustomControls />
-              <Menus />
-            </Container>
-          </section> */}
-          {/* <Navbars /> */}
-          {/* <section className="section section-components">
-            <Container>
-              <Tabs />
-              <Row className="row-grid justify-content-between align-items-center mt-lg">
-                <Progress />
-                <Pagination />
-              </Row>
-              <Row className="row-grid justify-content-between">
-                <Pills />
-                <Labels />
-              </Row>
-              <Alerts />
-              <Typography />
-              <Modals />
-              <Datepicker />
-              <TooltipPopover />
-            </Container>
-          </section> */}
-          {/* <Carousel /> */}
-          {/* <Icons /> */}
-          {/* <Login /> */}
-          {/* <Download /> */}
           <section className="section section-sm ">
-            <Container >
-            {/* <CustomControls /> */}
+            <Container>
+              {/* <CustomControls /> */}
               <Row className="justify-content-center text-center">
                 <p className="h3">History Transactions</p>
               </Row>
@@ -208,7 +328,7 @@ class Index extends React.Component {
                 <Table>
                   <thead>
                     <tr>
-                      <th>Id Transaction Blockchain</th>
+                      <th>Id Tx Blockchain</th>
                       <th>Sender</th>
                       <th>Receiver</th>
                       <th>Amount</th>
