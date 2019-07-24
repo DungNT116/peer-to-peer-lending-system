@@ -138,7 +138,7 @@ class ViewRequestNew extends React.Component {
           });
         });
       } else if (result.status === 401) {
-        localStorage.setItem("isLoggedIn", false);
+        localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       }
     });
@@ -169,7 +169,7 @@ class ViewRequestNew extends React.Component {
           });
         });
       } else if (result.status === 401) {
-        localStorage.setItem("isLoggedIn", false);
+        localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       }
     });
