@@ -3,6 +3,8 @@ import React from "react";
 // nodejs library that concatenates classes
 import classnames from "classnames";
 import { connect } from 'react-redux';
+
+import CurrencyInput from 'react-currency-input';
 // reactstrap components
 import {
   Card,
@@ -30,6 +32,12 @@ const textVerticalCenter = {
   alignItems: 'center',
   height: '100%'
 }
+const inputCurrency = {
+  margin: 0,
+  fontFamily: 'inherit',
+  fontSize: 'inherit',
+  lineHeight: 'inherit',
+}
 class CreateRequestPage extends React.Component {
   constructor(props) {
     super(props);
@@ -48,6 +56,42 @@ class CreateRequestPage extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDataTimeline = this.handleDataTimeline.bind(this);
     this.createMileStone = this.createMileStone.bind(this);
+  }
+
+  formatCurrency(number) {
+    // let indexes = [];
+    let count = 0;
+    let tmpString = "";
+    // if(number.length > 3) {
+    //   for (let i = number.length; i >= 1; i--) {
+    //     if(count === 3 && i !== number.length) {
+    //       count = 0;
+    //       output += number[i] + ",";
+    //     } else if(count !== 3) {
+    //       output += number[i];
+    //     }
+    //     count++;
+    //   }  
+    // }
+    if (number.length > 3) {
+      for (let i = number.length; i > 0; i--) {
+        const element = number[i - 1];
+        if (count === 3 && i !== number.length) {
+          count = 0;
+          tmpString += "," + element
+        } else if (count !== 3) {
+          tmpString += element;
+        }
+        count++;
+      }
+    }
+
+    let output = "";
+    for (let i = tmpString.length; i > 0; i--) {
+      const element = tmpString[i - 1];
+      output += element;
+    }
+    return output;
   }
 
   createMileStone() {
@@ -144,22 +188,32 @@ class CreateRequestPage extends React.Component {
     // this.createMileStone();
   }
 
-  onAmountChange(event) {
-    const tmp = event.target.value.trim();
-    console.log(tmp);
-    if (!tmp.match(/^(\d{1,12})*$/)) {
-      document.getElementById("amountError").innerHTML = "amount only contain number ";
-      this.setState({
-        amount: Number(tmp),
-        validAmount: false
-      });
-    } else {
-      document.getElementById("amountError").innerHTML = "";
-      this.setState({
-        amount: tmp,
-        validAmount: true
-      });
-    }
+  onAmountChange(event, maskedvalue, floatvalue){
+    // const tmp = event.target.value.trim();
+    // console.log(tmp);
+    // if(this.state.amount === 0 || )
+    this.setState({
+      amount: maskedvalue
+    });
+    // let output = this.formatCurrency(tmp);
+
+    // const input = document.getElementById("amount");
+    // input.value = output;
+    // console.log(output)
+    // if (!tmp.match(/^\d{1,12}$/)) {
+    //   document.getElementById("amountError").innerHTML = "amount only contain number ";
+    //   this.setState({
+    //     amount: tmp,
+    //     validAmount: false
+    //   });
+    // } else {
+    //   document.getElementById("amountError").innerHTML = "";
+    //   this.setState({
+    //     amount: tmp,
+    //     validAmount: true
+    //   });
+    // }
+    
   }
 
   onBorrowDurationChange(event) {
@@ -170,7 +224,21 @@ class CreateRequestPage extends React.Component {
     })
   }
 
-  handleSubmit(event) {
+  async handleSubmit(event) {
+    event.preventDefault();
+    let value = this.state.amount;
+    console.log(value);
+    console.log(Number(value) !== 0)
+    console.log(value.length < 12)
+    //12 so va 3 dau phay
+    if(Number(value) !== 0 && value.length <= 15) {
+      await this.setState({
+        validAmount: true
+      })
+    } else {
+      event.preventDefault();
+      document.getElementById("amountError").innerHTML = "amount is not valid";
+    }
     console.log(this.state.validAmount)
     if (this.state.validAmount === true) {
       fetch(apiLink + "/rest/request/createRequest", {
@@ -183,7 +251,7 @@ class CreateRequestPage extends React.Component {
         },
         body: JSON.stringify({
           // borrowerName: this.state.borrowerName,
-          amount: this.state.amount,
+          amount: this.state.amount.replace(",", ""),
           // dueDate: 125666,
           // times: 5,
           duration: this.state.borrowDuration,
@@ -207,7 +275,7 @@ class CreateRequestPage extends React.Component {
           }
         }
       )
-    }
+    } 
     event.preventDefault();
   }
 
@@ -284,17 +352,22 @@ class CreateRequestPage extends React.Component {
                                 Amount
                             </Label>
                             </Col>
-                            <Col lg="9" md="9">
-                                <Input
-                                  name="amount"
-                                  placeholder="Amount"
-                                  type="text"
-                                  onFocus={e => this.setState({ amountFocused: true })}
-                                  onBlur={e => this.setState({ amountFocused: false })}
-                                  onChange={this.onAmountChange}
-                                  required
-                                />
-                              <p id="amountError"></p>
+                            <Col lg="4" md="4">
+                              <CurrencyInput style={inputCurrency}
+                              value={this.state.amount} 
+                              onChangeEvent={this.onAmountChange}
+                              precision="0"
+                              allowEmpty="false"/>
+                              {/* <Input
+                                id="amount"
+                                placeholder="Amount"
+                                type="text"
+                                onFocus={e => this.setState({ amountFocused: true })}
+                                onBlur={e => this.setState({ amountFocused: false })}
+                                value={this.state.amount}
+                                onChange={this.onAmountChange}
+                                required
+                              /> */}
                             </Col>
                           </FormGroup>
                           <FormGroup row className={classnames({
@@ -303,18 +376,18 @@ class CreateRequestPage extends React.Component {
                             <Col lg="3" md="3">
                               <Label htmlFor="duration" style={textVerticalCenter}>Borrow Duration</Label>
                             </Col>
-                            <Col lg="9" md="9">
-                                <Input type="select" name="duration" id="duration"
-                                  onFocus={e => this.setState({ durationFocused: true })}
-                                  onBlur={e => this.setState({ durationFocused: false })}
-                                  onChange={this.onBorrowDurationChange} required defaultValue="">
-                                  <option value="" disabled>Please select</option>
-                                  <option value="1">30 days</option>
-                                  <option value="3">90 days</option>
-                                  <option value="6">180 days</option>
-                                  <option value="9">270 days</option>
-                                  <option value="12">360 days</option>
-                                </Input>
+                            <Col lg="3" md="3">
+                              <Input type="select" name="duration" id="duration"
+                                onFocus={e => this.setState({ durationFocused: true })}
+                                onBlur={e => this.setState({ durationFocused: false })}
+                                onChange={this.onBorrowDurationChange} required defaultValue="">
+                                <option value="" disabled>Please select</option>
+                                <option value="1">30 days</option>
+                                <option value="3">90 days</option>
+                                <option value="6">180 days</option>
+                                <option value="9">270 days</option>
+                                <option value="12">360 days</option>
+                              </Input>
                               <p id="durationError"></p>
                             </Col>
                           </FormGroup>
@@ -325,19 +398,23 @@ class CreateRequestPage extends React.Component {
                           </Label>
                             </Col>
                             <Col lg="9" md="9">
-                                <Input
+                              <p>18% per year</p>
+                              {/* <Input
                                   name="interestedRate"
                                   type="text"
                                   disabled
                                   value="18% per year"
-                                />
+                                /> */}
                             </Col>
                           </FormGroup>
-                          <ApplyTimeline 
+                          <ApplyTimeline
                             onDataChange={this.handleDataTimeline}></ApplyTimeline>
                           <div className="text-center my-4">
                             {/* <Input type="submit" value="Send" /> */}
                             <Button type="submit" size="md" className="btn btn-outline-primary">Create Request</Button>
+                          </div>
+                          <div className="text-center my-4">
+                          <p id="amountError"></p>
                           </div>
 
                         </Form>
