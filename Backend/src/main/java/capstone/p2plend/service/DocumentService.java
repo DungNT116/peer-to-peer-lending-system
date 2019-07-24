@@ -35,7 +35,7 @@ public class DocumentService {
 	@Autowired
 	UserRepository userRepo;
 
-	public boolean uploadDocument(String documentType, String token, MultipartFile[] mf) {
+	public boolean uploadDocument(String documentId, String documentType, String token, MultipartFile[] mf) {
 		try {
 			String username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
@@ -58,10 +58,10 @@ public class DocumentService {
 				return false;
 			}
 			Document checkExistDocument = docRepo.findUserDocument(iDoc.getDocumentType(), user.getId());
-			if(checkExistDocument != null) {
+			if (checkExistDocument != null) {
 				return false;
 			}
-			
+			iDoc.setStatus("invalid");
 			iDoc.setUser(user);
 			Document savedDoc = docRepo.saveAndFlush(iDoc);
 
@@ -110,42 +110,48 @@ public class DocumentService {
 				return false;
 			}
 
-			//Receive document with id and docId
+			// Receive document with id and docId
 			Document findDoc = docRepo.findByDocumentIdAndDocumentType(document.getDocumentId(),
 					docRepo.findById(document.getId()).get().getDocumentType());
-			
-			if(findDoc != null) {
+
+			if (findDoc != null) {
 				return false;
 			}
 
 			Document existDoc = docRepo.findById(document.getId()).get();
-			existDoc.setDocumentId(document.getDocumentId());
+			if(!existDoc.getDocumentId().equals(document.getDocumentId())) {
+				return false;
+			}
+			existDoc.setStatus("valid");
 			docRepo.saveAndFlush(existDoc);
-			
+
 			return true;
 		} catch (Exception e) {
 			return false;
 		}
 	}
-	
-	public PageDTO<Document> getAllUnvalidDocument(Integer page, Integer element){
+
+	public PageDTO<Document> getAllInvalidDocument(Integer page, Integer element) {
 		try {
 			Pageable pageable = PageRequest.of(page - 1, element);
-			Page<Document> lstDoc = docRepo.findAllNullDocument(pageable);
-			for(Document d : lstDoc) {
+			Page<Document> lstDoc = docRepo.findAllDocumentWithStatus(pageable, "invalid");
+			for (Document d : lstDoc) {
 				User user = new User();
 				user.setUsername(d.getUser().getUsername());
 				user.setFirstName(d.getUser().getFirstName());
 				user.setLastName(d.getUser().getLastName());
 				d.setUser(user);
+
+				d.setDocumentId(null);
+				d.setDocumentFile(null);
 			}
-			
+
 			PageDTO<Document> pageDTO = new PageDTO<>();
 			pageDTO.setMaxPage(lstDoc.getTotalPages());
 			pageDTO.setData(lstDoc.getContent());
-			
+
 			return pageDTO;
-			
+
 		} catch (Exception e) {
 			return null;
 		}

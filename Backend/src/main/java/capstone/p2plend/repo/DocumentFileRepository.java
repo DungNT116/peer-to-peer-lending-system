@@ -1,9 +1,19 @@
 package capstone.p2plend.repo;
 
 import capstone.p2plend.entity.DocumentFile;
+import capstone.p2plend.entity.Request;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface DocumentFileRepository extends JpaRepository<DocumentFile, Integer> {
+
+	@Query(value = "SELECT * FROM document_file WHERE document_id = :id", nativeQuery = true)
+	List<DocumentFile> findDocumentFiles(@Param("id") Integer id);
 
 }

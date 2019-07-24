@@ -28,11 +28,12 @@ public class DocumentController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping("/rest/document/uploadFile")
-	public Integer uploadFile(@RequestParam("documentType") String documentType,
-			@RequestHeader("Authorization") String token, @RequestParam("file") MultipartFile[] file) {
+	public Integer uploadFile(@RequestParam("documentId") String documentId,
+			@RequestParam("documentType") String documentType, @RequestHeader("Authorization") String token,
+			@RequestParam("file") MultipartFile[] file) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = docService.uploadDocument(documentType, token, file);
+		valid = docService.uploadDocument(documentId, documentType, token, file);
 		if (valid == true) {
 			status = HttpStatus.OK;
 		} else {
@@ -70,16 +71,16 @@ public class DocumentController {
 		}
 		return status.value();
 	}
-	
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
-	@GetMapping("/rest/admin/document/getAllUnvalidDocument")
-	public ResponseEntity<PageDTO<Document>> getAllUnvalidDocument(@RequestParam Integer page, @RequestParam Integer element) {
+	@GetMapping("/rest/admin/document/getAllInvalidDocument")
+	public ResponseEntity<PageDTO<Document>> getAllUnvalidDocument(@RequestParam Integer page,
+			@RequestParam Integer element) {
 		HttpStatus httpStatus = null;
 		PageDTO<Document> result = null;
 		try {
-			result = docService.getAllUnvalidDocument(page, element);
+			result = docService.getAllInvalidDocument(page, element);
 			httpStatus = HttpStatus.OK;
 		} catch (Exception e) {
 			httpStatus = HttpStatus.BAD_REQUEST;

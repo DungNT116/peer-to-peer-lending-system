@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -28,12 +27,14 @@ public class Document {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@JsonInclude(JsonInclude.Include.ALWAYS)
 	@Column
 	private String documentId;
 
 	@Column
 	private String documentType;
+
+	@Column
+	private String status;
 
 	@JsonIgnoreProperties(value = { "document" })
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -69,6 +70,14 @@ public class Document {
 
 	public void setDocumentType(String documentType) {
 		this.documentType = documentType;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public User getUser() {

@@ -1,5 +1,7 @@
 package capstone.p2plend.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -18,7 +20,7 @@ public class DocumentFileService {
 		try {
 
 			int number = mf.length;
-			for(int i = 0; i < number; i++) {
+			for (int i = 0; i < number; i++) {
 				String fileName = StringUtils.cleanPath(mf[i].getOriginalFilename());
 
 				DocumentFile df = new DocumentFile();
@@ -26,7 +28,7 @@ public class DocumentFileService {
 				df.setFileType(mf[i].getContentType());
 				df.setData(mf[i].getBytes());
 
-				docFileRepo.saveAndFlush(df);				
+				docFileRepo.saveAndFlush(df);
 			}
 
 			return true;
@@ -37,5 +39,21 @@ public class DocumentFileService {
 
 	public DocumentFile downloadDocument(int id) {
 		return docFileRepo.findById(id).get();
+	}
+
+	public List<DocumentFile> getDocumentFiles(Integer id) {
+		try {
+
+			List<DocumentFile> lstDocFile = docFileRepo.findDocumentFiles(id);
+			
+			for(DocumentFile df : lstDocFile) {
+				df.setDocument(null);
+			}
+					
+			return lstDocFile;
+			
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }
