@@ -6,6 +6,7 @@ import Login from "views/examples/Login.jsx";
 import Tables from "views/examples/Tables.jsx";
 import Icons from "views/examples/Icons.jsx";
 import UserList from "views/UserList.jsx";
+import PendingDocuments from "views/PendingDocuments.jsx";
 import UserProfile from "views/UserProfile.jsx";
 
 var routes = [
@@ -14,6 +15,14 @@ var routes = [
     name: "User List",
     icon: "ni ni-circle-08 text-primary",
     component: UserList,
+    layout: "/admin"
+  },
+  
+  {
+    path: "/pending-document",
+    name: "Pending Documents",
+    icon: "ni ni-folder-17 text-warning",
+    component: PendingDocuments,
     layout: "/admin"
   },
   // {

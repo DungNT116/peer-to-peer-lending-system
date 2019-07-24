@@ -71,16 +71,14 @@ class Login extends React.Component {
         password: this.state.password
       })
     }).then(result => {
-      result.text().then(data => {
-        console.log(data)
+      result.json().then((data) => {
         if (result.status === 200) {
-          localStorage.setItem("user", this.state.username);
-          if (localStorage.getItem("user") !== "admin") {
+          if (data.role !== "ROLE_ADMIN") {
             document.getElementById("loginError").innerHTML =
               "<div class='alert alert-danger' role='alert'><strong>Only Admin can login to this site !</strong></div>";
           } else {
-            localStorage.setItem("token", data);
-            localStorage.setItem("user", this.state.username);
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", data.username);
             localStorage.setItem("isLoggedIn", true);
             this.getUsername();
             this.props.history.push("/");
@@ -89,7 +87,7 @@ class Login extends React.Component {
         if (result.status !== 200) {
           event.preventDefault();
           // alert(data);
-          if (data === "Wrong userId and password")
+          if (data.message === "Wrong userId and password")
             document.getElementById("loginError").innerHTML =
               "<div class='alert alert-danger' role='alert'><strong>Username or password is incorrect!</strong><br/> Please try again!</div>";
         }
