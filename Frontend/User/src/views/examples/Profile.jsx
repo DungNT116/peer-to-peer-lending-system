@@ -12,8 +12,13 @@ import {
   FormGroup,
   Form,
   Input,
-  Collapse
+  Collapse,
+  Spinner
 } from "reactstrap";
+
+import { css } from '@emotion/core';
+
+import { PulseLoader } from 'react-spinners';
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
@@ -28,7 +33,13 @@ class Profile extends React.Component {
       loanLimit: 0,
       email: "",
       phoneNumber: "",
+      documentID: [],
+      documentPP: [],
+      documentDL: [],
 
+      loadingID: true,
+      loadingPP: true,
+      loadingDL: true,
       collapse: false,
       accordion: [true, false, false],
       custom: [true, false],
@@ -41,6 +52,126 @@ class Profile extends React.Component {
     this.toggleAccordion = this.toggleAccordion.bind(this);
     this.toggleCustom = this.toggleCustom.bind(this);
     this.toggleFade = this.toggleFade.bind(this);
+
+    this.handleFileInput = this.handleFileInput.bind(this);
+
+    this.getDocument = this.getDocument.bind(this);
+    this.saveDocument = this.saveDocument.bind(this);
+
+    this.setSrcImgBase64 = this.setSrcImgBase64.bind(this);
+
+  }
+
+  setSrcImgBase64(type, image) {
+    return "data:" + type + ";base64, " + image;
+  }
+
+  getDocument() {
+    fetch(apiLink + "/rest/document/getUserDocument", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token")
+      }
+    }).then(result => {
+      if (result.status === 200) {
+        result.json().then(data => {
+          console.log("get success");
+          console.log(data)
+          if (data.length === 0) {
+            this.setState({
+              loadingID: false,
+              loadingPP: false,
+              loadingDL: false
+            })
+          } else {
+            for (let i = 0; i < data.length; i++) {
+              const element = data[i];
+              if (element.documentType === "Identity Card") {
+                this.setState({
+                  documentID: element,
+                  loadingID: false
+                })
+              } else if (element.documentType === "Passport") {
+                this.setState({
+                  documentPP: element,
+                  loadingPP: false
+                })
+              } else if (element.documentType === "Driving Licence") {
+                this.setState({
+                  documentDL: element,
+                  loadingDL: false
+                })
+              }
+            }
+          }
+        });
+        // this.props.history.push("/view-request-trading");
+      } else if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login-page");
+      }
+    });
+  }
+
+  saveDocument(type) {
+    let document = [];
+    if (type === "ID") {
+      document = this.state.documentID;
+    } else if (type === "PP") {
+      document = this.state.documentPP;
+    } else if (type === "DL") {
+      document = this.state.documentDL;
+    }
+    var formData = new FormData();
+    formData.append("documentType", document.documentType);
+    for (let i = 0; i < document.listImage.length; i++) {
+      const element = document.listImage[i];
+      formData.append("file", element);
+    }
+    console.log("formData", formData.getAll("file"));
+    fetch(apiLink + "/rest/document/uploadFile", {
+      method: "POST",
+      headers: {
+        // "Content-Type": "multipart/form-data",
+        Authorization: localStorage.getItem("token")
+      },
+      body: formData
+      // JSON.stringify({
+      //   documentType: this.state.documentID.documentType,
+      //   file: this.state.documentID.listImage
+      // })
+    }).then(result => {
+      if (result.status === 200) {
+        alert("save success");
+        // this.props.history.push("/view-request-trading");
+      } else if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login-page");
+      }
+    });
+  }
+
+  handleFileInput(event, type) {
+    var document = { documentType: type, listImage: event.target.files }
+    switch (type) {
+      case "ID":
+        this.setState({
+          documentID: document
+        });
+        break;
+      case "PP":
+        this.setState({
+          documentPP: document
+        })
+        break;
+      case "DL":
+        this.setState({
+          documentDL: document
+        })
+        break;
+    }
+
   }
 
   onEntering() {
@@ -83,11 +214,16 @@ class Profile extends React.Component {
     this.setState({ fadeIn: !this.state.fadeIn });
   }
 
+  componentWillMount() {
+    this.getDocument();
+  }
+
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
     this.getProfile();
+    // this.getDocument();
   }
 
   getProfile() {
@@ -130,8 +266,24 @@ class Profile extends React.Component {
       myAccount: {
         position: "relative",
         top: -150
+      },
+      sameSizeWithParent: {
+        width: "100%",
+        height: "100%"
       }
     };
+    const override = css`
+    display: flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      padding-left: 0;
+      `;
+    // let IDData = [];
+    // if (this.state.documentID.length !== 0) {
+    //   IDData = 
+    //   ))
+    // }
     return (
       <>
         <DemoNavbar />
@@ -372,25 +524,54 @@ class Profile extends React.Component {
                             </Col>
                           </Row>
                         </div>
-                        <hr className="my-4" />
-                        {/* Description */}
-                        <h6 className="heading-small text-muted mb-4">
-                          About me
-                        </h6>
-                        <div className="pl-lg-4">
-                          <FormGroup>
-                            <Input
-                              className="form-control-alternative"
-                              placeholder="A few words about you ..."
-                              rows="4"
-                              defaultValue="A beautiful Dashboard for Bootstrap 4. It is Free and
-                          Open Source."
-                              type="textarea"
-                            />
-                          </FormGroup>
-                        </div>
                         <Card className="mb-0">
                           <CardHeader id="headingTwo">
+                            <Button
+                              block
+                              color="link"
+                              className="text-left m-0 p-0"
+                              onClick={() => this.toggleAccordion(0)}
+                              aria-expanded={this.state.accordion[0]}
+                              aria-controls="collapseOne"
+                            >
+                              <h5 className="m-0 p-0">
+                                Identity Card
+                              </h5>
+                            </Button>
+                          </CardHeader>
+                          <Collapse
+                            isOpen={this.state.accordion[0]}
+                            data-parent="#accordion"
+                            id="collapseOne"
+                          >
+                            <CardBody style={style.sameSizeWithParent}>
+
+                              {(this.state.loadingID === true) ?
+                                (<PulseLoader
+                                  css={override}
+                                  sizeUnit={"px"}
+                                  size={15}
+                                  color={'#123abc'}
+                                  loading={this.state.loadingID}
+                                />)
+                                :
+                                (this.state.documentID.length !== 0) ?
+                                  (<div>
+                                    {this.state.documentID.documentFile.map((imageData) => (
+                                      <img src={this.setSrcImgBase64(imageData.fileType,
+                                        imageData.data)} style={style.sameSizeWithParent} />))}
+                                  </div>)
+                                  :
+                                  (<div>
+                                    <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
+                                    {' '}
+                                    <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
+                                  </div>)}
+                            </CardBody>
+                          </Collapse>
+                        </Card>
+                        <Card className="mb-0">
+                          <CardHeader id="headingThree">
                             <Button
                               block
                               color="link"
@@ -400,7 +581,7 @@ class Profile extends React.Component {
                               aria-controls="collapseTwo"
                             >
                               <h5 className="m-0 p-0">
-                                Collapsible Group Item #2
+                                Passport
                               </h5>
                             </Button>
                           </CardHeader>
@@ -409,21 +590,29 @@ class Profile extends React.Component {
                             data-parent="#accordion"
                             id="collapseTwo"
                           >
-                            <CardBody>
-                              2. Anim pariatur cliche reprehenderit, enim
-                              eiusmod high life accusamus terry richardson ad
-                              squid. 3 wolf moon officia aute, non cupidatat
-                              skateboard dolor brunch. Food truck quinoa
-                              nesciunt laborum eiusmod. Brunch 3 wolf moon
-                              tempor, sunt aliqua put a bird on it squid
-                              single-origin coffee nulla assumenda shoreditch
-                              et. Nihil anim keffiyeh helvetica, craft beer
-                              labore wes anderson cred nesciunt sapiente ea
-                              proident. Ad vegan excepteur butcher vice lomo.
-                              Leggings occaecat craft beer farm-to-table, raw
-                              denim aesthetic synth nesciunt you probably
-                              haven't heard of them accusamus labore sustainable
-                              VHS.
+                            <CardBody style={style.sameSizeWithParent}>
+
+                              {(this.state.loadingPP === true) ?
+                                (<PulseLoader
+                                  css={override}
+                                  sizeUnit={"px"}
+                                  size={15}
+                                  color={'#123abc'}
+                                  loading={this.state.loadingPP}
+                                />)
+                                :
+                                (this.state.documentPP.length !== 0) ?
+                                  (<div>
+                                    {this.state.documentPP.documentFile.map((imageData) => (
+                                      <img src={this.setSrcImgBase64(imageData.fileType,
+                                        imageData.data)} style={style.sameSizeWithParent} />))}
+                                  </div>)
+                                  :
+                                  (<div>
+                                    <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "PP")} />
+                                    {' '}
+                                    <Button type="button" onClick={() => this.saveDocument("PP")}>Save</Button>
+                                  </div>)}
                             </CardBody>
                           </Collapse>
                         </Card>
@@ -438,7 +627,7 @@ class Profile extends React.Component {
                               aria-controls="collapseThree"
                             >
                               <h5 className="m-0 p-0">
-                                Collapsible Group Item #3
+                                Driving License
                               </h5>
                             </Button>
                           </CardHeader>
@@ -447,21 +636,29 @@ class Profile extends React.Component {
                             data-parent="#accordion"
                             id="collapseThree"
                           >
-                            <CardBody>
-                              3. Anim pariatur cliche reprehenderit, enim
-                              eiusmod high life accusamus terry richardson ad
-                              squid. 3 wolf moon officia aute, non cupidatat
-                              skateboard dolor brunch. Food truck quinoa
-                              nesciunt laborum eiusmod. Brunch 3 wolf moon
-                              tempor, sunt aliqua put a bird on it squid
-                              single-origin coffee nulla assumenda shoreditch
-                              et. Nihil anim keffiyeh helvetica, craft beer
-                              labore wes anderson cred nesciunt sapiente ea
-                              proident. Ad vegan excepteur butcher vice lomo.
-                              Leggings occaecat craft beer farm-to-table, raw
-                              denim aesthetic synth nesciunt you probably
-                              haven't heard of them accusamus labore sustainable
-                              VHS.
+                            <CardBody style={style.sameSizeWithParent}>
+
+                              {(this.state.loadingDL === true) ?
+                                (<PulseLoader
+                                  css={override}
+                                  sizeUnit={"px"}
+                                  size={15}
+                                  color={'#123abc'}
+                                  loading={this.state.loadingDL}
+                                />)
+                                :
+                                (this.state.documentDL.length !== 0) ?
+                                  (<div>
+                                    {this.state.documentDL.documentFile.map((imageData) => (
+                                      <img src={this.setSrcImgBase64(imageData.fileType,
+                                        imageData.data)} style={style.sameSizeWithParent} />))}
+                                  </div>)
+                                  :
+                                  (<div>
+                                    <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "DL")} />
+                                    {' '}
+                                    <Button type="button" onClick={() => this.saveDocument("DL")}>Save</Button>
+                                  </div>)}
                             </CardBody>
                           </Collapse>
                         </Card>

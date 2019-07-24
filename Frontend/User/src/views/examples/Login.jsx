@@ -79,28 +79,37 @@ class Login extends React.Component {
 
     }).then(
       (result) => {
-        result.text().then((data) => {
-          if (result.status === 200) {
-            // this.setToken(data);
-            //                   let header = document.getElementsByTagName("head")[0];
-            // // console.log("header" + header);
-            // var meta = document.createElement("meta");
-            // meta.name = "token";
-            // meta.content = data;
-            // header.appendChild(meta);
-            localStorage.setItem("token", data);
-            localStorage.setItem("isLoggedIn", true);
-            localStorage.setItem("user", this.state.username);
-            this.getUsername();
-            this.props.history.push('view-request-list');
-          }
-          if (result.status !== 200) {
-            event.preventDefault();
-            // alert(data);
-            if (data === "Wrong userId and password")
-              document.getElementById("loginError").innerHTML = 
-              "<div class='alert alert-danger' role='alert'><strong>Username or password is incorrect!</strong><br/> Please try again!</div>";
-          }
+        result.json().then((data) => {
+            if (result.status === 200) {
+              if (data.role === "ROLE_USER") {
+              // this.setToken(data);
+              //                   let header = document.getElementsByTagName("head")[0];
+              // // console.log("header" + header);
+              // var meta = document.createElement("meta");
+              // meta.name = "token";
+              // meta.content = data;
+              // header.appendChild(meta);
+              localStorage.setItem("token", data.token);
+              localStorage.setItem("isLoggedIn", true);
+              localStorage.setItem("user", data.username);
+              this.getUsername();
+              console.log(data)
+              this.props.history.push('view-request-list');
+
+              } else {
+                console.log(data)
+                document.getElementById("loginError").innerHTML =
+                      "<div class='alert alert-danger' role='alert'><strong>Your account is not user account</strong><br/> Please try again!</div>";
+              }
+            }
+            if (result.status !== 200) {
+              event.preventDefault();
+              // alert(data);
+              console.log(data)
+              if (data.message === "Wrong userId and password")
+                document.getElementById("loginError").innerHTML =
+                  "<div class='alert alert-danger' role='alert'><strong>Username or password is incorrect!</strong><br/> Please try again!</div>";
+            }
         });
       }
 
@@ -112,7 +121,7 @@ class Login extends React.Component {
   componentWillMount() {
     // console.log(localStorage.getItem("isLoggedIn"))
     //isLoggedIn = true go back to homepage (prevent go to login page when isLoggedIn = true)
-    if(localStorage.getItem("isLoggedIn") !== null && localStorage.getItem("token") !== null) {
+    if (localStorage.getItem("isLoggedIn") !== null && localStorage.getItem("token") !== null) {
       this.props.history.push("/")
     } else {
       // localStorage.removeItem("token");
