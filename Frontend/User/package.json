@@ -48,6 +48,7 @@
     "@material-ui/core": "^4.2.1",
     "bootstrap": "^4.3.1",
     "classnames": "2.2.6",
+    "firebase": "^6.3.2",
     "glamor": "^2.20.40",
     "glamorous": "^5.0.0",
     "govuk-colours": "^1.0.3",
@@ -62,16 +63,13 @@
     "react-dom": "^16.8.6",
     "react-horizontal-timeline": "^1.5.3",
     "react-icons": "^3.7.0",
+    "react-notification-badge": "^1.5.1",
     "react-paypal-button-v2": "^2.3.1",
     "react-redux": "^7.0.3",
     "react-router": "5.0.0",
     "react-router-dom": "5.0.0",
     "react-scripts": "3.0.0",
     "react-spinners": "^0.5.13",
-<<<<<<< HEAD
-    "react-swipeable-views": "^0.13.3",
-=======
->>>>>>> c70aa1763901f39b1bea6801794c2d0d9e85cbbf
     "reactstrap": "^8.0.0",
     "redux": "^4.0.1"
   },

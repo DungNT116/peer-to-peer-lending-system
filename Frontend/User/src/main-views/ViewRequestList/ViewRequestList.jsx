@@ -80,7 +80,6 @@ class ViewRequestList extends React.Component {
         }
       }
     ).then(result => {
-      console.log(result);
       if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
@@ -121,7 +120,6 @@ class ViewRequestList extends React.Component {
   }
 
   render() {
-    console.log(this.state.requests);
     const listItems = this.state.requests.map((request, index) => (
       <tr key={index}>
         <td>
