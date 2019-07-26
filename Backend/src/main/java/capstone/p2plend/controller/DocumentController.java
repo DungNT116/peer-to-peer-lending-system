@@ -87,4 +87,19 @@ public class DocumentController {
 		}
 		return new ResponseEntity<PageDTO<Document>>(result, httpStatus);
 	}
+	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN" })
+	@GetMapping("/rest/admin/document/getAllUserDocument")
+	public ResponseEntity<List<Document>> getAllUserDocument(@RequestParam("username") String username) {
+		HttpStatus httpStatus = null;
+		List<Document> result = null;
+		try {
+			result = docService.getAllUserDocument(username);
+			httpStatus = HttpStatus.OK;
+		} catch (Exception e) {
+			httpStatus = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<List<Document>>(result, httpStatus);
+	}
 }

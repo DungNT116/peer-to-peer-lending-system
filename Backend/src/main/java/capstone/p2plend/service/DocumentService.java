@@ -102,6 +102,20 @@ public class DocumentService {
 		}
 
 	}
+	
+	public List<Document> getAllUserDocument(String username) {
+		try {
+			User user = userRepo.findByUsername(username);
+			List<Document> lstDoc = user.getDocument();
+			for (Document d : lstDoc) {
+				d.setUser(null);
+			}
+			return lstDoc;
+		} catch (Exception e) {
+			return null;
+		}
+
+	}
 
 	public boolean validDocumentId(Document document) {
 		try {
