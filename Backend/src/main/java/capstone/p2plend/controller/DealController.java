@@ -69,11 +69,11 @@ public class DealController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/deal/cancelDeal")
-	public Integer cancelDeal(@RequestBody Deal deal) {
+	public Integer cancelDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
 		
-		valid = dealService.cancelDeal(deal.getId());
+		valid = dealService.cancelDeal(deal.getId(), token);
 		
 		if (valid == true) {
 			status = HttpStatus.OK;

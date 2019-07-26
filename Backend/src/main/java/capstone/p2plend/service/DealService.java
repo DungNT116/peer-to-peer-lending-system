@@ -72,10 +72,17 @@ public class DealService {
 			List<Milestone> listMilestone = deal.getMilestone();
 
 			Deal existDeal = dealRepo.findById(deal.getId()).get();
+			
+			User existUser = existDeal.getUser();
+			if(existUser.getId() == user.getId()) {
+				return false;
+			}
+			
 			existDeal.setStatus("dealing");
 			existDeal.setBorrowTime(deal.getBorrowTime());
 			existDeal.setPaybackTime(deal.getPaybackTime());
 			existDeal.setUser(user);
+			
 			
 			List<Milestone> lstMs = existDeal.getMilestone();
 			for(Milestone m : lstMs) {
@@ -124,7 +131,7 @@ public class DealService {
 		}
 	}
 	
-	public boolean cancelDeal(int id) {
+	public boolean cancelDeal(int id, String token) {
 		try {
 			
 			Deal deal = dealRepo.findById(id).get();
