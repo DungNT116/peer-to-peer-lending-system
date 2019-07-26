@@ -22,14 +22,18 @@ import {
   Media
   // UncontrolledTooltip
 } from "reactstrap";
+import NotificationBadge from "react-notification-badge";
+import { Effect } from "react-notification-badge";
+import { database } from "../../firebase";
 
 class DemoNavbar extends React.Component {
   constructor(props) {
     super(props);
-    // this.state = {
-    //   isLoggedIn: false
-    // }
+    this.state = {
+      notifications: []
+    };
     this.logout = this.logout.bind(this);
+    this.onResetCountView = this.onResetCountView.bind(this);
   }
 
   logout() {
@@ -42,22 +46,76 @@ class DemoNavbar extends React.Component {
     let headroom = new Headroom(document.getElementById("navbar-main"));
     // initialise
     headroom.init();
-    // if (localStorage.getItem("isLoggedIn") !== null) {
-    //   await this.setState({
-    //     isLoggedIn: localStorage.getItem("isLoggedIn")
-    //   });
-    // }
+  }
+  async componentWillMount() {
+    const username = localStorage.getItem("user");
+
+    //query data get key of User exist
+    await database
+      .ref("ppls")
+      .orderByChild("username")
+      .equalTo(username)
+      .once("value", snapshot => {
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          this.setState({ keyUserFb: Object.keys(userData)[0] });
+        }
+      });
+
+    //query notifications base on key get above
+    const notificationRef = await database
+      .ref("/ppls/" + this.state.keyUserFb + "/notification")
+      .orderByKey()
+      .limitToLast(100);
+    await notificationRef.on("value", snapshot => {
+      let notificationObj = snapshot.val();
+      let notifications = [];
+      Object.keys(notificationObj).forEach(key =>
+        notifications.push(notificationObj[key])
+      );
+      notifications = notifications.reverse().map(noti => {
+        return { message: noti.message, user: noti.sender };
+      });
+      this.setState(prevState => ({
+        notifications: notifications
+      }));
+    });
+    //get amounts new Notifications
+    await database
+      .ref("/ppls/" + this.state.keyUserFb + "/countNew")
+      .on("value", snapshot => {
+        this.setState({
+          countNew: snapshot.val()
+        });
+      });
+  }
+  //reset count view by clicking notification
+  onResetCountView(event) {
+    event.preventDefault();
+    var upvotesRef = database.ref(
+      "/ppls/" + this.state.keyUserFb + "/countNew"
+    );
+    upvotesRef.transaction(function(current_value) {
+      return (current_value -= current_value);
+    });
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   if(this.state.isLoggedIn !== localStorage.getItem("isLoggedIn")) {
-  //     return true;
-  //   }
-  //   return false;
-  // }
+  //function add new message to firebase when something happen
+  onAddMessage(event) {
+    event.preventDefault();
+    var upvotesRef = database.ref(
+      "/ppls/" + this.state.keyUserFb + "/countNew"
+    );
+    upvotesRef.transaction(function(current_value) {
+      return (current_value || 0) + 1;
+    });
+
+    database
+      .ref("/ppls/" + this.state.keyUserFb + "/notification/")
+      .push({ message: this.input.value, sender: this.state.username });
+  }
 
   render() {
-    // console.log(localStorage.getItem("isLoggedIn"))
     return (
       <>
         <header className="header-global">
@@ -106,71 +164,6 @@ class DemoNavbar extends React.Component {
                   </Row>
                 </div>
                 <Nav className="navbar-nav-hover align-items-lg-center" navbar>
-                  {/* <UncontrolledDropdown nav>
-                    <DropdownToggle nav>
-                      <i className="ni ni-ui-04 d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">Components</span>
-                    </DropdownToggle>
-                    <DropdownMenu className="dropdown-menu-xl">
-                      <div className="dropdown-menu-inner">
-                        <Media
-                          className="d-flex align-items-center"
-                          href="https://demos.creative-tim.com/argon-design-system-react/#/documentation/overview?ref=adsr-navbar"
-                          target="_blank"
-                        >
-                          <div className="icon icon-shape bg-gradient-primary rounded-circle text-white">
-                            <i className="ni ni-spaceship" />
-                          </div>
-                          <Media body className="ml-3">
-                            <h6 className="heading text-primary mb-md-1">
-                              Getting started
-                            </h6>
-                            <p className="description d-none d-md-inline-block mb-0">
-                              Learn how to use Argon compiling Scss, change
-                              brand colors and more.
-                            </p>
-                          </Media>
-                        </Media>
-                        <Media
-                          className="d-flex align-items-center"
-                          href="https://demos.creative-tim.com/argon-design-system-react/#/documentation/colors?ref=adsr-navbar"
-                          target="_blank"
-                        >
-                          <div className="icon icon-shape bg-gradient-success rounded-circle text-white">
-                            <i className="ni ni-palette" />
-                          </div>
-                          <Media body className="ml-3">
-                            <h6 className="heading text-primary mb-md-1">
-                              Foundation
-                            </h6>
-                            <p className="description d-none d-md-inline-block mb-0">
-                              Learn more about colors, typography, icons and the
-                              grid system we used for Argon.
-                            </p>
-                          </Media>
-                        </Media>
-                        <Media
-                          className="d-flex align-items-center"
-                          href="https://demos.creative-tim.com/argon-design-system-react/#/documentation/alert?ref=adsr-navbar"
-                          target="_blank"
-                        >
-                          <div className="icon icon-shape bg-gradient-warning rounded-circle text-white">
-                            <i className="ni ni-ui-04" />
-                          </div>
-                          <Media body className="ml-3">
-                            <h5 className="heading text-warning mb-md-1">
-                              Components
-                            </h5>
-                            <p className="description d-none d-md-inline-block mb-0">
-                              Browse our 50 beautiful handcrafted components
-                              offered in the Free version.
-                            </p>
-                          </Media>
-                        </Media>
-                      </div>
-                    </DropdownMenu>
-                  </UncontrolledDropdown> */}
-                  {/* {(this.state.isLoggedIn) ? */}
                   {localStorage.getItem("isLoggedIn") ? (
                     // {this.state.isLoggedIn ? (
                     <UncontrolledDropdown nav>
@@ -262,32 +255,76 @@ class DemoNavbar extends React.Component {
                       </Button>
                     )}
                     {localStorage.getItem("isLoggedIn") ? (
-                      <UncontrolledDropdown nav>
-                        <DropdownToggle nav>
-                          <Media className="align-items-center">
-                            <span className="avatar avatar-sm rounded-circle">
-                              <img
-                                alt="..."
-                                src={require("assets/img/theme/team-4-800x800.jpg")}
-                              />
-                            </span>
-                            <Media className="ml-2 d-none d-lg-block">
-                              <span className="mb-0 text-sm font-weight-bold">
-                                {localStorage.getItem("profile")}
+                      <div>
+                        <UncontrolledDropdown nav>
+                          <DropdownToggle nav>
+                            <Media className="align-items-center">
+                              <span
+                                className="avatar avatar-sm rounded-circle"
+                                style={{ backgroundColor: "white" }}
+                              >
+                                <img
+                                  alt="..."
+                                  src={require("assets/img/theme/icon_smartinbox.svg")}
+                                />
+                                <NotificationBadge
+                                  count={this.state.countNew}
+                                  effect={Effect.SCALE}
+                                />
                               </span>
                             </Media>
-                          </Media>
-                        </DropdownToggle>
+                          </DropdownToggle>
+                          <DropdownMenu className="dropdown-menu-arrow" right>
+                            <DropdownItem>
+                              <h6 className="text-overflow m-0">
+                                Notification
+                              </h6>
+                            </DropdownItem>
+                            {this.state.notifications.map((noti, index) => {
+                              return (
+                                <div key={index}>
+                                  <DropdownItem divider />
+                                  <DropdownItem href="#">
+                                    <span onClick={this.onResetCountView}>
+                                      {noti.message}
+                                    </span>
+                                    <strong>{" - " + noti.user}</strong>
+                                  </DropdownItem>
+                                </div>
+                              );
+                            })}
+                          </DropdownMenu>
+                        </UncontrolledDropdown>
+                        <UncontrolledDropdown nav>
+                          <DropdownToggle nav>
+                            <Media className="align-items-center">
+                              <span className="avatar avatar-sm rounded-circle">
+                                <img
+                                  alt="..."
+                                  src={require("assets/img/theme/team-4-800x800.jpg")}
+                                />
+                              </span>
+                              <Media className="ml-2 d-none d-lg-block">
+                                <span className="mb-0 text-sm font-weight-bold">
+                                  {localStorage.getItem("profile")}
+                                </span>
+                              </Media>
+                            </Media>
+                          </DropdownToggle>
 
-                        <DropdownMenu>
-                          <DropdownItem className="noti-title" header tag="div">
-                            <h6 className="text-overflow m-0">Welcome!</h6>
-                          </DropdownItem>
-                          <DropdownItem to="/profile-page" tag={Link}>
-                            <i className="ni ni-single-02" />
-                            <span>My profile</span>
-                          </DropdownItem>
-                          {/* <DropdownItem to="/admin/user-profile" tag={Link}>
+                          <DropdownMenu>
+                            <DropdownItem
+                              className="noti-title"
+                              header
+                              tag="div"
+                            >
+                              <h6 className="text-overflow m-0">Welcome!</h6>
+                            </DropdownItem>
+                            <DropdownItem to="/profile-page" tag={Link}>
+                              <i className="ni ni-single-02" />
+                              <span>My profile</span>
+                            </DropdownItem>
+                            {/* <DropdownItem to="/admin/user-profile" tag={Link}>
                             <i className="ni ni-settings-gear-65" />
                             <span>Settings</span>
                           </DropdownItem>
@@ -299,13 +336,17 @@ class DemoNavbar extends React.Component {
                             <i className="ni ni-support-16" />
                             <span>Support</span>
                           </DropdownItem> */}
-                          <DropdownItem divider />
-                          <DropdownItem href="/" onClick={() => this.logout()}>
-                            <i className="ni ni-user-run" />
-                            <span>Logout</span>
-                          </DropdownItem>
-                        </DropdownMenu>
-                      </UncontrolledDropdown>
+                            <DropdownItem divider />
+                            <DropdownItem
+                              href="/"
+                              onClick={() => this.logout()}
+                            >
+                              <i className="ni ni-user-run" />
+                              <span>Logout</span>
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </UncontrolledDropdown>
+                      </div>
                     ) : (
                       ""
                     )}
