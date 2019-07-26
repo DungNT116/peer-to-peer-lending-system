@@ -75,6 +75,7 @@ public class DealService {
 			existDeal.setStatus("dealing");
 			existDeal.setBorrowTime(deal.getBorrowTime());
 			existDeal.setPaybackTime(deal.getPaybackTime());
+			existDeal.setUser(user);
 			
 			List<Milestone> lstMs = existDeal.getMilestone();
 			for(Milestone m : lstMs) {
@@ -143,6 +144,7 @@ public class DealService {
 			deal.setBorrowTime(backupDeal.getBorrowTime());
 			deal.setPaybackTime(backupDeal.getPaybackTime());
 			deal.setStatus(backupDeal.getStatus());
+			deal.setUser(request.getBorrower());
 			Deal savedDeal = dealRepo.saveAndFlush(deal);
 			
 			List<Milestone> newLstMilestone = new ArrayList<>();

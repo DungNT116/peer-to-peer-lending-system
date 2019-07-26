@@ -55,6 +55,10 @@ public class User {
 	@Column
 	private String status;
 
+	@JsonIgnoreProperties(value = { "user" })
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	private List<Deal> deal = new ArrayList<>();
+
 	@JsonIgnoreProperties(value = { "borrower", "lender" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "borrower")
 	private List<Request> borrowRequest = new ArrayList<>();
@@ -159,6 +163,14 @@ public class User {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public List<Deal> getDeal() {
+		return deal;
+	}
+
+	public void setDeal(List<Deal> deal) {
+		this.deal = deal;
 	}
 
 	public List<Request> getBorrowRequest() {

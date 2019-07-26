@@ -39,10 +39,10 @@ public class RequestService {
 
 	@Autowired
 	MilestoneRepository milestoneRepo;
-	
+
 	@Autowired
 	BackupDealRepository backupDealRepo;
-	
+
 	@Autowired
 	BackupMilestoneRepository backupMilestoneRepo;
 
@@ -95,6 +95,15 @@ public class RequestService {
 				deal.setMilestone(listMilestone);
 			}
 
+			if (r.getDeal().getUser() != null) {
+				User user = r.getDeal().getUser();
+				User attachUser = new User();
+				attachUser.setUsername(user.getUsername());
+				attachUser.setFirstName(user.getFirstName());
+				attachUser.setLastName(user.getLastName());
+				deal.setUser(attachUser);
+			}
+
 			r.setDeal(deal);
 		}
 
@@ -142,6 +151,16 @@ public class RequestService {
 					}
 					deal.setMilestone(listMilestone);
 				}
+
+				if (r.getDeal().getUser() != null) {
+					User user = r.getDeal().getUser();
+					User attachUser = new User();
+					attachUser.setUsername(user.getUsername());
+					attachUser.setFirstName(user.getFirstName());
+					attachUser.setLastName(user.getLastName());
+					deal.setUser(attachUser);
+				}
+				
 				r.setDeal(deal);
 			}
 		}
@@ -192,6 +211,16 @@ public class RequestService {
 					}
 					deal.setMilestone(listMilestone);
 				}
+				
+				if (r.getDeal().getUser() != null) {
+					User user = r.getDeal().getUser();
+					User attachUser = new User();
+					attachUser.setUsername(user.getUsername());
+					attachUser.setFirstName(user.getFirstName());
+					attachUser.setLastName(user.getLastName());
+					deal.setUser(attachUser);
+				}
+				
 				r.setDeal(deal);
 			}
 		}
@@ -241,6 +270,16 @@ public class RequestService {
 					}
 					deal.setMilestone(listMilestone);
 				}
+				
+				if (r.getDeal().getUser() != null) {
+					User user = r.getDeal().getUser();
+					User attachUser = new User();
+					attachUser.setUsername(user.getUsername());
+					attachUser.setFirstName(user.getFirstName());
+					attachUser.setLastName(user.getLastName());
+					deal.setUser(attachUser);
+				}
+				
 				r.setDeal(deal);
 			}
 		}
@@ -292,6 +331,16 @@ public class RequestService {
 					}
 					deal.setMilestone(listMilestone);
 				}
+				
+				if (r.getDeal().getUser() != null) {
+					User user = r.getDeal().getUser();
+					User attachUser = new User();
+					attachUser.setUsername(user.getUsername());
+					attachUser.setFirstName(user.getFirstName());
+					attachUser.setLastName(user.getLastName());
+					deal.setUser(attachUser);
+				}
+				
 				r.setDeal(deal);
 			}
 		}
@@ -342,6 +391,16 @@ public class RequestService {
 					}
 					deal.setMilestone(listMilestone);
 				}
+				
+				if (r.getDeal().getUser() != null) {
+					User user = r.getDeal().getUser();
+					User attachUser = new User();
+					attachUser.setUsername(user.getUsername());
+					attachUser.setFirstName(user.getFirstName());
+					attachUser.setLastName(user.getLastName());
+					deal.setUser(attachUser);
+				}
+				
 				r.setDeal(deal);
 			}
 		}
@@ -392,6 +451,16 @@ public class RequestService {
 					}
 					deal.setMilestone(listMilestone);
 				}
+				
+				if (r.getDeal().getUser() != null) {
+					User user = r.getDeal().getUser();
+					User attachUser = new User();
+					attachUser.setUsername(user.getUsername());
+					attachUser.setFirstName(user.getFirstName());
+					attachUser.setLastName(user.getLastName());
+					deal.setUser(attachUser);
+				}
+				
 				r.setDeal(deal);
 			}
 		}
@@ -410,9 +479,9 @@ public class RequestService {
 				return false;
 			}
 
-			List<Milestone> listMilestone = new ArrayList<>();			
+			List<Milestone> listMilestone = new ArrayList<>();
 			if (request.getDeal().getMilestone() != null) {
-				listMilestone.addAll(request.getDeal().getMilestone());			
+				listMilestone.addAll(request.getDeal().getMilestone());
 			} else {
 				return false;
 			}
@@ -444,22 +513,23 @@ public class RequestService {
 
 			deal.setStatus("pending");
 			deal.setRequest(reObj);
+			deal.setUser(account);
 			Deal dealObj = dealRepo.saveAndFlush(deal);
-			
+
 			BackupDeal backupDealObj = new BackupDeal();
 			backupDealObj.setBorrowTime(dealObj.getBorrowTime());
 			backupDealObj.setPaybackTime(dealObj.getPaybackTime());
 			backupDealObj.setStatus(dealObj.getStatus());
 			backupDealObj.setDeal(dealObj);
 			backupDealObj = backupDealRepo.saveAndFlush(backupDealObj);
-			
+
 			for (Milestone m : listMilestone) {
 				m.setDeal(dealObj);
 				milestoneRepo.saveAndFlush(m);
 			}
-			
+
 			List<BackupMilestone> listBackupMilestone = new ArrayList<>();
-			for(Milestone m : listMilestone) {
+			for (Milestone m : listMilestone) {
 				BackupMilestone backupMilestone = new BackupMilestone();
 				backupMilestone.setPercent(m.getPercent());
 				backupMilestone.setPresentDate(m.getPresentDate());
@@ -467,17 +537,17 @@ public class RequestService {
 				backupMilestone.setType(m.getType());
 				listBackupMilestone.add(backupMilestone);
 			}
-			
+
 			for (Milestone m : listMilestone) {
 				m.setDeal(dealObj);
-				milestoneRepo.saveAndFlush(m);								
+				milestoneRepo.saveAndFlush(m);
 			}
-			
+
 			for (BackupMilestone bm : listBackupMilestone) {
 				bm.setBackupDeal(backupDealObj);
-				backupMilestoneRepo.saveAndFlush(bm);								
+				backupMilestoneRepo.saveAndFlush(bm);
 			}
-			
+
 			return true;
 		} catch (Exception e) {
 			return false;
