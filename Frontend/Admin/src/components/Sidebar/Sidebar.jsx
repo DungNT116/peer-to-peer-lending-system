@@ -64,7 +64,7 @@ class Sidebar extends React.Component {
 
   // creates the links that appear in the left menu / Sidebar
   createLinks = routes => {
-    let routeIgnores = ["icons", "tables", "login"];
+    let routeIgnores = ["icons", "tables", "login", "document-detail"];
     return routes
       .filter(function(routeIgnore) {
         let elementIgnore = routeIgnore.path.split("/").pop();

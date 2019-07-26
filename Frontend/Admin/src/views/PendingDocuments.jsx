@@ -18,6 +18,7 @@ import {
 } from "reactstrap";
 // core components
 
+import { connect } from "react-redux";
 import { Link, Redirect } from "react-router-dom";
 import Pagination from "./examples/Pagination";
 import Header from "components/Headers/Header.jsx";
@@ -35,10 +36,12 @@ class PendingDocuments extends React.Component {
       maxPage: 0,
       iconTabs: 1,
       plainTabs: 1,
-      loading: true
+      loading: true,
+      docIdChoosed: null,
+      docType: null
     };
     this.getPendingDocuments = this.getPendingDocuments.bind(this);
-    // this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
+    this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.changePage = this.changePage.bind(this);
   }
@@ -48,7 +51,16 @@ class PendingDocuments extends React.Component {
       page: index
     });
   }
+  setDataToDetailPage(doc) {
+    // this.setState({
+    //   docIdChoosed: id,
+    // })
+    console.log(doc)
+    this.props.setDocument(doc.id);
+    this.props.setDocType(doc.documentType);
 
+    // localStorage.setItem("previousPage", window.location.pathname);
+  }
   getPendingDocuments() {
     let pageParam = encodeURIComponent(this.state.page);
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
@@ -137,13 +149,13 @@ class PendingDocuments extends React.Component {
         </td>
         <td>{doc.documentType}</td>
         <td>
-          <Link to="/view-detail-request">
+          <Link to="/admin/document-detail">
             <Button
               type="button"
               id="dealButton"
               size="md"
               className="btn btn-outline-primary"
-              // onClick={() => this.setDataToDetailPage(request)}
+              onClick={() => this.setDataToDetailPage(doc)}
             >
               View Detail
             </Button>
@@ -202,5 +214,29 @@ class PendingDocuments extends React.Component {
     );
   }
 }
+const mapStateToProps = state => {
+  return {
+    document: state.document
+  };
+};
+const mapDispatchToProps = dispatch => {
+  return {
+    setDocument: idDoc => {
+      dispatch({
+        type: "SET_DETAIL_DOCUMENT_DATA",
+        payload: idDoc
+      });
+    },
+    setDocType: documentType => {
+      dispatch({
+        type: "SET_TYPE_DOCUMENT_DATA",
+        payload: documentType
+      });
+    }
+  };
+};
 
-export default PendingDocuments;
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(PendingDocuments);

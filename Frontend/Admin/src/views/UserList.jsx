@@ -226,7 +226,7 @@ class UserList extends React.Component {
             </Modal>
           </div>
         </td>
-        <td>
+        {/* <td>
           <Link to="/view-detail-request">
             <Button
               type="button"
@@ -238,7 +238,7 @@ class UserList extends React.Component {
               View Detail
             </Button>{" "}
           </Link>
-        </td>
+        </td> */}
       </tr>
     ));
     return (
@@ -260,8 +260,8 @@ class UserList extends React.Component {
                       <th scope="col">Username</th>
                       <th scope="col">First Name</th>
                       <th scope="col">Last Name</th>
-                      <th scope="col">Status</th>
-                      <th scope="col" />
+                      <th scope="col">Active/Deactive</th>
+                      {/* <th scope="col" /> */}
                     </tr>
                   </thead>
                   <tbody>{listUsers}</tbody>

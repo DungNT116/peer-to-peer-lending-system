@@ -7,7 +7,7 @@ import Tables from "views/examples/Tables.jsx";
 import Icons from "views/examples/Icons.jsx";
 import UserList from "views/UserList.jsx";
 import PendingDocuments from "views/PendingDocuments.jsx";
-import UserProfile from "views/UserProfile.jsx";
+import DocumentDetail from "views/DocumentDetail.jsx";
 
 var routes = [
   {
@@ -17,7 +17,7 @@ var routes = [
     component: UserList,
     layout: "/admin"
   },
-  
+
   {
     path: "/pending-document",
     name: "Pending Documents",
@@ -46,6 +46,13 @@ var routes = [
   //   component: Maps,
   //   layout: "/admin"
   // },
+  {
+    path: "/document-detail",
+    name: "Document Detail",
+    icon: "ni ni-single-02 text-yellow",
+    component: DocumentDetail,
+    layout: "/admin"
+  },
   // {
   //   path: "/user-profile",
   //   name: "User Profile",
@@ -66,7 +73,7 @@ var routes = [
     icon: "ni ni-key-25 text-info",
     component: Login,
     layout: "/auth"
-  },
+  }
   // {
   //   path: "/register",
   //   name: "Register",
