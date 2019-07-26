@@ -27,7 +27,7 @@ public class DocumentFileController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping("/rest/documentFile/uploadFile")
-	public Integer uploadFile(@RequestParam("file") MultipartFile[] file) {
+	public ResponseEntity<Integer> uploadFile(@RequestParam("file") MultipartFile[] file) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = dfService.uploadDocument(file);
@@ -36,7 +36,7 @@ public class DocumentFileController {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin

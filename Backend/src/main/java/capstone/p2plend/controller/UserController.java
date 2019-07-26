@@ -127,7 +127,7 @@ public class UserController {
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
 	@PutMapping(value = "/rest/admin/user/activateUser")
-	public Integer activateAccount(@RequestBody User user) {
+	public ResponseEntity<Integer> activateAccount(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = userService.activateAccount(user.getId());
@@ -137,13 +137,13 @@ public class UserController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
 	@PutMapping(value = "/rest/user/loanLimit")
-	public Integer changeLoanLimit(@RequestBody User user) {
+	public ResponseEntity<Integer> changeLoanLimit(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = userService.changeLoanLimit(user.getId(), user.getLoanLimit());
@@ -153,13 +153,13 @@ public class UserController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
 	@PutMapping(value = "/rest/admin/user/deactivateUser")
-	public Integer deactivateAccount(@RequestBody User user) {
+	public ResponseEntity<Integer> deactivateAccount(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = userService.deactivateAccount(user.getId());
@@ -169,7 +169,7 @@ public class UserController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin

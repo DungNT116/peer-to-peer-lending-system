@@ -28,7 +28,7 @@ public class DocumentController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping("/rest/document/uploadFile")
-	public Integer uploadFile(@RequestParam("documentId") String documentId,
+	public ResponseEntity<Integer> uploadFile(@RequestParam("documentId") String documentId,
 			@RequestParam("documentType") String documentType, @RequestHeader("Authorization") String token,
 			@RequestParam("file") MultipartFile[] file) {
 		HttpStatus status = null;
@@ -39,7 +39,7 @@ public class DocumentController {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin
@@ -60,7 +60,7 @@ public class DocumentController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@PostMapping("/rest/admin/document/validDocument")
-	public Integer validDocument(@RequestBody Document document) {
+	public ResponseEntity<Integer> validDocument(@RequestBody Document document) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = docService.validDocumentId(document);
@@ -69,7 +69,7 @@ public class DocumentController {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin

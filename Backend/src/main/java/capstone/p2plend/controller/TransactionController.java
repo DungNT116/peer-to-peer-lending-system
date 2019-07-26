@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,7 @@ public class TransactionController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping(value = "/rest/transaction/newTransaction")
-	public Integer newTransaction(@RequestBody Transaction transaction) {
+	public ResponseEntity<Integer> newTransaction(@RequestBody Transaction transaction) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = transactionService.newTransaction(transaction);
@@ -39,13 +40,13 @@ public class TransactionController {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/transaction/updateTransaction")
-	public Integer updateTransaction(@RequestBody Transaction transaction) {
+	public ResponseEntity<Integer> updateTransaction(@RequestBody Transaction transaction) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = transactionService.updateTransaction(transaction);
@@ -54,6 +55,6 @@ public class TransactionController {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 }
