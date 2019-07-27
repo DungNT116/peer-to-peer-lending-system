@@ -133,6 +133,7 @@ public class DocumentService {
 			}
 
 			Document existDoc = docRepo.findById(document.getId()).get();
+			existDoc.setDocumentId(document.getDocumentId());
 			existDoc.setStatus("valid");
 			docRepo.saveAndFlush(existDoc);
 
