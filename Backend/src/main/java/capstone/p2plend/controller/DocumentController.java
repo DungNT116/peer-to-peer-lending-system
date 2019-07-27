@@ -70,16 +70,31 @@ public class DocumentController {
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
+	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN" })
+	@PostMapping("/rest/admin/document/invalidDocument")
+	public ResponseEntity<Integer> invalidDocument(@RequestBody Document document) {
+		HttpStatus status = null;
+		boolean valid = false;
+		valid = docService.invalidDocumentId(document.getId());
+		if (valid == true) {
+			status = HttpStatus.OK;
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<Integer>(status.value(), status);
+	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
-	@GetMapping("/rest/admin/document/getAllInvalidDocument")
-	public ResponseEntity<PageDTO<Document>> getAllUnvalidDocument(@RequestParam Integer page,
+	@GetMapping("/rest/admin/document/getAllPendingDocument")
+	public ResponseEntity<PageDTO<Document>> getAllPendingDocument(@RequestParam Integer page,
 			@RequestParam Integer element) {
 		HttpStatus httpStatus = null;
 		PageDTO<Document> result = null;
 		try {
-			result = docService.getAllInvalidDocument(page, element);
+			result = docService.getAllPendingDocument(page, element);
 			httpStatus = HttpStatus.OK;
 		} catch (Exception e) {
 			httpStatus = HttpStatus.BAD_REQUEST;

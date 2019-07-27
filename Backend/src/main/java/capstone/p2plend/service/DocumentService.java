@@ -61,7 +61,7 @@ public class DocumentService {
 			if (checkExistDocument != null) {
 				return false;
 			}
-			iDoc.setStatus("invalid");
+			iDoc.setStatus("pending");
 			iDoc.setUser(user);
 			Document savedDoc = docRepo.saveAndFlush(iDoc);
 
@@ -143,10 +143,10 @@ public class DocumentService {
 		}
 	}
 
-	public PageDTO<Document> getAllInvalidDocument(Integer page, Integer element) {
+	public PageDTO<Document> getAllPendingDocument(Integer page, Integer element) {
 		try {
 			Pageable pageable = PageRequest.of(page - 1, element);
-			Page<Document> lstDoc = docRepo.findAllDocumentWithStatus(pageable, "invalid");
+			Page<Document> lstDoc = docRepo.findAllDocumentWithStatus(pageable, "pending");
 			for (Document d : lstDoc) {
 				User user = new User();
 				user.setUsername(d.getUser().getUsername());
@@ -169,4 +169,20 @@ public class DocumentService {
 		}
 	}
 
+	public boolean invalidDocumentId(Integer id) {
+		try {
+
+			if (id == null) {
+				return false;
+			}
+
+			Document existDoc = docRepo.findById(id).get();
+			existDoc.setStatus("invalid");
+			docRepo.saveAndFlush(existDoc);
+
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }
