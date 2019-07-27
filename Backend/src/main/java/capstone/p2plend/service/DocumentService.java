@@ -35,7 +35,7 @@ public class DocumentService {
 	@Autowired
 	UserRepository userRepo;
 
-	public boolean uploadDocument(String documentId, String documentType, String token, MultipartFile[] mf) {
+	public boolean uploadDocument(String documentType, String token, MultipartFile[] mf) {
 		try {
 			String username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
@@ -133,9 +133,6 @@ public class DocumentService {
 			}
 
 			Document existDoc = docRepo.findById(document.getId()).get();
-			if(!existDoc.getDocumentId().equals(document.getDocumentId())) {
-				return false;
-			}
 			existDoc.setStatus("valid");
 			docRepo.saveAndFlush(existDoc);
 

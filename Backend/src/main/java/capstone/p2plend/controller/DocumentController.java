@@ -28,12 +28,11 @@ public class DocumentController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping("/rest/document/uploadFile")
-	public ResponseEntity<Integer> uploadFile(@RequestParam("documentId") String documentId,
-			@RequestParam("documentType") String documentType, @RequestHeader("Authorization") String token,
-			@RequestParam("file") MultipartFile[] file) {
+	public ResponseEntity<Integer> uploadFile(@RequestParam("documentType") String documentType,
+			@RequestHeader("Authorization") String token, @RequestParam("file") MultipartFile[] file) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = docService.uploadDocument(documentId, documentType, token, file);
+		valid = docService.uploadDocument(documentType, token, file);
 		if (valid == true) {
 			status = HttpStatus.OK;
 		} else {
@@ -87,7 +86,7 @@ public class DocumentController {
 		}
 		return new ResponseEntity<PageDTO<Document>>(result, httpStatus);
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@GetMapping("/rest/admin/document/getAllUserDocument")
