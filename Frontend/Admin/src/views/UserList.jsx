@@ -264,7 +264,8 @@ class UserList extends React.Component {
                       {/* <th scope="col" /> */}
                     </tr>
                   </thead>
-                  <tbody>{listUsers}</tbody>
+                  {listUsers == "" ? ("No data is matching") : (<tbody>{listUsers}</tbody>)}
+                  
                 </Table>
                 <PulseLoader
                   css={override}
