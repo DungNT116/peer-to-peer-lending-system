@@ -21,7 +21,7 @@ import {
 import UserHeader from "components/Headers/UserHeader.jsx";
 
 import { css } from "@emotion/core";
-import { PulseLoader } from "react-spinners";
+import { PulseLoader, BeatLoader } from "react-spinners";
 import Header from "components/Headers/Header.jsx";
 
 import { apiLink } from "../api";
@@ -34,42 +34,13 @@ class DocumentDetail extends React.Component {
       loading: true,
       //collapse
       collapse: false,
-      accordion: [true, false, false],
-      custom: [true, false],
-      status: "Closed",
-      fadeIn: true,
+      accordion: [false, false, false],
       timeout: 300
     };
 
-    this.onEntering = this.onEntering.bind(this);
-    this.onEntered = this.onEntered.bind(this);
-    this.onExiting = this.onExiting.bind(this);
-    this.onExited = this.onExited.bind(this);
-    this.toggle = this.toggle.bind(this);
     this.toggleAccordion = this.toggleAccordion.bind(this);
-    this.toggleCustom = this.toggleCustom.bind(this);
-    this.toggleFade = this.toggleFade.bind(this);
     this.setSrcImgBase64 = this.setSrcImgBase64.bind(this);
-  }
-
-  onEntering() {
-    this.setState({ status: "Opening..." });
-  }
-
-  onEntered() {
-    this.setState({ status: "Opened" });
-  }
-
-  onExiting() {
-    this.setState({ status: "Closing..." });
-  }
-
-  onExited() {
-    this.setState({ status: "Closed" });
-  }
-
-  toggle() {
-    this.setState({ collapse: !this.state.collapse });
+    this.handleIDChange = this.handleIDChange.bind(this);
   }
 
   toggleAccordion(tab) {
@@ -81,27 +52,79 @@ class DocumentDetail extends React.Component {
     });
   }
 
-  toggleCustom(tab) {
-    const prevState = this.state.custom;
-    const state = prevState.map((x, index) => (tab === index ? !x : false));
-
+  async approveDocument(idDoc) {
+    this.toggleModal("defaultModal");
     this.setState({
-      custom: state
+      isOpen: true,
+      loading: true
+    });
+    await fetch(apiLink + "/rest/admin/document/validDocument", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        id: idDoc,
+        documentId: this.state.idDocValidation
+      })
+    }).then(result => {
+      if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login");
+      } else if (result.status === 200) {
+        result.json().then(data => {});
+      }
     });
   }
 
-  toggleFade() {
-    this.setState({ fadeIn: !this.state.fadeIn });
+  async rejectDocument(idDoc) {
+    this.toggleModal("defaultModal");
+    this.setState({
+      isOpen: true,
+      loading: true
+    });
+    await fetch(apiLink + "/rest/admin/document/invalidDocument", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        id: idDoc
+      })
+    }).then(result => {
+      if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login");
+      } else if (result.status === 200) {
+        result.json().then(data => {});
+      }
+    });
   }
 
   setSrcImgBase64(type, image) {
     return "data:" + type + ";base64, " + image;
   }
-  async componentWillMount() {
+  componentWillUpdate() {
+    if (
+      localStorage.getItem("isLoggedIn") == "" ||
+      localStorage.getItem("isLoggedIn") == undefined
+    ) {
+      this.props.history.push("/login");
+    } else {
+      this.getUserDocument();
+    }
+  }
+
+  handleIDChange(event) {
+    this.setState({ idDocValidation: event.target.value });
+  }
+  async getUserDocument() {
     await fetch(
       apiLink +
-        "/rest/documentFile/getDocumentFiles?id=" +
-        this.props.document.idDoc,
+        "/rest/admin/document/getAllUserDocument?username=" +
+        this.props.document.userInfo.username,
       {
         method: "GET",
         headers: {
@@ -123,6 +146,9 @@ class DocumentDetail extends React.Component {
         });
       }
     });
+  }
+  componentWillMount() {
+    this.getUserDocument();
   }
   toggleModal = stateParam => {
     this.setState({
@@ -151,7 +177,6 @@ class DocumentDetail extends React.Component {
         height: "100%"
       }
     };
-    console.log(this.state.docs);
     return (
       <>
         <Header />
@@ -183,7 +208,12 @@ class DocumentDetail extends React.Component {
                 <CardHeader className="bg-white border-0">
                   <Row className="align-items-center">
                     <Col xs="8">
-                      <h3 className="mb-0">{this.props.document.docType}</h3>
+                      <h3 className="mb-0">
+                        Profile :
+                        {this.props.document.userInfo.firstName +
+                          " " +
+                          this.props.document.userInfo.lastName}
+                      </h3>
                     </Col>
                   </Row>
                 </CardHeader>
@@ -204,9 +234,7 @@ class DocumentDetail extends React.Component {
                             </label>
                             <br />
                             <span className="description">
-                              {this.state.docs
-                                .slice(0, 1)
-                                .map(data => data.document.user.username)}
+                              {this.props.document.userInfo.username}
                             </span>
                           </FormGroup>
                         </Col>
@@ -220,14 +248,9 @@ class DocumentDetail extends React.Component {
                             </label>
                             <br />
                             <span className="description">
-                              {this.state.docs
-                                .slice(0, 1)
-                                .map(
-                                  data =>
-                                    data.document.user.firstName +
-                                    " " +
-                                    data.document.user.lastName
-                                )}
+                              {this.props.document.userInfo.firstName +
+                                " " +
+                                this.props.document.userInfo.lastName}
                             </span>
                           </FormGroup>
                         </Col>
@@ -235,213 +258,282 @@ class DocumentDetail extends React.Component {
                     </div>
 
                     <hr className="my-4" />
-                    <Row>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label>Id Card</label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-postal-code"
-                            placeholder="12390849128"
-                            type="number"
-                            disabled
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label>Validate ID(Admin)</label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-postal-code"
-                            placeholder="12390849128"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="4">
-                        <FormGroup>
-                          <label>Validation</label>
-                          <br />
-                          <Button
-                            type="button"
-                            size="md"
-                            className="btn btn-outline-primary"
-                            // onClick={() => this.setDataToDetailPage(doc)}
-                          >
-                            Validate
-                          </Button>
-                          <Button
-                            type="button"
-                            size="md"
-                            className="btn btn-outline-danger"
-                            // onClick={() => this.setDataToDetailPage(doc)}
-                          >
-                            Reject
-                          </Button>
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      {this.state.docs.map((imageData, index) => (
-                        <Col lg="4" key={index}>
-                          <img
-                            src={this.setSrcImgBase64(
-                              imageData.fileType,
-                              imageData.data
-                            )}
-                            style={style.sameSizeWithParent}
-                          />
-                        </Col>
-                      ))}
-                      {/* {this.state.docs.forEach(element => (
-                            <img src={this.setSrcImgBase64(element.fileType,element.data)}/>
-                          ))} */}
-                    </Row>
-                    <hr className="my-4" />
                     <div id="accordion" style={{ width: "95%" }}>
-                      <Card className="mb-0">
-                        <CardHeader id="headingOne">
-                          <Button
-                            block
-                            color="link"
-                            className="text-left m-0 p-0"
-                            onClick={() => this.toggleAccordion(0)}
-                            aria-expanded={this.state.accordion[0]}
-                            aria-controls="collapseOne"
-                          >
-                            <h5 className="m-0 p-0">Id card</h5>
-                          </Button>
-                        </CardHeader>
-                        <Collapse
-                          isOpen={this.state.accordion[0]}
-                          data-parent="#accordion"
-                          id="collapseOne"
-                          aria-labelledby="headingOne"
-                        >
-                          <CardBody>
-                            <Row>
-                              <Col lg="6">
-                                <img src="https://www.idcreator.com/media/sc/id-card-templates/drone_pilots_license_2_featured.png" />
-                              </Col>
-                              <Col lg="6">
-                                <select name="cars">
-                                  <option value="">$100.000</option>
-                                  <option value="">$200.000</option>
-                                  <option value="">$300.000</option>
-                                  <option value="">$400.000</option>
-                                </select>
-                              </Col>
-                            </Row>
-                            <Row>
-                              <Col lg="4">
-                                <FormGroup>
-                                  <label>Id Card</label>
-                                  <Input
-                                    className="form-control-alternative"
-                                    id="input-postal-code"
-                                    placeholder="12390849128"
-                                    type="number"
+                      {this.state.docs.map((docData, index) => (
+                        <Card className="mb-0" key={index}>
+                          <CardHeader id={"heading" + index}>
+                            <Button
+                              block
+                              color="link"
+                              className="text-left m-0 p-0"
+                              onClick={() => this.toggleAccordion(index)}
+                              aria-expanded={this.state.accordion[index]}
+                              aria-controls={"collapse" + index}
+                            >
+                              <h5 className="m-0 p-0">
+                                {docData.status == "valid" ? (
+                                  <i
+                                    className="ni ni-check-bold"
+                                    style={{ color: "green" }}
                                   />
-                                </FormGroup>
-                              </Col>
-                              <Col lg="4">
-                                <FormGroup>
-                                  <label>Name on card</label>
-                                  <Input
-                                    className="form-control-alternative"
-                                    id="input-postal-code"
-                                    placeholder="Tran Van A"
+                                ) : docData.status == "pending" ? (
+                                  <span
+                                    style={{ width: "7.5%", float: "left" }}
+                                  >
+                                    <BeatLoader
+                                      // css={override}
+                                      sizeUnit={"px"}
+                                      size={10}
+                                      color={"#F00"}
+                                      loading={this.state["loading" + index]}
+                                    />
+                                  </span>
+                                ) : (
+                                  <i
+                                    className="ni ni-fat-remove"
+                                    style={{ color: "red", fontSize: "15px" }}
                                   />
-                                </FormGroup>
-                              </Col>
-                              <Col lg="4">
-                                <FormGroup>
-                                  <label>Create Date</label>
-                                  <Input
-                                    className="form-control-alternative"
-                                    id="input-postal-code"
-                                    placeholder="Wednesday, December 25"
-                                  />
-                                </FormGroup>
-                              </Col>
-                            </Row>
-                          </CardBody>
-                        </Collapse>
-                      </Card>
-                      <Card className="mb-0">
-                        <CardHeader id="headingTwo">
-                          <Button
-                            block
-                            color="link"
-                            className="text-left m-0 p-0"
-                            onClick={() => this.toggleAccordion(1)}
-                            aria-expanded={this.state.accordion[1]}
-                            aria-controls="collapseTwo"
+                                )}
+                                {docData.documentType}
+                              </h5>
+                            </Button>
+                          </CardHeader>
+
+                          <Collapse
+                            isOpen={this.state.accordion[index]}
+                            data-parent="#accordion"
+                            id={"collapse" + index}
+                            aria-labelledby={"heading" + index}
                           >
-                            <h5 className="m-0 p-0">
-                              Collapsible Group Item #2
-                            </h5>
-                          </Button>
-                        </CardHeader>
-                        <Collapse
-                          isOpen={this.state.accordion[1]}
-                          data-parent="#accordion"
-                          id="collapseTwo"
-                        >
-                          <CardBody>
-                            2. Anim pariatur cliche reprehenderit, enim eiusmod
-                            high life accusamus terry richardson ad squid. 3
-                            wolf moon officia aute, non cupidatat skateboard
-                            dolor brunch. Food truck quinoa nesciunt laborum
-                            eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put
-                            a bird on it squid single-origin coffee nulla
-                            assumenda shoreditch et. Nihil anim keffiyeh
-                            helvetica, craft beer labore wes anderson cred
-                            nesciunt sapiente ea proident. Ad vegan excepteur
-                            butcher vice lomo. Leggings occaecat craft beer
-                            farm-to-table, raw denim aesthetic synth nesciunt
-                            you probably haven't heard of them accusamus labore
-                            sustainable VHS.
-                          </CardBody>
-                        </Collapse>
-                      </Card>
-                      <Card className="mb-0">
-                        <CardHeader id="headingThree">
-                          <Button
-                            block
-                            color="link"
-                            className="text-left m-0 p-0"
-                            onClick={() => this.toggleAccordion(2)}
-                            aria-expanded={this.state.accordion[2]}
-                            aria-controls="collapseThree"
-                          >
-                            <h5 className="m-0 p-0">
-                              Collapsible Group Item #3
-                            </h5>
-                          </Button>
-                        </CardHeader>
-                        <Collapse
-                          isOpen={this.state.accordion[2]}
-                          data-parent="#accordion"
-                          id="collapseThree"
-                        >
-                          <CardBody>
-                            3. Anim pariatur cliche reprehenderit, enim eiusmod
-                            high life accusamus terry richardson ad squid. 3
-                            wolf moon officia aute, non cupidatat skateboard
-                            dolor brunch. Food truck quinoa nesciunt laborum
-                            eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put
-                            a bird on it squid single-origin coffee nulla
-                            assumenda shoreditch et. Nihil anim keffiyeh
-                            helvetica, craft beer labore wes anderson cred
-                            nesciunt sapiente ea proident. Ad vegan excepteur
-                            butcher vice lomo. Leggings occaecat craft beer
-                            farm-to-table, raw denim aesthetic synth nesciunt
-                            you probably haven't heard of them accusamus labore
-                            sustainable VHS.
-                          </CardBody>
-                        </Collapse>
-                      </Card>
+                            <CardBody>
+                              <Row>
+                                {docData.documentFile.map(
+                                  (imageData, indexImg) => (
+                                    <Col
+                                      lg="4"
+                                      key={indexImg}
+                                      style={style.sameSizeWithParent}
+                                    >
+                                      <img
+                                        src={this.setSrcImgBase64(
+                                          imageData.fileType,
+                                          imageData.data
+                                        )}
+                                        style={style.sameSizeWithParent}
+                                      />
+                                    </Col>
+                                  )
+                                )}
+                              </Row>
+                              {docData.status == "valid" ? (
+                                ""
+                              ) : (
+                                <Row>
+                                  <Col lg="4" />
+                                  <Col lg="4">
+                                    <Input
+                                      placeholder="Validation ID Document"
+                                      type="text"
+                                      autoComplete="off"
+                                      value={this.state.idDocValidation}
+                                      onChange={this.handleIDChange}
+                                    />
+                                  </Col>
+                                  <Col lg="4">
+                                    <FormGroup>
+                                      <Button
+                                        type="button"
+                                        size="md"
+                                        className="btn btn-outline-primary"
+                                        onClick={() =>
+                                          this.toggleModal(
+                                            "defaultModal-approve-" + index
+                                          )
+                                        }
+                                      >
+                                        Approve
+                                      </Button>
+                                      <Button
+                                        type="button"
+                                        size="md"
+                                        className="btn btn-outline-danger"
+                                        disabled={docData.status == "invalid"}
+                                        onClick={() =>
+                                          this.toggleModal(
+                                            "defaultModal-reject-" + index
+                                          )
+                                        }
+                                      >
+                                        Reject
+                                      </Button>
+                                      {/* Approve MODAL */}
+                                      <Modal
+                                        className="modal-dialog-centered"
+                                        isOpen={
+                                          this.state[
+                                            "defaultModal-approve-" + index
+                                          ]
+                                        }
+                                        toggle={() =>
+                                          this.toggleModal(
+                                            "defaultModal-approve-" + index
+                                          )
+                                        }
+                                      >
+                                        <div className="modal-header">
+                                          <h6
+                                            className="modal-title"
+                                            id="modal-title-default"
+                                          >
+                                            Approve document
+                                          </h6>
+                                          <button
+                                            aria-label="Close"
+                                            className="close"
+                                            data-dismiss="modal"
+                                            type="button"
+                                            onClick={() =>
+                                              this.toggleModal(
+                                                "defaultModal-approve-" + index
+                                              )
+                                            }
+                                          >
+                                            <span aria-hidden={true}>×</span>
+                                          </button>
+                                        </div>
+                                        <div className="modal-body">
+                                          <p>
+                                            Approve{" "}
+                                            <strong>
+                                              {docData.documentType}
+                                            </strong>{" "}
+                                            of{" "}
+                                            <strong>
+                                              {
+                                                this.props.document.userInfo
+                                                  .username
+                                              }
+                                            </strong>{" "}
+                                            ?
+                                          </p>
+                                        </div>
+                                        <div className="modal-footer">
+                                          <Button
+                                            color="primary"
+                                            type="button"
+                                            onClick={() => {
+                                              this.approveDocument(docData.id);
+                                              this.toggleModal(
+                                                "defaultModal-approve-" + index
+                                              );
+                                            }}
+                                          >
+                                            Yes
+                                          </Button>
+                                          <Button
+                                            className="ml-auto"
+                                            color="link"
+                                            data-dismiss="modal"
+                                            type="button"
+                                            onClick={() =>
+                                              this.toggleModal(
+                                                "defaultModal-approve-" + index
+                                              )
+                                            }
+                                          >
+                                            No
+                                          </Button>
+                                        </div>
+                                      </Modal>
+                                      {/* Approve MODAL */}
+                                      {/* REJECT MODAL */}
+                                      <Modal
+                                        className="modal-dialog-centered"
+                                        isOpen={
+                                          this.state[
+                                            "defaultModal-reject-" + index
+                                          ]
+                                        }
+                                        toggle={() =>
+                                          this.toggleModal(
+                                            "defaultModal-reject-" + index
+                                          )
+                                        }
+                                      >
+                                        <div className="modal-header">
+                                          <h6
+                                            className="modal-title"
+                                            id="modal-title-default"
+                                          >
+                                            Reject document
+                                          </h6>
+                                          <button
+                                            aria-label="Close"
+                                            className="close"
+                                            data-dismiss="modal"
+                                            type="button"
+                                            onClick={() =>
+                                              this.toggleModal(
+                                                "defaultModal-reject-" + index
+                                              )
+                                            }
+                                          >
+                                            <span aria-hidden={true}>×</span>
+                                          </button>
+                                        </div>
+                                        <div className="modal-body">
+                                          <p>
+                                            Reject{" "}
+                                            <strong>
+                                              {docData.documentType}
+                                            </strong>{" "}
+                                            of{" "}
+                                            <strong>
+                                              {
+                                                this.props.document.userInfo
+                                                  .username
+                                              }
+                                            </strong>{" "}
+                                            ?
+                                          </p>
+                                        </div>
+                                        <div className="modal-footer">
+                                          <Button
+                                            color="primary"
+                                            type="button"
+                                            onClick={() => {
+                                              this.rejectDocument(docData.id);
+                                              this.toggleModal(
+                                                "defaultModal-reject-" + index
+                                              );
+                                            }}
+                                          >
+                                            Yes
+                                          </Button>
+                                          <Button
+                                            className="ml-auto"
+                                            color="link"
+                                            data-dismiss="modal"
+                                            type="button"
+                                            onClick={() =>
+                                              this.toggleModal(
+                                                "defaultModal-reject-" + index
+                                              )
+                                            }
+                                          >
+                                            No
+                                          </Button>
+                                        </div>
+                                      </Modal>
+                                      {/* REJECT MODAL */}
+                                    </FormGroup>
+                                  </Col>
+                                </Row>
+                              )}
+                            </CardBody>
+                          </Collapse>
+                        </Card>
+                      ))}
                     </div>
                   </Form>
                 </CardBody>
@@ -460,10 +552,10 @@ const mapStateToProps = state => {
 };
 const mapDispatchToProps = dispatch => {
   return {
-    setDocument: idDoc => {
+    setDocument: userInfo => {
       dispatch({
         type: "SET_DETAIL_DOCUMENT_DATA",
-        payload: idDoc
+        payload: userInfo
       });
     },
     setDocType: documentType => {

@@ -52,11 +52,7 @@ class PendingDocuments extends React.Component {
     });
   }
   setDataToDetailPage(doc) {
-    // this.setState({
-    //   docIdChoosed: id,
-    // })
-    console.log(doc)
-    this.props.setDocument(doc.id);
+    this.props.setDocument(doc.user);
     this.props.setDocType(doc.documentType);
 
     // localStorage.setItem("previousPage", window.location.pathname);
@@ -66,7 +62,7 @@ class PendingDocuments extends React.Component {
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
     fetch(
       apiLink +
-        "/rest/admin/document/getAllInvalidDocument?page=" +
+        "/rest/admin/document/getAllPendingDocument?page=" +
         pageParam +
         "&element=" +
         pageSizeParam,
@@ -175,7 +171,11 @@ class PendingDocuments extends React.Component {
                 <CardHeader className="border-0">
                   <h3 className="mb-0">List Pending Documents </h3>
                 </CardHeader>
-                <Table className="align-items-center table-flush" responsive>
+                <Table
+                  className="align-items-center table-flush"
+                  style={style.sameSizeWithParent}
+                  responsive
+                >
                   <thead className="thead-light">
                     <tr>
                       <th scope="col">ID</th>
@@ -185,7 +185,11 @@ class PendingDocuments extends React.Component {
                       <th scope="col">Status</th>
                     </tr>
                   </thead>
-                  <tbody>{listPendingDocs}</tbody>
+                  {listPendingDocs == "" ? (
+                    <div>No data is matching</div>
+                  ) : (
+                    <tbody>{listPendingDocs}</tbody>
+                  )}
                 </Table>
                 <PulseLoader
                   css={override}
@@ -221,10 +225,10 @@ const mapStateToProps = state => {
 };
 const mapDispatchToProps = dispatch => {
   return {
-    setDocument: idDoc => {
+    setDocument: userInfo => {
       dispatch({
         type: "SET_DETAIL_DOCUMENT_DATA",
-        payload: idDoc
+        payload: userInfo
       });
     },
     setDocType: documentType => {

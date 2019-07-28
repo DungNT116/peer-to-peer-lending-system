@@ -3,7 +3,7 @@ import {
   SET_TYPE_DOCUMENT_DATA
 } from "redux/action/types";
 let STATE = {
-  idDoc: {},
+  userInfo: {},
   docType: {}
 };
 
@@ -12,7 +12,7 @@ export const DocumentReducers = (state = STATE, action) => {
     case SET_DETAIL_DOCUMENT_DATA:
       state = {
         ...state,
-        idDoc: action.payload
+        userInfo: action.payload
       };
       break;
     case SET_TYPE_DOCUMENT_DATA:
