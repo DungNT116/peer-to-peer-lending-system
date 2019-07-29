@@ -90,6 +90,7 @@ public class DocumentService {
 			System.out.println(base64Video);
 			String[] splits = base64Video.split(",");
 			String base64 = splits[1];
+			System.out.println(base64);
 			
 			
 			String username = jwtService.getUsernameFromToken(token);
