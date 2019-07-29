@@ -86,6 +86,9 @@ public class DocumentService {
 	public boolean uploadVideo(Integer docTypeId, String fileType, String token, String base64Video) {
 		try {
 
+			System.out.println("000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+			System.out.println(base64Video);
+			
 			String username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
 			if (docTypeId == null || docTypeId != 2) {
@@ -108,8 +111,6 @@ public class DocumentService {
 //			byte[] decodedString = Base64.getDecoder().decode(new String(name).getBytes("UTF-8"));
 //            System.out.println(new String(decodedString));
 
-			System.out.println(base64Video);
-			
 			byte[] byteArray = Base64.decodeBase64(base64Video.getBytes());
             
 			DocumentFile df = new DocumentFile();
