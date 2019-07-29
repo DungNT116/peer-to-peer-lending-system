@@ -502,11 +502,21 @@ public class RequestService {
 			}
 			if (countLend != deal.getBorrowTime()) {
 				return false;
-			}
-
+			}			
+			
 			String username = jwtService.getUsernameFromToken(token);
 			User account = accountRepo.findByUsername(username);
 
+			
+			Long loanLimit = account.getLoanLimit();
+			List<Request> lstRequest = account.getBorrowRequest();
+			Long limit = 0L;
+			for(Request r : lstRequest) {
+				limit += r.getAmount();
+			}
+			
+			
+			
 			request.setBorrower(account);
 			request.setStatus("pending");
 			Request reObj = requestRepo.saveAndFlush(request);
