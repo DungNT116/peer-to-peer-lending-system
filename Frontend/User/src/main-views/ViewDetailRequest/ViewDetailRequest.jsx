@@ -27,8 +27,6 @@ import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
 import ApplyTimeline from "../ApplyTimeline/ApplyTimeline";
 
-import { Redirect } from "react-router-dom";
-
 class ViewDetailRequest extends React.Component {
   constructor(props) {
     super(props);

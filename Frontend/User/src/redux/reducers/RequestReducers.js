@@ -5,8 +5,8 @@ let STATE = {
 }
 
 export const RequestReducers = (state = STATE, action) => {
-    console.log(action.payload)
-    console.log(state.data)
+    // console.log(action.payload)
+    // console.log(state.data)
     switch (action.type) {
         case SET_REQUEST_DATA:
             state = {
@@ -14,7 +14,7 @@ export const RequestReducers = (state = STATE, action) => {
                 data: action.payload
 
             }
-            console.log(state.data)
+            // console.log(state.data)
             break;
         default:
             return state;
