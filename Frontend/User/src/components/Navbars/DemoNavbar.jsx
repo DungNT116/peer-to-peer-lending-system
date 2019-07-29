@@ -49,45 +49,46 @@ class DemoNavbar extends React.Component {
   }
   async componentWillMount() {
     const username = localStorage.getItem("user");
-
     //query data get key of User exist
-    await database
-      .ref("ppls")
-      .orderByChild("username")
-      .equalTo(username)
-      .once("value", snapshot => {
-        if (snapshot.exists()) {
-          const userData = snapshot.val();
-          this.setState({ keyUserFb: Object.keys(userData)[0] });
-        }
-      });
-
-    //query notifications base on key get above
-    const notificationRef = await database
-      .ref("/ppls/" + this.state.keyUserFb + "/notification")
-      .orderByKey()
-      .limitToLast(100);
-    await notificationRef.on("value", snapshot => {
-      let notificationObj = snapshot.val();
-      let notifications = [];
-      Object.keys(notificationObj).forEach(key =>
-        notifications.push(notificationObj[key])
-      );
-      notifications = notifications.reverse().map(noti => {
-        return { message: noti.message, user: noti.sender };
-      });
-      this.setState(prevState => ({
-        notifications: notifications
-      }));
-    });
-    //get amounts new Notifications
-    await database
-      .ref("/ppls/" + this.state.keyUserFb + "/countNew")
-      .on("value", snapshot => {
-        this.setState({
-          countNew: snapshot.val()
+    if (username !== undefined && username !== null) {
+      await database
+        .ref("ppls")
+        .orderByChild("username")
+        .equalTo(username)
+        .once("value", snapshot => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            this.setState({ keyUserFb: Object.keys(userData)[0] });
+          }
         });
+
+      //query notifications base on key get above
+      const notificationRef = await database
+        .ref("/ppls/" + this.state.keyUserFb + "/notification")
+        .orderByKey()
+        .limitToLast(100);
+      await notificationRef.on("value", snapshot => {
+        let notificationObj = snapshot.val();
+        let notifications = [];
+        Object.keys(notificationObj).forEach(key =>
+          notifications.push(notificationObj[key])
+        );
+        notifications = notifications.reverse().map(noti => {
+          return { message: noti.message, user: noti.sender };
+        });
+        this.setState(prevState => ({
+          notifications: notifications
+        }));
       });
+      //get amounts new Notifications
+      await database
+        .ref("/ppls/" + this.state.keyUserFb + "/countNew")
+        .on("value", snapshot => {
+          this.setState({
+            countNew: snapshot.val()
+          });
+        });
+    }
   }
   //reset count view by clicking notification
   onResetCountView(event) {

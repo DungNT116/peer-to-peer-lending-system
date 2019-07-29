@@ -54,7 +54,7 @@ class PendingDocuments extends React.Component {
   setDataToDetailPage(doc) {
     this.props.setDocument(doc.user);
     this.props.setDocType(doc.documentType);
-
+    localStorage.setItem("previousPage", window.location.pathname);
     // localStorage.setItem("previousPage", window.location.pathname);
   }
   getPendingDocuments() {

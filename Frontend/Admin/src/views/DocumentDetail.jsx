@@ -41,6 +41,8 @@ class DocumentDetail extends React.Component {
     this.toggleAccordion = this.toggleAccordion.bind(this);
     this.setSrcImgBase64 = this.setSrcImgBase64.bind(this);
     this.handleIDChange = this.handleIDChange.bind(this);
+    
+    this.validRedux = this.validRedux.bind(this);
   }
 
   toggleAccordion(tab) {
@@ -102,7 +104,12 @@ class DocumentDetail extends React.Component {
       }
     });
   }
-
+  validRedux() {x
+    if (Object.keys(this.props.document.userInfo).length === 0) {
+      this.props.history.push(localStorage.getItem("previousPage"));
+      window.location.reload();
+    }
+  }
   setSrcImgBase64(type, image) {
     return "data:" + type + ";base64, " + image;
   }
@@ -179,6 +186,7 @@ class DocumentDetail extends React.Component {
     };
     return (
       <>
+      {this.validRedux()}
         <Header />
         <Container className="mt--7" fluid>
           <Modal
