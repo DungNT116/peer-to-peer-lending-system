@@ -28,10 +28,12 @@ class Index extends React.Component {
       transactions: [],
       modalValid: false,
       position: 0,
-      validTx: {}
+      validTx: {},
     };
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
+    // this.test = this.test.bind(this);
+    
   }
 
   convertDateToTimestamp(date) {
@@ -64,7 +66,7 @@ class Index extends React.Component {
       if (result.status === 200) {
         // alert("create success");
       }
-    });
+    })
   }
 
   toggleModalValid() {
@@ -88,14 +90,14 @@ class Index extends React.Component {
     }).then(result => {
       result.json().then(data => {
         setTimeout(
-          function() {
+          function () {
             let dateCreate = new Date(data.asset.data.createDate);
             if (
               data.asset.data.sender === transactionInput.sender &&
               data.asset.data.receiver === transactionInput.receiver &&
               Number(data.asset.data.amount) === transactionInput.amount &&
               Math.round(dateCreate.getTime() / 1000) ===
-                transactionInput.createDate
+              transactionInput.createDate
             ) {
               this.setState({
                 validTx: {
@@ -199,7 +201,7 @@ class Index extends React.Component {
           {/* <Download /> */}
           <section className="section section-sm ">
             <Container >
-            {/* <CustomControls /> */}
+              {/* <CustomControls /> */}
               <Row className="justify-content-center text-center">
                 <p className="h3">History Transactions</p>
               </Row>
@@ -222,6 +224,11 @@ class Index extends React.Component {
               {/* <Row className="align-items-center justify-content-center text-center">
                 <Pagination />
               </Row> */}
+
+              {/* <video autoplay></video> */}
+              {/* <input type="file" accept="video/*" capture="camera" id="recorder" />
+              <video id="player" controls></video> */}
+
             </Container>
           </section>
         </main>

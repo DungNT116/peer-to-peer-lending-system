@@ -59,7 +59,60 @@ class Profile extends React.Component {
     this.saveDocument = this.saveDocument.bind(this);
 
     this.setSrcImgBase64 = this.setSrcImgBase64.bind(this);
+    this.startRecording = this.startRecording.bind(this);
+    this.stopRecording = this.stopRecording.bind(this);
+    this.handleDataAvailable = this.handleDataAvailable.bind(this);
+    // this.convertBlobToFile = this.convertBlobToFile.bind(this);
+  }
 
+  // convertBlobToFile(blob, filename) {
+  //   blob.lastModifiedDate = new Date();
+  //   blob.name = filename;
+  //   return blob;
+  // }
+
+  handleDataAvailable(event) {
+    if (event.data && event.data.size > 0) {
+      window.recordedBlobs.push(event.data);
+    }
+  }
+
+  startRecording() {
+    window.recordedBlobs = [];
+    let options = { mimeType: 'video/webm;codecs=vp9' };
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+      console.error(`${options.mimeType} is not Supported`);
+      options = { mimeType: 'video/webm;codecs=vp8' };
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        console.error(`${options.mimeType} is not Supported`);
+        options = { mimeType: 'video/webm' };
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          console.error(`${options.mimeType} is not Supported`);
+          options = { mimeType: '' };
+        }
+      }
+    }
+    console.log(options);
+    try {
+      window.mediaRecorder = new MediaRecorder(window.stream, options);
+    } catch (e) {
+      console.error('Exception while creating MediaRecorder:', e);
+      return;
+    }
+
+    var recordButton = document.querySelector('button#record');
+    recordButton.textContent = 'Stop Recording';
+    window.mediaRecorder.ondataavailable = this.handleDataAvailable;
+    window.mediaRecorder.start(10);
+    console.log('MediaRecorder started', window.mediaRecorder);
+  }
+
+  stopRecording() {
+    window.mediaRecorder.stop();
+    console.log('Recorded Blobs: ', window.recordedBlobs);
+
+    var recordButton = document.querySelector('button#record');
+    recordButton.textContent = 'Start Recording';
   }
 
   setSrcImgBase64(type, image) {
@@ -115,6 +168,14 @@ class Profile extends React.Component {
   }
 
   saveDocument(type) {
+    const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
+    var reader = new FileReader();
+    reader.readAsDataURL(superBuffer);
+    reader.onloadend = function () {
+      var base64data = reader.result;
+      console.log(base64data);
+    }
+
     let document = [];
     if (type === "ID") {
       document = this.state.documentID;
@@ -122,13 +183,15 @@ class Profile extends React.Component {
       document = this.state.documentPP;
     } else if (type === "DL") {
       document = this.state.documentDL;
-    }
+    } 
     var formData = new FormData();
-    formData.append("documentType", document.documentType);
-    for (let i = 0; i < document.listImage.length; i++) {
-      const element = document.listImage[i];
-      formData.append("file", element);
-    }
+    // formData.append("documentType", document.documentType);
+    // for (let i = 0; i < document.listImage.length; i++) {
+    //   const element = document.listImage[i];
+    //   formData.append("file", element);
+    // }
+
+    formData.append("file", superBuffer)
     console.log("formData", formData.getAll("file"));
     fetch(apiLink + "/rest/document/uploadFile", {
       method: "POST",
@@ -148,6 +211,8 @@ class Profile extends React.Component {
       } else if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
+      } else if (result.status === 400) {
+        alert("error")
       }
     });
   }
@@ -662,10 +727,68 @@ class Profile extends React.Component {
                             </CardBody>
                           </Collapse>
                         </Card>
+
                       </Form>
                     </CardBody>
                   </Card>
                 </Col>
+              </Row>
+              <Row>
+                <video autoPlay id="gum"></video>
+                <button id="start" onClick={
+                  () => {
+                    console.log("gooooooooooooooo")
+                    const constraints = {
+                      audio: true,
+                      video: {
+                        width: 1280, height: 720
+                      }
+                    }
+                    try {
+                      // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                      //   navigator.mozGetUserMedia || navigator.msGetUserMedia;
+                      // console.log()
+
+                      const stream = navigator.mediaDevices.getUserMedia(constraints).then(data => {
+                        console.log('getUserMedia() got stream:', data);
+                        window.stream = data;
+
+                        const gumVideo = document.querySelector('video#gum');
+                        gumVideo.srcObject = data;
+
+                      });
+
+                    } catch (e) {
+                      console.error('navigator.getUserMedia error:', e);
+                    }
+                  }
+                }>Start camera</button>
+                <button id="record" onClick={
+                  () => {
+                    var recordButton = document.querySelector('button#record');
+
+                    if (recordButton.textContent === 'Start Recording') {
+                      this.startRecording();
+                    } else {
+                      this.stopRecording();
+                    }
+                  }
+                }>Start Recording</button>
+
+                <video autoPlay id="recorded"></video>
+                <button id="play" onClick={
+                  () => {
+                    const recordedVideo = document.querySelector('video#recorded');
+                    const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
+                    recordedVideo.src = null;
+                    recordedVideo.srcObject = null;
+                    recordedVideo.src = window.URL.createObjectURL(superBuffer);
+                    recordedVideo.controls = true;
+                    recordedVideo.play();
+                    console.log(recordedVideo);
+                  }
+                }>play</button>
+                <button onClick={() => this.saveDocument("DL")}>Save to DB</button>
               </Row>
             </Container>
           </section>
