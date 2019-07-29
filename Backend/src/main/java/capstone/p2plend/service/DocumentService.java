@@ -108,6 +108,8 @@ public class DocumentService {
 //			byte[] decodedString = Base64.getDecoder().decode(new String(name).getBytes("UTF-8"));
 //            System.out.println(new String(decodedString));
 
+			System.out.println(base64Video);
+			
 			byte[] byteArray = Base64.decodeBase64(base64Video.getBytes());
             
 			DocumentFile df = new DocumentFile();
