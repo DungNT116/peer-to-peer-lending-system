@@ -510,11 +510,14 @@ public class RequestService {
 			
 			Long loanLimit = account.getLoanLimit();
 			List<Request> lstRequest = account.getBorrowRequest();
-			Long limit = 0L;
+			Long currentLoanAmount = 0L;
 			for(Request r : lstRequest) {
-				limit += r.getAmount();
+				currentLoanAmount += r.getAmount();
 			}
-			
+			currentLoanAmount += request.getAmount();
+			if(currentLoanAmount > loanLimit) {
+				return false;
+			}
 			
 			
 			request.setBorrower(account);

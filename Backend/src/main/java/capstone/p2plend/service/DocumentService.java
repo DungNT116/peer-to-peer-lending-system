@@ -2,6 +2,7 @@ package capstone.p2plend.service;
 
 import java.util.List;
 
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,11 +14,12 @@ import org.springframework.web.multipart.MultipartFile;
 import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.DocumentFile;
+import capstone.p2plend.entity.DocumentType;
 import capstone.p2plend.entity.Request;
 import capstone.p2plend.entity.User;
-import capstone.p2plend.enums.DocumentType;
 import capstone.p2plend.repo.DocumentFileRepository;
 import capstone.p2plend.repo.DocumentRepository;
+import capstone.p2plend.repo.DocumentTypeRepository;
 import capstone.p2plend.repo.UserRepository;
 
 @Service
@@ -30,37 +32,30 @@ public class DocumentService {
 	DocumentFileRepository docFileRepo;
 
 	@Autowired
+	DocumentTypeRepository docTypeRepo;
+
+	@Autowired
 	JwtService jwtService;
 
 	@Autowired
 	UserRepository userRepo;
 
-	public boolean uploadDocument(String documentType, String token, MultipartFile[] mf) {
+	public boolean uploadDocument(Integer docTypeId, String token, MultipartFile[] mf) {
 		try {
 			String username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
-			if (documentType == null) {
+			if (docTypeId == null || docTypeId == 2) {
 				return false;
 			}
 			Document iDoc = new Document();
-			DocumentType dt = DocumentType.valueOf(documentType.toUpperCase());
-			switch (dt) {
-			case ID:
-				iDoc.setDocumentType("Identity Card");
-				break;
-			case PP:
-				iDoc.setDocumentType("Passport");
-				break;
-			case DL:
-				iDoc.setDocumentType("Driving Licence");
-				break;
-			default:
-				return false;
-			}
-			Document checkExistDocument = docRepo.findUserDocument(iDoc.getDocumentType(), user.getId());
+
+			Document checkExistDocument = docRepo.findUserDocument(iDoc.getDocumentType().getId(), user.getId());
 			if (checkExistDocument != null) {
 				return false;
 			}
+			DocumentType docType = docTypeRepo.findById(docTypeId).get();
+
+			iDoc.setDocumentType(docType);
 			iDoc.setStatus("pending");
 			iDoc.setUser(user);
 			Document savedDoc = docRepo.saveAndFlush(iDoc);
@@ -88,6 +83,41 @@ public class DocumentService {
 		}
 	}
 
+	public boolean uploadVideo(Integer docTypeId, String token, String base64Video) {
+		try {
+
+			String username = jwtService.getUsernameFromToken(token);
+			User user = userRepo.findByUsername(username);
+			if (docTypeId == null || docTypeId != 2) {
+				return false;
+			}
+			Document iDoc = new Document();
+
+			Document checkExistDocument = docRepo.findUserDocument(iDoc.getDocumentType().getId(), user.getId());
+			if (checkExistDocument != null) {
+				return false;
+			}
+			DocumentType docType = docTypeRepo.findById(docTypeId).get();
+
+			iDoc.setDocumentType(docType);
+			iDoc.setStatus("pending");
+			iDoc.setUser(user);
+			Document savedDoc = docRepo.saveAndFlush(iDoc);
+			
+			byte[] decodedByte = Base64.decodeBase64(base64Video);
+			
+			DocumentFile df = new DocumentFile();
+			df.setData(decodedByte);
+			df.setDocument(savedDoc);
+			docFileRepo.saveAndFlush(df);
+			
+			
+			return true;
+		} catch (Exception e) {
+			return false; // TODO: handle exception
+		}
+	}
+
 	public List<Document> getUserDocument(String token) {
 		try {
 			String username = jwtService.getUsernameFromToken(token);
@@ -102,7 +132,7 @@ public class DocumentService {
 		}
 
 	}
-	
+
 	public List<Document> getAllUserDocument(String username) {
 		try {
 			User user = userRepo.findByUsername(username);
@@ -126,7 +156,7 @@ public class DocumentService {
 
 			// Receive document with id and docId
 			Document findDoc = docRepo.findByDocumentIdAndDocumentType(document.getDocumentId(),
-					docRepo.findById(document.getId()).get().getDocumentType());
+					document.getDocumentType().getId());
 
 			if (findDoc != null) {
 				return false;
@@ -136,6 +166,31 @@ public class DocumentService {
 			existDoc.setDocumentId(document.getDocumentId());
 			existDoc.setStatus("valid");
 			docRepo.saveAndFlush(existDoc);
+
+			User user = existDoc.getUser();
+			List<Document> lstUserDocument = user.getDocument();
+			Long limit = 0L;
+			for (Document d1 : lstUserDocument) {
+				if (d1.getDocumentType().getId() == 1 && d1.getStatus().equalsIgnoreCase("valid")) {
+					limit += d1.getDocumentType().getAmountLimit();
+					for (Document d2 : lstUserDocument) {
+						if (d2.getDocumentType().getId() == 2 && d2.getStatus().equalsIgnoreCase("valid")) {
+							limit += d2.getDocumentType().getAmountLimit();
+							user.setLoanLimit(limit);
+							userRepo.saveAndFlush(user);
+
+							for (Document d3 : lstUserDocument) {
+								if (d3.getDocumentType().getId() != 1 && d3.getDocumentType().getId() != 2
+										&& d3.getStatus().equalsIgnoreCase("valid")) {
+									limit += d3.getDocumentType().getAmountLimit();
+									user.setLoanLimit(limit);
+									userRepo.saveAndFlush(user);
+								}
+							}
+						}
+					}
+				}
+			}
 
 			return true;
 		} catch (Exception e) {

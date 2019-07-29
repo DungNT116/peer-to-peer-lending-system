@@ -28,11 +28,27 @@ public class DocumentController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping("/rest/document/uploadFile")
-	public ResponseEntity<Integer> uploadFile(@RequestParam("documentType") String documentType,
+	public ResponseEntity<Integer> uploadFile(@RequestParam("documentTypeId") Integer documentTypeId,
 			@RequestHeader("Authorization") String token, @RequestParam("file") MultipartFile[] file) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = docService.uploadDocument(documentType, token, file);
+		valid = docService.uploadDocument(documentTypeId, token, file);
+		if (valid == true) {
+			status = HttpStatus.OK;
+		} else {
+			status = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<Integer>(status.value(), status);
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@PostMapping("/rest/document/uploadVideo")
+	public ResponseEntity<Integer> uploadVideo(@RequestParam("documentTypeId") Integer documentTypeId,
+			@RequestHeader("Authorization") String token, @RequestParam("base64Video") String base64Video) {
+		HttpStatus status = null;
+		boolean valid = false;
+		valid = docService.uploadVideo(documentTypeId, token, base64Video);
 		if (valid == true) {
 			status = HttpStatus.OK;
 		} else {
@@ -70,7 +86,7 @@ public class DocumentController {
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@PostMapping("/rest/admin/document/invalidDocument")

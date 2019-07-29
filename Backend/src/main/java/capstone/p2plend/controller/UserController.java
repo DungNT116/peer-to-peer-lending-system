@@ -64,7 +64,13 @@ public class UserController {
 		String result = "";
 		try {
 			result = userService.createAccount(user);
-			httpStatus = HttpStatus.OK;
+
+			if (result.equalsIgnoreCase("Account successfully created")) {
+				httpStatus = HttpStatus.OK;
+				return new ResponseEntity<String>(result, httpStatus);
+			}
+
+			httpStatus = HttpStatus.BAD_REQUEST;
 		} catch (Exception e) {
 			httpStatus = HttpStatus.BAD_REQUEST;
 		}

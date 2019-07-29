@@ -10,11 +10,12 @@ import org.springframework.data.repository.query.Param;
 
 public interface DocumentRepository extends JpaRepository<Document, Integer> {
 	
-	Document findByDocumentIdAndDocumentType(String docId, String docType);
+	@Query(value = "SELECT * FROM document WHERE document_id = :status AND document_type_id = :documentTypeId", nativeQuery = true)
+	Document findByDocumentIdAndDocumentType(@Param("documentId") String documentId, @Param("documentTypeId") Integer documentTypeId);
 	
 	@Query(value = "SELECT * FROM document WHERE status = :status", nativeQuery = true)
 	Page<Document> findAllDocumentWithStatus(Pageable pageable, @Param("status") String status);
 		
-	@Query(value = "SELECT * FROM document WHERE document_type = :documentType AND user_id = :id", nativeQuery = true)
-	Document findUserDocument(@Param("documentType") String documentType, @Param("id") Integer id);
+	@Query(value = "SELECT * FROM document WHERE document_type_id = :documentTypeId AND user_id = :id", nativeQuery = true)
+	Document findUserDocument(@Param("documentType") Integer documentTypeId, @Param("id") Integer id);
 }

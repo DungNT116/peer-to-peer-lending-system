@@ -83,21 +83,27 @@ public class UserService {
 	}
 
 	public String createAccount(User account) {
+		try {
 
-		User usernameExist = userRepo.findByUsername(account.getUsername());
-		if (usernameExist != null) {
-			return "Username existed";
-		}
+			User usernameExist = userRepo.findByUsername(account.getUsername());
+			if (usernameExist != null) {
+				return "Username existed";
+			}
 
-		User emailExist = userRepo.findByEmail(account.getEmail());
-		if (emailExist != null) {
-			return "Email existed";
-		}
+			User emailExist = userRepo.findByEmail(account.getEmail());
+			if (emailExist != null) {
+				return "Email existed";
+			}
 
-		account.setRole("ROLE_USER");
-		account.setStatus("active");
-		userRepo.save(account);
-		return "Account successfully created";
+			account.setRole("ROLE_USER");
+			account.setStatus("active");
+			account.setLoanLimit(0L);
+			userRepo.save(account);
+			return "Account successfully created";
+			
+		} catch (Exception e) {
+			return "Error";
+		}		
 	}
 
 	public boolean activateAccount(int id) {

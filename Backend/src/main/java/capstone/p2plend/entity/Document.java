@@ -31,10 +31,12 @@ public class Document {
 	private String documentId;
 
 	@Column
-	private String documentType;
-
-	@Column
 	private String status;
+
+	@JsonIgnoreProperties(value = { "document" })
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "document_type_id")
+	private DocumentType documentType;
 
 	@JsonIgnoreProperties(value = { "document" })
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -64,20 +66,20 @@ public class Document {
 		this.documentId = documentId;
 	}
 
-	public String getDocumentType() {
-		return documentType;
-	}
-
-	public void setDocumentType(String documentType) {
-		this.documentType = documentType;
-	}
-
 	public String getStatus() {
 		return status;
 	}
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public DocumentType getDocumentType() {
+		return documentType;
+	}
+
+	public void setDocumentType(DocumentType documentType) {
+		this.documentType = documentType;
 	}
 
 	public User getUser() {
