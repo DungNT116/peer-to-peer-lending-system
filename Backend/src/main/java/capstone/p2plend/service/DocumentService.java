@@ -88,6 +88,9 @@ public class DocumentService {
 
 			System.out.println("000000000000000000000000000000000000000000000000000000000000000000000000000000000");
 			System.out.println(base64Video);
+			String[] splits = base64Video.split(",");
+			String base64 = splits[1];
+			
 			
 			String username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
@@ -111,7 +114,7 @@ public class DocumentService {
 //			byte[] decodedString = Base64.getDecoder().decode(new String(name).getBytes("UTF-8"));
 //            System.out.println(new String(decodedString));
 
-			byte[] byteArray = Base64.decodeBase64(base64Video.getBytes());
+			byte[] byteArray = Base64.decodeBase64(base64.getBytes());
             
 			DocumentFile df = new DocumentFile();
 			df.setFileName(username + "_Video");
