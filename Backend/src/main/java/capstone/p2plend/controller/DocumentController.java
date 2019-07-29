@@ -45,10 +45,11 @@ public class DocumentController {
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping("/rest/document/uploadVideo")
 	public ResponseEntity<Integer> uploadVideo(@RequestParam("documentTypeId") Integer documentTypeId,
-			@RequestHeader("Authorization") String token, @RequestParam("base64Video") String base64Video) {
+			@RequestParam("fileType") String fileType, @RequestHeader("Authorization") String token,
+			@RequestParam("base64Video") String base64Video) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = docService.uploadVideo(documentTypeId, token, base64Video);
+		valid = docService.uploadVideo(documentTypeId, fileType, token, base64Video);
 		if (valid == true) {
 			status = HttpStatus.OK;
 		} else {

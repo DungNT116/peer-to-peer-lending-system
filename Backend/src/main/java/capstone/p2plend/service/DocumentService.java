@@ -83,7 +83,7 @@ public class DocumentService {
 		}
 	}
 
-	public boolean uploadVideo(Integer docTypeId, String token, String base64Video) {
+	public boolean uploadVideo(Integer docTypeId, String fileType, String token, String base64Video) {
 		try {
 
 			String username = jwtService.getUsernameFromToken(token);
@@ -103,15 +103,20 @@ public class DocumentService {
 			iDoc.setStatus("pending");
 			iDoc.setUser(user);
 			Document savedDoc = docRepo.saveAndFlush(iDoc);
-			
-			byte[] decodedByte = Base64.decodeBase64(base64Video);
-			
+
+//			byte[] name = Base64.getEncoder().encode((base64Video.getBytes()));
+//			byte[] decodedString = Base64.getDecoder().decode(new String(name).getBytes("UTF-8"));
+//            System.out.println(new String(decodedString));
+
+			byte[] byteArray = Base64.decodeBase64(base64Video.getBytes());
+            
 			DocumentFile df = new DocumentFile();
-			df.setData(decodedByte);
+			df.setFileName(username + "_Video");
+			df.setData(byteArray);
+			df.setFileType(fileType);
 			df.setDocument(savedDoc);
 			docFileRepo.saveAndFlush(df);
-			
-			
+
 			return true;
 		} catch (Exception e) {
 			return false; // TODO: handle exception
