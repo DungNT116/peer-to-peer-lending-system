@@ -49,7 +49,7 @@ public class DocumentService {
 			}
 			Document iDoc = new Document();
 
-			Document checkExistDocument = docRepo.findUserDocument(iDoc.getDocumentType().getId(), user.getId());
+			Document checkExistDocument = docRepo.findUserDocument(docTypeId, user.getId());
 			if (checkExistDocument != null) {
 				return false;
 			}
@@ -93,7 +93,7 @@ public class DocumentService {
 			}
 			Document iDoc = new Document();
 
-			Document checkExistDocument = docRepo.findUserDocument(iDoc.getDocumentType().getId(), user.getId());
+			Document checkExistDocument = docRepo.findUserDocument(docTypeId, user.getId());
 			if (checkExistDocument != null) {
 				return false;
 			}
