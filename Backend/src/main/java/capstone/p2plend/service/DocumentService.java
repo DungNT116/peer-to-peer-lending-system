@@ -86,11 +86,9 @@ public class DocumentService {
 	public boolean uploadVideo(Integer docTypeId, String fileType, String token, String base64Video) {
 		try {
 
-			System.out.println("000000000000000000000000000000000000000000000000000000000000000000000000000000000");
-			System.out.println(base64Video);
 			String[] splits = base64Video.split(",");
 			String base64 = splits[1];
-			System.out.println(base64);
+			System.out.println(splits[0]);
 			
 			
 			String username = jwtService.getUsernameFromToken(token);

@@ -507,9 +507,8 @@ public class RequestService {
 			String username = jwtService.getUsernameFromToken(token);
 			User account = accountRepo.findByUsername(username);
 
-			
 			Long loanLimit = account.getLoanLimit();
-			List<Request> lstRequest = account.getBorrowRequest();
+			List<Request> lstRequest = requestRepo.findListAllUserRequestByExceptStatus(account.getId(), "done");
 			Long currentLoanAmount = 0L;
 			for(Request r : lstRequest) {
 				currentLoanAmount += r.getAmount();
@@ -518,7 +517,6 @@ public class RequestService {
 			if(currentLoanAmount > loanLimit) {
 				return false;
 			}
-			
 			
 			request.setBorrower(account);
 			request.setStatus("pending");
