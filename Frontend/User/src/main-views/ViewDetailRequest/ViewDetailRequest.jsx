@@ -20,6 +20,7 @@ import {
   Input
 } from "reactstrap";
 
+import { database } from "../../firebase";
 import { PayPalButton } from "react-paypal-button-v2";
 import { apiLink, bigchainAPI, client_API } from "../../api.jsx";
 // core components
@@ -152,8 +153,30 @@ class ViewDetailRequest extends React.Component {
           borrowDate: Math.round(new Date().getTime() / 1000)
         }
       })
-    }).then(result => {
+    }).then(async result => {
       if (result.status === 200) {
+        console.log("username", this.props.request.data.borrower.username)
+        await database
+          .ref("ppls")
+          .orderByChild("username")
+          .equalTo(this.props.request.data.borrower.username)
+          .once("value", snapshot => {
+            if (snapshot.exists()) {
+              const userData = snapshot.val();
+              this.setState({ keyUserFb: Object.keys(userData)[0] });
+            }
+          });
+        database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+          message: localStorage.getItem("user") + " accepted your request" + this.props.request.data.id + " !",
+          sender: localStorage.getItem("user"),
+          requestId: this.props.request.data.id
+        });
+        var upvotesRef = database.ref(
+          "/ppls/" + this.state.keyUserFb + "/countNew"
+        );
+        upvotesRef.transaction(function (current_value) {
+          return (current_value || 0) + 1;
+        });
         alert("create success");
         this.props.history.push("/view-request-trading");
       } else if (result.status === 401) {
@@ -227,8 +250,9 @@ class ViewDetailRequest extends React.Component {
   }
 
   saveNewDealInformationToDB() {
-    console.log(this.state.lendingTimeline);
-    console.log(this.state.paybackTimeline);
+    // console.log(this.state.lendingTimeline);
+    // console.log(this.state.paybackTimeline);
+    console.log("username", this.props.request.data.borrower.username)
     fetch(apiLink + "/rest/deal/makeDeal", {
       method: "PUT",
       headers: {
@@ -241,7 +265,7 @@ class ViewDetailRequest extends React.Component {
         paybackTime: this.state.paybackTimeline.length,
         milestone: this.createMileStone()
       })
-    }).then(result => {
+    }).then(async result => {
       console.log(result);
       if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
@@ -249,6 +273,27 @@ class ViewDetailRequest extends React.Component {
       } else if (result.status === 200) {
         // alert("create success");
         console.log("success");
+        await database
+          .ref("ppls")
+          .orderByChild("username")
+          .equalTo(this.props.request.data.borrower.username)
+          .once("value", snapshot => {
+            if (snapshot.exists()) {
+              const userData = snapshot.val();
+              this.setState({ keyUserFb: Object.keys(userData)[0] });
+            }
+          });
+        database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+          message: localStorage.getItem("user") + " make deal your request" + this.props.request.data.id + " !",
+          sender: localStorage.getItem("user"),
+          requestId: this.props.request.data.id
+        });
+        var upvotesRef = database.ref(
+          "/ppls/" + this.state.keyUserFb + "/countNew"
+        );
+        upvotesRef.transaction(function (current_value) {
+          return (current_value || 0) + 1;
+        });
       } else if (result.status === 400) {
         this.toggleErrorModal();
       }

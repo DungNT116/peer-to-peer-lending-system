@@ -22,6 +22,7 @@ import {
 } from "reactstrap";
 import classnames from "classnames";
 
+import { database } from "../../firebase";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import Pagination from "../../views/IndexSections/Pagination.jsx";
@@ -50,7 +51,7 @@ class ViewRequestNew extends React.Component {
       plainTabs: 1,
 
       cancelDealModal: false,
-      cancelRequestID: 0,
+      cancelRequest: {},
     };
     this.getRequest = this.getRequest.bind(this);
     this.deleteRequest = this.deleteRequest.bind(this);
@@ -62,10 +63,10 @@ class ViewRequestNew extends React.Component {
     this.toggleCancelDeal = this.toggleCancelDeal.bind(this);
   }
 
-  toggleCancelDeal(id) {
+  toggleCancelDeal(request) {
     this.setState({
       cancelDealModal: !this.state.cancelDealModal,
-      cancelRequestID: id
+      cancelRequest: request
     })
   }
 
@@ -76,8 +77,8 @@ class ViewRequestNew extends React.Component {
     });
   };
 
-  cancelRequest(id) {
-    console.log(id);
+  cancelRequest(request) {
+    console.log(request);
     fetch(apiLink + "/rest/deal/cancelDeal", {
       method: "PUT",
       headers: {
@@ -87,14 +88,36 @@ class ViewRequestNew extends React.Component {
         // 'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        id: id
+        id: request.id
       })
-    }).then(result => {
+    }).then(async result => {
       if (result.status === 200) {
         // alert("delete success");
         //reload data
         this.toggleCancelDeal();
         this.getRequest();
+        await database
+          .ref("ppls")
+          .orderByChild("username")
+          .equalTo(request.borrower.username)
+          .once("value", snapshot => {
+            if (snapshot.exists()) {
+              const userData = snapshot.val();
+              this.setState({ keyUserFb: Object.keys(userData)[0] });
+            }
+          });
+        database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+          message: localStorage.getItem("user") + " cancel your request " + request.id + " !" ,
+          sender: localStorage.getItem("user"),
+          requestId: request.id
+        });
+
+        var upvotesRef = database.ref(
+          "/ppls/" + this.state.keyUserFb + "/countNew"
+        );
+        upvotesRef.transaction(function (current_value) {
+          return (current_value || 0) + 1;
+        });
       } else if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
@@ -302,7 +325,7 @@ class ViewRequestNew extends React.Component {
             id="dealButton"
             size="md"
             className="btn btn-outline-danger"
-            onClick={() => this.toggleCancelDeal(request.id)}
+            onClick={() => this.toggleCancelDeal(request)}
           >
             <i className="fa fa-remove" /> Cancel Deal
           </Button>{" "}
@@ -465,7 +488,7 @@ class ViewRequestNew extends React.Component {
           <ModalFooter>
             <Button
               color="primary"
-              onClick={() => this.cancelRequest(this.state.cancelRequestID)}
+              onClick={() => this.cancelRequest(this.state.cancelRequest)}
             >
               Yes
             </Button>{" "}

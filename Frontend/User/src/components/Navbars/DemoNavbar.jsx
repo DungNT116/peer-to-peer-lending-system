@@ -49,45 +49,49 @@ class DemoNavbar extends React.Component {
   }
   async componentWillMount() {
     const username = localStorage.getItem("user");
-
-    //query data get key of User exist
-    await database
-      .ref("ppls")
-      .orderByChild("username")
-      .equalTo(username)
-      .once("value", snapshot => {
-        if (snapshot.exists()) {
-          const userData = snapshot.val();
-          this.setState({ keyUserFb: Object.keys(userData)[0] });
-        }
-      });
-
-    //query notifications base on key get above
-    const notificationRef = await database
-      .ref("/ppls/" + this.state.keyUserFb + "/notification")
-      .orderByKey()
-      .limitToLast(100);
-    await notificationRef.on("value", snapshot => {
-      let notificationObj = snapshot.val();
-      let notifications = [];
-      Object.keys(notificationObj).forEach(key =>
-        notifications.push(notificationObj[key])
-      );
-      notifications = notifications.reverse().map(noti => {
-        return { message: noti.message, user: noti.sender };
-      });
-      this.setState(prevState => ({
-        notifications: notifications
-      }));
-    });
-    //get amounts new Notifications
-    await database
-      .ref("/ppls/" + this.state.keyUserFb + "/countNew")
-      .on("value", snapshot => {
-        this.setState({
-          countNew: snapshot.val()
+    console.log(username);
+    if ((username !== undefined && username !== null) && username.length !== 0) {
+      //query data get key of User exist
+      await database
+        .ref("ppls")
+        .orderByChild("username")
+        .equalTo(username)
+        .once("value", snapshot => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            this.setState({ keyUserFb: Object.keys(userData)[0] });
+          }
         });
+
+      //query notifications base on key get above
+      const notificationRef = await database
+        .ref("/ppls/" + this.state.keyUserFb + "/notification")
+        .orderByKey()
+        .limitToLast(100);
+      await notificationRef.on("value", snapshot => {
+        let notificationObj = snapshot.val();
+        let notifications = [];
+        console.log(notificationObj)
+        Object.keys(notificationObj).forEach(key =>
+          notifications.push(notificationObj[key])
+        );
+        notifications = notifications.reverse().map(noti => {
+          return { message: noti.message, user: noti.sender };
+        });
+        this.setState(prevState => ({
+          notifications: notifications
+        }));
       });
+      //get amounts new Notifications
+      await database
+        .ref("/ppls/" + this.state.keyUserFb + "/countNew")
+        .on("value", snapshot => {
+          this.setState({
+            countNew: snapshot.val()
+          });
+        });
+    }
+
   }
   //reset count view by clicking notification
   onResetCountView(event) {
@@ -95,7 +99,7 @@ class DemoNavbar extends React.Component {
     var upvotesRef = database.ref(
       "/ppls/" + this.state.keyUserFb + "/countNew"
     );
-    upvotesRef.transaction(function(current_value) {
+    upvotesRef.transaction(function (current_value) {
       return (current_value -= current_value);
     });
   }
@@ -106,7 +110,7 @@ class DemoNavbar extends React.Component {
     var upvotesRef = database.ref(
       "/ppls/" + this.state.keyUserFb + "/countNew"
     );
-    upvotesRef.transaction(function(current_value) {
+    upvotesRef.transaction(function (current_value) {
       return (current_value || 0) + 1;
     });
 
@@ -184,8 +188,8 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                    ""
-                  )}
+                      ""
+                    )}
                   {localStorage.getItem("isLoggedIn") ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
@@ -199,8 +203,8 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                    ""
-                  )}
+                      ""
+                    )}
                   {localStorage.getItem("isLoggedIn") ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
@@ -216,8 +220,8 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                    ""
-                  )}
+                      ""
+                    )}
                 </Nav>
                 <Nav
                   className="align-items-lg-center navbar-nav-hover ml-lg-auto"
@@ -227,33 +231,33 @@ class DemoNavbar extends React.Component {
                     {localStorage.getItem("isLoggedIn") ? (
                       ""
                     ) : (
-                      <Button
-                        className="btn-neutral btn-icon"
-                        color="default"
-                        href="/login-page"
-                      >
-                        <span className="btn-inner--icon">
-                          <i className="fa fa-user mr-2" />
-                        </span>
-                        <span className="nav-link-inner--text ml-1">Login</span>
-                      </Button>
-                    )}
+                        <Button
+                          className="btn-neutral btn-icon"
+                          color="default"
+                          href="/login-page"
+                        >
+                          <span className="btn-inner--icon">
+                            <i className="fa fa-user mr-2" />
+                          </span>
+                          <span className="nav-link-inner--text ml-1">Login</span>
+                        </Button>
+                      )}
                     {localStorage.getItem("isLoggedIn") ? (
                       ""
                     ) : (
-                      <Button
-                        className="btn-neutral btn-icon"
-                        color="default"
-                        href="/register-page"
-                      >
-                        <span className="btn-inner--icon">
-                          <i className="ni ni-key-25 mr-2" />
+                        <Button
+                          className="btn-neutral btn-icon"
+                          color="default"
+                          href="/register-page"
+                        >
+                          <span className="btn-inner--icon">
+                            <i className="ni ni-key-25 mr-2" />
+                          </span>
+                          <span className="nav-link-inner--text ml-1">
+                            register
                         </span>
-                        <span className="nav-link-inner--text ml-1">
-                          register
-                        </span>
-                      </Button>
-                    )}
+                        </Button>
+                      )}
                     {localStorage.getItem("isLoggedIn") ? (
                       <div>
                         <UncontrolledDropdown nav>
@@ -348,8 +352,8 @@ class DemoNavbar extends React.Component {
                         </UncontrolledDropdown>
                       </div>
                     ) : (
-                      ""
-                    )}
+                        ""
+                      )}
                   </NavItem>
                 </Nav>
               </UncontrolledCollapse>
