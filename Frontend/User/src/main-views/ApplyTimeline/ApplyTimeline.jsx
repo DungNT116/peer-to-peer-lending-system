@@ -35,7 +35,6 @@ class ApplyTimeline extends React.Component {
 
     if (this.props.setTimelineData !== undefined) {
       let timelineData = this.props.setTimelineData();
-      console.log(timelineData);
       this.props.onDataChange(
         timelineData.lendingTimeline,
         timelineData.payBackTimeline
@@ -50,7 +49,6 @@ class ApplyTimeline extends React.Component {
       await this.setState({
         rawMilestone: this.props.rawMilestone
       });
-      console.log(this.state.rawMilestone);
     }
 
     if (this.props.isLendMany !== undefined) {
@@ -711,7 +709,6 @@ class ApplyTimeline extends React.Component {
     } else {
       idMilestone = this.state.curDatePayback.id;
     }
-    console.log(idMilestone);
     fetch(apiLink + "/rest/transaction/newTransaction", {
       method: "POST",
       headers: {

@@ -77,7 +77,6 @@ class Profile extends React.Component {
       if (result.status === 200) {
         result.json().then(data => {
           console.log("get success");
-          console.log(data)
           if (data.length === 0) {
             this.setState({
               loadingID: false,
@@ -240,8 +239,7 @@ class Profile extends React.Component {
         // alert("create success");
         // this.props.history.push('view-new-request');
         result.json().then(data => {
-          console.log(data);
-          this.setState({
+          this.setState({ 
             username: data.username,
             firstName: data.firstName,
             lastName: data.lastName,

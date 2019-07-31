@@ -21,6 +21,7 @@ import ViewDetailRequest from "main-views/ViewDetailRequest/ViewDetailRequest.js
 import HistoryRequest from "main-views/HistoryRequest/HistoryRequest.jsx";
 import ViewRequestNew from "main-views/ViewRequestNew/ViewRequestNew.jsx";
 import ViewRequestTrading from "main-views/ViewRequestTrading/ViewRequestTrading";
+import ViewOwnTransaction from "main-views/ViewOwnTransaction/ViewOwnTransaction";
 
 ReactDOM.render(
   <Provider store={store}>
@@ -82,6 +83,11 @@ ReactDOM.render(
           path="/view-request-trading"
           exact
           render={props => <ViewRequestTrading {...props} />}
+        />
+        <Route
+          path="/view-own-transactions"
+          exact
+          render={props => <ViewOwnTransaction {...props} />}
         />
         <Redirect to="/" />
       </Switch>

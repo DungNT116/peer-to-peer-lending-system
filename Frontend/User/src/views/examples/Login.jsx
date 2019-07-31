@@ -93,19 +93,15 @@ class Login extends React.Component {
               localStorage.setItem("isLoggedIn", true);
               localStorage.setItem("user", data.username);
               this.getUsername();
-              console.log(data)
               this.props.history.push('view-request-list');
 
               } else {
-                console.log(data)
                 document.getElementById("loginError").innerHTML =
                       "<div class='alert alert-danger' role='alert'><strong>Your account is not user account</strong><br/> Please try again!</div>";
               }
             }
             if (result.status !== 200) {
               event.preventDefault();
-              // alert(data);
-              console.log(data)
               if (data.message === "Wrong userId and password")
                 document.getElementById("loginError").innerHTML =
                   "<div class='alert alert-danger' role='alert'><strong>Username or password is incorrect!</strong><br/> Please try again!</div>";

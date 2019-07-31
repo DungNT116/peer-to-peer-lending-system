@@ -2,9 +2,7 @@ import React from "react";
 
 // nodejs library that concatenates classes
 import classnames from "classnames";
-import { connect } from 'react-redux';
-
-import CurrencyInput from 'react-currency-input';
+import { connect } from "react-redux";
 // reactstrap components
 import {
   Card,
@@ -24,61 +22,46 @@ import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import ApplyTimeline from "../ApplyTimeline/ApplyTimeline.jsx";
 
 //api link
-import { apiLink } from '../../api.jsx';
+import { apiLink } from "../../api.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter";
-
+import Cleave from "cleave.js/react";
 const textVerticalCenter = {
-  display: 'flex',
-  alignItems: 'center',
-  height: '100%'
-}
-const inputCurrency = {
-  margin: 0,
-  fontFamily: 'inherit',
-  fontSize: 'inherit',
-  lineHeight: 'inherit',
-}
+  display: "flex",
+  alignItems: "center",
+  height: "100%"
+};
 class CreateRequestPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       amount: 0,
-      borrowDuration: '',
-      interestRate: '',
-      createDate: '',
+      borrowDuration: "",
+      interestRate: "",
+      createDate: "",
       lendingTimeline: [],
       paybackTimeline: [],
-      validAmount: false
-    }
+      invalidAmount: true,
+      errorAmount: ""
+    };
 
     this.onAmountChange = this.onAmountChange.bind(this);
     this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDataTimeline = this.handleDataTimeline.bind(this);
     this.createMileStone = this.createMileStone.bind(this);
+    this.onAmountCleaveChange = this.onAmountCleaveChange.bind(this);
+    this.onCreditCardFocus = this.onCreditCardFocus.bind(this);
   }
 
   formatCurrency(number) {
-    // let indexes = [];
     let count = 0;
     let tmpString = "";
-    // if(number.length > 3) {
-    //   for (let i = number.length; i >= 1; i--) {
-    //     if(count === 3 && i !== number.length) {
-    //       count = 0;
-    //       output += number[i] + ",";
-    //     } else if(count !== 3) {
-    //       output += number[i];
-    //     }
-    //     count++;
-    //   }  
-    // }
     if (number.length > 3) {
       for (let i = number.length; i > 0; i--) {
         const element = number[i - 1];
         if (count === 3 && i !== number.length) {
           count = 0;
-          tmpString += "," + element
+          tmpString += "," + element;
         } else if (count !== 3) {
           tmpString += element;
         }
@@ -97,32 +80,26 @@ class CreateRequestPage extends React.Component {
   createMileStone() {
     let milestones = [];
     let milestone = {
-      previousDate: '',
-      presentDate: '',
-      percent: '',
-      type: '',
-
-    }
+      previousDate: "",
+      presentDate: "",
+      percent: "",
+      type: ""
+    };
     for (let i = 0; i < this.state.lendingTimeline.length; i++) {
       const element = this.state.lendingTimeline[i];
-      console.log(element)
       // console.log(new Date(element.data).getTime() / 1000)
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
-        previousDate: '',
-        presentDate: '',
-        percent: '',
-        type: ''
-      }
+        previousDate: "",
+        presentDate: "",
+        percent: "",
+        type: ""
+      };
       if (i === 0) {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = dateToTimestamp;
         milestone.type = "lend";
         milestone.percent = element.percent;
-        console.log("Milestone 0 : " + milestone.percent);
-        console.log("Milestone 0 : " + milestone.presentDate);
-        console.log("Milestone 0 : " + milestone.previousDate);
-        console.log("Milestone 0 : " + milestone.type);
       } else {
         const preElement = this.state.lendingTimeline[i - 1];
         var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
@@ -130,12 +107,7 @@ class CreateRequestPage extends React.Component {
         milestone.previousDate = preDateToTimestamp;
         milestone.type = "lend";
         milestone.percent = element.percent;
-        console.log("Milestone 0 : " + milestone.percent);
-        console.log("Milestone " + i + " : " + milestone.presentDate);
-        console.log("Milestone " + i + " : " + milestone.previousDate);
-        console.log("Milestone " + i + " : " + milestone.type);
       }
-      // console.log(milestone);
       milestones.push(milestone);
     }
     for (let i = 0; i < this.state.paybackTimeline.length; i++) {
@@ -144,20 +116,16 @@ class CreateRequestPage extends React.Component {
       // console.log(new Date(element.data).getTime() / 1000)
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
-        previousDate: '',
-        presentDate: '',
-        percent: '',
-        type: ''
-      }
+        previousDate: "",
+        presentDate: "",
+        percent: "",
+        type: ""
+      };
       if (i === 0) {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = dateToTimestamp;
         milestone.type = "payback";
         milestone.percent = element.percent;
-        console.log("Milestone 0 : " + milestone.percent);
-        console.log("Milestone 0 : " + milestone.presentDate);
-        console.log("Milestone 0 : " + milestone.previousDate);
-        console.log("Milestone 0 : " + milestone.type);
       } else {
         const preElement = this.state.paybackTimeline[i - 1];
         var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
@@ -165,15 +133,9 @@ class CreateRequestPage extends React.Component {
         milestone.previousDate = preDateToTimestamp;
         milestone.type = "payback";
         milestone.percent = element.percent;
-        console.log("Milestone 0 : " + milestone.percent);
-        console.log("Milestone " + i + " : " + milestone.presentDate);
-        console.log("Milestone " + i + " : " + milestone.previousDate);
-        console.log("Milestone " + i + " : " + milestone.type);
       }
-      // console.log(milestone);
       milestones.push(milestone);
     }
-    console.log(milestones);
     return milestones;
   }
 
@@ -182,70 +144,32 @@ class CreateRequestPage extends React.Component {
       lendingTimeline: lendingTimeline,
       paybackTimeline: paybackTimeline
     });
-    // console.log("aaaaTimeline")
-    console.log(this.state.lendingTimeline)
-    console.log(this.state.paybackTimeline)
-    // this.createMileStone();
   }
 
-  onAmountChange(event, maskedvalue, floatvalue){
-    // const tmp = event.target.value.trim();
-    // console.log(tmp);
-    // if(this.state.amount === 0 || )
+  onAmountChange(event, maskedvalue, floatvalue) {
     this.setState({
       amount: maskedvalue
     });
-    // let output = this.formatCurrency(tmp);
-
-    // const input = document.getElementById("amount");
-    // input.value = output;
-    // console.log(output)
-    // if (!tmp.match(/^\d{1,12}$/)) {
-    //   document.getElementById("amountError").innerHTML = "amount only contain number ";
-    //   this.setState({
-    //     amount: tmp,
-    //     validAmount: false
-    //   });
-    // } else {
-    //   document.getElementById("amountError").innerHTML = "";
-    //   this.setState({
-    //     amount: tmp,
-    //     validAmount: true
-    //   });
-    // }
-    
   }
 
   onBorrowDurationChange(event) {
     var index = event.target.selectedIndex;
     var text = event.target[index].innerText.split(" ")[0];
     this.setState({
-      borrowDuration: text,
-    })
+      borrowDuration: text
+    });
   }
 
   async handleSubmit(event) {
     event.preventDefault();
-    let value = this.state.amount;
-    console.log(value);
-    console.log(Number(value) !== 0)
-    console.log(value.length < 12)
-    //12 so va 3 dau phay
-    if(Number(value) !== 0 && value.length <= 15) {
-      await this.setState({
-        validAmount: true
-      })
-    } else {
-      event.preventDefault();
-      document.getElementById("amountError").innerHTML = "amount is not valid";
-    }
-    console.log(this.state.validAmount)
+    
+    console.log(this.state.validAmount);
     if (this.state.validAmount === true) {
       fetch(apiLink + "/rest/request/createRequest", {
-        method: 'POST',
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": localStorage.getItem("token")
+          Authorization: localStorage.getItem("token")
           // "Authorization": this.props.tokenReducer.token
           // 'Access-Control-Allow-Origin': '*'
         },
@@ -263,19 +187,16 @@ class CreateRequestPage extends React.Component {
             milestone: this.createMileStone()
           }
         })
-
-      }).then(
-        (result) => {
-          if (result.status === 200) {
-            alert("create success");
-            this.props.history.push('view-new-request');
-          } else if (result.status === 401) {
-            localStorage.removeItem("isLoggedIn");
-            this.props.history.push('/login-page')
-          }
+      }).then(result => {
+        if (result.status === 200) {
+          alert("create success");
+          this.props.history.push("view-new-request");
+        } else if (result.status === 401) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push("/login-page");
         }
-      )
-    } 
+      });
+    }
     event.preventDefault();
   }
 
@@ -287,13 +208,58 @@ class CreateRequestPage extends React.Component {
     var timeStampeDateNow = Math.round(dateNow.getTime() / 1000);
     this.setState({
       createDate: timeStampeDateNow
-    })
+    });
     this.props.setIsHistory(false);
     this.props.setIsViewDetail(true);
     this.props.setIsHistoryDetail(false);
   }
-  render() {
 
+  onAmountCleaveChange(event) {
+    // formatted pretty value
+    // console.log(event.target.value);
+
+    // raw value
+    // console.log(event.target.rawValue);
+    var rawValue = event.target.rawValue;
+
+    if (rawValue % 500000 !== 0) {
+      if (rawValue >= 1000000000) {
+        //1 billion
+        this.setState({
+          invalidAmount: true,
+          errorAmount: "The amount must be lower than 1 billion!"
+        });
+      } else {
+        this.setState({
+          invalidAmount: true,
+          errorAmount: "The amount must be a multiple of 500.000 VNĐ !"
+        });
+      }
+    } else {
+      if (rawValue >= 1000000000) {
+        //1 billion
+        this.setState({
+          invalidAmount: true,
+          errorAmount: "The amount must be lower than 1 billion!"
+        });
+      } else if (rawValue === "") {
+        this.setState({
+          invalidAmount: true,
+          errorAmount: ""
+        });
+      } else {
+        this.setState({
+          invalidAmount: false,
+          errorAmount: ""
+        });
+      }
+    }
+  }
+
+  onCreditCardFocus(event) {
+    // update some state
+  }
+  render() {
     return (
       <>
         <DemoNavbar />
@@ -321,7 +287,8 @@ class CreateRequestPage extends React.Component {
                         <span>create your own request</span>
                       </h1>
                       <p className="lead text-white">
-                        create borrow request more easier. Every where, every times, ...
+                        create borrow request more easier. Every where, every
+                        times, ...
                       </p>
                     </Col>
                   </Row>
@@ -337,65 +304,109 @@ class CreateRequestPage extends React.Component {
                 {/* <div className="px-4"> */}
                 <Row className="justify-content-center ">
                   <Col>
-                    <h2 className="display-3 text-center">Create your request</h2>
+                    <h2 className="display-3 text-center">
+                      Create your request
+                    </h2>
                     <Card className="bg-gradient-secondary shadow">
                       <CardBody className="p-lg-5">
-                        <h4 className="mb-1 text-center mb-5">Fill your information into the form</h4>
+                        <h4 className="mb-1 text-center mb-5">
+                          Fill your information into the form
+                        </h4>
                         <Form role="form" onSubmit={this.handleSubmit}>
-                          <FormGroup row
+                          <FormGroup
+                            row
                             className={classnames({
                               focused: this.state.amountFocused
                             })}
                           >
                             <Col lg="3" md="3">
-                              <Label htmlFor="amount" style={textVerticalCenter}>
+                              <Label
+                                htmlFor="amount"
+                                style={textVerticalCenter}
+                              >
                                 Amount
-                            </Label>
+                              </Label>
                             </Col>
                             <Col lg="4" md="4">
-                              <CurrencyInput style={inputCurrency}
-                              value={this.state.amount} 
-                              onChangeEvent={this.onAmountChange}
-                              precision="0"
-                              allowEmpty="false"/>
-                              {/* <Input
-                                id="amount"
-                                placeholder="Amount"
-                                type="text"
-                                onFocus={e => this.setState({ amountFocused: true })}
-                                onBlur={e => this.setState({ amountFocused: false })}
-                                value={this.state.amount}
-                                onChange={this.onAmountChange}
-                                required
-                              /> */}
+                              <Cleave
+                                placeholder="Enter your Amount"
+                                options={{
+                                  numeral: true,
+                                  numeralThousandsGroupStyle: "thousand"
+                                }}
+                                onFocus={this.onCreditCardFocus}
+                                onChange={this.onAmountCleaveChange}
+                                style={{
+                                  display: "block",
+                                  width: "100%",
+                                  height: "calc(2.75rem + 2px)",
+                                  padding: "0.625rem 0.75rem",
+                                  fontSize: "1rem",
+                                  lineHeight: 1.5,
+                                  color: "#8898aa",
+                                  backgroundColor: "#fff",
+                                  backgroundClip: "padding-box",
+                                  border: "1px solid #cad1d7",
+                                  borderRadius: "0.25rem",
+                                  boxShadow: "none"
+                                }}
+                              />
+                              <small>
+                                <strong style={{ color: "red" }}>
+                                  {this.state.errorAmount}
+                                </strong>
+                              </small>
                             </Col>
                           </FormGroup>
-                          <FormGroup row className={classnames({
-                            focused: this.state.durationFocused
-                          })}>
+                          <FormGroup
+                            row
+                            className={classnames({
+                              focused: this.state.durationFocused
+                            })}
+                          >
                             <Col lg="3" md="3">
-                              <Label htmlFor="duration" style={textVerticalCenter}>Borrow Duration</Label>
+                              <Label
+                                htmlFor="duration"
+                                style={textVerticalCenter}
+                              >
+                                Borrow Duration
+                              </Label>
                             </Col>
                             <Col lg="3" md="3">
-                              <Input type="select" name="duration" id="duration"
-                                onFocus={e => this.setState({ durationFocused: true })}
-                                onBlur={e => this.setState({ durationFocused: false })}
-                                onChange={this.onBorrowDurationChange} required defaultValue="">
-                                <option value="" disabled>Please select</option>
+                              <Input
+                                type="select"
+                                name="duration"
+                                id="duration"
+                                onFocus={e =>
+                                  this.setState({ durationFocused: true })
+                                }
+                                onBlur={e =>
+                                  this.setState({ durationFocused: false })
+                                }
+                                onChange={this.onBorrowDurationChange}
+                                required
+                                defaultValue=""
+                              >
+                                <option value="" disabled>
+                                  Please select
+                                </option>
                                 <option value="1">30 days</option>
                                 <option value="3">90 days</option>
                                 <option value="6">180 days</option>
                                 <option value="9">270 days</option>
                                 <option value="12">360 days</option>
                               </Input>
-                              <p id="durationError"></p>
+                              <p id="durationError" />
                             </Col>
                           </FormGroup>
                           <FormGroup row>
                             <Col lg="3" md="3">
-                              <Label htmlFor="interestedRate" style={textVerticalCenter}>
+                              <Label
+                                htmlFor="interestedRate"
+                                style={textVerticalCenter}
+                              >
                                 Interest rate
-                          </Label>
+                              </Label>
                             </Col>
                             <Col lg="9" md="9">
                               <p>18% per year</p>
@@ -408,15 +419,19 @@ class CreateRequestPage extends React.Component {
                             </Col>
                           </FormGroup>
                           <ApplyTimeline
-                            onDataChange={this.handleDataTimeline}></ApplyTimeline>
+                            onDataChange={this.handleDataTimeline}
+                          />
                           <div className="text-center my-4">
                             {/* <Input type="submit" value="Send" /> */}
-                            <Button type="submit" size="md" className="btn btn-outline-primary">Create Request</Button>
+                            <Button
+                              type="submit"
+                              size="md"
+                              className="btn btn-outline-primary"
+                              disabled={this.state.invalidAmount}
+                            >
+                              Create Request
+                            </Button>
                           </div>
-                          <div className="text-center my-4">
-                          <p id="amountError"></p>
-                          </div>
-
                         </Form>
                       </CardBody>
                     </Card>
@@ -433,45 +448,47 @@ class CreateRequestPage extends React.Component {
   }
 }
 
-
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
-    request: state.request,
-  }
-}
-const mapDispatchToProps = (dispatch) => {
+    request: state.request
+  };
+};
+const mapDispatchToProps = dispatch => {
   return {
-    setRequest: (id) => {
+    setRequest: id => {
       dispatch({
         type: "SET_REQUEST",
         payload: id
       });
     },
-    setIsTrading: (status) => {
+    setIsTrading: status => {
       dispatch({
         type: "SET_IS_TRADING",
         payload: status
       });
     },
-    setIsViewDetail: (status) => {
+    setIsViewDetail: status => {
       dispatch({
         type: "SET_IS_VIEWDETAIL",
         payload: status
       });
     },
-    setIsHistory: (status) => {
+    setIsHistory: status => {
       dispatch({
         type: "SET_IS_HISTORY",
         payload: status
       });
     },
-    setIsHistoryDetail: (status) => {
+    setIsHistoryDetail: status => {
       dispatch({
         type: "SET_IS_HISTORY_DETAIL",
         payload: status
       });
     }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateRequestPage);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(CreateRequestPage);

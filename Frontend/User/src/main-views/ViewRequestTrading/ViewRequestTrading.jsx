@@ -95,7 +95,6 @@ class ViewRequestTrading extends React.Component {
         }
       }
     ).then(result => {
-      console.log(result);
       if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
@@ -127,7 +126,6 @@ class ViewRequestTrading extends React.Component {
         }
       }
     ).then(result => {
-      console.log(result);
       if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
