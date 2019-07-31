@@ -922,7 +922,6 @@ class Profile extends React.Component {
                                             }
                                           }
                                         }>Start camera</button>
-                                        {' '}
                                         <button id="record" onClick={
                                           (event) => {
                                             event.preventDefault();
