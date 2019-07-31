@@ -52,13 +52,13 @@ public class DocumentService {
 			if (checkExistDocument != null) {
 				return false;
 			}
-			
+
 			checkExistDocument = docRepo.findUserDocumentWithStatus(docTypeId, user.getId(), "invalid");
 			if (checkExistDocument != null) {
 				iDoc = checkExistDocument;
 				docFileRepo.deleteByDocId(checkExistDocument.getId());
 			}
-			
+
 			DocumentType docType = docTypeRepo.findById(docTypeId).get();
 
 			iDoc.setDocumentType(docType);
@@ -112,13 +112,13 @@ public class DocumentService {
 			if (checkExistDocument != null) {
 				return false;
 			}
-			
+
 			checkExistDocument = docRepo.findUserDocumentWithStatus(docTypeId, user.getId(), "invalid");
 			if (checkExistDocument != null) {
 				iDoc = checkExistDocument;
 				docFileRepo.deleteByDocId(checkExistDocument.getId());
 			}
-			
+
 			DocumentType docType = docTypeRepo.findById(docTypeId).get();
 
 			iDoc.setDocumentType(docType);
@@ -196,25 +196,36 @@ public class DocumentService {
 
 			User user = existDoc.getUser();
 			List<Document> lstUserDocument = user.getDocument();
-			Long limit = 0L;
-			for (Document d1 : lstUserDocument) {
-				if (d1.getDocumentType().getId() == 1 && d1.getStatus().equalsIgnoreCase("valid")) {
-					limit += d1.getDocumentType().getAmountLimit();
-					for (Document d2 : lstUserDocument) {
-						if (d2.getDocumentType().getId() == 2 && d2.getStatus().equalsIgnoreCase("valid")) {
-							limit += d2.getDocumentType().getAmountLimit();
-							user.setLoanLimit(limit);
-							userRepo.saveAndFlush(user);
 
-							for (Document d3 : lstUserDocument) {
-								if (d3.getDocumentType().getId() != 1 && d3.getDocumentType().getId() != 2
-										&& d3.getStatus().equalsIgnoreCase("valid")) {
-									limit += d3.getDocumentType().getAmountLimit();
-									user.setLoanLimit(limit);
-									userRepo.saveAndFlush(user);
-								}
-							}
-						}
+			Long limit = 0L;
+			int count = 0;
+			for (Document d : lstUserDocument) {
+				if (d.getDocumentType().getId() == 1 && d.getStatus().equalsIgnoreCase("valid")) {
+					limit += d.getDocumentType().getAmountLimit();
+					count += 1;
+					break;
+				}
+			}
+
+			if (count == 1) {
+				for (Document d : lstUserDocument) {
+					if (d.getDocumentType().getId() == 2 && d.getStatus().equalsIgnoreCase("valid")) {
+						limit += d.getDocumentType().getAmountLimit();
+						user.setLoanLimit(limit);
+						user = userRepo.saveAndFlush(user);
+						count += 1;
+						break;
+					}
+				}
+			}
+
+			if (count == 2) {
+				for (Document d : lstUserDocument) {
+					if ((d.getDocumentType().getId() != 1 && d.getDocumentType().getId() != 2)
+							&& d.getStatus().equalsIgnoreCase("valid")) {
+						limit += d.getDocumentType().getAmountLimit();
+						user.setLoanLimit(limit);
+						user = userRepo.saveAndFlush(user);
 					}
 				}
 			}
