@@ -2,6 +2,7 @@ package capstone.p2plend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class MilestoneConstroller {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping(value = "/rest/milestone/newMilestone")
-	public Integer newMilestone(@RequestBody Milestone milestone) {
+	public ResponseEntity<Integer> newMilestone(@RequestBody Milestone milestone) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = milestoneService.newMilestone(milestone);
@@ -30,13 +31,13 @@ public class MilestoneConstroller {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/milestone/updateMilestone")
-	public Integer updateMilestone(@RequestBody Milestone milestone) {
+	public ResponseEntity<Integer> updateMilestone(@RequestBody Milestone milestone) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = milestoneService.updateMilestone(milestone);
@@ -45,6 +46,6 @@ public class MilestoneConstroller {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 }

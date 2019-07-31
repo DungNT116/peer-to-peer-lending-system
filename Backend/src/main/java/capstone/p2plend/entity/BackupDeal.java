@@ -47,6 +47,9 @@ public class BackupDeal {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "backupDeal")
 	private List<BackupMilestone> backupMilestone = new ArrayList<>();
 
+	public BackupDeal() {
+	}
+
 	public Integer getId() {
 		return id;
 	}

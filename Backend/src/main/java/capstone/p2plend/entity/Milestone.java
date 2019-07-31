@@ -47,6 +47,9 @@ public class Milestone {
 	@JoinColumn(name = "deal_id")
 	private Deal deal;
 
+	public Milestone() {
+	}
+
 	public Integer getId() {
 		return id;
 	}

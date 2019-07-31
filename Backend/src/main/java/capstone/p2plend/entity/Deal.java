@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -39,6 +40,11 @@ public class Deal {
 	private Integer paybackTime;
 
 	@JsonIgnoreProperties(value = { "deal" })
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private User user;
+
+	@JsonIgnoreProperties(value = { "deal" })
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "request_id", referencedColumnName = "id")
 	private Request request;
@@ -48,8 +54,11 @@ public class Deal {
 	private List<Milestone> milestone = new ArrayList<>();
 
 	@JsonIgnoreProperties(value = { "deal" })
-	@OneToOne(mappedBy = "deal", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "deal")
 	private BackupDeal backupDeal;
+
+	public Deal() {
+	}
 
 	public Integer getId() {
 		return id;
@@ -81,6 +90,14 @@ public class Deal {
 
 	public void setPaybackTime(Integer paybackTime) {
 		this.paybackTime = paybackTime;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public Request getRequest() {
