@@ -220,15 +220,10 @@ public class DocumentService {
 
 			if (count == 2) {
 				for (Document d : lstUserDocument) {
-					if (d.getDocumentType().getId() != 1) {
-						if (d.getDocumentType().getId() != 2) {
-							if (d.getStatus().equalsIgnoreCase("valid")) {
-								limit += d.getDocumentType().getAmountLimit();
-								user.setLoanLimit(limit);
-								user = userRepo.saveAndFlush(user);
-							}
-						}
-
+					if (d.getDocumentType().getId() > 2 && d.getStatus().equalsIgnoreCase("valid")) {
+						limit += d.getDocumentType().getAmountLimit();
+						user.setLoanLimit(limit);
+						user = userRepo.saveAndFlush(user);
 					}
 				}
 			}
