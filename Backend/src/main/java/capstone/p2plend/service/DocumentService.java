@@ -15,7 +15,6 @@ import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.DocumentFile;
 import capstone.p2plend.entity.DocumentType;
-import capstone.p2plend.entity.Request;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.repo.DocumentFileRepository;
 import capstone.p2plend.repo.DocumentRepository;
@@ -89,8 +88,12 @@ public class DocumentService {
 			String[] splits = base64Video.split(",");
 			String base64 = splits[1];
 			System.out.println(splits[0]);
-			
-			
+
+			boolean checkBase64 = Base64.isBase64(base64);
+			if (checkBase64 == false) {
+				return false;
+			}
+
 			String username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
 			if (docTypeId == null || docTypeId != 2) {
@@ -114,7 +117,7 @@ public class DocumentService {
 //            System.out.println(new String(decodedString));
 
 			byte[] byteArray = Base64.decodeBase64(base64.getBytes());
-            
+
 			DocumentFile df = new DocumentFile();
 			df.setFileName(username + "_Video");
 			df.setData(byteArray);
