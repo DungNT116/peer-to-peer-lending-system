@@ -264,7 +264,6 @@ class DocumentDetail extends React.Component {
                         </Col>
                       </Row>
                     </div>
-
                     <hr className="my-4" />
                     <div id="accordion" style={{ width: "95%" }}>
                       {this.state.docs.map((docData, index) => (
@@ -332,7 +331,7 @@ class DocumentDetail extends React.Component {
                                         />
                                       </Col>
                                     ) : (
-                                      <video width="320" height="240" autoPlay src={"data:"+imageData.fileType+";base64,"+imageData.data}/>
+                                      <video width="320" height="240" controls autoPlay src={"data:"+imageData.fileType+";base64,"+imageData.data}/>
                                     )
                                 )}
                               </Row>
