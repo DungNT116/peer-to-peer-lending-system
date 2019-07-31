@@ -143,7 +143,7 @@ class PendingDocuments extends React.Component {
         <td>
           {doc.user.firstName} {doc.user.lastName}
         </td>
-        <td>{doc.documentType}</td>
+        <td>{doc.documentType.name}</td>
         <td>
           <Link to="/admin/document-detail">
             <Button
@@ -186,7 +186,7 @@ class PendingDocuments extends React.Component {
                     </tr>
                   </thead>
                   {listPendingDocs == "" ? (
-                    <div>No data is matching</div>
+                    "No data is matching"
                   ) : (
                     <tbody>{listPendingDocs}</tbody>
                   )}
