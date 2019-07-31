@@ -10,7 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import capstone.p2plend.dto.PageDTO;
+import capstone.p2plend.entity.Request;
 import capstone.p2plend.entity.User;
+import capstone.p2plend.repo.RequestRepository;
 import capstone.p2plend.repo.UserRepository;
 
 @Service
@@ -18,6 +20,9 @@ public class UserService {
 
 	@Autowired
 	UserRepository userRepo;
+
+	@Autowired
+	RequestRepository requestRepo;
 
 	@Autowired
 	JwtService jwtService;
@@ -100,10 +105,10 @@ public class UserService {
 			account.setLoanLimit(0L);
 			userRepo.save(account);
 			return "Account successfully created";
-			
+
 		} catch (Exception e) {
 			return "Error";
-		}		
+		}
 	}
 
 	public boolean activateAccount(int id) {
@@ -166,5 +171,28 @@ public class UserService {
 		pageDTO.setMaxPage(allUsers.getTotalPages());
 		pageDTO.setData(userList);
 		return pageDTO;
+	}
+
+	public Long getUserMaximunLoanLimit(String token) {
+		try {
+
+			String username = jwtService.getUsernameFromToken(token);
+			User user = userRepo.findByUsername(username);
+
+			Long loanLimit = user.getLoanLimit();
+
+			List<Request> lstRequest = requestRepo.findListAllUserRequestByExceptStatus(user.getId(), "done");
+
+			Long currentLoanAmount = 0L;
+
+			for (Request r : lstRequest) {
+				currentLoanAmount += r.getAmount();
+			}
+
+			return loanLimit - currentLoanAmount;
+
+		} catch (Exception e) {
+			return 0L;
+		}
 	}
 }

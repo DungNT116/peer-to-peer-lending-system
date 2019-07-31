@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import capstone.p2plend.dto.PageDTO;
+import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.payload.LoginRespone;
 import capstone.p2plend.service.UserService;
@@ -161,7 +162,7 @@ public class UserController {
 
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-
+	
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
 	@PutMapping(value = "/rest/admin/user/deactivateUser")
@@ -178,6 +179,21 @@ public class UserController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@CrossOrigin
+	@Secured({ "ROLE_USER" })
+	@GetMapping(value = "/rest/user/getUserMaximunLoanLimit")
+	public ResponseEntity<Long> userMaximumLoanLimit(@RequestHeader("Authorization") String token) {
+		HttpStatus httpStatus = null;
+		Long result = null;
+		try {
+			result = userService.getUserMaximunLoanLimit(token);
+			httpStatus = HttpStatus.OK;
+		} catch (Exception e) {
+			httpStatus = HttpStatus.BAD_REQUEST;
+		}
+		return new ResponseEntity<Long>(result, httpStatus);
+	}
+	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@GetMapping(value = "/rest/admin/user/getUsers")
