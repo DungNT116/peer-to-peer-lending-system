@@ -132,8 +132,7 @@ class ApplyTimeline extends React.Component {
         {
           data: this.formatDate(
             new Date(
-              (new Date(Date.now()).getTime() / 1000 + 86400 * duration * 2) *
-              1000
+              (new Date(Date.now()).getTime() / 1000 + 86400 * duration * 2) * 1000
             ).toLocaleDateString()
           ),
           percent: 1.0,

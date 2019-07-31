@@ -98,7 +98,7 @@ class DemoNavbar extends React.Component {
     var upvotesRef = database.ref(
       "/ppls/" + this.state.keyUserFb + "/countNew"
     );
-    upvotesRef.transaction(function(current_value) {
+    upvotesRef.transaction(function (current_value) {
       return (current_value -= current_value);
     });
   }
@@ -109,7 +109,7 @@ class DemoNavbar extends React.Component {
     var upvotesRef = database.ref(
       "/ppls/" + this.state.keyUserFb + "/countNew"
     );
-    upvotesRef.transaction(function(current_value) {
+    upvotesRef.transaction(function (current_value) {
       return (current_value || 0) + 1;
     });
 
@@ -187,8 +187,8 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                    ""
-                  )}
+                      ""
+                    )}
                   {localStorage.getItem("isLoggedIn") ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
@@ -202,8 +202,8 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                    ""
-                  )}
+                      ""
+                    )}
                   {localStorage.getItem("isLoggedIn") ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
@@ -223,8 +223,8 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                    ""
-                  )}
+                      ""
+                    )}
                 </Nav>
                 <Nav
                   className="align-items-lg-center navbar-nav-hover ml-lg-auto"
@@ -234,33 +234,33 @@ class DemoNavbar extends React.Component {
                     {localStorage.getItem("isLoggedIn") ? (
                       ""
                     ) : (
-                      <Button
-                        className="btn-neutral btn-icon"
-                        color="default"
-                        href="/login-page"
-                      >
-                        <span className="btn-inner--icon">
-                          <i className="fa fa-user mr-2" />
-                        </span>
-                        <span className="nav-link-inner--text ml-1">Login</span>
-                      </Button>
-                    )}
+                        <Button
+                          className="btn-neutral btn-icon"
+                          color="default"
+                          href="/login-page"
+                        >
+                          <span className="btn-inner--icon">
+                            <i className="fa fa-user mr-2" />
+                          </span>
+                          <span className="nav-link-inner--text ml-1">Login</span>
+                        </Button>
+                      )}
                     {localStorage.getItem("isLoggedIn") ? (
                       ""
                     ) : (
-                      <Button
-                        className="btn-neutral btn-icon"
-                        color="default"
-                        href="/register-page"
-                      >
-                        <span className="btn-inner--icon">
-                          <i className="ni ni-key-25 mr-2" />
+                        <Button
+                          className="btn-neutral btn-icon"
+                          color="default"
+                          href="/register-page"
+                        >
+                          <span className="btn-inner--icon">
+                            <i className="ni ni-key-25 mr-2" />
+                          </span>
+                          <span className="nav-link-inner--text ml-1">
+                            register
                         </span>
-                        <span className="nav-link-inner--text ml-1">
-                          register
-                        </span>
-                      </Button>
-                    )}
+                        </Button>
+                      )}
                     {localStorage.getItem("isLoggedIn") ? (
                       <div>
                         <UncontrolledDropdown nav>
@@ -355,8 +355,8 @@ class DemoNavbar extends React.Component {
                         </UncontrolledDropdown>
                       </div>
                     ) : (
-                      ""
-                    )}
+                        ""
+                      )}
                   </NavItem>
                 </Nav>
               </UncontrolledCollapse>

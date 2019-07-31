@@ -16,6 +16,7 @@ import {
   Col
 } from "reactstrap";
 
+import { database } from "../../firebase";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
@@ -202,9 +203,36 @@ class Register extends React.Component {
         phoneNumber: this.state.phone
       })
     }).then(result => {
-      result.text().then(data => {
-        console.log(data);
-      });
+        if(result.status !== 200){
+          // console.log(result)
+        }else if(result.status === 200){
+          result.text().then(async data => {
+            console.log(data)
+            await database.ref("ppls/").push({
+              username: this.state.username,
+              notification: "",
+              countNew: 1
+            });
+            await localStorage.setItem("user", this.state.username);
+            const username = localStorage.getItem("user");
+            await database
+              .ref("ppls")
+              .orderByChild("username")
+              .equalTo(username)
+              .once("value", snapshot => {
+                if (snapshot.exists()) {
+                  const userData = snapshot.val();
+                  this.setState({ keyUserFb: Object.keys(userData)[0] });
+                }
+              });
+            database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+              message: "Congratulations ! You have just create account !",
+              sender: "System"
+            });
+          });
+
+        }
+      
     });
     // this.props.history.push('/login-page')
 
