@@ -169,7 +169,7 @@ class ViewRequestList extends React.Component {
                   <Row>
                     <Col lg="10">
                       <h1 className="display-3 text-white">
-                        View Request List{" "}
+                        View Requests Lending{" "}
                         <span>View request for your lending </span>
                       </h1>
                       <p className="lead text-white">
@@ -202,7 +202,7 @@ class ViewRequestList extends React.Component {
                       href="#pablo"
                       role="tab"
                     >
-                      Lending Request
+                      Lending Requests
                     </NavLink>
                   </NavItem>
                 </Nav>

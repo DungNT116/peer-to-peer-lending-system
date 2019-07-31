@@ -24,13 +24,7 @@ class Profile extends React.Component {
 
   constructor(props) {
     super(props);
-    this.onEntering = this.onEntering.bind(this);
-    this.onEntered = this.onEntered.bind(this);
-    this.onExiting = this.onExiting.bind(this);
-    this.onExited = this.onExited.bind(this);
-    this.toggle = this.toggle.bind(this);
     this.toggleAccordion = this.toggleAccordion.bind(this);
-    this.toggleCustom = this.toggleCustom.bind(this);
     this.toggleFade = this.toggleFade.bind(this);
     this.state = {
       collapse: false,
@@ -42,25 +36,6 @@ class Profile extends React.Component {
     };
   }
 
-  onEntering() {
-    this.setState({ status: 'Opening...' });
-  }
-
-  onEntered() {
-    this.setState({ status: 'Opened' });
-  }
-
-  onExiting() {
-    this.setState({ status: 'Closing...' });
-  }
-
-  onExited() {
-    this.setState({ status: 'Closed' });
-  }
-
-  toggle() {
-    this.setState({ collapse: !this.state.collapse });
-  }
 
   toggleAccordion(tab) {
 
@@ -72,15 +47,6 @@ class Profile extends React.Component {
     });
   }
 
-  toggleCustom(tab) {
-
-    const prevState = this.state.custom;
-    const state = prevState.map((x, index) => tab === index ? !x : false);
-
-    this.setState({
-      custom: state,
-    });
-  }
 
   toggleFade() {
     this.setState({ fadeIn: !this.state.fadeIn });

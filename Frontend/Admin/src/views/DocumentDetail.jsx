@@ -41,6 +41,8 @@ class DocumentDetail extends React.Component {
     this.toggleAccordion = this.toggleAccordion.bind(this);
     this.setSrcImgBase64 = this.setSrcImgBase64.bind(this);
     this.handleIDChange = this.handleIDChange.bind(this);
+
+    this.validRedux = this.validRedux.bind(this);
   }
 
   toggleAccordion(tab) {
@@ -102,7 +104,12 @@ class DocumentDetail extends React.Component {
       }
     });
   }
-
+  validRedux() {
+    if (Object.keys(this.props.document.userInfo).length === 0) {
+      this.props.history.push(localStorage.getItem("previousPage"));
+      window.location.reload();
+    }
+  }
   setSrcImgBase64(type, image) {
     return "data:" + type + ";base64, " + image;
   }
@@ -179,6 +186,7 @@ class DocumentDetail extends React.Component {
     };
     return (
       <>
+        {this.validRedux()}
         <Header />
         <Container className="mt--7" fluid>
           <Modal
@@ -294,7 +302,7 @@ class DocumentDetail extends React.Component {
                                     style={{ color: "red", fontSize: "15px" }}
                                   />
                                 )}
-                                {docData.documentType}
+                                {docData.documentType.name}
                               </h5>
                             </Button>
                           </CardHeader>
@@ -308,21 +316,24 @@ class DocumentDetail extends React.Component {
                             <CardBody>
                               <Row>
                                 {docData.documentFile.map(
-                                  (imageData, indexImg) => (
-                                    <Col
-                                      lg="4"
-                                      key={indexImg}
-                                      style={style.sameSizeWithParent}
-                                    >
-                                      <img
-                                        src={this.setSrcImgBase64(
-                                          imageData.fileType,
-                                          imageData.data
-                                        )}
+                                  (imageData, indexImg) =>
+                                    imageData.fileType !== "video/webm" ? (
+                                      <Col
+                                        lg="4"
+                                        key={indexImg}
                                         style={style.sameSizeWithParent}
-                                      />
-                                    </Col>
-                                  )
+                                      >
+                                        <img
+                                          src={this.setSrcImgBase64(
+                                            imageData.fileType,
+                                            imageData.data
+                                          )}
+                                          style={style.sameSizeWithParent}
+                                        />
+                                      </Col>
+                                    ) : (
+                                      <video width="320" height="240" autoPlay src={"data:"+imageData.fileType+";base64,"+imageData.data}/>
+                                    )
                                 )}
                               </Row>
                               {docData.status == "valid" ? (

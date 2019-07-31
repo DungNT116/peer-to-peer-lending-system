@@ -313,7 +313,6 @@ class ViewDetailRequest extends React.Component {
   }
 
   changeMilestoneToTimelineData() {
-    console.log(this.props.request.data.deal.milestone);
     let numberOfLendingMilestones = 0;
     let numberOfPayBackMilestones = 0;
     let milestone = this.props.request.data.deal.milestone;
@@ -351,13 +350,6 @@ class ViewDetailRequest extends React.Component {
 
     timelineData.lendingTimeline = lendingTimeline;
     timelineData.payBackTimeline = payBackTimeline;
-    console.log(lendingTimeline);
-    console.log(payBackTimeline);
-    // this.setState({
-    //   dbDataLendingTimeline: lendingTimeline,
-    //   dbDataPayBackTimeline: payBackTimeline
-    // })
-    // console.log(timelineData);
     return timelineData;
   }
 
@@ -366,9 +358,6 @@ class ViewDetailRequest extends React.Component {
       lendingTimeline: lendingTimeline,
       paybackTimeline: paybackTimeline
     });
-    // console.log("aaaaTimeline")
-    console.log(this.state.lendingTimeline);
-    console.log(this.state.paybackTimeline);
     // this.createMileStone();
   }
 

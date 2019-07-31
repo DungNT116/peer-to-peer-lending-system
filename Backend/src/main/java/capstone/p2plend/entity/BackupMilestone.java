@@ -40,6 +40,9 @@ public class BackupMilestone {
 	@JoinColumn(name = "backup_deal_id")
 	private BackupDeal backupDeal;
 
+	public BackupMilestone() {
+	}
+
 	public Integer getId() {
 		return id;
 	}

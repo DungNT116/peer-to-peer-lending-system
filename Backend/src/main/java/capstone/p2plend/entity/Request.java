@@ -44,7 +44,6 @@ public class Request {
 	@Column
 	private String status;
 
-//	@JsonIgnoreProperties(value = { "borrowRequest", "lendRequest" })
 	@JsonIgnoreProperties(value = { "borrowRequest", "lendRequest" })
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "borrower_id")
@@ -58,6 +57,9 @@ public class Request {
 	@JsonIgnoreProperties(value = { "request" })
 	@OneToOne(mappedBy = "request", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Deal deal;
+
+	public Request() {
+	}
 
 	public Integer getId() {
 		return id;

@@ -36,7 +36,7 @@ public class RequestController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping(value = "/rest/request/createRequest")
-	public Integer createAccount(@RequestBody Request request, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<Integer> createAccount(@RequestBody Request request, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = requestService.createRequest(request, token);
@@ -45,7 +45,7 @@ public class RequestController {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin
@@ -148,7 +148,7 @@ public class RequestController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@DeleteMapping(value = "/rest/request/delete")
-	public Integer deleteRequest(@RequestBody Request request, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<Integer> deleteRequest(@RequestBody Request request, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = requestService.remove(request.getId(), token);
 		if (valid == true) {
@@ -156,6 +156,6 @@ public class RequestController {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 }

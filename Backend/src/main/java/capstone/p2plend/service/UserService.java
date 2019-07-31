@@ -21,9 +21,23 @@ public class UserService {
 
 	@Autowired
 	JwtService jwtService;
-	
+
 	public List<User> findAll() {
 		return userRepo.findAll();
+	}
+
+	public String checkUser(String token) {
+		try {
+			String username = null;
+			username = jwtService.getUsernameFromToken(token);
+			User user = userRepo.findByUsername(username);
+			if (user != null) {
+				return username;
+			}
+			return "";
+		} catch (Exception e) {
+			return "";
+		}
 	}
 
 	public User getOneById(int id) {
@@ -37,7 +51,7 @@ public class UserService {
 		return account;
 	}
 
-	public User getOneByUsername(String token) {		
+	public User getOneByUsername(String token) {
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
 		User account = new User();
@@ -49,12 +63,12 @@ public class UserService {
 		account.setLoanLimit(user.getLoanLimit());
 		return account;
 	}
-	
+
 	public User findUsername(String username) {
 		return userRepo.findByUsername(username);
 	}
 
-	public boolean checkLogin(User account) {
+	public User checkLogin(User account) {
 
 		String username = account.getUsername();
 		String password = account.getPassword();
@@ -62,31 +76,37 @@ public class UserService {
 		User checkExist = userRepo.findByUsernameAndPassword(username, password);
 
 		if (checkExist != null && checkExist.getStatus().equals("active")) {
-			return true;
+			return checkExist;
 		}
 
-		return false;
+		return null;
 	}
 
 	public String createAccount(User account) {
+		try {
 
-		User usernameExist = userRepo.findByUsername(account.getUsername());
-		if (usernameExist != null) {
-			return "Username existed";
-		}
+			User usernameExist = userRepo.findByUsername(account.getUsername());
+			if (usernameExist != null) {
+				return "Username existed";
+			}
 
-		User emailExist = userRepo.findByEmail(account.getEmail());
-		if (emailExist != null) {
-			return "Email existed";
-		}
+			User emailExist = userRepo.findByEmail(account.getEmail());
+			if (emailExist != null) {
+				return "Email existed";
+			}
 
-		account.setRole("ROLE_USER");
-		account.setStatus("active");
-		userRepo.save(account);
-		return "Account successfully created";
+			account.setRole("ROLE_USER");
+			account.setStatus("active");
+			account.setLoanLimit(0L);
+			userRepo.save(account);
+			return "Account successfully created";
+			
+		} catch (Exception e) {
+			return "Error";
+		}		
 	}
 
-	public boolean activeAccount(int id) {
+	public boolean activateAccount(int id) {
 		boolean valid = false;
 		try {
 			User account = userRepo.findById(id).get();
@@ -132,12 +152,15 @@ public class UserService {
 		Page<User> allUsers = userRepo.findAll(pageable);
 		List<User> userList = new ArrayList<>();
 		for (User u : allUsers) {
-			User user = new User();
-			user.setId(u.getId());
-			user.setUsername(u.getUsername());
-			user.setFirstName(u.getFirstName());
-			user.setLastName(u.getLastName());
-			userList.add(user);
+			if (!u.getRole().equals("ROLE_ADMIN")) {
+				User user = new User();
+				user.setId(u.getId());
+				user.setUsername(u.getUsername());
+				user.setFirstName(u.getFirstName());
+				user.setLastName(u.getLastName());
+				user.setStatus(u.getStatus());
+				userList.add(user);
+			}
 		}
 		PageDTO<User> pageDTO = new PageDTO<>();
 		pageDTO.setMaxPage(allUsers.getTotalPages());

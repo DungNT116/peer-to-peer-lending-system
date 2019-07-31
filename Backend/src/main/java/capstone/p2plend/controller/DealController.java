@@ -31,7 +31,7 @@ public class DealController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/deal/makeDeal")
-	public Integer makeDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<Integer> makeDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
 
@@ -44,13 +44,13 @@ public class DealController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/deal/acceptDeal")
-	public Integer acceptDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<Integer> acceptDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
 		
@@ -63,17 +63,17 @@ public class DealController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/deal/cancelDeal")
-	public Integer cancelDeal(@RequestBody Deal deal) {
+	public ResponseEntity<Integer> cancelDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
 		
-		valid = dealService.cancelDeal(deal.getId());
+		valid = dealService.cancelDeal(deal.getId(), token);
 		
 		if (valid == true) {
 			status = HttpStatus.OK;
@@ -82,13 +82,13 @@ public class DealController {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping(value = "/rest/deal/newDeal")
-	public Integer newTransaction(@RequestBody Deal deal) {
+	public ResponseEntity<Integer> newTransaction(@RequestBody Deal deal) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = dealService.newDeal(deal);
@@ -97,13 +97,13 @@ public class DealController {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/deal/updateDeal")
-	public Integer updateDeal(@RequestBody Deal deal) {
+	public ResponseEntity<Integer> updateDeal(@RequestBody Deal deal) {
 		HttpStatus status = null;
 		boolean valid = false;
 		valid = dealService.updateDeal(deal);
@@ -112,6 +112,6 @@ public class DealController {
 		} else {
 			status = HttpStatus.BAD_REQUEST;
 		}
-		return status.value();
+		return new ResponseEntity<Integer>(status.value(), status);
 	}
 }

@@ -55,6 +55,10 @@ public class User {
 	@Column
 	private String status;
 
+	@JsonIgnoreProperties(value = { "user" })
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	private List<Deal> deal = new ArrayList<>();
+
 	@JsonIgnoreProperties(value = { "borrower", "lender" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "borrower")
 	private List<Request> borrowRequest = new ArrayList<>();
@@ -62,6 +66,10 @@ public class User {
 	@JsonIgnoreProperties(value = { "borrower", "lender" })
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "lender")
 	private List<Request> lendRequest = new ArrayList<>();;
+
+	@JsonIgnoreProperties(value = { "user" })
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	private List<Document> document = new ArrayList<>();;
 
 	public User() {
 	}
@@ -157,6 +165,14 @@ public class User {
 		this.status = status;
 	}
 
+	public List<Deal> getDeal() {
+		return deal;
+	}
+
+	public void setDeal(List<Deal> deal) {
+		this.deal = deal;
+	}
+
 	public List<Request> getBorrowRequest() {
 		return borrowRequest;
 	}
@@ -171,6 +187,14 @@ public class User {
 
 	public void setLendRequest(List<Request> lendRequest) {
 		this.lendRequest = lendRequest;
+	}
+
+	public List<Document> getDocument() {
+		return document;
+	}
+
+	public void setDocument(List<Document> document) {
+		this.document = document;
 	}
 
 }
