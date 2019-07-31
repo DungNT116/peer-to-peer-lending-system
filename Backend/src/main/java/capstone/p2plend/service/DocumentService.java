@@ -181,8 +181,8 @@ public class DocumentService {
 				return false;
 			}
 
-			Document checkDocExist = docRepo.findById(document.getId()).get();			
-			
+			Document checkDocExist = docRepo.findById(document.getId()).get();
+
 			// Receive document with id and docId
 			Document findDoc = docRepo.findByDocumentIdAndDocumentType(document.getDocumentId(),
 					checkDocExist.getDocumentType().getId());
@@ -203,8 +203,7 @@ public class DocumentService {
 			for (Document d : lstUserDocument) {
 				if (d.getDocumentType().getId() == 1 && d.getStatus().equalsIgnoreCase("valid")) {
 					limit += d.getDocumentType().getAmountLimit();
-					count += 1;
-					break;
+					count = 1;
 				}
 			}
 
@@ -214,19 +213,22 @@ public class DocumentService {
 						limit += d.getDocumentType().getAmountLimit();
 						user.setLoanLimit(limit);
 						user = userRepo.saveAndFlush(user);
-						count += 1;
-						break;
+						count = 2;
 					}
 				}
 			}
 
 			if (count == 2) {
 				for (Document d : lstUserDocument) {
-					if ((d.getDocumentType().getId() != 1 || d.getDocumentType().getId() != 2)
-							&& d.getStatus().equalsIgnoreCase("valid")) {
-						limit += d.getDocumentType().getAmountLimit();
-						user.setLoanLimit(limit);
-						user = userRepo.saveAndFlush(user);
+					if (d.getDocumentType().getId() != 1) {
+						if (d.getDocumentType().getId() != 2) {
+							if (d.getStatus().equalsIgnoreCase("valid")) {
+								limit += d.getDocumentType().getAmountLimit();
+								user.setLoanLimit(limit);
+								user = userRepo.saveAndFlush(user);
+							}
+						}
+
 					}
 				}
 			}
