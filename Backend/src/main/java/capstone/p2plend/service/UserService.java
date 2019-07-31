@@ -189,6 +189,12 @@ public class UserService {
 				currentLoanAmount += r.getAmount();
 			}
 
+			
+			
+			if(loanLimit - currentLoanAmount < 0) {
+				return 0L;
+			}
+			
 			return loanLimit - currentLoanAmount;
 
 		} catch (Exception e) {
