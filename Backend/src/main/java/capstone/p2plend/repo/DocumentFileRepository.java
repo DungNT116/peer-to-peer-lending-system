@@ -16,4 +16,6 @@ public interface DocumentFileRepository extends JpaRepository<DocumentFile, Inte
 	@Query(value = "SELECT * FROM document_file WHERE document_id = :id", nativeQuery = true)
 	List<DocumentFile> findDocumentFiles(@Param("id") Integer id);
 
+	@Query(value = "DELETE FROM document_file WHERE document_id = :id;", nativeQuery = true)
+	void deleteByDocId(@Param("id") Integer id);
 }

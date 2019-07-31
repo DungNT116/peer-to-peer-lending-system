@@ -48,10 +48,17 @@ public class DocumentService {
 			}
 			Document iDoc = new Document();
 
-			Document checkExistDocument = docRepo.findUserDocument(docTypeId, user.getId());
+			Document checkExistDocument = docRepo.findUserDocumentExceptStatus(docTypeId, user.getId(), "invalid");
 			if (checkExistDocument != null) {
 				return false;
 			}
+			
+			checkExistDocument = docRepo.findUserDocumentWithStatus(docTypeId, user.getId(), "invalid");
+			if (checkExistDocument != null) {
+				iDoc = checkExistDocument;
+				docFileRepo.deleteByDocId(checkExistDocument.getId());
+			}
+			
 			DocumentType docType = docTypeRepo.findById(docTypeId).get();
 
 			iDoc.setDocumentType(docType);
@@ -101,10 +108,17 @@ public class DocumentService {
 			}
 			Document iDoc = new Document();
 
-			Document checkExistDocument = docRepo.findUserDocument(docTypeId, user.getId());
+			Document checkExistDocument = docRepo.findUserDocumentExceptStatus(docTypeId, user.getId(), "invalid");
 			if (checkExistDocument != null) {
 				return false;
 			}
+			
+			checkExistDocument = docRepo.findUserDocumentWithStatus(docTypeId, user.getId(), "invalid");
+			if (checkExistDocument != null) {
+				iDoc = checkExistDocument;
+				docFileRepo.deleteByDocId(checkExistDocument.getId());
+			}
+			
 			DocumentType docType = docTypeRepo.findById(docTypeId).get();
 
 			iDoc.setDocumentType(docType);
