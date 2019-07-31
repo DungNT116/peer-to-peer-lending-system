@@ -36,16 +36,21 @@ class Profile extends React.Component {
       documentID: [],
       documentPP: [],
       documentDL: [],
+      uploadDocumentID: [],
+      uploadDocumentPP: [],
+      uploadDocumentDL: [],
 
       loadingID: true,
       loadingPP: true,
       loadingDL: true,
       collapse: false,
-      accordion: [true, false, false],
+      accordion: [true, false, false, false],
       custom: [true, false],
       status: "Closed",
       fadeIn: true,
-      timeout: 300
+      timeout: 300,
+      isUploadedVideo: false,
+      loadingVideo: true
     };
     this.getProfile = this.getProfile.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -59,7 +64,61 @@ class Profile extends React.Component {
     this.saveDocument = this.saveDocument.bind(this);
 
     this.setSrcImgBase64 = this.setSrcImgBase64.bind(this);
+    this.startRecording = this.startRecording.bind(this);
+    this.stopRecording = this.stopRecording.bind(this);
+    this.handleDataAvailable = this.handleDataAvailable.bind(this);
+    // this.convertBlobToFile = this.convertBlobToFile.bind(this);
+    this.uploadVideo = this.uploadVideo.bind(this);
+  }
 
+  // convertBlobToFile(blob, filename) {
+  //   blob.lastModifiedDate = new Date();
+  //   blob.name = filename;
+  //   return blob;
+  // }
+
+  handleDataAvailable(event) {
+    if (event.data && event.data.size > 0) {
+      window.recordedBlobs.push(event.data);
+    }
+  }
+
+  startRecording() {
+    window.recordedBlobs = [];
+    let options = { mimeType: 'video/webm;codecs=vp9' };
+    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+      console.error(`${options.mimeType} is not Supported`);
+      options = { mimeType: 'video/webm;codecs=vp8' };
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        console.error(`${options.mimeType} is not Supported`);
+        options = { mimeType: 'video/webm' };
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          console.error(`${options.mimeType} is not Supported`);
+          options = { mimeType: '' };
+        }
+      }
+    }
+    console.log(options);
+    try {
+      window.mediaRecorder = new MediaRecorder(window.stream, options);
+    } catch (e) {
+      console.error('Exception while creating MediaRecorder:', e);
+      return;
+    }
+
+    var recordButton = document.querySelector('button#record');
+    recordButton.textContent = 'Stop Recording';
+    window.mediaRecorder.ondataavailable = this.handleDataAvailable;
+    window.mediaRecorder.start(10);
+    console.log('MediaRecorder started', window.mediaRecorder);
+  }
+
+  stopRecording() {
+    window.mediaRecorder.stop();
+    console.log('Recorded Blobs: ', window.recordedBlobs);
+
+    var recordButton = document.querySelector('button#record');
+    recordButton.textContent = 'Start Recording';
   }
 
   setSrcImgBase64(type, image) {
@@ -81,28 +140,59 @@ class Profile extends React.Component {
             this.setState({
               loadingID: false,
               loadingPP: false,
-              loadingDL: false
+              loadingDL: false,
+              loadingVideo: false
             })
           } else {
             for (let i = 0; i < data.length; i++) {
               const element = data[i];
-              if (element.documentType === "Identity Card") {
+              if (element.documentType.name === "Identity Card") {
                 this.setState({
                   documentID: element,
                   loadingID: false
                 })
-              } else if (element.documentType === "Passport") {
+              }
+              if (element.documentType.name === "Passport") {
                 this.setState({
                   documentPP: element,
                   loadingPP: false
                 })
-              } else if (element.documentType === "Driving Licence") {
+              }
+              if (element.documentType.name === "Driving Licence") {
                 this.setState({
                   documentDL: element,
                   loadingDL: false
                 })
               }
+              if (element.documentType.name === "Video") {
+                console.log("video");
+                this.setState({
+                  isUploadedVideo: true,
+                  loadingVideo: false
+                })
+              } else {
+                this.setState({
+                  isUploadedVideo: false,
+                  loadingVideo: false
+                })
+              }
             }
+            if (this.state.documentID.length === 0) {
+              this.setState({
+                loadingID: false
+              })
+            }
+            if (this.state.documentPP.length === 0) {
+              this.setState({
+                loadingPP: false
+              })
+            }
+            if (this.state.documentDL.length === 0) {
+              this.setState({
+                loadingDL: false
+              })
+            }
+
           }
         });
         // this.props.history.push("/view-request-trading");
@@ -113,42 +203,118 @@ class Profile extends React.Component {
     });
   }
 
+  uploadVideo() {
+    const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
+    var base64data = '';
+    var reader = new FileReader();
+    reader.readAsDataURL(superBuffer);
+    reader.onloadend = function () {
+      base64data = reader.result;
+      console.log(base64data);
+
+      var formData = new FormData();
+      formData.append("fileType", 'video/webm')
+      formData.append("documentTypeId", 2); //2= VIdeo
+      formData.append("base64Video", base64data)
+
+      // formData.append("file", superBuffer)
+      console.log("formData", formData.getAll("file"));
+
+      fetch(apiLink + "/rest/document/uploadVideo", {
+        method: "POST",
+        headers: {
+          // "Content-Type": "multipart/form-data",
+          Authorization: localStorage.getItem("token")
+        },
+        body: formData
+        // JSON.stringify({
+        //   documentType: this.state.documentID.documentType,
+        //   file: this.state.documentID.listImage
+        // })
+      }).then(result => {
+        if (result.status === 200) {
+          alert("save success");
+          // this.props.history.push("/view-request-trading");
+        } else if (result.status === 401) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push("/login-page");
+        } else if (result.status === 400) {
+          alert("error")
+        }
+      });
+    }
+
+
+  }
+
   saveDocument(type) {
+    // const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
+    // var reader = new FileReader();
+    // reader.readAsDataURL(superBuffer);
+    // reader.onloadend = function () {
+    //   var base64data = reader.result;
+    //   console.log(base64data);
+    // }
+
     let document = [];
+    let typeId = 0;
     if (type === "ID") {
-      document = this.state.documentID;
+      document = this.state.uploadDocumentID;
+      typeId = 1;
     } else if (type === "PP") {
-      document = this.state.documentPP;
+      document = this.state.uploadDocumentPP;
+      typeId = 3;
     } else if (type === "DL") {
-      document = this.state.documentDL;
+      document = this.state.uploadDocumentDL;
+      typeId = 4;
     }
-    var formData = new FormData();
-    formData.append("documentType", document.documentType);
-    for (let i = 0; i < document.listImage.length; i++) {
-      const element = document.listImage[i];
-      formData.append("file", element);
-    }
-    console.log("formData", formData.getAll("file"));
-    fetch(apiLink + "/rest/document/uploadFile", {
-      method: "POST",
-      headers: {
-        // "Content-Type": "multipart/form-data",
-        Authorization: localStorage.getItem("token")
-      },
-      body: formData
-      // JSON.stringify({
-      //   documentType: this.state.documentID.documentType,
-      //   file: this.state.documentID.listImage
-      // })
-    }).then(result => {
-      if (result.status === 200) {
-        alert("save success");
-        // this.props.history.push("/view-request-trading");
-      } else if (result.status === 401) {
-        localStorage.removeItem("isLoggedIn");
-        this.props.history.push("/login-page");
+
+    if (document.listImage !== undefined) {
+      console.log("typeId: ", typeId)
+      var formData = new FormData();
+      formData.append("documentTypeId", typeId);
+      for (let i = 0; i < document.listImage.length; i++) {
+        const element = document.listImage[i];
+        formData.append("file", element);
       }
-    });
+
+      // formData.append("file", superBuffer)
+      console.log("formData", formData.getAll("file"));
+      fetch(apiLink + "/rest/document/uploadFile", {
+        method: "POST",
+        headers: {
+          // "Content-Type": "multipart/form-data",
+          Authorization: localStorage.getItem("token")
+        },
+        body: formData
+        // JSON.stringify({
+        //   documentType: this.state.documentID.documentType,
+        //   file: this.state.documentID.listImage
+        // })
+      }).then(async result => {
+        if (result.status === 200) {
+          alert("save success");
+
+          //load document again
+          await this.setState({
+            loadingID: true,
+            loadingPP: true,
+            loadingDL: true,
+            loadingVideo: true,
+          })
+          this.getDocument();
+          // this.props.history.push("/view-request-trading");
+        } else if (result.status === 401) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push("/login-page");
+        } else if (result.status === 400) {
+          alert("error")
+        }
+      });
+    } else {
+      alert("please select image to upload")
+    }
+
   }
 
   handleFileInput(event, type) {
@@ -156,17 +322,17 @@ class Profile extends React.Component {
     switch (type) {
       case "ID":
         this.setState({
-          documentID: document
+          uploadDocumentID: document
         });
         break;
       case "PP":
         this.setState({
-          documentPP: document
+          uploadDocumentPP: document
         })
         break;
       case "DL":
         this.setState({
-          documentDL: document
+          uploadDocumentDL: document
         })
         break;
     }
@@ -553,18 +719,29 @@ class Profile extends React.Component {
                                   loading={this.state.loadingID}
                                 />)
                                 :
-                                (this.state.documentID.length !== 0) ?
+                                ((this.state.documentID.length !== 0) ?
                                   (<div>
                                     {this.state.documentID.documentFile.map((imageData) => (
                                       <img src={this.setSrcImgBase64(imageData.fileType,
                                         imageData.data)} style={style.sameSizeWithParent} />))}
+                                    {this.state.documentID.status === "invalid" ? (
+                                      <div>
+                                        <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
+                                        {' '}
+                                        <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
+                                      </div>
+                                    ) : (
+                                        this.state.documentID.status === "pending" ? ("Document is waiting for validation") : ("")
+                                      )}
                                   </div>)
                                   :
                                   (<div>
+                                    {console.log(this.state.documentID)}
                                     <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
                                     {' '}
                                     <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
-                                  </div>)}
+                                  </div>))
+                              }
                             </CardBody>
                           </Collapse>
                         </Card>
@@ -604,6 +781,15 @@ class Profile extends React.Component {
                                     {this.state.documentPP.documentFile.map((imageData) => (
                                       <img src={this.setSrcImgBase64(imageData.fileType,
                                         imageData.data)} style={style.sameSizeWithParent} />))}
+                                    {this.state.documentID.status === "invalid" ? (
+                                      <div>
+                                        <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
+                                        {' '}
+                                        <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
+                                      </div>
+                                    ) : (
+                                        this.state.documentID.status === "pending" ? ("Document is waiting for validation") : ("")
+                                      )}
                                   </div>)
                                   :
                                   (<div>
@@ -650,6 +836,15 @@ class Profile extends React.Component {
                                     {this.state.documentDL.documentFile.map((imageData) => (
                                       <img src={this.setSrcImgBase64(imageData.fileType,
                                         imageData.data)} style={style.sameSizeWithParent} />))}
+                                    {this.state.documentID.status === "invalid" ? (
+                                      <div>
+                                        <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
+                                        {' '}
+                                        <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
+                                      </div>
+                                    ) : (
+                                        this.state.documentID.status === "pending" ? ("Document is waiting for validation") : ("")
+                                      )}
                                   </div>)
                                   :
                                   (<div>
@@ -660,11 +855,120 @@ class Profile extends React.Component {
                             </CardBody>
                           </Collapse>
                         </Card>
+                        <Card className="mb-0">
+                          <CardHeader id="headingThree">
+                            <Button
+                              block
+                              color="link"
+                              className="text-left m-0 p-0"
+                              onClick={() => this.toggleAccordion(3)}
+                              aria-expanded={this.state.accordion[3]}
+                              aria-controls="collapseThree"
+                            >
+                              <h5 className="m-0 p-0">
+                                Identity Video
+                              </h5>
+                            </Button>
+                          </CardHeader>
+                          <Collapse
+                            isOpen={this.state.accordion[3]}
+                            data-parent="#accordion"
+                            id="collapseThree"
+                          >
+                            <CardBody style={style.sameSizeWithParent}>
+
+                              {(this.state.loadingVideo === true) ?
+                                (<PulseLoader
+                                  css={override}
+                                  sizeUnit={"px"}
+                                  size={15}
+                                  color={'#123abc'}
+                                  loading={this.state.loadingVideo}
+                                />)
+                                :
+                                (this.state.isUploadedVideo === false) ?
+                                  (
+                                    <div>
+                                      <Row>
+                                        <video autoPlay id="gum"></video>
+                                      </Row>
+                                      <Row>
+                                        <button id="start" onClick={
+                                          (event) => {
+                                            event.preventDefault();
+                                            console.log("gooooooooooooooo")
+                                            const constraints = {
+                                              audio: true,
+                                              video: {
+                                                width: 1280, height: 720
+                                              }
+                                            }
+                                            try {
+                                              // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                                              //   navigator.mozGetUserMedia || navigator.msGetUserMedia;
+                                              // console.log()
+
+                                              const stream = navigator.mediaDevices.getUserMedia(constraints).then(data => {
+                                                console.log('getUserMedia() got stream:', data);
+                                                window.stream = data;
+
+                                                const gumVideo = document.querySelector('video#gum');
+                                                gumVideo.srcObject = data;
+
+                                              });
+
+                                            } catch (e) {
+                                              console.error('navigator.getUserMedia error:', e);
+                                            }
+                                          }
+                                        }>Start camera</button>
+                                        <button id="record" onClick={
+                                          (event) => {
+                                            event.preventDefault();
+                                            var recordButton = document.querySelector('button#record');
+
+                                            if (recordButton.textContent === 'Start Recording') {
+                                              this.startRecording();
+                                            } else {
+                                              this.stopRecording();
+                                            }
+                                          }
+                                        }>Start Recording</button>
+                                      </Row>
+                                      <Row>
+                                        <video autoPlay id="recorded"></video>
+                                      </Row>
+                                      <Row>
+                                        <button id="play" onClick={
+                                          (event) => {
+                                            event.preventDefault();
+                                            const recordedVideo = document.querySelector('video#recorded');
+                                            const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
+                                            recordedVideo.src = null;
+                                            recordedVideo.srcObject = null;
+                                            recordedVideo.src = window.URL.createObjectURL(superBuffer);
+                                            recordedVideo.controls = true;
+                                            recordedVideo.play();
+                                            console.log(recordedVideo);
+                                          }
+                                        }>play</button> {' '}
+                                        <button onClick={(event) => { event.preventDefault(); this.uploadVideo() }}>Save to DB</button>
+                                      </Row>
+                                    </div>
+                                  )
+                                  :
+                                  (<div>
+                                    <p>You already upload video, you dont need to upload again</p>
+                                  </div>)}
+                            </CardBody>
+                          </Collapse>
+                        </Card>
                       </Form>
                     </CardBody>
                   </Card>
                 </Col>
               </Row>
+
             </Container>
           </section>
         </main>

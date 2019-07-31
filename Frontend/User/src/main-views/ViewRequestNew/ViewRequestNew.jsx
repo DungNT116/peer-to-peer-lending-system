@@ -14,10 +14,15 @@ import {
   TabContent,
   TabPane,
   Nav,
-  NavItem
+  NavItem,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter
 } from "reactstrap";
 import classnames from "classnames";
 
+import { database } from "../../firebase";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import Pagination from "../../views/IndexSections/Pagination.jsx";
@@ -43,7 +48,10 @@ class ViewRequestNew extends React.Component {
       pageSize: 5,
 
       iconTabs: 1,
-      plainTabs: 1
+      plainTabs: 1,
+
+      cancelDealModal: false,
+      cancelRequest: {},
     };
     this.getRequest = this.getRequest.bind(this);
     this.deleteRequest = this.deleteRequest.bind(this);
@@ -52,6 +60,14 @@ class ViewRequestNew extends React.Component {
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
     this.cancelRequest = this.cancelRequest.bind(this);
+    this.toggleCancelDeal = this.toggleCancelDeal.bind(this);
+  }
+
+  toggleCancelDeal(request) {
+    this.setState({
+      cancelDealModal: !this.state.cancelDealModal,
+      cancelRequest: request
+    })
   }
 
   toggleNavs = (e, state, index) => {
@@ -61,7 +77,8 @@ class ViewRequestNew extends React.Component {
     });
   };
 
-  cancelRequest(id) {
+  cancelRequest(request) {
+    console.log(request);
     fetch(apiLink + "/rest/deal/cancelDeal", {
       method: "PUT",
       headers: {
@@ -71,13 +88,36 @@ class ViewRequestNew extends React.Component {
         // 'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        id: id
+        id: request.id
       })
-    }).then(result => {
+    }).then(async result => {
       if (result.status === 200) {
         // alert("delete success");
         //reload data
+        this.toggleCancelDeal();
         this.getRequest();
+        await database
+          .ref("ppls")
+          .orderByChild("username")
+          .equalTo(request.borrower.username)
+          .once("value", snapshot => {
+            if (snapshot.exists()) {
+              const userData = snapshot.val();
+              this.setState({ keyUserFb: Object.keys(userData)[0] });
+            }
+          });
+        database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+          message: localStorage.getItem("user") + " cancel your request " + request.id + " !" ,
+          sender: localStorage.getItem("user"),
+          requestId: request.id
+        });
+
+        var upvotesRef = database.ref(
+          "/ppls/" + this.state.keyUserFb + "/countNew"
+        );
+        upvotesRef.transaction(function (current_value) {
+          return (current_value || 0) + 1;
+        });
       } else if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
@@ -115,10 +155,10 @@ class ViewRequestNew extends React.Component {
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
     fetch(
       apiLink +
-        "/rest/request/allRequestHistoryPending?page=" +
-        newPageParam +
-        "&element=" +
-        pageSizeParam,
+      "/rest/request/allRequestHistoryPending?page=" +
+      newPageParam +
+      "&element=" +
+      pageSizeParam,
       {
         method: "GET",
         headers: {
@@ -145,10 +185,10 @@ class ViewRequestNew extends React.Component {
 
     fetch(
       apiLink +
-        "/rest/request/all_request_dealing_by_borrower_or_lender?page=" +
-        dealingPageParam +
-        "&element=" +
-        pageSizeParam,
+      "/rest/request/all_request_dealing_by_borrower_or_lender?page=" +
+      dealingPageParam +
+      "&element=" +
+      pageSizeParam,
       {
         method: "GET",
         headers: {
@@ -162,7 +202,7 @@ class ViewRequestNew extends React.Component {
       if (result.status === 200) {
         // console.log("create success");
         result.json().then(data => {
-          // console.log(data.data);
+          console.log("data dealing", data);
           this.setState({
             dealingRequests: data.data,
             dealingMaxPage: data.maxPage
@@ -285,7 +325,7 @@ class ViewRequestNew extends React.Component {
             id="dealButton"
             size="md"
             className="btn btn-outline-danger"
-            onClick={() => this.cancelRequest(request.id)}
+            onClick={() => this.toggleCancelDeal(request)}
           >
             <i className="fa fa-remove" /> Cancel Deal
           </Button>{" "}
@@ -434,6 +474,32 @@ class ViewRequestNew extends React.Component {
           </section>
         </main>
         <SimpleFooter />
+        <Modal
+          isOpen={this.state.cancelDealModal}
+          toggle={this.toggleCancelDeal}
+          className={this.props.className}
+        >
+          <ModalHeader toggle={this.toggleCancelDeal}>
+            Xac Nhan yeu cau vay muon
+          </ModalHeader>
+          <ModalBody>
+            Ban co chac chan se chap nhan yeu cau nay khong
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="primary"
+              onClick={() => this.cancelRequest(this.state.cancelRequest)}
+            >
+              Yes
+            </Button>{" "}
+            <Button
+              color="secondary"
+              onClick={this.toggleCancelDeal}
+            >
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Modal>
       </>
     );
   }

@@ -34,6 +34,8 @@ class Index extends React.Component {
     };
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
+    // this.test = this.test.bind(this);
+    
   }
 
   convertDateToTimestamp(date) {
@@ -66,7 +68,7 @@ class Index extends React.Component {
       if (result.status === 200) {
         // alert("create success");
       }
-    });
+    })
   }
 
   toggleModalValid() {
@@ -342,6 +344,11 @@ class Index extends React.Component {
               {/* <Row className="align-items-center justify-content-center text-center">
                 <Pagination />
               </Row> */}
+
+              {/* <video autoplay></video> */}
+              {/* <input type="file" accept="video/*" capture="camera" id="recorder" />
+              <video id="player" controls></video> */}
+
             </Container>
           </section>
         </main>
