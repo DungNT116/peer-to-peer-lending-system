@@ -181,10 +181,11 @@ public class DocumentService {
 				return false;
 			}
 
+			Document checkDocExist = docRepo.findById(document.getId()).get();			
+			
 			// Receive document with id and docId
 			Document findDoc = docRepo.findByDocumentIdAndDocumentType(document.getDocumentId(),
-					document.getDocumentType().getId());
-
+					checkDocExist.getDocumentType().getId());
 			if (findDoc != null) {
 				return false;
 			}
