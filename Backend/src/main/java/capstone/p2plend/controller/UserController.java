@@ -62,18 +62,17 @@ public class UserController {
 	@PostMapping(value = "/rest/user/createUser")
 	public ResponseEntity<String> createAccount(@RequestBody User user) {
 		HttpStatus httpStatus = null;
-		String result = "";
+		String result = null;
 		try {
 			result = userService.createAccount(user);
 
 			if (result.equalsIgnoreCase("Account successfully created")) {
 				httpStatus = HttpStatus.OK;
-				return new ResponseEntity<String>(result, httpStatus);
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
 			}
-
-			httpStatus = HttpStatus.BAD_REQUEST;
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<String>(result, httpStatus);
 	}
@@ -82,12 +81,16 @@ public class UserController {
 	@PostMapping(value = "/rest/user/checkUser")
 	public ResponseEntity<String> checkUser(@RequestHeader("Authorization") String token) {
 		HttpStatus httpStatus = null;
-		String result = "";
+		String result = null;
 		try {
 			result = userService.checkUser(token);
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<String>(result, httpStatus);
 	}
@@ -99,9 +102,14 @@ public class UserController {
 		User result = null;
 		try {
 			result = userService.getOneByUsername(token);
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<User>(result, httpStatus);
 	}
@@ -137,11 +145,16 @@ public class UserController {
 	public ResponseEntity<Integer> activateAccount(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = userService.activateAccount(user.getId());
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = userService.activateAccount(user.getId());
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			// TODO: handle exception
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
@@ -153,27 +166,36 @@ public class UserController {
 	public ResponseEntity<Integer> changeLoanLimit(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = userService.changeLoanLimit(user.getId(), user.getLoanLimit());
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = userService.changeLoanLimit(user.getId(), user.getLoanLimit());
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
 	@PutMapping(value = "/rest/admin/user/deactivateUser")
 	public ResponseEntity<Integer> deactivateAccount(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = userService.deactivateAccount(user.getId());
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+
+		try {
+			valid = userService.deactivateAccount(user.getId());
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
@@ -193,7 +215,27 @@ public class UserController {
 		}
 		return new ResponseEntity<Long>(result, httpStatus);
 	}
-	
+
+	@CrossOrigin
+	@Secured({ "ROLE_USER" })
+	@GetMapping(value = "/rest/user/changeUserInfo")
+	public ResponseEntity<Integer> changeUserInfo(@RequestBody User user,
+			@RequestHeader("Authorization") String token) {
+		HttpStatus httpStatus = null;
+		boolean result = false;
+		try {
+			result = userService.changeUserInfo(user, token);
+			if (result == true) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<Integer>(httpStatus.value(), httpStatus);
+	}
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@GetMapping(value = "/rest/admin/user/getUsers")

@@ -36,15 +36,14 @@ public class UserService {
 
 	public String checkUser(String token) {
 		try {
-			String username = null;
-			username = jwtService.getUsernameFromToken(token);
+			String username = jwtService.getUsernameFromToken(token);
 			User user = userRepo.findByUsername(username);
 			if (user != null) {
 				return username;
 			}
-			return "";
+			return null;
 		} catch (Exception e) {
-			return "";
+			return null;
 		}
 	}
 
@@ -60,16 +59,26 @@ public class UserService {
 	}
 
 	public User getOneByUsername(String token) {
-		String username = jwtService.getUsernameFromToken(token);
-		User user = userRepo.findByUsername(username);
-		User account = new User();
-		account.setUsername(user.getUsername());
-		account.setFirstName(user.getFirstName());
-		account.setLastName(user.getLastName());
-		account.setEmail(user.getEmail());
-		account.setPhoneNumber(user.getPhoneNumber());
-		account.setLoanLimit(user.getLoanLimit());
-		return account;
+		try {
+			String username = jwtService.getUsernameFromToken(token);
+			User user = userRepo.findByUsername(username);
+			
+			if(user == null) {
+				return null;
+			}
+			
+			User account = new User();
+			account.setUsername(user.getUsername());
+			account.setFirstName(user.getFirstName());
+			account.setLastName(user.getLastName());
+			account.setEmail(user.getEmail());
+			account.setPhoneNumber(user.getPhoneNumber());
+			account.setLoanLimit(user.getLoanLimit());
+			return account;
+		} catch (Exception e) {
+			return null;
+		}
+
 	}
 
 	public User findUsername(String username) {
@@ -226,6 +235,40 @@ public class UserService {
 
 		} catch (Exception e) {
 			return 0L;
+		}
+	}
+
+	public boolean changeUserInfo(User user, String token) {
+		try {
+			String username = jwtService.getUsernameFromToken(token);
+			User existUser = userRepo.findByUsername(username);
+
+			if (user.getFirstName() != null) {
+				existUser.setFirstName(user.getFirstName());
+			}
+
+			if (user.getLastName() != null) {
+				existUser.setLastName(user.getLastName());
+			}
+
+			if (user.getPhoneNumber() != null) {
+				existUser.setPhoneNumber(user.getPhoneNumber());
+			}
+
+			if (user.getEmail() != null) {
+				existUser.setEmail(user.getEmail());
+			}
+
+			User savedUser = userRepo.saveAndFlush(existUser);
+
+			if (savedUser != null) {
+				return true;
+			}
+
+			return false;
+		} catch (Exception e) {
+			// TODO: handle exception
+			return false;
 		}
 	}
 }
