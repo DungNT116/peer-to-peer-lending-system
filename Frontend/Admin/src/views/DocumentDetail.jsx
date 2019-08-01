@@ -23,7 +23,7 @@ import UserHeader from "components/Headers/UserHeader.jsx";
 import { css } from "@emotion/core";
 import { PulseLoader, BeatLoader } from "react-spinners";
 import Header from "components/Headers/Header.jsx";
-
+import { database } from "../firebase";
 import { apiLink } from "../api";
 class DocumentDetail extends React.Component {
   constructor(props) {
@@ -34,7 +34,7 @@ class DocumentDetail extends React.Component {
       loading: true,
       //collapse
       collapse: false,
-      accordion: [false, false, false],
+      accordion: [],
       timeout: 300
     };
 
@@ -45,7 +45,11 @@ class DocumentDetail extends React.Component {
     this.validRedux = this.validRedux.bind(this);
   }
 
-  toggleAccordion(tab) {
+  async toggleAccordion(tab) {
+    var arrAccordition = await this.fillArray(false, this.state.docs.length);
+    await this.setState({
+      accordion: arrAccordition
+    });
     const prevState = this.state.accordion;
     const state = prevState.map((x, index) => (tab === index ? !x : false));
 
@@ -54,7 +58,7 @@ class DocumentDetail extends React.Component {
     });
   }
 
-  async approveDocument(idDoc) {
+  async approveDocument(idDoc, username, docName) {
     this.toggleModal("defaultModal");
     this.setState({
       isOpen: true,
@@ -68,19 +72,42 @@ class DocumentDetail extends React.Component {
       },
       body: JSON.stringify({
         id: idDoc,
-        documentId: this.state.idDocValidation
+        documentId: this.state["idDocValidation-" + idDoc]
       })
     }).then(result => {
+      console.log(result);
       if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login");
       } else if (result.status === 200) {
-        result.json().then(data => {});
+        result.json().then(async data => {
+          await database
+            .ref("ppls")
+            .orderByChild("username")
+            .equalTo(username)
+            .once("value", snapshot => {
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+                this.setState({ keyUserFb: Object.keys(userData)[0] });
+              }
+            });
+          database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+            message: "Your " + docName + " is approved !",
+            sender: localStorage.getItem("user")
+          });
+
+          var upvotesRef = database.ref(
+            "/ppls/" + this.state.keyUserFb + "/countNew"
+          );
+          upvotesRef.transaction(function(current_value) {
+            return (current_value || 0) + 1;
+          });
+        });
       }
     });
   }
 
-  async rejectDocument(idDoc) {
+  async rejectDocument(idDoc, username, docName) {
     this.toggleModal("defaultModal");
     this.setState({
       isOpen: true,
@@ -100,7 +127,29 @@ class DocumentDetail extends React.Component {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login");
       } else if (result.status === 200) {
-        result.json().then(data => {});
+        result.json().then(async data => {
+          await database
+            .ref("ppls")
+            .orderByChild("username")
+            .equalTo(username)
+            .once("value", snapshot => {
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+                this.setState({ keyUserFb: Object.keys(userData)[0] });
+              }
+            });
+          database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+            message: "Your " + docName + " is rejected !",
+            sender: localStorage.getItem("user")
+          });
+
+          var upvotesRef = database.ref(
+            "/ppls/" + this.state.keyUserFb + "/countNew"
+          );
+          upvotesRef.transaction(function(current_value) {
+            return (current_value || 0) + 1;
+          });
+        });
       }
     });
   }
@@ -124,8 +173,8 @@ class DocumentDetail extends React.Component {
     }
   }
 
-  handleIDChange(event) {
-    this.setState({ idDocValidation: event.target.value });
+  handleIDChange(event, idDoc) {
+    this.setState({ ["idDocValidation-" + idDoc]: event.target.value });
   }
   async getUserDocument() {
     await fetch(
@@ -153,6 +202,13 @@ class DocumentDetail extends React.Component {
         });
       }
     });
+  }
+  fillArray(value, len) {
+    var arr = [];
+    for (var i = 0; i < len; i++) {
+      arr.push(value);
+    }
+    return arr;
   }
   componentWillMount() {
     this.getUserDocument();
@@ -184,9 +240,11 @@ class DocumentDetail extends React.Component {
         height: "100%"
       }
     };
+
     return (
       <>
         {this.validRedux()}
+
         <Header />
         <Container className="mt--7" fluid>
           <Modal
@@ -264,19 +322,18 @@ class DocumentDetail extends React.Component {
                         </Col>
                       </Row>
                     </div>
-
                     <hr className="my-4" />
                     <div id="accordion" style={{ width: "95%" }}>
                       {this.state.docs.map((docData, index) => (
                         <Card className="mb-0" key={index}>
-                          <CardHeader id={"heading" + index}>
+                          <CardHeader id={"heading-" + index}>
                             <Button
                               block
                               color="link"
                               className="text-left m-0 p-0"
                               onClick={() => this.toggleAccordion(index)}
                               aria-expanded={this.state.accordion[index]}
-                              aria-controls={"collapse" + index}
+                              aria-controls={"collapse-" + index}
                             >
                               <h5 className="m-0 p-0">
                                 {docData.status == "valid" ? (
@@ -310,19 +367,19 @@ class DocumentDetail extends React.Component {
                           <Collapse
                             isOpen={this.state.accordion[index]}
                             data-parent="#accordion"
-                            id={"collapse" + index}
-                            aria-labelledby={"heading" + index}
+                            id={"collapse-" + index}
+                            aria-labelledby={"heading-" + index}
                           >
                             <CardBody>
                               <Row>
                                 {docData.documentFile.map(
-                                  (imageData, indexImg) =>
-                                    imageData.fileType !== "video/webm" ? (
-                                      <Col
-                                        lg="4"
-                                        key={indexImg}
-                                        style={style.sameSizeWithParent}
-                                      >
+                                  (imageData, indexImg) => (
+                                    <Col
+                                      lg="4"
+                                      key={indexImg}
+                                      style={style.sameSizeWithParent}
+                                    >
+                                      {imageData.fileType !== "video/webm" ? (
                                         <img
                                           src={this.setSrcImgBase64(
                                             imageData.fileType,
@@ -330,10 +387,19 @@ class DocumentDetail extends React.Component {
                                           )}
                                           style={style.sameSizeWithParent}
                                         />
-                                      </Col>
-                                    ) : (
-                                      <video width="320" height="240" autoPlay src={"data:"+imageData.fileType+";base64,"+imageData.data}/>
-                                    )
+                                      ) : (
+                                        <video
+                                          width="320"
+                                          height="240"
+                                          controls
+                                          src={this.setSrcImgBase64(
+                                            imageData.fileType,
+                                            imageData.data
+                                          )}
+                                        />
+                                      )}
+                                    </Col>
+                                  )
                                 )}
                               </Row>
                               {docData.status == "valid" ? (
@@ -346,8 +412,14 @@ class DocumentDetail extends React.Component {
                                       placeholder="Validation ID Document"
                                       type="text"
                                       autoComplete="off"
-                                      value={this.state.idDocValidation}
-                                      onChange={this.handleIDChange}
+                                      value={
+                                        this.state[
+                                          "idDocValidation-" + docData.id
+                                        ]
+                                      }
+                                      onChange={e =>
+                                        this.handleIDChange(e, docData.id)
+                                      }
                                     />
                                   </Col>
                                   <Col lg="4">
@@ -416,7 +488,7 @@ class DocumentDetail extends React.Component {
                                           <p>
                                             Approve{" "}
                                             <strong>
-                                              {docData.documentType}
+                                              {docData.documentType.name}
                                             </strong>{" "}
                                             of{" "}
                                             <strong>
@@ -433,7 +505,12 @@ class DocumentDetail extends React.Component {
                                             color="primary"
                                             type="button"
                                             onClick={() => {
-                                              this.approveDocument(docData.id);
+                                              this.approveDocument(
+                                                docData.id,
+                                                this.props.document.userInfo
+                                                  .username,
+                                                docData.documentType.name
+                                              );
                                               this.toggleModal(
                                                 "defaultModal-approve-" + index
                                               );
@@ -496,7 +573,7 @@ class DocumentDetail extends React.Component {
                                           <p>
                                             Reject{" "}
                                             <strong>
-                                              {docData.documentType}
+                                              {docData.documentType.name}
                                             </strong>{" "}
                                             of{" "}
                                             <strong>
@@ -513,7 +590,12 @@ class DocumentDetail extends React.Component {
                                             color="primary"
                                             type="button"
                                             onClick={() => {
-                                              this.rejectDocument(docData.id);
+                                              this.rejectDocument(
+                                                docData.id,
+                                                this.props.document.userInfo
+                                                  .username,
+                                                docData.documentType.name
+                                              );
                                               this.toggleModal(
                                                 "defaultModal-reject-" + index
                                               );
