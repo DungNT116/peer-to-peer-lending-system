@@ -41,7 +41,9 @@ class CreateRequestPage extends React.Component {
       lendingTimeline: [],
       paybackTimeline: [],
       invalidAmount: true,
-      errorAmount: ""
+      errorAmount: "",
+      maxloadlimit: 0,
+      // invalidLoanLimit: true
     };
 
     this.onAmountChange = this.onAmountChange.bind(this);
@@ -51,6 +53,19 @@ class CreateRequestPage extends React.Component {
     this.createMileStone = this.createMileStone.bind(this);
     this.onAmountCleaveChange = this.onAmountCleaveChange.bind(this);
     this.onCreditCardFocus = this.onCreditCardFocus.bind(this);
+    this.checkLoanLimit = this.checkLoanLimit.bind(this);
+  }
+
+  checkLoanLimit() {
+    if(this.state.maxloadlimit > 0) {
+      // this.setState({
+      //   invalidLoanLimit: false
+      // })
+      return false;
+    } else {
+      alert("your loan limit is not enough to use this function");
+      return true;
+    }
   }
 
   formatCurrency(number) {
@@ -162,22 +177,19 @@ class CreateRequestPage extends React.Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    
-    console.log(this.state.validAmount);
-    if (this.state.validAmount === true) {
+    var invalidLoanLimit = this.checkLoanLimit();
+
+    console.log(invalidLoanLimit)
+    console.log(this.state.invalidAmount);
+    if (this.state.invalidAmount === false && invalidLoanLimit === false) {
       fetch(apiLink + "/rest/request/createRequest", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: localStorage.getItem("token")
-          // "Authorization": this.props.tokenReducer.token
-          // 'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify({
-          // borrowerName: this.state.borrowerName,
-          amount: this.state.amount.replace(",", ""),
-          // dueDate: 125666,
-          // times: 5,
+          amount: this.state.amount,
           duration: this.state.borrowDuration,
           interestRate: 18,
           createDate: this.state.createDate,
@@ -189,7 +201,7 @@ class CreateRequestPage extends React.Component {
         })
       }).then(result => {
         if (result.status === 200) {
-          alert("create success");
+          // alert("create success");
           this.props.history.push("view-new-request");
         } else if (result.status === 401) {
           localStorage.removeItem("isLoggedIn");
@@ -212,6 +224,30 @@ class CreateRequestPage extends React.Component {
     this.props.setIsHistory(false);
     this.props.setIsViewDetail(true);
     this.props.setIsHistoryDetail(false);
+
+    this.getLoanLimit();
+  }
+
+  getLoanLimit() {
+    fetch(apiLink + "/rest/user/getUserMaximunLoanLimit", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token")
+      }
+    }).then(result => {
+      if (result.status === 200) {
+        result.json().then((data) => {
+          console.log("set loan limit")
+          this.setState({
+            maxloadlimit: data
+          })
+        })
+      } else if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login-page");
+      }
+    });
   }
 
   onAmountCleaveChange(event) {
@@ -312,6 +348,7 @@ class CreateRequestPage extends React.Component {
                         <h4 className="mb-1 text-center mb-5">
                           Fill your information into the form
                         </h4>
+                        <h5 className="mb-1 text-center mb-5">Loan limit available: {this.state.maxloadlimit}</h5>
                         <Form role="form" onSubmit={this.handleSubmit}>
                           <FormGroup
                             row

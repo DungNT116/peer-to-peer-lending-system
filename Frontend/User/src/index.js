@@ -9,10 +9,9 @@ import "assets/vendor/font-awesome/css/font-awesome.min.css";
 import "assets/scss/argon-design-system-react.scss";
 
 import Index from "views/Index.jsx";
-import Landing from "views/examples/Landing.jsx";
-import Login from "views/examples/Login.jsx";
-import Profile from "views/examples/Profile.jsx";
-import Register from "views/examples/Register.jsx";
+import Login from "main-views/Login/Login.jsx";
+import Profile from "main-views/Profile/Profile.jsx";
+import Register from "main-views/Register/Register.jsx";
 import CreateRequestPage from "main-views/CreateRequestPage/CreateRequestPage.jsx";
 import ApplyPaypal from "main-views/ApplyPaypal/ApplyPaypal.jsx";
 import ApplyTimeline from "main-views/ApplyTimeline/ApplyTimeline.jsx";
@@ -28,11 +27,11 @@ ReactDOM.render(
     <BrowserRouter>
       <Switch>
         <Route path="/" exact render={props => (localStorage.getItem("isLoggedIn")) ? <ViewRequestNew {...props} /> : < Index {...props} />} />
-        <Route
+        {/* <Route
           path="/landing-page"
           exact
           render={props => <Landing {...props} />}
-        />
+        /> */}
         <Route path="/login-page" exact render={props => <Login {...props} />} />
         <Route
           path="/profile-page"
