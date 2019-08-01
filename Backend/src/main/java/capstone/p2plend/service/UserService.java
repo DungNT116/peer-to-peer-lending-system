@@ -127,7 +127,8 @@ public class UserService {
 			account.setRole("ROLE_USER");
 			account.setStatus("active");
 			account.setLoanLimit(0L);
-			userRepo.save(account);
+			
+			account = userRepo.save(account);
 
 			emailService.sendSimpleMessage(account.getEmail(), "Welcome to PPLS",
 					"You have create account successfully in PPLS website");
