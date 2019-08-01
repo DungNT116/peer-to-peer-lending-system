@@ -201,15 +201,18 @@ public class DocumentService {
 			Long limit = 0L;
 			int count = 0;
 			for (Document d : lstUserDocument) {
-				if (d.getDocumentType().getId() == 1 && d.getStatus().equalsIgnoreCase("valid")) {
+				if (d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
+						&& d.getStatus().equalsIgnoreCase("valid")) {
 					limit += d.getDocumentType().getAmountLimit();
 					count = 1;
+
 				}
 			}
 
 			if (count == 1) {
 				for (Document d : lstUserDocument) {
-					if (d.getDocumentType().getId() == 2 && d.getStatus().equalsIgnoreCase("valid")) {
+					if (d.getDocumentType().getName().equalsIgnoreCase("Video")
+							&& d.getStatus().equalsIgnoreCase("valid")) {
 						limit += d.getDocumentType().getAmountLimit();
 						user.setLoanLimit(limit);
 						user = userRepo.saveAndFlush(user);
@@ -220,16 +223,21 @@ public class DocumentService {
 
 			if (count == 2) {
 				for (Document d : lstUserDocument) {
-					if (d.getDocumentType().getId() > 2 && d.getStatus().equalsIgnoreCase("valid")) {
-						limit += d.getDocumentType().getAmountLimit();
-						user.setLoanLimit(limit);
-						user = userRepo.saveAndFlush(user);
+					if (!d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
+							&& !d.getDocumentType().getName().equalsIgnoreCase("Video")) {
+						if (d.getStatus().equalsIgnoreCase("valid")) {
+							limit += d.getDocumentType().getAmountLimit();
+							user.setLoanLimit(limit);
+							user = userRepo.saveAndFlush(user);
+						}
 					}
+
 				}
 			}
 
 			return true;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 	}

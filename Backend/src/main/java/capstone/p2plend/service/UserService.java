@@ -27,6 +27,9 @@ public class UserService {
 	@Autowired
 	JwtService jwtService;
 
+	@Autowired
+	EmailService emailService;
+
 	public List<User> findAll() {
 		return userRepo.findAll();
 	}
@@ -90,6 +93,27 @@ public class UserService {
 	public String createAccount(User account) {
 		try {
 
+			if (account.getUsername() == null) {
+				return "Error";
+			}
+			if (account.getPassword() == null) {
+				return "Error";
+			}
+
+			if (account.getFirstName() == null) {
+				return "Error";
+			}
+			if (account.getLastName() == null) {
+				return "Error";
+			}
+
+			if (account.getEmail() == null) {
+				return "Error";
+			}
+			if (account.getPhoneNumber() == null) {
+				return "Error";
+			}
+
 			User usernameExist = userRepo.findByUsername(account.getUsername());
 			if (usernameExist != null) {
 				return "Username existed";
@@ -104,6 +128,10 @@ public class UserService {
 			account.setStatus("active");
 			account.setLoanLimit(0L);
 			userRepo.save(account);
+
+			emailService.sendSimpleMessage(account.getEmail(), "Welcome to PPLS",
+					"You have create account successfully in PPLS website");
+
 			return "Account successfully created";
 
 		} catch (Exception e) {
@@ -189,12 +217,10 @@ public class UserService {
 				currentLoanAmount += r.getAmount();
 			}
 
-			
-			
-			if(loanLimit - currentLoanAmount < 0) {
+			if (loanLimit - currentLoanAmount < 0) {
 				return 0L;
 			}
-			
+
 			return loanLimit - currentLoanAmount;
 
 		} catch (Exception e) {
