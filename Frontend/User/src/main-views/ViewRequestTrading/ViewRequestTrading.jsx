@@ -176,7 +176,9 @@ class ViewRequestTrading extends React.Component {
     var timestampToDate = new Date(date * 1000);
     return timestampToDate.toLocaleDateString();
   }
-
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   render() {
     const lendListItems = this.state.lendRequests.map((request, index) => (
       <tr key={index}>
@@ -185,7 +187,7 @@ class ViewRequestTrading extends React.Component {
             {request.id}
           </Col>
         </td>
-        <td>{request.amount} VND</td>
+        <td>{this.numberWithCommas(request.amount)} VND</td>
         <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>
@@ -212,7 +214,7 @@ class ViewRequestTrading extends React.Component {
             {request.id}
           </Col>
         </td>
-        <td>{request.amount} VND</td>
+        <td>{this.numberWithCommas(request.amount)} VND</td>
         <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>

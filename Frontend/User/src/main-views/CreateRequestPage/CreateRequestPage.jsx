@@ -42,7 +42,7 @@ class CreateRequestPage extends React.Component {
       paybackTimeline: [],
       invalidAmount: true,
       errorAmount: "",
-      maxloadlimit: 0,
+      maxloadlimit: 0
       // invalidLoanLimit: true
     };
 
@@ -57,7 +57,7 @@ class CreateRequestPage extends React.Component {
   }
 
   checkLoanLimit() {
-    if(this.state.maxloadlimit > 0) {
+    if (this.state.maxloadlimit > 0) {
       // this.setState({
       //   invalidLoanLimit: false
       // })
@@ -179,7 +179,7 @@ class CreateRequestPage extends React.Component {
     event.preventDefault();
     var invalidLoanLimit = this.checkLoanLimit();
 
-    console.log(invalidLoanLimit)
+    console.log(invalidLoanLimit);
     console.log(this.state.invalidAmount);
     if (this.state.invalidAmount === false && invalidLoanLimit === false) {
       fetch(apiLink + "/rest/request/createRequest", {
@@ -227,7 +227,9 @@ class CreateRequestPage extends React.Component {
 
     this.getLoanLimit();
   }
-
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   getLoanLimit() {
     fetch(apiLink + "/rest/user/getUserMaximunLoanLimit", {
       method: "GET",
@@ -237,12 +239,12 @@ class CreateRequestPage extends React.Component {
       }
     }).then(result => {
       if (result.status === 200) {
-        result.json().then((data) => {
-          console.log("set loan limit")
+        result.json().then(data => {
+          console.log("set loan limit");
           this.setState({
             maxloadlimit: data
-          })
-        })
+          });
+        });
       } else if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
@@ -284,7 +286,9 @@ class CreateRequestPage extends React.Component {
           errorAmount: ""
         });
       } else {
+        
         this.setState({
+          amount : rawValue,
           invalidAmount: false,
           errorAmount: ""
         });
@@ -348,7 +352,10 @@ class CreateRequestPage extends React.Component {
                         <h4 className="mb-1 text-center mb-5">
                           Fill your information into the form
                         </h4>
-                        <h5 className="mb-1 text-center mb-5">Loan limit available: {this.state.maxloadlimit}</h5>
+                        <h5 className="mb-1 text-center mb-5">
+                          Loan limit available:{" "}
+                          {this.numberWithCommas(this.state.maxloadlimit)} VNĐ
+                        </h5>
                         <Form role="form" onSubmit={this.handleSubmit}>
                           <FormGroup
                             row
