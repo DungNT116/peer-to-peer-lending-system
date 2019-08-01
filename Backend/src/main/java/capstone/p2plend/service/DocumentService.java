@@ -1,5 +1,6 @@
 package capstone.p2plend.service;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -215,23 +216,23 @@ public class DocumentService {
 							&& d.getStatus().equalsIgnoreCase("valid")) {
 						limit += d.getDocumentType().getAmountLimit();
 						user.setLoanLimit(limit);
-						user = userRepo.saveAndFlush(user);
+						user = userRepo.save(user);
 						count = 2;
 					}
 				}
 			}
 
 			if (count == 2) {
-				for (Document d : lstUserDocument) {
-					if (!d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
-							&& !d.getDocumentType().getName().equalsIgnoreCase("Video")) {
-						if (d.getStatus().equalsIgnoreCase("valid")) {
-							limit += d.getDocumentType().getAmountLimit();
-							user.setLoanLimit(limit);
-							user = userRepo.saveAndFlush(user);
-						}
-					}
 
+				for (int i = 0; i < lstUserDocument.size(); i++) {
+					Document d = lstUserDocument.get(i);
+					if (!d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
+							&& !d.getDocumentType().getName().equalsIgnoreCase("Video")
+							&& d.getStatus().equalsIgnoreCase("valid")) {
+						limit += d.getDocumentType().getAmountLimit();
+						user.setLoanLimit(limit);
+						user = userRepo.save(user);
+					}
 				}
 			}
 
