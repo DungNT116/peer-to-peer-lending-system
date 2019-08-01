@@ -217,7 +217,9 @@ class ViewOwnTransaction extends React.Component {
       });
     });
   }
-
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   render() {
     const listItems = this.state.transactions.map((transaction, index) => (
       <tr key={index}>
@@ -233,7 +235,7 @@ class ViewOwnTransaction extends React.Component {
         </td>
         <td>{transaction.sender}</td>
         <td>{transaction.receiver}</td>
-        <td>{transaction.amount} VND</td>
+        <td>{this.numberWithCommas(transaction.amount)} VND</td>
         <td>{this.convertTimeStampToDate(transaction.createDate)}</td>
         {/* <td>{transaction.status}</td> */}
         <td>
