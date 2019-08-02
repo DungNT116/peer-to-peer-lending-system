@@ -231,9 +231,18 @@ class Profile extends React.Component {
         //   documentType: this.state.documentID.documentType,
         //   file: this.state.documentID.listImage
         // })
-      }).then(result => {
+      }).then(async result => {
         if (result.status === 200) {
           alert("save success");
+
+          //load document again
+          await this.setState({
+            loadingID: true,
+            loadingPP: true,
+            loadingDL: true,
+            loadingVideo: true,
+          })
+          this.getDocument();
           // this.props.history.push("/view-request-trading");
         } else if (result.status === 401) {
           localStorage.removeItem("isLoggedIn");
@@ -724,6 +733,7 @@ class Profile extends React.Component {
                                     {this.state.documentID.documentFile.map((imageData) => (
                                       <img src={this.setSrcImgBase64(imageData.fileType,
                                         imageData.data)} style={style.sameSizeWithParent} />))}
+                                        {console.log(this.state.documentID)}
                                     {this.state.documentID.status === "invalid" ? (
                                       <div>
                                         <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
@@ -781,14 +791,14 @@ class Profile extends React.Component {
                                     {this.state.documentPP.documentFile.map((imageData) => (
                                       <img src={this.setSrcImgBase64(imageData.fileType,
                                         imageData.data)} style={style.sameSizeWithParent} />))}
-                                    {this.state.documentID.status === "invalid" ? (
+                                    {this.state.documentPP.status === "invalid" ? (
                                       <div>
                                         <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
                                         {' '}
                                         <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
                                       </div>
                                     ) : (
-                                        this.state.documentID.status === "pending" ? ("Document is waiting for validation") : ("")
+                                        this.state.documentPP.status === "pending" ? ("Document is waiting for validation") : ("")
                                       )}
                                   </div>)
                                   :
@@ -836,14 +846,14 @@ class Profile extends React.Component {
                                     {this.state.documentDL.documentFile.map((imageData) => (
                                       <img src={this.setSrcImgBase64(imageData.fileType,
                                         imageData.data)} style={style.sameSizeWithParent} />))}
-                                    {this.state.documentID.status === "invalid" ? (
+                                    {this.state.documentDL.status === "invalid" ? (
                                       <div>
                                         <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
                                         {' '}
                                         <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
                                       </div>
                                     ) : (
-                                        this.state.documentID.status === "pending" ? ("Document is waiting for validation") : ("")
+                                        this.state.documentDL.status === "pending" ? ("Document is waiting for validation") : ("")
                                       )}
                                   </div>)
                                   :
