@@ -86,7 +86,7 @@ public class DealController {
 		HttpStatus status = null;
 		boolean valid = false;
 		try {
-			valid = dealService.cancelDeal(deal.getId(), token);
+			valid = dealService.cancelDeal(deal, token);
 			if (valid == true) {
 				status = HttpStatus.OK;
 			} else {

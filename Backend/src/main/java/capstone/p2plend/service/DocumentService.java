@@ -168,7 +168,7 @@ public class DocumentService {
 	}
 
 	public boolean validDocumentId(Document document) {
-		if (document.getDocumentId() == null) {
+		if (document.getDocumentId() == null || document.getId() == null) {
 			return false;
 		}
 
@@ -191,23 +191,30 @@ public class DocumentService {
 
 		Long limit = 0L;
 		int count = 0;
-		for (Document d : lstUserDocument) {
+		for (int i = 0; i < lstUserDocument.size(); i++) {
+			Document d = lstUserDocument.get(i);
 			if (d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
 					&& d.getStatus().equalsIgnoreCase("valid")) {
 				limit += d.getDocumentType().getAmountLimit();
 				count = 1;
-
+				lstUserDocument.remove(i);
+				break;
 			}
 		}
 
+		
+		
 		if (count == 1) {
-			for (Document d : lstUserDocument) {
+			for (int i = 0; i < lstUserDocument.size(); i++) {
+				Document d = lstUserDocument.get(i);
 				if (d.getDocumentType().getName().equalsIgnoreCase("Video")
 						&& d.getStatus().equalsIgnoreCase("valid")) {
 					limit += d.getDocumentType().getAmountLimit();
 					user.setLoanLimit(limit);
 					user = userRepo.save(user);
 					count = 2;
+					lstUserDocument.remove(i);
+					break;
 				}
 			}
 		}

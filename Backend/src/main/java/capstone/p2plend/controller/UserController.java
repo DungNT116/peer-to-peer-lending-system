@@ -73,8 +73,7 @@ public class UserController {
 			}
 		} catch (SendFailedException sfe) {
 			httpStatus = HttpStatus.ACCEPTED;
-		}
-		 catch (Exception e) {
+		} catch (Exception e) {
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<String>(result, httpStatus);
@@ -99,6 +98,46 @@ public class UserController {
 	}
 
 	@CrossOrigin
+	@Secured({ "ROLE_USER" })
+	@PostMapping(value = "/rest/user/changePassword")
+	public ResponseEntity<Integer> changePassowrd(@RequestParam("oldPassword") String oldPassword,
+			@RequestParam("newPassword") String newPassword, @RequestHeader("Authorization") String token) {
+		HttpStatus httpStatus = null;
+		boolean result = false;
+		try {
+			result = userService.changePassword(oldPassword, newPassword, token);
+			if (result == true) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<Integer>(httpStatus.value(), httpStatus);
+	}
+	
+	@CrossOrigin
+	@PostMapping(value = "/rest/user/forgotPassword")
+	public ResponseEntity<Integer> forgotPassword(@RequestParam("username") String username,
+			@RequestParam("email") String email) {
+		HttpStatus httpStatus = null;
+		boolean result = false;
+		try {
+			result = userService.forgotPassword(username, email);
+			if (result == true) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<Integer>(httpStatus.value(), httpStatus);
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getUser")
 	public ResponseEntity<User> getUser(@RequestHeader("Authorization") String token) {
 		HttpStatus httpStatus = null;

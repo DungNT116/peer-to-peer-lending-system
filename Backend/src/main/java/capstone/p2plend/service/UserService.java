@@ -2,6 +2,7 @@ package capstone.p2plend.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.mail.SendFailedException;
 
@@ -88,10 +89,10 @@ public class UserService {
 	}
 
 	public User checkLogin(User account) {
-		
+
 		String username = account.getUsername();
 		String password = account.getPassword();
-		if(username == null || password == null) {
+		if (username == null || password == null) {
 			return null;
 		}
 		User checkExist = userRepo.findByUsernameAndPassword(username, password);
@@ -139,8 +140,8 @@ public class UserService {
 
 		account = userRepo.save(account);
 
-			emailService.sendSimpleMessage(account.getEmail(), "Welcome to PPLS",
-					"You have create account successfully in PPLS website");
+		emailService.sendSimpleMessage(account.getEmail(), "Welcome to PPLS",
+				"You have create account successfully in PPLS website");
 
 		return "Account successfully created";
 
@@ -273,7 +274,52 @@ public class UserService {
 	}
 
 	public boolean changePassword(String oldPassword, String newPassword, String token) {
+		if (oldPassword == null || newPassword == null || token == null) {
+			return false;
+		}
+		if (oldPassword.equalsIgnoreCase(newPassword))
+			return false;
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
 
-		return false;
+		if (user == null) {
+			return false;
+		}
+
+		if (user.getPassword() != oldPassword)
+			return false;
+
+		user.setPassword(newPassword);
+		userRepo.save(user);
+
+		return true;
+	}
+
+	public boolean forgotPassword(String username, String email) {
+		if (username == null || email == null) {
+			return false;
+		}
+		User user = userRepo.findByUsernameAndEmail(username, email);
+		if (user == null) {
+			return false;
+		}
+
+		String SETCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+		StringBuilder strb = new StringBuilder();
+		Random rnd = new Random();
+
+		while (strb.length() < 18) { // length of the random string.
+			int index = (int) (rnd.nextFloat() * SETCHARS.length());
+			strb.append(SETCHARS.charAt(index));
+		}
+		String str = strb.toString();
+
+		user.setPassword(str);
+		emailService.sendSimpleMessage(email, "You have request a new Password from PPLS site",
+				"Your new password: " + str);
+
+		userRepo.save(user);
+
+		return true;
 	}
 }

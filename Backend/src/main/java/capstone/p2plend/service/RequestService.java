@@ -500,8 +500,12 @@ public class RequestService {
 		return true;
 	}
 
-	public boolean remove(int id, String token) {
-		Request request = requestRepo.findById(id).get();
+	public boolean remove(Request requestGet, String token) {
+		if(requestGet.getId() == null) {
+			return false;
+		}
+		
+		Request request = requestRepo.findById(requestGet.getId()).get();
 		if (request == null) {
 			return false;
 		}
@@ -515,7 +519,7 @@ public class RequestService {
 			return false;
 		}
 
-		requestRepo.deleteById(id);
+		requestRepo.deleteById(requestGet.getId());
 		return true;
 	}
 

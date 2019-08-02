@@ -221,7 +221,7 @@ public class RequestController {
 		HttpStatus status = null;
 		boolean valid = false;
 		try {
-			valid = requestService.remove(request.getId(), token);
+			valid = requestService.remove(request, token);
 			if (valid == true) {
 				status = HttpStatus.OK;
 			} else {

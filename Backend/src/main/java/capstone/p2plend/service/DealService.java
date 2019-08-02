@@ -47,6 +47,10 @@ public class DealService {
 	}
 
 	public boolean makeDeal(Deal deal, String token) {
+		if (deal.getMilestone() == null || deal.getId() == null || deal.getBorrowTime() == null
+				|| deal.getPaybackTime() == null)
+			return false;
+
 		String username = jwtService.getUsernameFromToken(token);
 		if (username == null) {
 			return false;
@@ -76,9 +80,6 @@ public class DealService {
 		existDeal.setUser(user);
 
 		List<Milestone> lstMs = existDeal.getMilestone();
-		if (lstMs == null) {
-			return false;
-		}
 
 		for (Milestone m : lstMs) {
 			milestoneRepo.deleteMilestoneByDealId(m.getDeal().getId());
@@ -106,6 +107,8 @@ public class DealService {
 	}
 
 	public boolean acceptDeal(Deal deal, String token) {
+		if(deal.getId() == null) return false;
+		
 		String username = jwtService.getUsernameFromToken(token);
 		if (username == null) {
 			return false;
@@ -138,8 +141,12 @@ public class DealService {
 		return true;
 	}
 
-	public boolean cancelDeal(int id, String token) {
-		Deal deal = dealRepo.findById(id).get();
+	public boolean cancelDeal(Deal dealGet, String token) {
+		if(dealGet.getId() == null) {
+			return false;
+		}
+		
+		Deal deal = dealRepo.findById(dealGet.getId()).get();
 		if (deal == null) {
 			return false;
 		}
