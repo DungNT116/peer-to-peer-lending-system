@@ -116,6 +116,14 @@ public class TransactionService {
 		}
 		Deal savedDeal = savedTrx.getMilestone().getDeal();
 		List<Milestone> lstMilestone = savedDeal.getMilestone();
+		
+		for (int i = 0; i < lstMilestone.size(); i++) {
+			Milestone m = lstMilestone.get(i);
+			if (m.getPercent() == null) {
+				lstMilestone.remove(i);
+			}
+		}
+		
 		int countComplete = 0;
 		for (int i = 0; i < lstMilestone.size(); i++) {
 			Milestone m = lstMilestone.get(i);

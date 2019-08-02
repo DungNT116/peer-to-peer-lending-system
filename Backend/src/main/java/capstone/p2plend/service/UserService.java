@@ -94,11 +94,13 @@ public class UserService {
 
 	public User checkLogin(User account) {
 
+		if(account.getUsername() == null || account.getPassword() == null) return null;
+		
 		String username = account.getUsername();
-		String password = account.getPassword();
-		if (username == null || password == null) {
-			return null;
-		}
+		String rawPassword = account.getPassword();
+		
+		String password = passwordEncoder.encode(rawPassword);
+		
 		User checkExist = userRepo.findByUsernameAndPassword(username, password);
 		if (checkExist != null && checkExist.getStatus().equals("active")) {
 			return checkExist;
