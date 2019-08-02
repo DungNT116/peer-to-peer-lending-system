@@ -226,6 +226,7 @@ class ViewOwnTransaction extends React.Component {
         <td
           style={{
             width: 200,
+            height:40,
             overflow: "hidden",
             textOverflow: "ellipsis",
             display: "inline-block"

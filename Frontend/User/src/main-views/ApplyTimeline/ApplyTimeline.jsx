@@ -98,8 +98,7 @@ class ApplyTimeline extends React.Component {
       timeline_lending: [
         {
           data: this.formatDate(new Date(Date.now())),
-          percent: "",
-          status: "In Progress 30%"
+          percent: ""
         },
         {
           data: this.formatDate(
@@ -107,8 +106,7 @@ class ApplyTimeline extends React.Component {
               (new Date(Date.now()).getTime() / 1000 + 86400 * duration) * 1000
             ).toLocaleDateString()
           ),
-          percent: 1.0,
-          status: "In Progress 60%"
+          percent: 1.0
         }
       ],
       backup_timeline_lending: [],
@@ -754,14 +752,14 @@ class ApplyTimeline extends React.Component {
       curPaybackId,
       prevPaybackId
     } = this.state;
-    const curLendingStatus = this.state.timeline_lending[curLendingId].status;
+    const curLendingStatus = this.state.timeline_lending[curLendingId].percent;
     // const prevLendingStatus =
     //   prevLendingId >= 0
     //     ? this.state.timeline_lending[prevLendingId].status
     //     : "";
     const isLendMany = this.state.isLendMany;
 
-    const curPaybackStatus = this.state.timeline_payback[curPaybackId].status;
+    const curPaybackStatus = this.state.timeline_payback[curPaybackId].percent;
     // const prevPaybackStatus =
     //   prevPaybackId >= 0
     //     ? this.state.timeline_payback[prevPaybackId].status

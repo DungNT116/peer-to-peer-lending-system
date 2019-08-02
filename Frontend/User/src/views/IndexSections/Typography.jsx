@@ -331,7 +331,7 @@ class Typography extends React.Component {
             <img
               alt="..."
               className="img-fluid rounded-circle shadow-lg"
-              src={require("assets/img/theme/team-4-800x800.jpg")}
+              src={require("assets/img/theme/team-4-800x800.png")}
               style={{ width: "150px" }}
             />
           </Col>
