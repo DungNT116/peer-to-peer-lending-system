@@ -101,7 +101,7 @@ class ApplyTimeline extends React.Component {
           data: this.formatDate(
             new Date(
               (new Date(Date.now()).getTime() / 1000 + 86400 * duration) * 1000
-            ).toLocaleDateString()
+            )
           ),
           percent: 1.0,
           status: "In Progress 60%"
@@ -124,7 +124,7 @@ class ApplyTimeline extends React.Component {
           data: this.formatDate(
             new Date(
               (new Date(Date.now()).getTime() / 1000 + 86400 * duration) * 1000
-            ).toLocaleDateString()
+            )
           ),
           percent: "",
           status: "In Progress 30%"
@@ -133,7 +133,7 @@ class ApplyTimeline extends React.Component {
           data: this.formatDate(
             new Date(
               (new Date(Date.now()).getTime() / 1000 + 86400 * duration * 2) * 1000
-            ).toLocaleDateString()
+            )
           ),
           percent: 1.0,
           status: "In Progress 60%"
@@ -165,7 +165,7 @@ class ApplyTimeline extends React.Component {
   }
   convertTimeStampToDate(date) {
     var timestampToDate = new Date(date * 1000);
-    return timestampToDate.toLocaleDateString();
+    return timestampToDate;
   }
   formatDate(date) {
     var d = new Date(date),
@@ -211,7 +211,7 @@ class ApplyTimeline extends React.Component {
                 1000 +
                 86400 * this.state.duration) *
               1000
-            ).toLocaleDateString()
+            )
           ),
           percent:
             Math.round((1 / this.state.backup_timeline_lending.length) * 100) /
@@ -299,7 +299,7 @@ class ApplyTimeline extends React.Component {
             (new Date(payback[0].data).getTime() / 1000 +
               86400 * this.state.duration) *
             1000
-          ).toLocaleDateString()
+          )
         );
         this.setState({ timeline_payback: payback });
       }
@@ -389,7 +389,7 @@ class ApplyTimeline extends React.Component {
   }
   onDayChangeLending(event) {
     this.setState({
-      dayTimelineLending: new Date(event.target.value).toLocaleDateString()
+      dayTimelineLending: new Date(event.target.value)
     });
   }
   toggleModalCheckTimelineLending() {
@@ -479,7 +479,7 @@ class ApplyTimeline extends React.Component {
                 1000 +
                 86400 * this.state.duration) *
               1000
-            ).toLocaleDateString()
+            )
           ),
           status: "ABC"
         }
@@ -541,7 +541,7 @@ class ApplyTimeline extends React.Component {
                     1000 +
                     86400 * this.state.duration) *
                   1000
-                ).toLocaleDateString()
+                )
               );
             }
           }
@@ -664,7 +664,7 @@ class ApplyTimeline extends React.Component {
   }
   onDayChangePayback(event) {
     this.setState({
-      dayTimelinePayback: new Date(event.target.value).toLocaleDateString()
+      dayTimelinePayback: new Date(event.target.value)
     });
   }
   //End Function Payback
