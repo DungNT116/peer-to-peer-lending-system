@@ -35,7 +35,6 @@ class Index extends React.Component {
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
     // this.test = this.test.bind(this);
-    
   }
 
   convertDateToTimestamp(date) {
@@ -68,12 +67,24 @@ class Index extends React.Component {
       if (result.status === 200) {
         // alert("create success");
       }
-    })
+    });
   }
-
+  roundUp(num) {
+    let precision = Math.pow(10, 2);
+    return Math.ceil(num * precision) / precision;
+  }
   toggleModalValid() {
     this.setState({ modalValid: !this.state.modalValid });
   }
+
+  changeCurrency(inputMoney) {
+    var money;
+    if (inputMoney % 500000 !== 0) {
+      money = inputMoney - (inputMoney % 500000);
+    }
+    return money;
+  }
+  
   validateTransaction(transactionInput) {
     this.setState({
       validTx: {
@@ -124,7 +135,8 @@ class Index extends React.Component {
         );
         setTimeout(
           function() {
-            if (Number(data.asset.data.amount) === transactionInput.amount) {
+            
+            if (this.changeCurrency(Number(data.asset.data.amount)) === transactionInput.amount) {
               this.setState({
                 validTx: {
                   ...this.state.validTx,
@@ -154,10 +166,10 @@ class Index extends React.Component {
         setTimeout(
           function() {
             if (
-              this.state.validTx.sender == true &&
-              this.state.validTx.receiver == true &&
-              this.state.validTx.amount == true &&
-              this.state.validTx.createDate == true
+              this.state.validTx.sender === true &&
+              this.state.validTx.receiver === true &&
+              this.state.validTx.amount === true &&
+              this.state.validTx.createDate === true
             ) {
               this.setState({
                 validTx: {
@@ -179,6 +191,9 @@ class Index extends React.Component {
       });
     });
   }
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   render() {
     const listItems = this.state.transactions.map((transaction, index) => (
       <tr key={index}>
@@ -194,7 +209,7 @@ class Index extends React.Component {
         </td>
         <td>{transaction.sender}</td>
         <td>{transaction.receiver}</td>
-        <td>{transaction.amount} VND</td>
+        <td>{this.numberWithCommas(transaction.amount)} VND</td>
         <td>{this.convertTimeStampToDate(transaction.createDate)}</td>
         {/* <td>{transaction.status}</td> */}
         <td>
@@ -219,7 +234,7 @@ class Index extends React.Component {
               Valid transaction
             </ModalHeader>
             <ModalBody>
-              {this.state.validTx.idTrx == "" ? (
+              {this.state.validTx.idTrx === "" ? (
                 <div>
                   <FormGroup row className="py-2">
                     <Col md="6">Check Sender</Col>
@@ -304,7 +319,10 @@ class Index extends React.Component {
                     <Col md="6">{this.state.validTx.idTrx}</Col>
                     <Col md="6">
                       {this.state.validTx.status}
-                      <i class="ni ni-check-bold" style={{ color: "green",fontSize: "20px" }} />
+                      <i
+                        class="ni ni-check-bold"
+                        style={{ color: "green", fontSize: "20px" }}
+                      />
                     </Col>
                   </FormGroup>
                 </div>
@@ -348,7 +366,6 @@ class Index extends React.Component {
               {/* <video autoplay></video> */}
               {/* <input type="file" accept="video/*" capture="camera" id="recorder" />
               <video id="player" controls></video> */}
-
             </Container>
           </section>
         </main>

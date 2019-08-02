@@ -50,7 +50,7 @@ class ViewDetailRequest extends React.Component {
       isLendMany: false,
       isPayMany: false,
 
-      errorModal: false,
+      errorModal: false
     };
     this.toggleErrorModal = this.toggleErrorModal.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
@@ -80,17 +80,17 @@ class ViewDetailRequest extends React.Component {
   toggleErrorModal() {
     this.setState({
       errorModal: !this.state.errorModal
-    })
+    });
   }
 
   toggleSaveDealModal() {
     this.setState({
       saveDealModal: !this.state.saveDealModal
-    })
+    });
   }
 
   goToViewRequestTrading() {
-    this.props.history.push("/view-request-trading")
+    this.props.history.push("/view-request-trading");
   }
 
   convertDateToTimestamp(date) {
@@ -98,9 +98,9 @@ class ViewDetailRequest extends React.Component {
   }
 
   saveTransaction(data, data_transaction) {
-    console.log(data)
-    console.log(data_transaction)
-    console.log(this.props.request.data.deal.milestone[1].id)
+    console.log(data);
+    console.log(data_transaction);
+    console.log(this.props.request.data.deal.milestone[1].id);
     fetch(apiLink + "/rest/transaction/newTransaction", {
       method: "POST",
       headers: {
@@ -113,7 +113,9 @@ class ViewDetailRequest extends React.Component {
         amount: Number(data_transaction.data_tx.data.amount),
         status: data.status,
         idTrx: data.id,
-        createDate: this.convertDateToTimestamp(data_transaction.data_tx.data.createDate),
+        createDate: this.convertDateToTimestamp(
+          data_transaction.data_tx.data.createDate
+        ),
         milestone: {
           id: Number(this.props.request.data.deal.milestone[1].id)
         }
@@ -139,7 +141,9 @@ class ViewDetailRequest extends React.Component {
       window.location.reload();
     }
   }
-
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   acceptDeal() {
     fetch(apiLink + "/rest/deal/acceptDeal", {
       method: "PUT",
@@ -155,7 +159,7 @@ class ViewDetailRequest extends React.Component {
       })
     }).then(async result => {
       if (result.status === 200) {
-        console.log("username", this.props.request.data.borrower.username)
+        console.log("username", this.props.request.data.borrower.username);
         await database
           .ref("ppls")
           .orderByChild("username")
@@ -167,14 +171,18 @@ class ViewDetailRequest extends React.Component {
             }
           });
         database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
-          message: localStorage.getItem("user") + " accepted your request" + this.props.request.data.id + " !",
+          message:
+            localStorage.getItem("user") +
+            " accepted your request" +
+            this.props.request.data.id +
+            " !",
           sender: localStorage.getItem("user"),
           requestId: this.props.request.data.id
         });
         var upvotesRef = database.ref(
           "/ppls/" + this.state.keyUserFb + "/countNew"
         );
-        upvotesRef.transaction(function (current_value) {
+        upvotesRef.transaction(function(current_value) {
           return (current_value || 0) + 1;
         });
         alert("create success");
@@ -189,22 +197,21 @@ class ViewDetailRequest extends React.Component {
   createMileStone() {
     let milestones = [];
     let milestone = {
-      previousDate: '',
-      presentDate: '',
-      percent: '',
-      type: '',
-
-    }
+      previousDate: "",
+      presentDate: "",
+      percent: "",
+      type: ""
+    };
     for (let i = 0; i < this.state.lendingTimeline.length; i++) {
       const element = this.state.lendingTimeline[i];
-      console.log(element)
+      console.log(element);
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
-        previousDate: '',
-        presentDate: '',
-        percent: '',
-        type: ''
-      }
+        previousDate: "",
+        presentDate: "",
+        percent: "",
+        type: ""
+      };
       if (i === 0) {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = dateToTimestamp;
@@ -225,11 +232,11 @@ class ViewDetailRequest extends React.Component {
       const element = this.state.paybackTimeline[i];
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
-        previousDate: '',
-        presentDate: '',
-        percent: '',
-        type: ''
-      }
+        previousDate: "",
+        presentDate: "",
+        percent: "",
+        type: ""
+      };
       if (i === 0) {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = dateToTimestamp;
@@ -252,7 +259,7 @@ class ViewDetailRequest extends React.Component {
   saveNewDealInformationToDB() {
     // console.log(this.state.lendingTimeline);
     // console.log(this.state.paybackTimeline);
-    console.log("username", this.props.request.data.borrower.username)
+    console.log("username", this.props.request.data.borrower.username);
     fetch(apiLink + "/rest/deal/makeDeal", {
       method: "PUT",
       headers: {
@@ -284,14 +291,18 @@ class ViewDetailRequest extends React.Component {
             }
           });
         database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
-          message: localStorage.getItem("user") + " make deal your request" + this.props.request.data.id + " !",
+          message:
+            localStorage.getItem("user") +
+            " make deal your request" +
+            this.props.request.data.id +
+            " !",
           sender: localStorage.getItem("user"),
           requestId: this.props.request.data.id
         });
         var upvotesRef = database.ref(
           "/ppls/" + this.state.keyUserFb + "/countNew"
         );
-        upvotesRef.transaction(function (current_value) {
+        upvotesRef.transaction(function(current_value) {
           return (current_value || 0) + 1;
         });
       } else if (result.status === 400) {
@@ -327,7 +338,6 @@ class ViewDetailRequest extends React.Component {
         this.convertTimeStampToDate(element.presentDate)
       );
       milestoneTimeline.percent = element.percent;
-      milestoneTimeline.status = "data is nothing";
       if (element.type === "lend") {
         numberOfLendingMilestones++;
         lendingTimeline.push(milestoneTimeline);
@@ -339,13 +349,13 @@ class ViewDetailRequest extends React.Component {
     if (numberOfLendingMilestones > 2) {
       this.setState({
         isLendMany: true
-      })
+      });
     }
 
     if (numberOfPayBackMilestones > 2) {
       this.setState({
         isPayMany: true
-      })
+      });
     }
 
     timelineData.lendingTimeline = lendingTimeline;
@@ -362,21 +372,7 @@ class ViewDetailRequest extends React.Component {
   }
 
   send_tx = () => {
-    // http://capstone.ppls.cf:5000/search_transaction_by_metadata
-    // let numberOfTransaction = 0;
     let user = localStorage.getItem("user");
-    // fetch(bigchainAPI + "/search_transaction_by_metadata", {
-    //   method: "POST",
-    //   body: JSON.stringify({
-    //     userId: user
-    //   })
-    // }).then(result => {
-    //   result.json().then(data => {
-    //     numberOfTransaction = data.length;
-    //     console.log(numberOfTransaction);
-    //     console.log(data.length);
-    //   });
-    // });
 
     let data_transaction = {
       data_tx: {
@@ -390,8 +386,6 @@ class ViewDetailRequest extends React.Component {
         }
       },
       metadata_tx: {
-        // userId: this.state.userId,
-        // createDate: this.state.createDate
         userId: user,
         createDate: this.state.data_tx.createDate
       }
@@ -536,7 +530,10 @@ class ViewDetailRequest extends React.Component {
       borrowDuration: text
     });
   }
-
+  roundUp(num) {
+    let precision = Math.pow(10, 2);
+    return Math.ceil(num * precision) / precision;
+  }
   render() {
     const isHistoryDetail = this.props.viewDetail.isHistoryDetail;
     return (
@@ -608,11 +605,11 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                             <Col xs="12" md="9">
                               <p className="h6">
-                                {this.props.request.data.amount +
+                                {this.numberWithCommas(this.props.request.data.amount +
                                   (this.props.request.data.amount *
                                     (this.props.request.data.duration / 30) *
                                     1.5) /
-                                  100}{" "}
+                                    100)}{" "}
                                 VND
                               </p>
                             </Col>
@@ -623,7 +620,7 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                             <Col xs="12" md="9">
                               <p className="h6">
-                                {this.props.request.data.amount} VND
+                                {this.numberWithCommas(this.props.request.data.amount)} VND
                               </p>
                             </Col>
                           </FormGroup>
@@ -645,7 +642,9 @@ class ViewDetailRequest extends React.Component {
                                 disabled={!this.state.editable}
                                 onChange={this.onBorrowDurationChange}
                               >
-                                <option value="" disabled>Please select</option>
+                                <option value="" disabled>
+                                  Please select
+                                </option>
                                 <option value="1">30 days</option>
                                 <option value="3">90 days</option>
                                 <option value="6">180 days</option>
@@ -684,21 +683,21 @@ class ViewDetailRequest extends React.Component {
                                 </p>
                               </Col>
                             ) : (
-                                <Col md="4">
-                                  <p
-                                    className="h6"
-                                    style={{
-                                      display: "flex",
-                                      alignItems: "center",
-                                      height: "100%"
-                                    }}
-                                    id="createDayText"
-                                  >
-                                    {" "}
-                                    Not Yet
+                              <Col md="4">
+                                <p
+                                  className="h6"
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    height: "100%"
+                                  }}
+                                  id="createDayText"
+                                >
+                                  {" "}
+                                  Not Yet
                                 </p>
-                                </Col>
-                              )}
+                              </Col>
+                            )}
                             <Col md="4">
                               <p
                                 className="h6"
@@ -724,7 +723,7 @@ class ViewDetailRequest extends React.Component {
                               <p className="h6" id="dueDateText">
                                 {this.convertTimeStampToDate(
                                   new Date().getTime() / 1000 +
-                                  86400 * this.props.request.data.duration
+                                    86400 * this.props.request.data.duration
                                 )}
                               </p>
                               <Input
@@ -752,18 +751,19 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                             <Col xs="12" md="9">
                               <p className="h6">
-                                {Math.round(
+                                {this.numberWithCommas(Math.round(
                                   ((this.props.request.data.amount *
                                     (this.props.request.data.duration / 30) *
                                     1.5) /
                                     100) *
-                                  1000
-                                ) / 1000}{" "}
+                                    1000
+                                ) / 1000)}{" "}
                                 VND
                               </p>
                             </Col>
                           </FormGroup>
                           <ApplyTimeline
+                            amountProps={this.props.request.data.amount}
                             onDataChange={this.handleDataTimeline}
                             setTimelineData={this.changeMilestoneToTimelineData}
                             rawMilestone={
@@ -774,129 +774,127 @@ class ViewDetailRequest extends React.Component {
                             isHistory={this.state.isHistory}
                             isLendMany={this.state.isLendMany}
                             isPayMany={this.state.isPayMany}
-                            borrowerUser={this.props.request.data.borrower.username}
-                            goToViewRequestTrading={() => this.goToViewRequestTrading()}
+                            borrowerUser={
+                              this.props.request.data.borrower.username
+                            }
+                            goToViewRequestTrading={() =>
+                              this.goToViewRequestTrading()
+                            }
                           />
                         </Form>
                         {isHistoryDetail ? (
                           ""
                         ) : (
-                            <div>
-                              <CardFooter className="text-center">
-                                <Button
-                                  type="submit"
-                                  id="dealButton"
-                                  size="md"
-                                  className="btn btn-outline-primary"
-                                  onClick={() => this.makeDeal()}
-                                  disabled={this.state.editable}
-                                >
-                                  <i className="fa fa-dot-circle-o" /> Make Deal
+                          <div>
+                            <CardFooter className="text-center">
+                              <Button
+                                type="submit"
+                                id="dealButton"
+                                size="md"
+                                className="btn btn-outline-primary"
+                                onClick={() => this.makeDeal()}
+                                disabled={this.state.editable}
+                              >
+                                <i className="fa fa-dot-circle-o" /> Make Deal
                               </Button>{" "}
+                              <Button
+                                type="submit"
+                                id="saveDealButton"
+                                size="md"
+                                className="btn btn-outline-primary"
+                                onClick={this.toggleSaveDealModal}
+                                disabled={!this.state.editable}
+                              >
+                                <i className="ni ni-cloud-download-95" /> Save
+                                Deal
+                              </Button>{" "}
+                              {this.props.borrowerUser == localStorage.getItem("user") ? ("") : (
+                                 <Button
+                                 type="submit"
+                                 id="acceptButton"
+                                 size="md"
+                                 className="btn btn-outline-primary"
+                                 onClick={this.toggleModal}
+                                 disabled={this.state.editable}
+                               >
+                                 <i className="ni ni-check-bold" /> Accept
+                               </Button>
+                              )}
+                             
+                            </CardFooter>
+                            {/* save deal */}
+                            <Modal
+                              isOpen={this.state.saveDealModal}
+                              toggle={this.toggleSaveDealModal}
+                              className={this.props.className}
+                            >
+                              <ModalHeader toggle={this.toggleSaveDealModal}>
+                                Confirm saving
+                              </ModalHeader>
+                              <ModalBody>
+                                Are you sure to save this deal ?
+                              </ModalBody>
+                              <ModalFooter>
                                 <Button
-                                  type="submit"
-                                  id="saveDealButton"
-                                  size="md"
-                                  className="btn btn-outline-primary"
+                                  color="primary"
+                                  onClick={() => this.saveDeal()}
+                                >
+                                  Yes
+                                </Button>{" "}
+                                <Button
+                                  color="secondary"
                                   onClick={this.toggleSaveDealModal}
-                                  disabled={!this.state.editable}
                                 >
-                                  <i className="ni ni-cloud-download-95" /> Save Deal
-                              </Button>{" "}
-                                <Button
-                                  type="submit"
-                                  id="acceptButton"
-                                  size="md"
-                                  className="btn btn-outline-primary"
-                                  onClick={this.toggleModal}
-                                  disabled={this.state.editable}
-                                >
-                                  <i className="ni ni-check-bold" /> Accept
-                              </Button>{" "}
-                              </CardFooter>
-                              {/* save deal */}
-                              <Modal
-                                isOpen={this.state.saveDealModal}
-                                toggle={this.toggleSaveDealModal}
-                                className={this.props.className}
-                              >
-                                <ModalHeader toggle={this.toggleSaveDealModal}>
-                                  Xac Nhan yeu cau vay muon
-                              </ModalHeader>
-                                <ModalBody>
-                                  Ban co chac chan se chap nhan yeu cau nay khong
-                              </ModalBody>
-                                <ModalFooter>
-                                  <Button
-                                    color="primary"
-                                    onClick={() => this.saveDeal()}
-                                  >
-                                    Yes
-                                </Button>{" "}
-                                  <Button
-                                    color="secondary"
-                                    onClick={this.toggleSaveDealModal}
-                                  >
-                                    Cancel
+                                  Cancel
                                 </Button>
-                                </ModalFooter>
-                              </Modal>
+                              </ModalFooter>
+                            </Modal>
 
-                              {/* accept modal */}
-                              <Modal
-                                isOpen={this.state.modal}
-                                toggle={this.toggleModal}
-                                className={this.props.className}
-                              >
-                                <ModalHeader toggle={this.toggleModal}>
-                                  Xac Nhan yeu cau vay muon
+                            {/* accept modal */}
+                            <Modal
+                              isOpen={this.state.modal}
+                              toggle={this.toggleModal}
+                              className={this.props.className}
+                            >
+                              <ModalHeader toggle={this.toggleModal}>
+                                Payment
                               </ModalHeader>
-                                <ModalBody>
-                                  Ban co chac chan se chap nhan yeu cau nay khong
+                              <ModalBody>
+                                <PayPalButton
+                                  amount={this.roundUp(
+                                    (this.props.request.data.amount *
+                                      this.props.request.data.deal.milestone[1]
+                                        .percent) /
+                                      23000
+                                  )}
+                                  onSuccess={(details, data) => {
+                                    this.setState({
+                                      data_tx: {
+                                        txId: details.id,
+                                        createDate: new Date(),
+                                        status: details.status,
+                                        amount: details.purchase_units[0].amount
+                                            .value
+                                      }
+                                    });
+                                    this.send_tx();
+                                    this.toggleModal();
+                                  }}
+                                  style={{
+                                    layout: "horizontal",
+                                    shape: "pill",
+                                    disableFunding: true,
+                                    tagline: false,
+                                    size: "responsive"
+                                  }}
+                                  options={{
+                                    clientId: client_API
+                                  }}
+                                />
                               </ModalBody>
-                                <ModalFooter>
-                                  <PayPalButton
-                                    amount={this.props.request.data.amount * this.props.request.data.deal.milestone[1].percent}
-                                    onSuccess={(details, data) => {
-                                      this.setState({
-                                        data_tx: {
-                                          txId: details.id,
-                                          createDate: new Date,
-                                          status: details.status,
-                                          amount:
-                                            details.purchase_units[0].amount.value
-                                        }
-                                      });
-                                      this.send_tx();
-                                      this.toggleModal();
-                                    }}
-                                    style={{
-                                      layout: "horizontal",
-                                      shape: "pill",
-                                      disableFunding: true,
-                                      tagline: false,
-                                      size: "responsive"
-                                    }}
-                                    options={{
-                                      clientId: client_API
-                                    }}
-                                  />
-                                  <Button
-                                    color="primary"
-                                    onClick={this.toggleModal}
-                                  >
-                                    Yes
-                                </Button>{" "}
-                                  <Button
-                                    color="secondary"
-                                    onClick={this.toggleModal}
-                                  >
-                                    Cancel
-                                </Button>
-                                </ModalFooter>
-                              </Modal>
-                            </div>
-                          )}
+                            </Modal>
+                          </div>
+                        )}
                       </Col>
                     </Row>
                   </div>
@@ -911,17 +909,12 @@ class ViewDetailRequest extends React.Component {
           toggle={this.toggleErrorModal}
           className={this.props.className}
         >
-          <ModalHeader toggle={this.toggleErrorModal}>
-            Error
-            </ModalHeader>
+          <ModalHeader toggle={this.toggleErrorModal}>Error</ModalHeader>
           <ModalBody>
             You already made deal please waiting for response!!
-            </ModalBody>
+          </ModalBody>
           <ModalFooter>
-            <Button
-              color="primary"
-              onClick={this.toggleErrorModal}
-            >
+            <Button color="primary" onClick={this.toggleErrorModal}>
               OK
             </Button>{" "}
           </ModalFooter>

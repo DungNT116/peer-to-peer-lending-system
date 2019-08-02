@@ -78,7 +78,6 @@ class ViewRequestNew extends React.Component {
   };
 
   cancelRequest(request) {
-    console.log(request);
     fetch(apiLink + "/rest/deal/cancelDeal", {
       method: "PUT",
       headers: {
@@ -254,6 +253,9 @@ class ViewRequestNew extends React.Component {
     this.refs.main.scrollTop = 0;
     this.getRequest();
   }
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   render() {
     console.log(this.state.newRequests);
     const newListItems = this.state.newRequests.map(request => (
@@ -263,7 +265,7 @@ class ViewRequestNew extends React.Component {
             {request.id}
           </Col>
         </td>
-        <td>{request.amount} VND</td>
+        <td>{this.numberWithCommas(request.amount)} VND</td>
         {/* <td>{request.dueDate}</td> */}
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>
@@ -301,7 +303,7 @@ class ViewRequestNew extends React.Component {
             {request.id}
           </Col>
         </td>
-        <td>{request.amount} VND</td>
+        <td>{this.numberWithCommas(request.amount)} VND</td>
         {/* <td>{request.dueDate}</td> */}
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>
@@ -420,7 +422,7 @@ class ViewRequestNew extends React.Component {
                                 <tr>
                                   <th>Id</th>
                                   <th>Amount</th>
-                                  <th>CreateDate</th>
+                                  <th>Create Date</th>
                                   <th>Duration</th>
                                   <th>Status</th>
                                   <th>View detail</th>
@@ -446,7 +448,7 @@ class ViewRequestNew extends React.Component {
                                 <tr>
                                   <th>Id</th>
                                   <th>Amount</th>
-                                  <th>CreateDate</th>
+                                  <th>Create Date</th>
                                   <th>Duration</th>
                                   <th>Status</th>
                                   <th>View detail</th>
@@ -480,10 +482,10 @@ class ViewRequestNew extends React.Component {
           className={this.props.className}
         >
           <ModalHeader toggle={this.toggleCancelDeal}>
-            Xac Nhan yeu cau vay muon
+            Confirm canceling
           </ModalHeader>
           <ModalBody>
-            Ban co chac chan se chap nhan yeu cau nay khong
+            Are you sure to cancel this request ?
           </ModalBody>
           <ModalFooter>
             <Button

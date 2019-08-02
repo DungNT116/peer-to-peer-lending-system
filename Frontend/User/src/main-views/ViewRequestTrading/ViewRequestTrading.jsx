@@ -176,7 +176,9 @@ class ViewRequestTrading extends React.Component {
     var timestampToDate = new Date(date * 1000);
     return timestampToDate.toLocaleDateString();
   }
-
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   render() {
     const lendListItems = this.state.lendRequests.map((request, index) => (
       <tr key={index}>
@@ -185,7 +187,7 @@ class ViewRequestTrading extends React.Component {
             {request.id}
           </Col>
         </td>
-        <td>{request.amount} VND</td>
+        <td>{this.numberWithCommas(request.amount)} VND</td>
         <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>
@@ -212,7 +214,7 @@ class ViewRequestTrading extends React.Component {
             {request.id}
           </Col>
         </td>
-        <td>{request.amount} VND</td>
+        <td>{this.numberWithCommas(request.amount)} VND</td>
         <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>
@@ -317,8 +319,8 @@ class ViewRequestTrading extends React.Component {
                     <tr>
                       <th>Id</th>
                       <th>Amount</th>
-                      <th>user</th>
-                      <th>CreateDate</th>
+                      <th>User</th>
+                      <th>Create Date</th>
                       <th>Duration</th>
                       <th>View Detail</th>
                     </tr>
@@ -342,8 +344,8 @@ class ViewRequestTrading extends React.Component {
                     <tr>
                       <th>Id</th>
                       <th>Amount</th>
-                      <th>user</th>
-                      <th>CreateDate</th>
+                      <th>User</th>
+                      <th>Create Date</th>
                       <th>Duration</th>
                       <th>View Detail</th>
                     </tr>

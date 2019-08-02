@@ -182,7 +182,7 @@ class Login extends React.Component {
                                 <i className="ni ni-email-83" />
                               </InputGroupText>
                             </InputGroupAddon>
-                            <Input placeholder="Email or username" type="text" value={this.state.username} onChange={this.handleNameChange} />
+                            <Input placeholder="Username" type="text" value={this.state.username} onChange={this.handleNameChange} />
                           </InputGroup>
                         </FormGroup>
                         <FormGroup>
