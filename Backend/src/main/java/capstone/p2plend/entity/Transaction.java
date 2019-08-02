@@ -30,6 +30,9 @@ public class Transaction {
 	private String idTrx;
 
 	@Column
+	private Long amountValid;
+	
+	@Column
 	private String receiver;
 
 	@Column
@@ -114,4 +117,11 @@ public class Transaction {
 		this.idTrx = idTrx;
 	}
 
+	public Long getAmountValid() {
+		return amountValid;
+	}
+
+	public void setAmountValid(Long amountValid) {
+		this.amountValid = amountValid;
+	}
 }

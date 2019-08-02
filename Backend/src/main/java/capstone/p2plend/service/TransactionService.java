@@ -50,6 +50,7 @@ public class TransactionService {
 			transaction.setAmount(t.getAmount());
 			transaction.setStatus(t.getStatus());
 			transaction.setIdTrx(t.getIdTrx());
+			transaction.setAmountValid(t.getAmountValid());
 			transactions.add(transaction);
 		}
 
@@ -79,6 +80,7 @@ public class TransactionService {
 			transaction.setAmount(t.getAmount());
 			transaction.setStatus(t.getStatus());
 			transaction.setIdTrx(t.getIdTrx());
+			transaction.setAmountValid(t.getAmountValid());
 			transactions.add(transaction);
 		}
 
@@ -106,7 +108,7 @@ public class TransactionService {
 
 			if (transaction.getAmount() == null || transaction.getCreateDate() == null || transaction.getIdTrx() == null
 					|| transaction.getReceiver() == null || transaction.getSender() == null
-					|| transaction.getStatus() == null) {
+					|| transaction.getStatus() == null || transaction.getAmountValid() == null) {
 				return false;
 			}
 
