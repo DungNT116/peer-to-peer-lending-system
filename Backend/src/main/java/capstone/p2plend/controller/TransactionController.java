@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import capstone.p2plend.dto.PageDTO;
+import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.Transaction;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.payload.LoginRespone;
@@ -29,8 +30,20 @@ public class TransactionController {
 
 	@CrossOrigin
 	@GetMapping(value = "/rest/transaction/getTop20Transaction")
-	public List<Transaction> getTop20TransactionOrderByCreateDateDesc() {
-		return transactionService.getTopTransactionOrderByCreateDateDesc();
+	public ResponseEntity<List<Transaction>> getTop20TransactionOrderByCreateDateDesc() {
+		HttpStatus httpStatus = null;
+		List<Transaction> result = null;
+		try {
+			result = transactionService.getTopTransactionOrderByCreateDateDesc();
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<List<Transaction>>(result, httpStatus);
 	}
 
 	@CrossOrigin
@@ -42,11 +55,13 @@ public class TransactionController {
 		PageDTO<Transaction> result = null;
 		try {
 			result = transactionService.getAllUserTransaction(page, element, token);
-			httpStatus = HttpStatus.OK;
-
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception ex) {
-			result = null;
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Transaction>>(result, httpStatus);
 	}
@@ -57,11 +72,15 @@ public class TransactionController {
 	public ResponseEntity<Integer> newTransaction(@RequestBody Transaction transaction) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = transactionService.newTransaction(transaction);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = transactionService.newTransaction(transaction);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
@@ -72,11 +91,15 @@ public class TransactionController {
 	public ResponseEntity<Integer> updateTransaction(@RequestBody Transaction transaction) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = transactionService.updateTransaction(transaction);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = transactionService.updateTransaction(transaction);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}

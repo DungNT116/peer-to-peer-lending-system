@@ -36,6 +36,9 @@ public class TransactionService {
 	public List<Transaction> getTopTransactionOrderByCreateDateDesc() {
 
 		List<Transaction> listTrans = transactionRepo.findTop20ByOrderByCreateDateDesc();
+		if (listTrans == null) {
+			return null;
+		}
 
 		List<Transaction> transactions = new ArrayList<>();
 		for (Transaction t : listTrans) {
@@ -54,42 +57,38 @@ public class TransactionService {
 	}
 
 	public PageDTO<Transaction> getAllUserTransaction(Integer page, Integer element, String token) {
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
 
-		try {
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
-
-			if (user == null)
-				return null;
-
-			Pageable pageable = PageRequest.of(page - 1, element);
-			Page<Transaction> listTrx = transactionRepo.findAllUserTransaction(pageable, username);
-			
-			List<Transaction> transactions = new ArrayList<>();
-			for (Transaction t : listTrx) {
-				Transaction transaction = new Transaction();
-				transaction.setId(t.getId());
-				transaction.setSender(t.getSender());
-				transaction.setReceiver(t.getReceiver());
-				transaction.setCreateDate(t.getCreateDate());
-				transaction.setAmount(t.getAmount());
-				transaction.setStatus(t.getStatus());
-				transaction.setIdTrx(t.getIdTrx());
-				transactions.add(transaction);
-			}
-			
-			PageDTO<Transaction> pageDTO = new PageDTO<>();
-			pageDTO.setMaxPage(listTrx.getTotalPages());
-			pageDTO.setData(transactions);
-			return pageDTO;
-		} catch (Exception e) {
+		if (user == null)
 			return null;
+
+		Pageable pageable = PageRequest.of(page - 1, element);
+		Page<Transaction> listTrx = transactionRepo.findAllUserTransaction(pageable, username);
+
+		if (listTrx == null)
+			return null;
+
+		List<Transaction> transactions = new ArrayList<>();
+		for (Transaction t : listTrx) {
+			Transaction transaction = new Transaction();
+			transaction.setId(t.getId());
+			transaction.setSender(t.getSender());
+			transaction.setReceiver(t.getReceiver());
+			transaction.setCreateDate(t.getCreateDate());
+			transaction.setAmount(t.getAmount());
+			transaction.setStatus(t.getStatus());
+			transaction.setIdTrx(t.getIdTrx());
+			transactions.add(transaction);
 		}
+
+		PageDTO<Transaction> pageDTO = new PageDTO<>();
+		pageDTO.setMaxPage(listTrx.getTotalPages());
+		pageDTO.setData(transactions);
+		return pageDTO;
 	}
 
 	public boolean newTransaction(Transaction transaction) {
-		try {
-
 			if (transaction.getId() != null) {
 				return false;
 			}
@@ -115,9 +114,6 @@ public class TransactionService {
 			transactionRepo.saveAndFlush(transaction);
 
 			return true;
-		} catch (Exception e) {
-			return false;
-		}
 	}
 
 	public boolean updateTransaction(Transaction transaction) {

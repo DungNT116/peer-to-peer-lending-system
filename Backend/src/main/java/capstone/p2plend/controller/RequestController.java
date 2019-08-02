@@ -36,54 +36,100 @@ public class RequestController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping(value = "/rest/request/createRequest")
-	public ResponseEntity<Integer> createAccount(@RequestBody Request request, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<Integer> createAccount(@RequestBody Request request,
+			@RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = requestService.createRequest(request, token);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = requestService.createRequest(request, token);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
-	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/request/getById")
-	public Request getOne(@RequestBody Request request) {
-		return requestService.getOneById(request.getId());
-	}
-
-	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/request/all")
-	public List<Request> all() {
-		return requestService.findAll();
-	}
+//	@CrossOrigin
+//	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+//	@GetMapping(value = "/rest/request/getById")
+//	public ResponseEntity<Request> getOne(@RequestBody Request request) {
+//		HttpStatus status = null;
+//		Request result = null;
+//		try {
+//			result = requestService.getOneById(request.getId());
+//			if (result != null) {
+//				status = HttpStatus.OK;
+//			} else {
+//				status = HttpStatus.BAD_REQUEST;
+//			}
+//		} catch (Exception e) {
+//			status = HttpStatus.INTERNAL_SERVER_ERROR;
+//		}
+//		return new ResponseEntity<Request>(result, status);
+//	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/user/allRequest")
-	public PageDTO<Request> findAllOtherUserRequest(@RequestParam Integer page, @RequestParam Integer element,
-			@RequestHeader("Authorization") String token) {
-		return requestService.findAllOtherUserRequest(page, element, token);
+	public ResponseEntity<PageDTO<Request>> findAllOtherUserRequest(@RequestParam Integer page,
+			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		HttpStatus status = null;
+		PageDTO<Request> result = null;
+		try {
+			result = requestService.findAllOtherUserRequest(page, element, token);
+			if (result != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<PageDTO<Request>>(result, status);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/user/allNewRequest")
-	public PageDTO<Request> findAllOtherUserNewRequest(@RequestParam Integer page, @RequestParam Integer element,
-			@RequestHeader("Authorization") String token) {
-		return requestService.findAllOtherUserRequestSortByDateDesc(page, element, token);
+	public ResponseEntity<PageDTO<Request>> findAllOtherUserNewRequest(@RequestParam Integer page,
+			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		HttpStatus status = null;
+		PageDTO<Request> result = null;
+		try {
+			result = requestService.findAllOtherUserRequestSortByDateDesc(page, element, token);
+			if (result != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<PageDTO<Request>>(result, status);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/allRequestHistoryDone")
-	public PageDTO<Request> findAllRequestHistoryStatusDone(@RequestParam Integer page, @RequestParam Integer element,
-			@RequestHeader("Authorization") String token) {
-		return requestService.findUserAllRequestByStatus(page, element, token, "done");
+	public ResponseEntity<PageDTO<Request>> findAllRequestHistoryStatusDone(@RequestParam Integer page,
+			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		HttpStatus status = null;
+		PageDTO<Request> result = null;
+		try {
+			result = requestService.findUserAllRequestByStatus(page, element, token, "done");
+			if (result != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<PageDTO<Request>>(result, status);
 	}
 
 	@CrossOrigin
@@ -91,14 +137,17 @@ public class RequestController {
 	@GetMapping(value = "/rest/request/all_request_dealing_by_borrower_or_lender")
 	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusDealingWithLenderOrBorrower(
 			@RequestParam Integer page, @RequestParam Integer element, @RequestHeader("Authorization") String token) {
-		PageDTO<Request> result = null;
 		HttpStatus httpStatus = null;
+		PageDTO<Request> result = null;
 		try {
 			result = requestService.findAllRequestByStatusWithLenderOrBorrower(page, element, token, "dealing");
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception ex) {
-			result = null;
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
 	}
@@ -106,55 +155,80 @@ public class RequestController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/all_request_trading_by_borrower")
-	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithBorrower(
-			@RequestParam Integer page, @RequestParam Integer element, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithBorrower(@RequestParam Integer page,
+			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
 		PageDTO<Request> result = null;
 		HttpStatus httpStatus = null;
 		try {
 			result = requestService.findAllRequestByStatusWithBorrower(page, element, token, "trading");
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception ex) {
 			result = null;
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/all_request_trading_by_lender")
-	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithLender(
-			@RequestParam Integer page, @RequestParam Integer element, @RequestHeader("Authorization") String token) {
-		PageDTO<Request> result = null;
+	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithLender(@RequestParam Integer page,
+			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
 		HttpStatus httpStatus = null;
+		PageDTO<Request> result = null;
 		try {
 			result = requestService.findAllRequestByStatusWithLender(page, element, token, "trading");
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception ex) {
-			result = null;
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/allRequestHistoryPending")
-	public PageDTO<Request> findAllUserRequestStatusPending(@RequestParam Integer page, @RequestParam Integer element,
-			@RequestHeader("Authorization") String token) {
-		return requestService.findUserAllRequestByStatus(page, element, token, "pending");
+	public ResponseEntity<PageDTO<Request>> findAllUserRequestStatusPending(@RequestParam Integer page,
+			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		HttpStatus httpStatus = null;
+		PageDTO<Request> result = null;
+		try {
+			result = requestService.findUserAllRequestByStatus(page, element, token, "pending");
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception ex) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@DeleteMapping(value = "/rest/request/delete")
-	public ResponseEntity<Integer> deleteRequest(@RequestBody Request request, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<Integer> deleteRequest(@RequestBody Request request,
+			@RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
-		boolean valid = requestService.remove(request.getId(), token);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		boolean valid = false;
+		try {
+			valid = requestService.remove(request.getId(), token);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}

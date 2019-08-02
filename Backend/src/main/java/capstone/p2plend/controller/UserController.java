@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.SendFailedException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -38,8 +39,8 @@ public class UserController {
 		LoginRespone result;
 		String message;
 		HttpStatus httpStatus = null;
-		User user = userService.checkLogin(account);
 		try {
+			User user = userService.checkLogin(account);
 			if (user != null) {
 				String token = jwtService.generateTokenLogin(account.getUsername());
 				message = "login successful";
@@ -65,13 +66,15 @@ public class UserController {
 		String result = null;
 		try {
 			result = userService.createAccount(user);
-
 			if (result.equalsIgnoreCase("Account successfully created")) {
 				httpStatus = HttpStatus.OK;
 			} else {
 				httpStatus = HttpStatus.BAD_REQUEST;
 			}
-		} catch (Exception e) {
+		} catch (SendFailedException sfe) {
+			httpStatus = HttpStatus.ACCEPTED;
+		}
+		 catch (Exception e) {
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<String>(result, httpStatus);
@@ -107,7 +110,6 @@ public class UserController {
 			} else {
 				httpStatus = HttpStatus.BAD_REQUEST;
 			}
-
 		} catch (Exception e) {
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
@@ -117,26 +119,58 @@ public class UserController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getById")
-	public User getOne(@RequestBody User user) {
-		return userService.getOneById(user.getId());
+	public ResponseEntity<User> getOne(@RequestBody User user) {
+		HttpStatus httpStatus = null;
+		User result = null;
+		try {
+			result = userService.getOneById(user.getId());
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<User>(result, httpStatus);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/users")
+	@GetMapping(value = "/rest/user/users")
 	public ResponseEntity<List<User>> getAllUser() {
-		return new ResponseEntity<List<User>>(userService.findAll(), HttpStatus.OK);
+		HttpStatus httpStatus = null;
+		List<User> result = null;
+		try {
+			result = userService.findAll();
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<List<User>>(result, httpStatus);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getByUsername")
 	public ResponseEntity<Object> getAccountByUsername(@RequestBody User user) {
-		User account = userService.findUsername(user.getUsername());
-		if (account != null) {
-			return new ResponseEntity<Object>(account, HttpStatus.OK);
+		HttpStatus status = null;
+		User account = null;
+		try {
+			account = userService.findUsername(user.getUsername());
+			if (account != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<Object>("Not Found User", HttpStatus.NO_CONTENT);
+		return new ResponseEntity<Object>(account, status);
 	}
 
 	@CrossOrigin
@@ -209,16 +243,20 @@ public class UserController {
 		Long result = null;
 		try {
 			result = userService.getUserMaximunLoanLimit(token);
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Long>(result, httpStatus);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_USER" })
-	@GetMapping(value = "/rest/user/changeUserInfo")
+	@PutMapping(value = "/rest/user/changeUserInfo")
 	public ResponseEntity<Integer> changeUserInfo(@RequestBody User user,
 			@RequestHeader("Authorization") String token) {
 		HttpStatus httpStatus = null;
@@ -239,7 +277,19 @@ public class UserController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@GetMapping(value = "/rest/admin/user/getUsers")
-	public PageDTO<User> listUser(@RequestParam Integer page, @RequestParam Integer element) {
-		return userService.getUsers(page, element);
+	public ResponseEntity<PageDTO<User>> listUser(@RequestParam Integer page, @RequestParam Integer element) {
+		HttpStatus httpStatus = null;
+		PageDTO<User> result = null;
+		try {
+			result = userService.getUsers(page, element);
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<PageDTO<User>>(result, httpStatus);
 	}
 }

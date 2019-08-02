@@ -3,6 +3,8 @@ package capstone.p2plend.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.SendFailedException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,16 +37,15 @@ public class UserService {
 	}
 
 	public String checkUser(String token) {
-		try {
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
-			if (user != null) {
-				return username;
-			}
-			return null;
-		} catch (Exception e) {
+		if (token == null) {
 			return null;
 		}
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
+		if (user != null) {
+			return username;
+		}
+		return null;
 	}
 
 	public User getOneById(int id) {
@@ -59,124 +60,118 @@ public class UserService {
 	}
 
 	public User getOneByUsername(String token) {
-		try {
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
-			
-			if(user == null) {
-				return null;
-			}
-			
-			User account = new User();
-			account.setUsername(user.getUsername());
-			account.setFirstName(user.getFirstName());
-			account.setLastName(user.getLastName());
-			account.setEmail(user.getEmail());
-			account.setPhoneNumber(user.getPhoneNumber());
-			account.setLoanLimit(user.getLoanLimit());
-			return account;
-		} catch (Exception e) {
+		if (token == null) {
 			return null;
 		}
-
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
+		if (user == null) {
+			return null;
+		}
+		User account = new User();
+		account.setUsername(user.getUsername());
+		account.setFirstName(user.getFirstName());
+		account.setLastName(user.getLastName());
+		account.setEmail(user.getEmail());
+		account.setPhoneNumber(user.getPhoneNumber());
+		account.setLoanLimit(user.getLoanLimit());
+		return account;
 	}
 
 	public User findUsername(String username) {
+
+		if (username == null) {
+			return null;
+		}
+
 		return userRepo.findByUsername(username);
 	}
 
 	public User checkLogin(User account) {
-
+		
 		String username = account.getUsername();
 		String password = account.getPassword();
-
+		if(username == null || password == null) {
+			return null;
+		}
 		User checkExist = userRepo.findByUsernameAndPassword(username, password);
-
 		if (checkExist != null && checkExist.getStatus().equals("active")) {
 			return checkExist;
 		}
-
 		return null;
 	}
 
-	public String createAccount(User account) {
-		try {
-
-			if (account.getUsername() == null) {
-				return "Error";
-			}
-			if (account.getPassword() == null) {
-				return "Error";
-			}
-
-			if (account.getFirstName() == null) {
-				return "Error";
-			}
-			if (account.getLastName() == null) {
-				return "Error";
-			}
-
-			if (account.getEmail() == null) {
-				return "Error";
-			}
-			if (account.getPhoneNumber() == null) {
-				return "Error";
-			}
-
-			User usernameExist = userRepo.findByUsername(account.getUsername());
-			if (usernameExist != null) {
-				return "Username existed";
-			}
-
-			User emailExist = userRepo.findByEmail(account.getEmail());
-			if (emailExist != null) {
-				return "Email existed";
-			}
-
-			account.setRole("ROLE_USER");
-			account.setStatus("active");
-			account.setLoanLimit(0L);
-
-			account = userRepo.save(account);
-
-//			emailService.sendSimpleMessage(account.getEmail(), "Welcome to PPLS",
-//					"You have create account successfully in PPLS website");
-
-			return "Account successfully created";
-
-		} catch (Exception e) {
+	public String createAccount(User account) throws SendFailedException {
+		if (account.getUsername() == null) {
 			return "Error";
 		}
-	}
-
-	public boolean activateAccount(int id) {
-		boolean valid = false;
-		try {
-			User account = userRepo.findById(id).get();
-			account.setRole("ROLE_USER");
-			account.setStatus("active");
-			userRepo.save(account);
-			valid = true;
-		} catch (Exception e) {
-			valid = false;
-			return valid;
+		if (account.getPassword() == null) {
+			return "Error";
 		}
-		return valid;
+
+		if (account.getFirstName() == null) {
+			return "Error";
+		}
+		if (account.getLastName() == null) {
+			return "Error";
+		}
+
+		if (account.getEmail() == null) {
+			return "Error";
+		}
+		if (account.getPhoneNumber() == null) {
+			return "Error";
+		}
+
+		User usernameExist = userRepo.findByUsername(account.getUsername());
+		if (usernameExist != null) {
+			return "Username existed";
+		}
+
+		User emailExist = userRepo.findByEmail(account.getEmail());
+		if (emailExist != null) {
+			return "Email existed";
+		}
+
+		account.setRole("ROLE_USER");
+		account.setStatus("active");
+		account.setLoanLimit(0L);
+
+		account = userRepo.save(account);
+
+			emailService.sendSimpleMessage(account.getEmail(), "Welcome to PPLS",
+					"You have create account successfully in PPLS website");
+
+		return "Account successfully created";
+
 	}
 
-	public boolean deactivateAccount(int id) {
-		boolean valid = false;
-		try {
-			User account = userRepo.findById(id).get();
+	public boolean activateAccount(Integer id) {
+		if (id == null)
+			return false;
+
+		User account = userRepo.findById(id).get();
+		if (account == null)
+			return false;
+
+		account.setRole("ROLE_USER");
+		account.setStatus("active");
+		userRepo.save(account);
+
+		return true;
+	}
+
+	public boolean deactivateAccount(Integer id) {
+		if (id == null)
+			return false;
+		User account = userRepo.findById(id).get();
+		if (account == null)
+			return false;
+
 //			account.setRole(null);
-			account.setStatus("deactivate");
-			userRepo.save(account);
-			valid = true;
-		} catch (Exception e) {
-			valid = false;
-			return valid;
-		}
-		return valid;
+		account.setStatus("deactivate");
+		userRepo.save(account);
+		return true;
 	}
 
 	public boolean changeLoanLimit(Integer id, Long loanLimit) {
@@ -212,63 +207,73 @@ public class UserService {
 	}
 
 	public Long getUserMaximunLoanLimit(String token) {
-		try {
 
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
 
-			Long loanLimit = user.getLoanLimit();
+		if (user == null) {
+			return null;
+		}
 
-			List<Request> lstRequest = requestRepo.findListAllUserRequestByExceptStatus(user.getId(), "done");
+		Long loanLimit = user.getLoanLimit();
 
-			Long currentLoanAmount = 0L;
+		if (loanLimit == null) {
+			return null;
+		}
 
-			for (Request r : lstRequest) {
-				currentLoanAmount += r.getAmount();
-			}
+		List<Request> lstRequest = requestRepo.findListAllUserRequestByExceptStatus(user.getId(), "done");
 
-			if (loanLimit - currentLoanAmount < 0) {
-				return 0L;
-			}
+		if (lstRequest == null) {
+			return null;
+		}
 
-			return loanLimit - currentLoanAmount;
+		Long currentLoanAmount = 0L;
 
-		} catch (Exception e) {
+		for (Request r : lstRequest) {
+			currentLoanAmount += r.getAmount();
+		}
+
+		if (loanLimit - currentLoanAmount < 0) {
 			return 0L;
 		}
+
+		return loanLimit - currentLoanAmount;
+
 	}
 
 	public boolean changeUserInfo(User user, String token) {
-		try {
-			String username = jwtService.getUsernameFromToken(token);
-			User existUser = userRepo.findByUsername(username);
 
-			if (user.getFirstName() != null) {
-				existUser.setFirstName(user.getFirstName());
-			}
-
-			if (user.getLastName() != null) {
-				existUser.setLastName(user.getLastName());
-			}
-
-			if (user.getPhoneNumber() != null) {
-				existUser.setPhoneNumber(user.getPhoneNumber());
-			}
-
-			if (user.getEmail() != null) {
-				existUser.setEmail(user.getEmail());
-			}
-
-			User savedUser = userRepo.saveAndFlush(existUser);
-
-			if (savedUser != null) {
-				return true;
-			}
-
-			return false;
-		} catch (Exception e) {
-			// TODO: handle exception
+		if (user == null || token == null) {
 			return false;
 		}
+
+		String username = jwtService.getUsernameFromToken(token);
+		User existUser = userRepo.findByUsername(username);
+
+		if (user.getFirstName() != null) {
+			existUser.setFirstName(user.getFirstName());
+		}
+		if (user.getLastName() != null) {
+			existUser.setLastName(user.getLastName());
+		}
+		if (user.getPhoneNumber() != null) {
+			existUser.setPhoneNumber(user.getPhoneNumber());
+		}
+		if (user.getEmail() != null) {
+			existUser.setEmail(user.getEmail());
+		}
+
+		User savedUser = userRepo.saveAndFlush(existUser);
+
+		if (savedUser != null) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public boolean changePassword(String oldPassword, String newPassword, String token) {
+
+		return false;
 	}
 }

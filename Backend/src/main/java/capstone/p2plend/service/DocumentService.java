@@ -1,5 +1,6 @@
 package capstone.p2plend.service;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,249 +41,233 @@ public class DocumentService {
 	@Autowired
 	UserRepository userRepo;
 
-	public boolean uploadDocument(Integer docTypeId, String token, MultipartFile[] mf) {
-		try {
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
-			if (docTypeId == null || docTypeId == 2) {
-				return false;
-			}
-			Document iDoc = new Document();
+	public boolean uploadDocument(Integer docTypeId, String token, MultipartFile[] mf) throws IOException {
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
+		if (docTypeId == null || docTypeId == 2 || user == null || username == null) {
+			return false;
+		}
+		Document iDoc = new Document();
 
-			Document checkExistDocument = docRepo.findUserDocumentExceptStatus(docTypeId, user.getId(), "invalid");
-			if (checkExistDocument != null) {
-				return false;
-			}
+		Document checkExistDocument = docRepo.findUserDocumentExceptStatus(docTypeId, user.getId(), "invalid");
+		if (checkExistDocument != null) {
+			return false;
+		}
 
-			checkExistDocument = docRepo.findUserDocumentWithStatus(docTypeId, user.getId(), "invalid");
-			if (checkExistDocument != null) {
-				iDoc = checkExistDocument;
-				docFileRepo.deleteByDocId(checkExistDocument.getId());
-			}
+		checkExistDocument = docRepo.findUserDocumentWithStatus(docTypeId, user.getId(), "invalid");
+		if (checkExistDocument != null) {
+			iDoc = checkExistDocument;
+			docFileRepo.deleteByDocId(checkExistDocument.getId());
+		}
 
-			DocumentType docType = docTypeRepo.findById(docTypeId).get();
+		DocumentType docType = docTypeRepo.findById(docTypeId).get();
 
-			iDoc.setDocumentType(docType);
-			iDoc.setStatus("pending");
-			iDoc.setUser(user);
-			Document savedDoc = docRepo.saveAndFlush(iDoc);
+		iDoc.setDocumentType(docType);
+		iDoc.setStatus("pending");
+		iDoc.setUser(user);
+		Document savedDoc = docRepo.saveAndFlush(iDoc);
 
-			int totalFile = mf.length;
-			for (int i = 0; i < totalFile; i++) {
-
-				String fileName = StringUtils.cleanPath(mf[i].getOriginalFilename());
+		int totalFile = mf.length;
+		for (int i = 0; i < totalFile; i++) {
+			String fileName = StringUtils.cleanPath(mf[i].getOriginalFilename());
 //				if (fileName.contains("..")) {
 //					return false;
 ////		                throw new FileStorageException("Sorry! Filename contains invalid path sequence " + fileName);
 //				}
-				DocumentFile df = new DocumentFile();
-				df.setFileName(fileName);
-				df.setFileType(mf[i].getContentType());
-				df.setData(mf[i].getBytes());
-				df.setDocument(savedDoc);
-				docFileRepo.saveAndFlush(df);
-
-			}
-
-			return true;
-		} catch (Exception e) {
-			return false;
+			DocumentFile df = new DocumentFile();
+			df.setFileName(fileName);
+			df.setFileType(mf[i].getContentType());
+			df.setData(mf[i].getBytes());
+			df.setDocument(savedDoc);
+			docFileRepo.saveAndFlush(df);
 		}
+		return true;
 	}
 
 	public boolean uploadVideo(Integer docTypeId, String fileType, String token, String base64Video) {
-		try {
+		if (base64Video == null || token == null) {
+			return false;
+		}
+		String[] splits = base64Video.split(",");
+		String base64 = splits[1];
+		System.out.println(splits[0]);
 
-			String[] splits = base64Video.split(",");
-			String base64 = splits[1];
-			System.out.println(splits[0]);
+		boolean checkBase64 = Base64.isBase64(base64);
+		if (checkBase64 == false) {
+			return false;
+		}
 
-			boolean checkBase64 = Base64.isBase64(base64);
-			if (checkBase64 == false) {
-				return false;
-			}
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
+		if (docTypeId == null || docTypeId != 2) {
+			return false;
+		}
+		Document iDoc = new Document();
 
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
-			if (docTypeId == null || docTypeId != 2) {
-				return false;
-			}
-			Document iDoc = new Document();
+		Document checkExistDocument = docRepo.findUserDocumentExceptStatus(docTypeId, user.getId(), "invalid");
+		if (checkExistDocument != null) {
+			return false;
+		}
 
-			Document checkExistDocument = docRepo.findUserDocumentExceptStatus(docTypeId, user.getId(), "invalid");
-			if (checkExistDocument != null) {
-				return false;
-			}
+		checkExistDocument = docRepo.findUserDocumentWithStatus(docTypeId, user.getId(), "invalid");
+		if (checkExistDocument != null) {
+			iDoc = checkExistDocument;
+			docFileRepo.deleteByDocId(checkExistDocument.getId());
+		}
 
-			checkExistDocument = docRepo.findUserDocumentWithStatus(docTypeId, user.getId(), "invalid");
-			if (checkExistDocument != null) {
-				iDoc = checkExistDocument;
-				docFileRepo.deleteByDocId(checkExistDocument.getId());
-			}
+		DocumentType docType = docTypeRepo.findById(docTypeId).get();
 
-			DocumentType docType = docTypeRepo.findById(docTypeId).get();
-
-			iDoc.setDocumentType(docType);
-			iDoc.setStatus("pending");
-			iDoc.setUser(user);
-			Document savedDoc = docRepo.saveAndFlush(iDoc);
+		iDoc.setDocumentType(docType);
+		iDoc.setStatus("pending");
+		iDoc.setUser(user);
+		Document savedDoc = docRepo.saveAndFlush(iDoc);
 
 //			byte[] name = Base64.getEncoder().encode((base64Video.getBytes()));
 //			byte[] decodedString = Base64.getDecoder().decode(new String(name).getBytes("UTF-8"));
 //            System.out.println(new String(decodedString));
 
-			byte[] byteArray = Base64.decodeBase64(base64.getBytes());
+		byte[] byteArray = Base64.decodeBase64(base64.getBytes());
 
-			DocumentFile df = new DocumentFile();
-			df.setFileName(username + "_Video");
-			df.setData(byteArray);
-			df.setFileType(fileType);
-			df.setDocument(savedDoc);
-			docFileRepo.saveAndFlush(df);
+		DocumentFile df = new DocumentFile();
+		df.setFileName(username + "_Video");
+		df.setData(byteArray);
+		df.setFileType(fileType);
+		df.setDocument(savedDoc);
+		docFileRepo.saveAndFlush(df);
 
-			return true;
-		} catch (Exception e) {
-			return false; // TODO: handle exception
-		}
+		return true;
 	}
 
 	public List<Document> getUserDocument(String token) {
-		try {
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
-			List<Document> lstDoc = user.getDocument();
-			for (Document d : lstDoc) {
-				d.setUser(null);
-			}
-			return lstDoc;
-		} catch (Exception e) {
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
+		List<Document> lstDoc = user.getDocument();
+		if (lstDoc == null) {
 			return null;
 		}
+		for (Document d : lstDoc) {
+			d.setUser(null);
+		}
+		return lstDoc;
 
 	}
 
 	public List<Document> getAllUserDocument(String username) {
-		try {
-			User user = userRepo.findByUsername(username);
-			List<Document> lstDoc = user.getDocument();
-			for (Document d : lstDoc) {
-				d.setUser(null);
-			}
-			return lstDoc;
-		} catch (Exception e) {
+		User user = userRepo.findByUsername(username);
+		if (user == null) {
 			return null;
 		}
-
+		List<Document> lstDoc = user.getDocument();
+		if (lstDoc == null) {
+			return null;
+		}
+		for (Document d : lstDoc) {
+			d.setUser(null);
+		}
+		return lstDoc;
 	}
 
 	public boolean validDocumentId(Document document) {
-		try {
-
-			if (document.getDocumentId() == null) {
-				return false;
-			}
-
-			Document checkDocExist = docRepo.findById(document.getId()).get();
-
-			// Receive document with id and docId
-			Document findDoc = docRepo.findByDocumentIdAndDocumentType(document.getDocumentId(),
-					checkDocExist.getDocumentType().getId());
-			if (findDoc != null) {
-				return false;
-			}
-
-			Document existDoc = docRepo.findById(document.getId()).get();
-			existDoc.setDocumentId(document.getDocumentId());
-			existDoc.setStatus("valid");
-			docRepo.saveAndFlush(existDoc);
-
-			User user = existDoc.getUser();
-			List<Document> lstUserDocument = user.getDocument();
-
-			Long limit = 0L;
-			int count = 0;
-			for (Document d : lstUserDocument) {
-				if (d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
-						&& d.getStatus().equalsIgnoreCase("valid")) {
-					limit += d.getDocumentType().getAmountLimit();
-					count = 1;
-
-				}
-			}
-
-			if (count == 1) {
-				for (Document d : lstUserDocument) {
-					if (d.getDocumentType().getName().equalsIgnoreCase("Video")
-							&& d.getStatus().equalsIgnoreCase("valid")) {
-						limit += d.getDocumentType().getAmountLimit();
-						user.setLoanLimit(limit);
-						user = userRepo.save(user);
-						count = 2;
-					}
-				}
-			}
-
-			if (count == 2) {
-
-				for (int i = 0; i < lstUserDocument.size(); i++) {
-					Document d = lstUserDocument.get(i);
-					if (!d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
-							&& !d.getDocumentType().getName().equalsIgnoreCase("Video")
-							&& d.getStatus().equalsIgnoreCase("valid")) {
-						limit += d.getDocumentType().getAmountLimit();
-						user.setLoanLimit(limit);
-						user = userRepo.save(user);
-					}
-				}
-			}
-
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
+		if (document.getDocumentId() == null) {
 			return false;
 		}
+
+		Document checkDocExist = docRepo.findById(document.getId()).get();
+
+		// Receive document with id and docId
+		Document findDoc = docRepo.findByDocumentIdAndDocumentType(document.getDocumentId(),
+				checkDocExist.getDocumentType().getId());
+		if (findDoc != null) {
+			return false;
+		}
+
+		Document existDoc = docRepo.findById(document.getId()).get();
+		existDoc.setDocumentId(document.getDocumentId());
+		existDoc.setStatus("valid");
+		docRepo.save(existDoc);
+
+		User user = existDoc.getUser();
+		List<Document> lstUserDocument = user.getDocument();
+
+		Long limit = 0L;
+		int count = 0;
+		for (Document d : lstUserDocument) {
+			if (d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
+					&& d.getStatus().equalsIgnoreCase("valid")) {
+				limit += d.getDocumentType().getAmountLimit();
+				count = 1;
+
+			}
+		}
+
+		if (count == 1) {
+			for (Document d : lstUserDocument) {
+				if (d.getDocumentType().getName().equalsIgnoreCase("Video")
+						&& d.getStatus().equalsIgnoreCase("valid")) {
+					limit += d.getDocumentType().getAmountLimit();
+					user.setLoanLimit(limit);
+					user = userRepo.save(user);
+					count = 2;
+				}
+			}
+		}
+
+		if (count == 2) {
+			for (int i = 0; i < lstUserDocument.size(); i++) {
+				Document d = lstUserDocument.get(i);
+				if (!d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
+						&& !d.getDocumentType().getName().equalsIgnoreCase("Video")
+						&& d.getStatus().equalsIgnoreCase("valid")) {
+					limit += d.getDocumentType().getAmountLimit();
+					user.setLoanLimit(limit);
+					user = userRepo.save(user);
+				}
+			}
+		}
+
+		return true;
 	}
 
 	public PageDTO<Document> getAllPendingDocument(Integer page, Integer element) {
-		try {
-			Pageable pageable = PageRequest.of(page - 1, element);
-			Page<Document> lstDoc = docRepo.findAllDocumentWithStatus(pageable, "pending");
-			for (Document d : lstDoc) {
-				User user = new User();
-				user.setUsername(d.getUser().getUsername());
-				user.setFirstName(d.getUser().getFirstName());
-				user.setLastName(d.getUser().getLastName());
-				d.setUser(user);
-
-				d.setDocumentId(null);
-				d.setDocumentFile(null);
-			}
-
-			PageDTO<Document> pageDTO = new PageDTO<>();
-			pageDTO.setMaxPage(lstDoc.getTotalPages());
-			pageDTO.setData(lstDoc.getContent());
-
-			return pageDTO;
-
-		} catch (Exception e) {
+		if (page == null || element == null) {
 			return null;
 		}
+		Pageable pageable = PageRequest.of(page - 1, element);
+		Page<Document> lstDoc = docRepo.findAllDocumentWithStatus(pageable, "pending");
+		if (lstDoc == null) {
+			return null;
+		}
+		for (Document d : lstDoc) {
+			User user = new User();
+			user.setUsername(d.getUser().getUsername());
+			user.setFirstName(d.getUser().getFirstName());
+			user.setLastName(d.getUser().getLastName());
+			d.setUser(user);
+
+			d.setDocumentId(null);
+			d.setDocumentFile(null);
+		}
+
+		PageDTO<Document> pageDTO = new PageDTO<>();
+		pageDTO.setMaxPage(lstDoc.getTotalPages());
+		pageDTO.setData(lstDoc.getContent());
+
+		return pageDTO;
+
 	}
 
 	public boolean invalidDocumentId(Integer id) {
-		try {
-
-			if (id == null) {
-				return false;
-			}
-
-			Document existDoc = docRepo.findById(id).get();
-			existDoc.setStatus("invalid");
-			docRepo.saveAndFlush(existDoc);
-
-			return true;
-		} catch (Exception e) {
+		if (id == null) {
 			return false;
 		}
+
+		Document existDoc = docRepo.findById(id).get();
+		if (existDoc == null) {
+			return false;
+		}
+		existDoc.setStatus("invalid");
+		docRepo.saveAndFlush(existDoc);
+
+		return true;
 	}
 }

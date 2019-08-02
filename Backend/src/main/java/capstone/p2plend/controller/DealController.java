@@ -25,7 +25,19 @@ public class DealController {
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/deal/getById")
 	public ResponseEntity<Deal> getOne(@RequestBody Deal deal) {
-		return new ResponseEntity<Deal>(dealService.getOneById(deal.getId()), HttpStatus.OK);
+		HttpStatus status = null;
+		Deal result = null;
+		try {
+			result = dealService.getOneById(deal.getId());
+			if (result != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<Deal>(result, status);
 	}
 
 	@CrossOrigin
@@ -34,14 +46,15 @@ public class DealController {
 	public ResponseEntity<Integer> makeDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
-
-		valid = dealService.makeDeal(deal, token);
-
-		if (valid == true) {
-			status = HttpStatus.OK;
-
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = dealService.makeDeal(deal, token);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
@@ -53,65 +66,74 @@ public class DealController {
 	public ResponseEntity<Integer> acceptDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
-		
-		valid = dealService.acceptDeal(deal, token);
-
-		if (valid == true) {
-			status = HttpStatus.OK;
-
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = dealService.acceptDeal(deal, token);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/deal/cancelDeal")
 	public ResponseEntity<Integer> cancelDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
-		
-		valid = dealService.cancelDeal(deal.getId(), token);
-		
-		if (valid == true) {
-			status = HttpStatus.OK;
-			
-		} else {
-			status = HttpStatus.BAD_REQUEST;
-		}
-		
-		return new ResponseEntity<Integer>(status.value(), status);
-	}
-
-	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@PostMapping(value = "/rest/deal/newDeal")
-	public ResponseEntity<Integer> newTransaction(@RequestBody Deal deal) {
-		HttpStatus status = null;
-		boolean valid = false;
-		valid = dealService.newDeal(deal);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = dealService.cancelDeal(deal.getId(), token);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
-	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@PutMapping(value = "/rest/deal/updateDeal")
-	public ResponseEntity<Integer> updateDeal(@RequestBody Deal deal) {
-		HttpStatus status = null;
-		boolean valid = false;
-		valid = dealService.updateDeal(deal);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
-		}
-		return new ResponseEntity<Integer>(status.value(), status);
-	}
+//	@CrossOrigin
+//	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+//	@PostMapping(value = "/rest/deal/newDeal")
+//	public ResponseEntity<Integer> newTransaction(@RequestBody Deal deal) {
+//		HttpStatus status = null;
+//		boolean valid = false;
+//		try {
+//			valid = dealService.newDeal(deal);
+//			if (valid == true) {
+//				status = HttpStatus.OK;
+//			} else {
+//				status = HttpStatus.BAD_REQUEST;
+//			}
+//		} catch (Exception e) {
+//			status = HttpStatus.INTERNAL_SERVER_ERROR;
+//		}
+//		return new ResponseEntity<Integer>(status.value(), status);
+//	}
+
+//	@CrossOrigin
+//	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+//	@PutMapping(value = "/rest/deal/updateDeal")
+//	public ResponseEntity<Integer> updateDeal(@RequestBody Deal deal) {
+//		HttpStatus status = null;
+//		boolean valid = false;
+//		try {
+//			valid = dealService.updateDeal(deal);
+//			if (valid == true) {
+//				status = HttpStatus.OK;
+//			} else {
+//				status = HttpStatus.BAD_REQUEST;
+//			}
+//		} catch (Exception e) {
+//			status = HttpStatus.INTERNAL_SERVER_ERROR;
+//		}
+//
+//		return new ResponseEntity<Integer>(status.value(), status);
+//	}
 }
