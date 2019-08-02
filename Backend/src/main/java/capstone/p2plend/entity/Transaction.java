@@ -30,13 +30,13 @@ public class Transaction {
 	private String idTrx;
 
 	@Column
-	private Long amountValid;
+	private Double amountValid;
 
 	@Column
 	private String receiver;
 
 	@Column
-	private Long amount;
+	private Double amount;
 
 	@JsonInclude(JsonInclude.Include.ALWAYS)
 	@Column
@@ -77,11 +77,11 @@ public class Transaction {
 		this.idTrx = idTrx;
 	}
 
-	public Long getAmountValid() {
+	public Double getAmountValid() {
 		return amountValid;
 	}
 
-	public void setAmountValid(Long amountValid) {
+	public void setAmountValid(Double amountValid) {
 		this.amountValid = amountValid;
 	}
 
@@ -93,11 +93,11 @@ public class Transaction {
 		this.receiver = receiver;
 	}
 
-	public Long getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Long amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 

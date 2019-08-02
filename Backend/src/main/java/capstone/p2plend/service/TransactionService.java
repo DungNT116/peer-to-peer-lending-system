@@ -10,11 +10,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import capstone.p2plend.dto.PageDTO;
+import capstone.p2plend.entity.Deal;
 import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.entity.Request;
 import capstone.p2plend.entity.Transaction;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.repo.MilestoneRepository;
+import capstone.p2plend.repo.RequestRepository;
 import capstone.p2plend.repo.TransactionRepository;
 import capstone.p2plend.repo.UserRepository;
 
@@ -29,6 +31,9 @@ public class TransactionService {
 
 	@Autowired
 	UserRepository userRepo;
+
+	@Autowired
+	RequestRepository requestRepo;
 
 	@Autowired
 	JwtService jwtService;
@@ -91,28 +96,39 @@ public class TransactionService {
 	}
 
 	public boolean newTransaction(Transaction transaction) {
-
-			if (transaction.getMilestone().getId() == null) {
-				return false;
+		if (transaction.getMilestone().getId() == null) {
+			return false;
+		}
+		Milestone existMilestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
+		if (existMilestone.getTransaction() != null) {
+			return false;
+		}
+		Milestone milestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
+		if (transaction.getAmount() == null || transaction.getCreateDate() == null || transaction.getIdTrx() == null
+				|| transaction.getReceiver() == null || transaction.getSender() == null
+				|| transaction.getStatus() == null || transaction.getAmountValid() == null) {
+			return false;
+		}
+		transaction.setMilestone(milestone);
+		Transaction savedTrx = transactionRepo.saveAndFlush(transaction);
+		if (savedTrx == null) {
+			return false;
+		}
+		Deal savedDeal = savedTrx.getMilestone().getDeal();
+		List<Milestone> lstMilestone = savedDeal.getMilestone();
+		int countComplete = 0;
+		for (int i = 0; i < lstMilestone.size(); i++) {
+			Milestone m = lstMilestone.get(i);
+			if (m.getTransaction().getStatus().equalsIgnoreCase("completed")) {
+				countComplete++;
 			}
-
-			Milestone existMilestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
-			if (existMilestone.getTransaction() != null) {
-				return false;
-			}
-
-			Milestone milestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
-
-			if (transaction.getAmount() == null || transaction.getCreateDate() == null || transaction.getIdTrx() == null
-					|| transaction.getReceiver() == null || transaction.getSender() == null
-					|| transaction.getStatus() == null || transaction.getAmountValid() == null) {
-				return false;
-			}
-
-			transaction.setMilestone(milestone);
-			transactionRepo.saveAndFlush(transaction);
-
-			return true;
+		}
+		if (countComplete == lstMilestone.size()) {
+			Request request = savedTrx.getMilestone().getDeal().getRequest();
+			request.setStatus("done");
+			requestRepo.save(request);
+		}
+		return true;
 	}
 
 	public boolean updateTransaction(Transaction transaction) {
