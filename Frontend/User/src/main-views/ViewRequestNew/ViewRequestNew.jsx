@@ -422,7 +422,7 @@ class ViewRequestNew extends React.Component {
                                 <tr>
                                   <th>Id</th>
                                   <th>Amount</th>
-                                  <th>CreateDate</th>
+                                  <th>Create Date</th>
                                   <th>Duration</th>
                                   <th>Status</th>
                                   <th>View detail</th>
@@ -448,7 +448,7 @@ class ViewRequestNew extends React.Component {
                                 <tr>
                                   <th>Id</th>
                                   <th>Amount</th>
-                                  <th>CreateDate</th>
+                                  <th>Create Date</th>
                                   <th>Duration</th>
                                   <th>Status</th>
                                   <th>View detail</th>

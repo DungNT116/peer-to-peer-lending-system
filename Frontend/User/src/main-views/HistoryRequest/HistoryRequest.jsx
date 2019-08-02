@@ -111,6 +111,9 @@ class HistoryRequest extends React.Component {
     this.refs.main.scrollTop = 0;
     this.getRequest();
   }
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   render() {
     const listItems = this.state.historyRequests.map(request => (
       <tr>
@@ -119,7 +122,7 @@ class HistoryRequest extends React.Component {
             {request.id}
           </Col>
         </td>
-        <td>{request.amount} VND</td>
+        <td>{this.numberWithCommas(request.amount)} VND</td>
         {/* <td>{request.dueDate}</td> */}
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>
@@ -212,10 +215,10 @@ class HistoryRequest extends React.Component {
                               <th>Id</th>
                               <th>Amount</th>
                               {/* <th>DueDate</th> */}
-                              <th>CreateDate</th>
+                              <th>Create Date</th>
                               <th>Duration</th>
-                              <th>status</th>
-                              <th>detail</th>
+                              <th>Status</th>
+                              <th>Detail</th>
                             </tr>
                           </thead>
                           <tbody>{listItems}</tbody>

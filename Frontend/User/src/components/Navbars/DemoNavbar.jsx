@@ -98,7 +98,7 @@ class DemoNavbar extends React.Component {
     var upvotesRef = database.ref(
       "/ppls/" + this.state.keyUserFb + "/countNew"
     );
-    upvotesRef.transaction(function (current_value) {
+    upvotesRef.transaction(function(current_value) {
       return (current_value -= current_value);
     });
   }
@@ -109,7 +109,7 @@ class DemoNavbar extends React.Component {
     var upvotesRef = database.ref(
       "/ppls/" + this.state.keyUserFb + "/countNew"
     );
-    upvotesRef.transaction(function (current_value) {
+    upvotesRef.transaction(function(current_value) {
       return (current_value || 0) + 1;
     });
 
@@ -181,14 +181,11 @@ class DemoNavbar extends React.Component {
                         <DropdownItem to="/view-history-request" tag={Link}>
                           View History Request
                         </DropdownItem>
-                        <DropdownItem to="/view-request-trading" tag={Link}>
-                          View Request Trading
-                        </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                      ""
-                    )}
+                    ""
+                  )}
                   {localStorage.getItem("isLoggedIn") ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
@@ -202,8 +199,8 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                      ""
-                    )}
+                    ""
+                  )}
                   {localStorage.getItem("isLoggedIn") ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
@@ -216,15 +213,17 @@ class DemoNavbar extends React.Component {
                         <DropdownItem to="/view-new-request" tag={Link}>
                           Own Requests
                         </DropdownItem>
-
                         <DropdownItem to="/view-own-transactions" tag={Link}>
                           Own Transactions
+                        </DropdownItem>
+                        <DropdownItem to="/view-request-trading" tag={Link}>
+                          Requests Trading
                         </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                      ""
-                    )}
+                    ""
+                  )}
                 </Nav>
                 <Nav
                   className="align-items-lg-center navbar-nav-hover ml-lg-auto"
@@ -234,33 +233,33 @@ class DemoNavbar extends React.Component {
                     {localStorage.getItem("isLoggedIn") ? (
                       ""
                     ) : (
-                        <Button
-                          className="btn-neutral btn-icon"
-                          color="default"
-                          href="/login-page"
-                        >
-                          <span className="btn-inner--icon">
-                            <i className="fa fa-user mr-2" />
-                          </span>
-                          <span className="nav-link-inner--text ml-1">Login</span>
-                        </Button>
-                      )}
+                      <Button
+                        className="btn-neutral btn-icon"
+                        color="default"
+                        href="/login-page"
+                      >
+                        <span className="btn-inner--icon">
+                          <i className="fa fa-user mr-2" />
+                        </span>
+                        <span className="nav-link-inner--text ml-1">Login</span>
+                      </Button>
+                    )}
                     {localStorage.getItem("isLoggedIn") ? (
                       ""
                     ) : (
-                        <Button
-                          className="btn-neutral btn-icon"
-                          color="default"
-                          href="/register-page"
-                        >
-                          <span className="btn-inner--icon">
-                            <i className="ni ni-key-25 mr-2" />
-                          </span>
-                          <span className="nav-link-inner--text ml-1">
-                            register
+                      <Button
+                        className="btn-neutral btn-icon"
+                        color="default"
+                        href="/register-page"
+                      >
+                        <span className="btn-inner--icon">
+                          <i className="ni ni-key-25 mr-2" />
                         </span>
-                        </Button>
-                      )}
+                        <span className="nav-link-inner--text ml-1">
+                          register
+                        </span>
+                      </Button>
+                    )}
                     {localStorage.getItem("isLoggedIn") ? (
                       <div>
                         <UncontrolledDropdown nav>
@@ -287,19 +286,28 @@ class DemoNavbar extends React.Component {
                                 Notification
                               </h6>
                             </DropdownItem>
-                            {this.state.notifications.map((noti, index) => {
-                              return (
-                                <div key={index}>
-                                  <DropdownItem divider />
-                                  <DropdownItem href="#">
-                                    <span onClick={this.onResetCountView}>
-                                      {noti.message}
-                                    </span>
-                                    <strong>{" - " + noti.user}</strong>
-                                  </DropdownItem>
-                                </div>
-                              );
-                            })}
+                            <div
+                              style={{
+                                height: "auto",
+                                maxHeight: "200px",
+                                overflowX: "hidden"
+                              }}
+                            >
+                              {this.state.notifications.map((noti, index) => {
+                                return (
+                                  <div key={index}>
+                                    <DropdownItem divider />
+                                    <DropdownItem
+                                      href="#"
+                                      onClick={this.onResetCountView}
+                                    >
+                                      <span>{noti.message}</span>
+                                      <strong>{" - " + noti.user}</strong>
+                                    </DropdownItem>
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </DropdownMenu>
                         </UncontrolledDropdown>
                         <UncontrolledDropdown nav>
@@ -308,7 +316,7 @@ class DemoNavbar extends React.Component {
                               <span className="avatar avatar-sm rounded-circle">
                                 <img
                                   alt="..."
-                                  src={require("assets/img/theme/team-4-800x800.jpg")}
+                                  src={require("assets/img/theme/team-4-800x800.png")}
                                 />
                               </span>
                               <Media className="ml-2 d-none d-lg-block">
@@ -355,8 +363,8 @@ class DemoNavbar extends React.Component {
                         </UncontrolledDropdown>
                       </div>
                     ) : (
-                        ""
-                      )}
+                      ""
+                    )}
                   </NavItem>
                 </Nav>
               </UncontrolledCollapse>

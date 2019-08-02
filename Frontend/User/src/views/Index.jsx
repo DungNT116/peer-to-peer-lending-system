@@ -79,7 +79,7 @@ class Index extends React.Component {
 
   changeCurrency(inputMoney) {
     var money;
-    if (inputMoney % 500000 != 0) {
+    if (inputMoney % 500000 !== 0) {
       money = inputMoney - (inputMoney % 500000);
     }
     return money;
@@ -166,10 +166,10 @@ class Index extends React.Component {
         setTimeout(
           function() {
             if (
-              this.state.validTx.sender == true &&
-              this.state.validTx.receiver == true &&
-              this.state.validTx.amount == true &&
-              this.state.validTx.createDate == true
+              this.state.validTx.sender === true &&
+              this.state.validTx.receiver === true &&
+              this.state.validTx.amount === true &&
+              this.state.validTx.createDate === true
             ) {
               this.setState({
                 validTx: {
@@ -234,7 +234,7 @@ class Index extends React.Component {
               Valid transaction
             </ModalHeader>
             <ModalBody>
-              {this.state.validTx.idTrx == "" ? (
+              {this.state.validTx.idTrx === "" ? (
                 <div>
                   <FormGroup row className="py-2">
                     <Col md="6">Check Sender</Col>

@@ -217,8 +217,8 @@ class ViewRequestList extends React.Component {
                             <tr>
                               <th>Id</th>
                               <th>Amount</th>
-                              <th>user</th>
-                              <th>CreateDate</th>
+                              <th>User</th>
+                              <th>Create Date</th>
                               <th>Duration</th>
                               <th>View Detail</th>
                             </tr>

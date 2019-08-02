@@ -338,7 +338,6 @@ class ViewDetailRequest extends React.Component {
         this.convertTimeStampToDate(element.presentDate)
       );
       milestoneTimeline.percent = element.percent;
-      milestoneTimeline.status = "data is nothing";
       if (element.type === "lend") {
         numberOfLendingMilestones++;
         lendingTimeline.push(milestoneTimeline);
@@ -373,21 +372,7 @@ class ViewDetailRequest extends React.Component {
   }
 
   send_tx = () => {
-    // http://capstone.ppls.cf:5000/search_transaction_by_metadata
-    // let numberOfTransaction = 0;
     let user = localStorage.getItem("user");
-    // fetch(bigchainAPI + "/search_transaction_by_metadata", {
-    //   method: "POST",
-    //   body: JSON.stringify({
-    //     userId: user
-    //   })
-    // }).then(result => {
-    //   result.json().then(data => {
-    //     numberOfTransaction = data.length;
-    //     console.log(numberOfTransaction);
-    //     console.log(data.length);
-    //   });
-    // });
 
     let data_transaction = {
       data_tx: {
@@ -401,8 +386,6 @@ class ViewDetailRequest extends React.Component {
         }
       },
       metadata_tx: {
-        // userId: this.state.userId,
-        // createDate: this.state.createDate
         userId: user,
         createDate: this.state.data_tx.createDate
       }
@@ -825,16 +808,19 @@ class ViewDetailRequest extends React.Component {
                                 <i className="ni ni-cloud-download-95" /> Save
                                 Deal
                               </Button>{" "}
-                              <Button
-                                type="submit"
-                                id="acceptButton"
-                                size="md"
-                                className="btn btn-outline-primary"
-                                onClick={this.toggleModal}
-                                disabled={this.state.editable}
-                              >
-                                <i className="ni ni-check-bold" /> Accept
-                              </Button>{" "}
+                              {this.props.borrowerUser == localStorage.getItem("user") ? ("") : (
+                                 <Button
+                                 type="submit"
+                                 id="acceptButton"
+                                 size="md"
+                                 className="btn btn-outline-primary"
+                                 onClick={this.toggleModal}
+                                 disabled={this.state.editable}
+                               >
+                                 <i className="ni ni-check-bold" /> Accept
+                               </Button>
+                              )}
+                             
                             </CardFooter>
                             {/* save deal */}
                             <Modal

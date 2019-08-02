@@ -13,14 +13,14 @@ import {
   InputGroup,
   Container,
   Row,
-  Col
+  Col,
+  Modal
 } from "reactstrap";
 
 import { database } from "../../firebase";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
-
 //api link
 import { apiLink } from "../../api.jsx";
 
@@ -42,9 +42,11 @@ class Register extends React.Component {
       validEmail: false,
       validPhone: false,
       isDisable: "",
-      checkBoxValue: false
-    };
+      checkBoxValue: false,
 
+      isOpen: false,
+      loading: false
+    };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleUserNameChange = this.handleUserNameChange.bind(this);
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
@@ -203,39 +205,46 @@ class Register extends React.Component {
         phoneNumber: this.state.phone
       })
     }).then(result => {
-        if(result.status !== 200){
-          // console.log(result)
-        }else if(result.status === 200){
-          result.text().then(async data => {
-            console.log(data)
-            await database.ref("ppls/").push({
-              username: this.state.username,
-              notification: "",
-              countNew: 1
+      if (result.status !== 200) {
+        // console.log(result)
+      } else if (result.status === 200) {
+        result.text().then(async data => {
+          console.log(data);
+
+          await database.ref("ppls/").push({
+            username: this.state.username,
+            notification: "",
+            countNew: 1
+          });
+          await localStorage.setItem("user", this.state.username);
+          const username = localStorage.getItem("user");
+          await database
+            .ref("ppls")
+            .orderByChild("username")
+            .equalTo(username)
+            .once("value", snapshot => {
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+                this.setState({ keyUserFb: Object.keys(userData)[0] });
+              }
             });
-            await localStorage.setItem("user", this.state.username);
-            const username = localStorage.getItem("user");
-            await database
-              .ref("ppls")
-              .orderByChild("username")
-              .equalTo(username)
-              .once("value", snapshot => {
-                if (snapshot.exists()) {
-                  const userData = snapshot.val();
-                  this.setState({ keyUserFb: Object.keys(userData)[0] });
-                }
-              });
-            database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
-              message: "Congratulations ! You have just create account !",
-              sender: "System"
-            });
+          database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+            message: "Congratulations ! You have just create account !",
+            sender: "System"
           });
 
-        }
-      
+          this.setState({
+            isOpen: true
+          });
+        });
+      }
     });
-    // this.props.history.push('/login-page')
-
+    setTimeout(
+      function() {
+        setTimeout(this.props.history.push("/login-page"), 10000);
+      }.bind(this),
+      5000
+    );
     event.preventDefault();
   }
   async toggleCheckboxValue() {
@@ -257,7 +266,26 @@ class Register extends React.Component {
       });
     }
   }
+  toggleModal = stateParam => {
+    this.setState({
+      [stateParam]: !this.state[stateParam]
+    });
+  };
   render() {
+    const style = {
+      profileComponent: {
+        position: "relative",
+        top: -250
+      },
+      myAccount: {
+        position: "relative",
+        top: -150
+      },
+      sameSizeWithParent: {
+        width: "100%",
+        height: "100%"
+      }
+    };
     return (
       <>
         <DemoNavbar />
@@ -275,6 +303,27 @@ class Register extends React.Component {
             </div> */}
             <Container className="pt-lg-md">
               <Row className="justify-content-center">
+                <Modal
+                  className="modal-dialog-centered"
+                  isOpen={this.state.isOpen}
+                  toggle={() => this.toggleModal("defaultModal")}
+                  style={style.sameSizeWithParent}
+                >
+                  {/* <div className="modal-header">
+                    <h3 className="modal-title" id="modal-title-default">
+                      Successfully Created
+                    </h3>
+                  </div> */}
+                  <div className="modal-body">
+                    <h3 className="modal-title" id="modal-title-default">
+                      <img
+                        style={{ width: 50, height: 50 }}
+                        src={require("assets/img/theme/checked.png")}
+                      />
+                      Successfully Created
+                    </h3>
+                  </div>
+                </Modal>
                 <Col lg="7">
                   <Card className="bg-secondary shadow border-0">
                     <CardBody>
