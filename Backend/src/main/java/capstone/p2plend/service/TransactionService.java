@@ -91,9 +91,6 @@ public class TransactionService {
 	}
 
 	public boolean newTransaction(Transaction transaction) {
-			if (transaction.getId() != null) {
-				return false;
-			}
 
 			if (transaction.getMilestone().getId() == null) {
 				return false;

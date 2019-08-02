@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import capstone.p2plend.dto.PageDTO;
@@ -32,6 +33,9 @@ public class UserService {
 
 	@Autowired
 	EmailService emailService;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	public List<User> findAll() {
 		return userRepo.findAll();

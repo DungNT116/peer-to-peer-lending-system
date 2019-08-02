@@ -69,8 +69,8 @@ public class DealService {
 			return false;
 		}
 
-		User existUser = existDeal.getUser();
-		if (existUser.getId() == user.getId()) {
+		User currentUser = existDeal.getUser();
+		if (currentUser.getId() == user.getId()) {
 			return false;
 		}
 
