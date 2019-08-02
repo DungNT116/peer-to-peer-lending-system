@@ -31,12 +31,12 @@ public class Transaction {
 
 	@Column
 	private Long amountValid;
-	
+
 	@Column
 	private String receiver;
 
 	@Column
-	private Integer amount;
+	private Long amount;
 
 	@JsonInclude(JsonInclude.Include.ALWAYS)
 	@Column
@@ -69,6 +69,22 @@ public class Transaction {
 		this.sender = sender;
 	}
 
+	public String getIdTrx() {
+		return idTrx;
+	}
+
+	public void setIdTrx(String idTrx) {
+		this.idTrx = idTrx;
+	}
+
+	public Long getAmountValid() {
+		return amountValid;
+	}
+
+	public void setAmountValid(Long amountValid) {
+		this.amountValid = amountValid;
+	}
+
 	public String getReceiver() {
 		return receiver;
 	}
@@ -77,11 +93,11 @@ public class Transaction {
 		this.receiver = receiver;
 	}
 
-	public Integer getAmount() {
+	public Long getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Integer amount) {
+	public void setAmount(Long amount) {
 		this.amount = amount;
 	}
 
@@ -109,19 +125,4 @@ public class Transaction {
 		this.milestone = milestone;
 	}
 
-	public String getIdTrx() {
-		return idTrx;
-	}
-
-	public void setIdTrx(String idTrx) {
-		this.idTrx = idTrx;
-	}
-
-	public Long getAmountValid() {
-		return amountValid;
-	}
-
-	public void setAmountValid(Long amountValid) {
-		this.amountValid = amountValid;
-	}
 }
