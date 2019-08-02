@@ -115,10 +115,14 @@ public class TransactionService {
 			return false;
 		}
 		Deal savedDeal = savedTrx.getMilestone().getDeal();
-		List<Milestone> lstMilestone = savedDeal.getMilestone();
+		System.out.println(savedDeal.getId());
+		
+		List<Milestone> lstMilestone = milestoneRepo.findListMilestoneByDealId(savedDeal.getId());
 		
 		for (int i = 0; i < lstMilestone.size(); i++) {
 			Milestone m = lstMilestone.get(i);
+			System.out.println(m.getTransaction().getStatus());
+			System.out.println(m.getPercent());
 			if (m.getPercent() == null) {
 				lstMilestone.remove(i);
 			}
@@ -127,7 +131,7 @@ public class TransactionService {
 		int countComplete = 0;
 		for (int i = 0; i < lstMilestone.size(); i++) {
 			Milestone m = lstMilestone.get(i);
-			if (m.getTransaction().getStatus().equalsIgnoreCase("completed")) {
+			if (m.getTransaction().getStatus().equalsIgnoreCase("COMPLETED")) {
 				countComplete++;
 			}
 		}
