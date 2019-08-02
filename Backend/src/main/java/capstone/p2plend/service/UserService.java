@@ -97,9 +97,11 @@ public class UserService {
 		if(account.getUsername() == null || account.getPassword() == null) return null;
 		
 		String username = account.getUsername();
-		String rawPassword = account.getPassword();
+//		String rawPassword = account.getPassword();
 		
-		String password = passwordEncoder.encode(rawPassword);
+//		String password = passwordEncoder.encode(rawPassword);
+		
+		String password = account.getPassword();
 		
 		User checkExist = userRepo.findByUsernameAndPassword(username, password);
 		if (checkExist != null && checkExist.getStatus().equals("active")) {
