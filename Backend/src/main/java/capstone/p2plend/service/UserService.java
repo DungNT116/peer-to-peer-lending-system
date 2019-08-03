@@ -101,6 +101,13 @@ public class UserService {
 		
 //		String password = passwordEncoder.encode(rawPassword);
 		
+		String a = passwordEncoder.encode("1A2");
+		System.out.println(a);
+		String b = passwordEncoder.encode("1A2");
+		System.out.println(b);
+		System.out.println(passwordEncoder.matches(a, b));
+		
+		
 		String password = account.getPassword();
 		
 		User checkExist = userRepo.findByUsernameAndPassword(username, password);
