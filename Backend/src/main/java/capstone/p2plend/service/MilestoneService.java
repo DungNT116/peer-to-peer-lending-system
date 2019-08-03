@@ -11,26 +11,20 @@ public class MilestoneService {
 
 	@Autowired
 	MilestoneRepository milestoneRepo;
-	
+
 	public boolean newMilestone(Milestone milestone) {
-		try {
-
-			milestoneRepo.saveAndFlush(milestone);
-			
-			return true;
-		} catch (Exception e) {
+		if (milestone == null) {
 			return false;
 		}
+		milestoneRepo.saveAndFlush(milestone);
+		return true;
 	}
-	
-	public boolean updateMilestone(Milestone milestone) {
-		try {
 
-			milestoneRepo.saveAndFlush(milestone);
-			
-			return true;
-		} catch (Exception e) {
+	public boolean updateMilestone(Milestone milestone) {
+		if (milestone == null) {
 			return false;
 		}
+		milestoneRepo.saveAndFlush(milestone);
+		return true;
 	}
 }

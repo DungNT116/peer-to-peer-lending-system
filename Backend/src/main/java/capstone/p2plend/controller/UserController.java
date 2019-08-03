@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.mail.SendFailedException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -37,10 +38,10 @@ public class UserController {
 		LoginRespone result;
 		String message;
 		HttpStatus httpStatus = null;
-		User user = userService.checkLogin(account);
 		try {
+			User user = userService.checkLogin(account);
 			if (user != null) {
-				String token = jwtService.generateTokenLogin(account.getUsername());
+				String token = jwtService.generateTokenLogin(user.getUsername());
 				message = "login successful";
 				result = new LoginRespone(token, user.getUsername(), user.getRole(), message);
 				httpStatus = HttpStatus.OK;
@@ -61,18 +62,18 @@ public class UserController {
 	@PostMapping(value = "/rest/user/createUser")
 	public ResponseEntity<String> createAccount(@RequestBody User user) {
 		HttpStatus httpStatus = null;
-		String result = "";
+		String result = null;
 		try {
 			result = userService.createAccount(user);
-
 			if (result.equalsIgnoreCase("Account successfully created")) {
 				httpStatus = HttpStatus.OK;
-				return new ResponseEntity<String>(result, httpStatus);
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
 			}
-
-			httpStatus = HttpStatus.BAD_REQUEST;
+		} catch (SendFailedException sfe) {
+			httpStatus = HttpStatus.ACCEPTED;
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<String>(result, httpStatus);
 	}
@@ -81,26 +82,74 @@ public class UserController {
 	@PostMapping(value = "/rest/user/checkUser")
 	public ResponseEntity<String> checkUser(@RequestHeader("Authorization") String token) {
 		HttpStatus httpStatus = null;
-		String result = "";
+		String result = null;
 		try {
 			result = userService.checkUser(token);
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<String>(result, httpStatus);
 	}
 
 	@CrossOrigin
+	@Secured({ "ROLE_USER" })
+	@PostMapping(value = "/rest/user/changePassword")
+	public ResponseEntity<String> changePassowrd(@RequestParam("oldPassword") String oldPassword,
+			@RequestParam("newPassword") String newPassword, @RequestHeader("Authorization") String token) {
+		HttpStatus httpStatus = null;
+		String result = null;
+		try {
+			result = userService.changePassword(oldPassword, newPassword, token);
+			if (result.equalsIgnoreCase("success")) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<String>(result, httpStatus);
+	}
+
+	@CrossOrigin
+	@PostMapping(value = "/rest/user/forgotPassword")
+	public ResponseEntity<String> forgotPassword(@RequestParam("username") String username,
+			@RequestParam("email") String email) {
+		HttpStatus httpStatus = null;
+		String result = null;
+		try {
+			result = userService.forgotPassword(username, email);
+			if (result.equalsIgnoreCase("success")) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<String>(result, httpStatus);
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getUser")
 	public ResponseEntity<User> getUser(@RequestHeader("Authorization") String token) {
 		HttpStatus httpStatus = null;
 		User result = null;
 		try {
 			result = userService.getOneByUsername(token);
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<User>(result, httpStatus);
 	}
@@ -108,26 +157,58 @@ public class UserController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getById")
-	public User getOne(@RequestBody User user) {
-		return userService.getOneById(user.getId());
+	public ResponseEntity<User> getOne(@RequestBody User user) {
+		HttpStatus httpStatus = null;
+		User result = null;
+		try {
+			result = userService.getOneById(user.getId());
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<User>(result, httpStatus);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/users")
+	@GetMapping(value = "/rest/user/users")
 	public ResponseEntity<List<User>> getAllUser() {
-		return new ResponseEntity<List<User>>(userService.findAll(), HttpStatus.OK);
+		HttpStatus httpStatus = null;
+		List<User> result = null;
+		try {
+			result = userService.findAll();
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<List<User>>(result, httpStatus);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getByUsername")
 	public ResponseEntity<Object> getAccountByUsername(@RequestBody User user) {
-		User account = userService.findUsername(user.getUsername());
-		if (account != null) {
-			return new ResponseEntity<Object>(account, HttpStatus.OK);
+		HttpStatus status = null;
+		User account = null;
+		try {
+			account = userService.findUsername(user.getUsername());
+			if (account != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<Object>("Not Found User", HttpStatus.NO_CONTENT);
+		return new ResponseEntity<Object>(account, status);
 	}
 
 	@CrossOrigin
@@ -136,11 +217,16 @@ public class UserController {
 	public ResponseEntity<Integer> activateAccount(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = userService.activateAccount(user.getId());
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = userService.activateAccount(user.getId());
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			// TODO: handle exception
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
@@ -152,11 +238,15 @@ public class UserController {
 	public ResponseEntity<Integer> changeLoanLimit(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = userService.changeLoanLimit(user.getId(), user.getLoanLimit());
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = userService.changeLoanLimit(user.getId(), user.getLoanLimit());
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
@@ -168,20 +258,76 @@ public class UserController {
 	public ResponseEntity<Integer> deactivateAccount(@RequestBody User user) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = userService.deactivateAccount(user.getId());
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+
+		try {
+			valid = userService.deactivateAccount(user.getId());
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin
+	@Secured({ "ROLE_USER" })
+	@GetMapping(value = "/rest/user/getUserMaximunLoanLimit")
+	public ResponseEntity<Long> userMaximumLoanLimit(@RequestHeader("Authorization") String token) {
+		HttpStatus httpStatus = null;
+		Long result = null;
+		try {
+			result = userService.getUserMaximunLoanLimit(token);
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<Long>(result, httpStatus);
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_USER" })
+	@PutMapping(value = "/rest/user/changeUserInfo")
+	public ResponseEntity<Integer> changeUserInfo(@RequestBody User user,
+			@RequestHeader("Authorization") String token) {
+		HttpStatus httpStatus = null;
+		boolean result = false;
+		try {
+			result = userService.changeUserInfo(user, token);
+			if (result == true) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<Integer>(httpStatus.value(), httpStatus);
+	}
+
+	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@GetMapping(value = "/rest/admin/user/getUsers")
-	public PageDTO<User> listUser(@RequestParam Integer page, @RequestParam Integer element) {
-		return userService.getUsers(page, element);
+	public ResponseEntity<PageDTO<User>> listUser(@RequestParam Integer page, @RequestParam Integer element) {
+		HttpStatus httpStatus = null;
+		PageDTO<User> result = null;
+		try {
+			result = userService.getUsers(page, element);
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<PageDTO<User>>(result, httpStatus);
 	}
 }
