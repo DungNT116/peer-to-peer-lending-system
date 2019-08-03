@@ -75,7 +75,7 @@ class DocumentDetail extends React.Component {
         documentId: this.state["idDocValidation-" + idDoc]
       })
     }).then(result => {
-      console.log(result);
+      // console.log(result);
       if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login");
@@ -91,7 +91,7 @@ class DocumentDetail extends React.Component {
                 this.setState({ keyUserFb: Object.keys(userData)[0] });
               }
             });
-          database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+          await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
             message: "Your " + docName + " is approved !",
             sender: localStorage.getItem("user")
           });
@@ -99,7 +99,7 @@ class DocumentDetail extends React.Component {
           var upvotesRef = database.ref(
             "/ppls/" + this.state.keyUserFb + "/countNew"
           );
-          upvotesRef.transaction(function(current_value) {
+          await upvotesRef.transaction(function(current_value) {
             return (current_value || 0) + 1;
           });
         });
@@ -138,7 +138,7 @@ class DocumentDetail extends React.Component {
                 this.setState({ keyUserFb: Object.keys(userData)[0] });
               }
             });
-          database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+          await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
             message: "Your " + docName + " is rejected !",
             sender: localStorage.getItem("user")
           });
