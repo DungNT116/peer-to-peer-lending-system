@@ -287,18 +287,18 @@ public class UserService {
 		return false;
 	}
 
-	public boolean changePassword(String oldPassword, String newPassword, String token) {
+	public String changePassword(String oldPassword, String newPassword, String token) {
 		if (oldPassword == null || newPassword == null) {
-			return false;
+			return "old password or new password is null";
 		}
 		
 		if (oldPassword.equalsIgnoreCase(newPassword))
-			return false;
+			return "old password and new password is similar";
 		
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
 		if (user == null) {
-			return false;
+			return "no user found";
 		}
 
 		boolean valid = passwordEncoder.matches(oldPassword, user.getPassword());
@@ -306,10 +306,10 @@ public class UserService {
 			user.setPassword(passwordEncoder.encode(newPassword));
 			User savedUser = userRepo.saveAndFlush(user);
 			if(savedUser != null) {
-				return true;
+				return "success";
 			}
 		}
-		return false;
+		return "error";
 	}
 
 	public String forgotPassword(String username, String email) {

@@ -99,13 +99,13 @@ public class UserController {
 	@CrossOrigin
 	@Secured({ "ROLE_USER" })
 	@PostMapping(value = "/rest/user/changePassword")
-	public ResponseEntity<Integer> changePassowrd(@RequestParam("oldPassword") String oldPassword,
+	public ResponseEntity<String> changePassowrd(@RequestParam("oldPassword") String oldPassword,
 			@RequestParam("newPassword") String newPassword, @RequestHeader("Authorization") String token) {
 		HttpStatus httpStatus = null;
-		boolean result = false;
+		String result = null;
 		try {
 			result = userService.changePassword(oldPassword, newPassword, token);
-			if (result == true) {
+			if (result.equalsIgnoreCase("success")) {
 				httpStatus = HttpStatus.OK;
 			} else {
 				httpStatus = HttpStatus.BAD_REQUEST;
@@ -113,7 +113,7 @@ public class UserController {
 		} catch (Exception e) {
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<Integer>(httpStatus.value(), httpStatus);
+		return new ResponseEntity<String>(result, httpStatus);
 	}
 
 	@CrossOrigin
