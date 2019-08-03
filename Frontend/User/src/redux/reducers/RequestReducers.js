@@ -1,22 +1,12 @@
 import { SET_REQUEST_DATA } from 'redux/action/types'
 let STATE = {
-    data : {
-        amount: 0,
-    borrowDate: 0,
-    borrower: {
-    firstName: '',
-    id: 0,
-    lastName: '',
-    username: ''},
-    createDate: 0,
-    duration: 0,
-    id: 0,
-    interestRate: 0,
-    status: ''}
+    data : {}   
 
 }
 
 export const RequestReducers = (state = STATE, action) => {
+    // console.log(action.payload)
+    // console.log(state.data)
     switch (action.type) {
         case SET_REQUEST_DATA:
             state = {
@@ -24,6 +14,7 @@ export const RequestReducers = (state = STATE, action) => {
                 data: action.payload
 
             }
+            // console.log(state.data)
             break;
         default:
             return state;

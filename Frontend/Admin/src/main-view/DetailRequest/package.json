@@ -1,6 +1,0 @@
-{
-  "name": "DetailRequest",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./DetailRequest.js"
-}
