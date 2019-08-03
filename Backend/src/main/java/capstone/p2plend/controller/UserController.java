@@ -118,13 +118,13 @@ public class UserController {
 
 	@CrossOrigin
 	@PostMapping(value = "/rest/user/forgotPassword")
-	public ResponseEntity<Integer> forgotPassword(@RequestParam("username") String username,
+	public ResponseEntity<String> forgotPassword(@RequestParam("username") String username,
 			@RequestParam("email") String email) {
 		HttpStatus httpStatus = null;
-		boolean result = false;
+		String result = null;
 		try {
 			result = userService.forgotPassword(username, email);
-			if (result == true) {
+			if (result.equalsIgnoreCase("success")) {
 				httpStatus = HttpStatus.OK;
 			} else {
 				httpStatus = HttpStatus.BAD_REQUEST;
@@ -132,7 +132,7 @@ public class UserController {
 		} catch (Exception e) {
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<Integer>(httpStatus.value(), httpStatus);
+		return new ResponseEntity<String>(result, httpStatus);
 	}
 
 	@CrossOrigin

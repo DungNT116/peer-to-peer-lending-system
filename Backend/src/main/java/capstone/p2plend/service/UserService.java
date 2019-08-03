@@ -312,13 +312,13 @@ public class UserService {
 		return false;
 	}
 
-	public boolean forgotPassword(String username, String email) {
+	public String forgotPassword(String username, String email) {
 		if (username == null || email == null) {
-			return false;
+			return "username or password is null";
 		}
 		User user = userRepo.findByUsernameAndEmail(username, email);
 		if (user == null) {
-			return false;
+			return "there are no user match that username or email";
 		}
 
 		String SETCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -337,9 +337,9 @@ public class UserService {
 
 		User savedUser = userRepo.saveAndFlush(user);
 		if(savedUser != null) {
-			return true;
+			return "success";
 		}
 
-		return false;
+		return "error";
 	}
 }
