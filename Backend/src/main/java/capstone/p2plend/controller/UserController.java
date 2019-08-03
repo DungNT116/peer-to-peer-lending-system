@@ -41,7 +41,7 @@ public class UserController {
 		try {
 			User user = userService.checkLogin(account);
 			if (user != null) {
-				String token = jwtService.generateTokenLogin(account.getUsername());
+				String token = jwtService.generateTokenLogin(user.getUsername());
 				message = "login successful";
 				result = new LoginRespone(token, user.getUsername(), user.getRole(), message);
 				httpStatus = HttpStatus.OK;
