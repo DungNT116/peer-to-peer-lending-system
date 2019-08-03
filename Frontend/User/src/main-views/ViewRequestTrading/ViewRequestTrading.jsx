@@ -106,7 +106,7 @@ class ViewRequestTrading extends React.Component {
             lendMaxPage: data.maxPage
           });
         });
-        console.log("success");
+        // console.log("success");
       }
     });
 
@@ -137,7 +137,7 @@ class ViewRequestTrading extends React.Component {
             borrowMaxPage: data.maxPage
           });
         });
-        console.log("success");
+        // console.log("success");
       }
     });
     // event.preventDefault();

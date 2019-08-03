@@ -16,9 +16,9 @@ import {
   Spinner
 } from "reactstrap";
 
-import { css } from '@emotion/core';
+import { css } from "@emotion/core";
 
-import { PulseLoader } from 'react-spinners';
+import { PulseLoader } from "react-spinners";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
@@ -50,13 +50,12 @@ class Profile extends React.Component {
       fadeIn: true,
       timeout: 300,
       isUploadedVideo: false,
-      loadingVideo: true
+      loadingVideo: true,
+      isVideoSaved:false
     };
     this.getProfile = this.getProfile.bind(this);
     this.toggle = this.toggle.bind(this);
     this.toggleAccordion = this.toggleAccordion.bind(this);
-    this.toggleCustom = this.toggleCustom.bind(this);
-    this.toggleFade = this.toggleFade.bind(this);
 
     this.handleFileInput = this.handleFileInput.bind(this);
 
@@ -67,15 +66,8 @@ class Profile extends React.Component {
     this.startRecording = this.startRecording.bind(this);
     this.stopRecording = this.stopRecording.bind(this);
     this.handleDataAvailable = this.handleDataAvailable.bind(this);
-    // this.convertBlobToFile = this.convertBlobToFile.bind(this);
     this.uploadVideo = this.uploadVideo.bind(this);
   }
-
-  // convertBlobToFile(blob, filename) {
-  //   blob.lastModifiedDate = new Date();
-  //   blob.name = filename;
-  //   return blob;
-  // }
 
   handleDataAvailable(event) {
     if (event.data && event.data.size > 0) {
@@ -83,42 +75,42 @@ class Profile extends React.Component {
     }
   }
 
-  startRecording() {
+  async startRecording() {
     window.recordedBlobs = [];
-    let options = { mimeType: 'video/webm;codecs=vp9' };
+    let options = { mimeType: "video/webm;codecs=vp9" };
     if (!MediaRecorder.isTypeSupported(options.mimeType)) {
       console.error(`${options.mimeType} is not Supported`);
-      options = { mimeType: 'video/webm;codecs=vp8' };
+      options = { mimeType: "video/webm;codecs=vp8" };
       if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         console.error(`${options.mimeType} is not Supported`);
-        options = { mimeType: 'video/webm' };
+        options = { mimeType: "video/webm" };
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
           console.error(`${options.mimeType} is not Supported`);
-          options = { mimeType: '' };
+          options = { mimeType: "" };
         }
       }
     }
-    console.log(options);
+    // console.log(options);
     try {
       window.mediaRecorder = new MediaRecorder(window.stream, options);
     } catch (e) {
-      console.error('Exception while creating MediaRecorder:', e);
+      console.error("Exception while creating MediaRecorder:", e);
       return;
     }
 
-    var recordButton = document.querySelector('button#record');
-    recordButton.textContent = 'Stop Recording';
+    var recordButton = document.querySelector("button#record");
+    recordButton.textContent = "Stop Recording";
     window.mediaRecorder.ondataavailable = this.handleDataAvailable;
-    window.mediaRecorder.start(10);
-    console.log('MediaRecorder started', window.mediaRecorder);
+    window.mediaRecorder.start();
+    // console.log('MediaRecorder started', window.mediaRecorder);
   }
 
   stopRecording() {
     window.mediaRecorder.stop();
-    console.log('Recorded Blobs: ', window.recordedBlobs);
+    // console.log('Recorded Blobs: ', window.recordedBlobs);
 
-    var recordButton = document.querySelector('button#record');
-    recordButton.textContent = 'Start Recording';
+    var recordButton = document.querySelector("button#record");
+    recordButton.textContent = "Start Recording";
   }
 
   setSrcImgBase64(type, image) {
@@ -135,14 +127,14 @@ class Profile extends React.Component {
     }).then(result => {
       if (result.status === 200) {
         result.json().then(data => {
-          console.log("get success");
+          // console.log("get success");
           if (data.length === 0) {
             this.setState({
               loadingID: false,
               loadingPP: false,
               loadingDL: false,
               loadingVideo: false
-            })
+            });
           } else {
             for (let i = 0; i < data.length; i++) {
               const element = data[i];
@@ -150,49 +142,48 @@ class Profile extends React.Component {
                 this.setState({
                   documentID: element,
                   loadingID: false
-                })
+                });
               }
               if (element.documentType.name === "Passport") {
                 this.setState({
                   documentPP: element,
                   loadingPP: false
-                })
+                });
               }
               if (element.documentType.name === "Driving Licence") {
                 this.setState({
                   documentDL: element,
                   loadingDL: false
-                })
+                });
               }
               if (element.documentType.name === "Video") {
-                console.log("video");
+                // console.log("video");
                 this.setState({
                   isUploadedVideo: true,
                   loadingVideo: false
-                })
+                });
               } else {
                 this.setState({
                   isUploadedVideo: false,
                   loadingVideo: false
-                })
+                });
               }
             }
             if (this.state.documentID.length === 0) {
               this.setState({
                 loadingID: false
-              })
+              });
             }
             if (this.state.documentPP.length === 0) {
               this.setState({
                 loadingPP: false
-              })
+              });
             }
             if (this.state.documentDL.length === 0) {
               this.setState({
                 loadingDL: false
-              })
+              });
             }
-
           }
         });
         // this.props.history.push("/view-request-trading");
@@ -204,21 +195,21 @@ class Profile extends React.Component {
   }
 
   uploadVideo() {
-    const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
-    var base64data = '';
+    const superBuffer = new Blob(window.recordedBlobs, { type: "video/webm" });
+    var base64data = "";
     var reader = new FileReader();
     reader.readAsDataURL(superBuffer);
-    reader.onloadend = function () {
+    reader.onloadend = function() {
       base64data = reader.result;
-      console.log(base64data);
+      // console.log(base64data);
 
       var formData = new FormData();
-      formData.append("fileType", 'video/webm')
+      formData.append("fileType", "video/webm");
       formData.append("documentTypeId", 2); //2= VIdeo
-      formData.append("base64Video", base64data)
+      formData.append("base64Video", base64data);
 
       // formData.append("file", superBuffer)
-      console.log("formData", formData.getAll("file"));
+      // console.log("formData", formData.getAll("file"));
 
       fetch(apiLink + "/rest/document/uploadVideo", {
         method: "POST",
@@ -239,12 +230,13 @@ class Profile extends React.Component {
           localStorage.removeItem("isLoggedIn");
           this.props.history.push("/login-page");
         } else if (result.status === 400) {
-          alert("error")
+          alert("error");
         }
       });
-    }
-
-
+    };
+    this.setState({
+      isVideoSaved: true
+    });
   }
 
   saveDocument(type) {
@@ -270,7 +262,7 @@ class Profile extends React.Component {
     }
 
     if (document.listImage !== undefined) {
-      console.log("typeId: ", typeId)
+      // console.log("typeId: ", typeId)
       var formData = new FormData();
       formData.append("documentTypeId", typeId);
       for (let i = 0; i < document.listImage.length; i++) {
@@ -279,7 +271,7 @@ class Profile extends React.Component {
       }
 
       // formData.append("file", superBuffer)
-      console.log("formData", formData.getAll("file"));
+      // console.log("formData", formData.getAll("file"));
       fetch(apiLink + "/rest/document/uploadFile", {
         method: "POST",
         headers: {
@@ -300,25 +292,24 @@ class Profile extends React.Component {
             loadingID: true,
             loadingPP: true,
             loadingDL: true,
-            loadingVideo: true,
-          })
+            loadingVideo: true
+          });
           this.getDocument();
           // this.props.history.push("/view-request-trading");
         } else if (result.status === 401) {
           localStorage.removeItem("isLoggedIn");
           this.props.history.push("/login-page");
         } else if (result.status === 400) {
-          alert("error")
+          alert("error");
         }
       });
     } else {
-      alert("please select image to upload")
+      alert("please select image to upload");
     }
-
   }
 
   handleFileInput(event, type) {
-    var document = { documentType: type, listImage: event.target.files }
+    var document = { documentType: type, listImage: event.target.files };
     switch (type) {
       case "ID":
         this.setState({
@@ -328,31 +319,14 @@ class Profile extends React.Component {
       case "PP":
         this.setState({
           uploadDocumentPP: document
-        })
+        });
         break;
       case "DL":
         this.setState({
           uploadDocumentDL: document
-        })
+        });
         break;
     }
-
-  }
-
-  onEntering() {
-    this.setState({ status: "Opening..." });
-  }
-
-  onEntered() {
-    this.setState({ status: "Opened" });
-  }
-
-  onExiting() {
-    this.setState({ status: "Closing..." });
-  }
-
-  onExited() {
-    this.setState({ status: "Closed" });
   }
 
   toggle() {
@@ -367,18 +341,6 @@ class Profile extends React.Component {
     });
   }
 
-  toggleCustom(tab) {
-    const prevState = this.state.custom;
-    const state = prevState.map((x, index) => (tab === index ? !x : false));
-    this.setState({
-      custom: state
-    });
-  }
-
-  toggleFade() {
-    this.setState({ fadeIn: !this.state.fadeIn });
-  }
-
   componentWillMount() {
     this.getDocument();
   }
@@ -388,7 +350,6 @@ class Profile extends React.Component {
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
     this.getProfile();
-    // this.getDocument();
   }
 
   getProfile() {
@@ -405,7 +366,7 @@ class Profile extends React.Component {
         // alert("create success");
         // this.props.history.push('view-new-request');
         result.json().then(data => {
-          this.setState({ 
+          this.setState({
             username: data.username,
             firstName: data.firstName,
             lastName: data.lastName,
@@ -420,7 +381,39 @@ class Profile extends React.Component {
       }
     });
   }
+  openCamera(event) {
+    event.preventDefault();
+    const constraints = {
+      audio: true,
+      video: {
+        width: "100%",
+        height: 240
+      }
+    };
+    try {
+      const stream = navigator.mediaDevices
+        .getUserMedia(constraints)
+        .then(async data => {
+          // console.log('getUserMedia() got stream:', data);
+          window.stream = data;
 
+          const gumVideo = await document.querySelector("video#gum");
+          gumVideo.srcObject = data;
+        });
+    } catch (e) {
+      console.error("navigator.getUserMedia error:", e);
+    }
+  }
+  autoPlayVideo(event) {
+    event.preventDefault();
+    const recordedVideo = document.querySelector("video#recorded");
+    const superBuffer = new Blob(window.recordedBlobs, { type: "video/webm" });
+    recordedVideo.src = null;
+    recordedVideo.srcObject = null;
+    recordedVideo.src = window.URL.createObjectURL(superBuffer);
+    recordedVideo.controls = true;
+    recordedVideo.play();
+  }
   render() {
     const style = {
       profileComponent: {
@@ -437,15 +430,15 @@ class Profile extends React.Component {
       }
     };
     const override = css`
-    display: flex;
+      display: flex;
       align-items: center;
       justify-content: center;
       width: auto;
       padding-left: 0;
-      `;
+    `;
     // let IDData = [];
     // if (this.state.documentID.length !== 0) {
-    //   IDData = 
+    //   IDData =
     //   ))
     // }
     return (
@@ -565,7 +558,7 @@ class Profile extends React.Component {
                           <i className="ni education_hat mr-2" />
                           University of Computer Science
                         </div> */}
-                        <hr className="my-4" />
+                        {/* <hr className="my-4" />
                         <p>
                           Ryan — the name taken by Melbourne-raised,
                           Brooklyn-based Nick Murphy — writes, performs and
@@ -573,7 +566,7 @@ class Profile extends React.Component {
                         </p>
                         <a href="#pablo" onClick={e => e.preventDefault()}>
                           Show more
-                        </a>
+                        </a> */}
                       </div>
                     </CardBody>
                   </Card>
@@ -698,9 +691,7 @@ class Profile extends React.Component {
                               aria-expanded={this.state.accordion[0]}
                               aria-controls="collapseOne"
                             >
-                              <h5 className="m-0 p-0">
-                                Identity Card
-                              </h5>
+                              <h5 className="m-0 p-0">Identity Card</h5>
                             </Button>
                           </CardHeader>
                           <Collapse
@@ -709,39 +700,69 @@ class Profile extends React.Component {
                             id="collapseOne"
                           >
                             <CardBody style={style.sameSizeWithParent}>
-
-                              {(this.state.loadingID === true) ?
-                                (<PulseLoader
+                              {this.state.loadingID === true ? (
+                                <PulseLoader
                                   css={override}
                                   sizeUnit={"px"}
                                   size={15}
-                                  color={'#123abc'}
+                                  color={"#123abc"}
                                   loading={this.state.loadingID}
-                                />)
-                                :
-                                ((this.state.documentID.length !== 0) ?
-                                  (<div>
-                                    {this.state.documentID.documentFile.map((imageData) => (
-                                      <img src={this.setSrcImgBase64(imageData.fileType,
-                                        imageData.data)} style={style.sameSizeWithParent} />))}
-                                    {this.state.documentID.status === "invalid" ? (
-                                      <div>
-                                        <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
-                                        {' '}
-                                        <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
-                                      </div>
-                                    ) : (
-                                        this.state.documentID.status === "pending" ? ("Document is waiting for validation") : ("")
-                                      )}
-                                  </div>)
-                                  :
-                                  (<div>
-                                    {console.log(this.state.documentID)}
-                                    <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
-                                    {' '}
-                                    <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
-                                  </div>))
-                              }
+                                />
+                              ) : this.state.documentID.length !== 0 ? (
+                                <div>
+                                  {this.state.documentID.documentFile.map(
+                                    imageData => (
+                                      <img
+                                        src={this.setSrcImgBase64(
+                                          imageData.fileType,
+                                          imageData.data
+                                        )}
+                                        style={style.sameSizeWithParent}
+                                      />
+                                    )
+                                  )}
+                                  {this.state.documentID.status ===
+                                  "invalid" ? (
+                                    <div>
+                                      <Input
+                                        type="file"
+                                        multiple
+                                        onChange={event =>
+                                          this.handleFileInput(event, "ID")
+                                        }
+                                      />{" "}
+                                      <Button
+                                        type="button"
+                                        onClick={() => this.saveDocument("ID")}
+                                      >
+                                        Save
+                                      </Button>
+                                    </div>
+                                  ) : this.state.documentID.status ===
+                                    "pending" ? (
+                                    "Document is waiting for validation"
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              ) : (
+                                <div>
+                                  {/* {console.log(this.state.documentID)} */}
+                                  <Input
+                                    type="file"
+                                    multiple
+                                    onChange={event =>
+                                      this.handleFileInput(event, "ID")
+                                    }
+                                  />{" "}
+                                  <Button
+                                    type="button"
+                                    onClick={() => this.saveDocument("ID")}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              )}
                             </CardBody>
                           </Collapse>
                         </Card>
@@ -755,9 +776,7 @@ class Profile extends React.Component {
                               aria-expanded={this.state.accordion[1]}
                               aria-controls="collapseTwo"
                             >
-                              <h5 className="m-0 p-0">
-                                Passport
-                              </h5>
+                              <h5 className="m-0 p-0">Passport</h5>
                             </Button>
                           </CardHeader>
                           <Collapse
@@ -766,37 +785,68 @@ class Profile extends React.Component {
                             id="collapseTwo"
                           >
                             <CardBody style={style.sameSizeWithParent}>
-
-                              {(this.state.loadingPP === true) ?
-                                (<PulseLoader
+                              {this.state.loadingPP === true ? (
+                                <PulseLoader
                                   css={override}
                                   sizeUnit={"px"}
                                   size={15}
-                                  color={'#123abc'}
+                                  color={"#123abc"}
                                   loading={this.state.loadingPP}
-                                />)
-                                :
-                                (this.state.documentPP.length !== 0) ?
-                                  (<div>
-                                    {this.state.documentPP.documentFile.map((imageData) => (
-                                      <img src={this.setSrcImgBase64(imageData.fileType,
-                                        imageData.data)} style={style.sameSizeWithParent} />))}
-                                    {this.state.documentID.status === "invalid" ? (
-                                      <div>
-                                        <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
-                                        {' '}
-                                        <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
-                                      </div>
-                                    ) : (
-                                        this.state.documentID.status === "pending" ? ("Document is waiting for validation") : ("")
-                                      )}
-                                  </div>)
-                                  :
-                                  (<div>
-                                    <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "PP")} />
-                                    {' '}
-                                    <Button type="button" onClick={() => this.saveDocument("PP")}>Save</Button>
-                                  </div>)}
+                                />
+                              ) : this.state.documentPP.length !== 0 ? (
+                                <div>
+                                  {this.state.documentPP.documentFile.map(
+                                    imageData => (
+                                      <img
+                                        src={this.setSrcImgBase64(
+                                          imageData.fileType,
+                                          imageData.data
+                                        )}
+                                        style={style.sameSizeWithParent}
+                                      />
+                                    )
+                                  )}
+                                  {this.state.documentID.status ===
+                                  "invalid" ? (
+                                    <div>
+                                      <Input
+                                        type="file"
+                                        multiple
+                                        onChange={event =>
+                                          this.handleFileInput(event, "ID")
+                                        }
+                                      />{" "}
+                                      <Button
+                                        type="button"
+                                        onClick={() => this.saveDocument("ID")}
+                                      >
+                                        Save
+                                      </Button>
+                                    </div>
+                                  ) : this.state.documentID.status ===
+                                    "pending" ? (
+                                    "Document is waiting for validation"
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              ) : (
+                                <div>
+                                  <Input
+                                    type="file"
+                                    multiple
+                                    onChange={event =>
+                                      this.handleFileInput(event, "PP")
+                                    }
+                                  />{" "}
+                                  <Button
+                                    type="button"
+                                    onClick={() => this.saveDocument("PP")}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              )}
                             </CardBody>
                           </Collapse>
                         </Card>
@@ -810,9 +860,7 @@ class Profile extends React.Component {
                               aria-expanded={this.state.accordion[2]}
                               aria-controls="collapseThree"
                             >
-                              <h5 className="m-0 p-0">
-                                Driving License
-                              </h5>
+                              <h5 className="m-0 p-0">Driving License</h5>
                             </Button>
                           </CardHeader>
                           <Collapse
@@ -821,37 +869,68 @@ class Profile extends React.Component {
                             id="collapseThree"
                           >
                             <CardBody style={style.sameSizeWithParent}>
-
-                              {(this.state.loadingDL === true) ?
-                                (<PulseLoader
+                              {this.state.loadingDL === true ? (
+                                <PulseLoader
                                   css={override}
                                   sizeUnit={"px"}
                                   size={15}
-                                  color={'#123abc'}
+                                  color={"#123abc"}
                                   loading={this.state.loadingDL}
-                                />)
-                                :
-                                (this.state.documentDL.length !== 0) ?
-                                  (<div>
-                                    {this.state.documentDL.documentFile.map((imageData) => (
-                                      <img src={this.setSrcImgBase64(imageData.fileType,
-                                        imageData.data)} style={style.sameSizeWithParent} />))}
-                                    {this.state.documentID.status === "invalid" ? (
-                                      <div>
-                                        <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "ID")} />
-                                        {' '}
-                                        <Button type="button" onClick={() => this.saveDocument("ID")}>Save</Button>
-                                      </div>
-                                    ) : (
-                                        this.state.documentID.status === "pending" ? ("Document is waiting for validation") : ("")
-                                      )}
-                                  </div>)
-                                  :
-                                  (<div>
-                                    <Input type="file" multiple onChange={(event) => this.handleFileInput(event, "DL")} />
-                                    {' '}
-                                    <Button type="button" onClick={() => this.saveDocument("DL")}>Save</Button>
-                                  </div>)}
+                                />
+                              ) : this.state.documentDL.length !== 0 ? (
+                                <div>
+                                  {this.state.documentDL.documentFile.map(
+                                    imageData => (
+                                      <img
+                                        src={this.setSrcImgBase64(
+                                          imageData.fileType,
+                                          imageData.data
+                                        )}
+                                        style={style.sameSizeWithParent}
+                                      />
+                                    )
+                                  )}
+                                  {this.state.documentID.status ===
+                                  "invalid" ? (
+                                    <div>
+                                      <Input
+                                        type="file"
+                                        multiple
+                                        onChange={event =>
+                                          this.handleFileInput(event, "ID")
+                                        }
+                                      />{" "}
+                                      <Button
+                                        type="button"
+                                        onClick={() => this.saveDocument("ID")}
+                                      >
+                                        Save
+                                      </Button>
+                                    </div>
+                                  ) : this.state.documentID.status ===
+                                    "pending" ? (
+                                    "Document is waiting for validation"
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              ) : (
+                                <div>
+                                  <Input
+                                    type="file"
+                                    multiple
+                                    onChange={event =>
+                                      this.handleFileInput(event, "DL")
+                                    }
+                                  />{" "}
+                                  <Button
+                                    type="button"
+                                    onClick={() => this.saveDocument("DL")}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              )}
                             </CardBody>
                           </Collapse>
                         </Card>
@@ -865,9 +944,7 @@ class Profile extends React.Component {
                               aria-expanded={this.state.accordion[3]}
                               aria-controls="collapseThree"
                             >
-                              <h5 className="m-0 p-0">
-                                Identity Video
-                              </h5>
+                              <h5 className="m-0 p-0">Identity Video</h5>
                             </Button>
                           </CardHeader>
                           <Collapse
@@ -876,90 +953,118 @@ class Profile extends React.Component {
                             id="collapseThree"
                           >
                             <CardBody style={style.sameSizeWithParent}>
-
-                              {(this.state.loadingVideo === true) ?
-                                (<PulseLoader
+                              {this.state.loadingVideo === true ? (
+                                <PulseLoader
                                   css={override}
                                   sizeUnit={"px"}
                                   size={15}
-                                  color={'#123abc'}
+                                  color={"#123abc"}
                                   loading={this.state.loadingVideo}
-                                />)
-                                :
-                                (this.state.isUploadedVideo === false) ?
-                                  (
-                                    <div>
-                                      <Row>
-                                        <video autoPlay id="gum"></video>
-                                      </Row>
-                                      <Row>
-                                        <button id="start" onClick={
-                                          (event) => {
-                                            event.preventDefault();
-                                            console.log("gooooooooooooooo")
-                                            const constraints = {
-                                              audio: true,
-                                              video: {
-                                                width: 1280, height: 720
-                                              }
-                                            }
-                                            try {
-                                              // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-                                              //   navigator.mozGetUserMedia || navigator.msGetUserMedia;
-                                              // console.log()
+                                />
+                              ) : this.state.isUploadedVideo === false ? (
+                                this.state.isVideoSaved === false ? (
+                                  <div>
+                                    <Row>
+                                      <Col md={2} />
+                                      <Col md={8}>
+                                        <video autoPlay id="gum" />
+                                        <video autoPlay id="recorded" />
+                                      </Col>
+                                      <Col md={2} />
+                                    </Row>
+                                    <Row>
+                                      <h5>
+                                        <strong>
+                                          Turn on the camera , show your face
+                                          clearly in camera and talk "I agree to
+                                          use PPLS" to validate your Identity
+                                          Video
+                                        </strong>
+                                      </h5>
+                                      
+                                    </Row>
+                                    <Row>
+                                    <Button
+                                        size="md"
+                                        className="btn btn-outline-primary"
+                                        id="start"
+                                        onClick={event => {
+                                          this.openCamera(event);
+                                        }}
+                                      >
+                                        Start camera
+                                      </Button>
+                                      <Button
+                                        size="md"
+                                        className="btn btn-outline-primary"
+                                        id="record"
+                                        onClick={event => {
+                                          event.preventDefault();
+                                          var recordButton = document.querySelector(
+                                            "button#record"
+                                          );
 
-                                              const stream = navigator.mediaDevices.getUserMedia(constraints).then(data => {
-                                                console.log('getUserMedia() got stream:', data);
-                                                window.stream = data;
-
-                                                const gumVideo = document.querySelector('video#gum');
-                                                gumVideo.srcObject = data;
-
-                                              });
-
-                                            } catch (e) {
-                                              console.error('navigator.getUserMedia error:', e);
-                                            }
+                                          if (
+                                            recordButton.textContent ===
+                                            "Start Recording"
+                                          ) {
+                                            this.startRecording();
+                                            setTimeout(
+                                              function() {
+                                                this.stopRecording();
+                                                window.stream
+                                                  .getTracks()
+                                                  .forEach(function(track) {
+                                                    track.stop();
+                                                  });
+                                              }.bind(this),
+                                              5000
+                                            );
+                                          } else {
+                                            this.stopRecording();
                                           }
-                                        }>Start camera</button>
-                                        <button id="record" onClick={
-                                          (event) => {
-                                            event.preventDefault();
-                                            var recordButton = document.querySelector('button#record');
-
-                                            if (recordButton.textContent === 'Start Recording') {
-                                              this.startRecording();
-                                            } else {
-                                              this.stopRecording();
-                                            }
-                                          }
-                                        }>Start Recording</button>
-                                      </Row>
-                                      <Row>
-                                        <video autoPlay id="recorded"></video>
-                                      </Row>
-                                      <Row>
-                                        <button id="play" onClick={
-                                          (event) => {
-                                            event.preventDefault();
-                                            const recordedVideo = document.querySelector('video#recorded');
-                                            const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
-                                            recordedVideo.src = null;
-                                            recordedVideo.srcObject = null;
-                                            recordedVideo.src = window.URL.createObjectURL(superBuffer);
-                                            recordedVideo.controls = true;
-                                            recordedVideo.play();
-                                            console.log(recordedVideo);
-                                          }
-                                        }>play</button> {' '}
-                                        <button onClick={(event) => { event.preventDefault(); this.uploadVideo() }}>Save to DB</button>
-                                      </Row>
-                                    </div>
-                                  )
-                                  :
-                                  (<div>
-                                    <p>You already upload video, you dont need to upload again</p>
-                                  </div>)}
+                                        }}
+                                      >
+                                        Start Recording
+                                      </Button>
+                                      <Button
+                                        size="md"
+                                        className="btn btn-outline-primary"
+                                        id="play"
+                                        onClick={event => {
+                                          this.autoPlayVideo(event);
+                                        }}
+                                      >
+                                        Play
+                                      </Button>{" "}
+                                      <Button
+                                        size="md"
+                                        className="btn btn-outline-primary"
+                                        onClick={event => {
+                                          event.preventDefault();
+                                          this.uploadVideo();
+                                        }}
+                                      >
+                                        Save to DB
+                                      </Button>
+                                    </Row>
+                                  </div>
+                                ) : (
+                                  <div>
+                                    <p>
+                                      You already upload video, waiting for
+                                      validating from Admin
+                                    </p>
+                                  </div>
+                                )
+                              ) : (
+                                <div>
+                                  <p>
+                                    You already upload video, system will keep
+                                    your Identity Video due to User Privacy
+                                  </p>
+                                </div>
+                              )}
                             </CardBody>
                           </Collapse>
                         </Card>
@@ -968,7 +1073,6 @@ class Profile extends React.Component {
                   </Card>
                 </Col>
               </Row>
-
             </Container>
           </section>
         </main>

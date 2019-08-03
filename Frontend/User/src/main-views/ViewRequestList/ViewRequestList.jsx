@@ -60,7 +60,9 @@ class ViewRequestList extends React.Component {
       page: index
     });
   }
-
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   getRequest() {
     let pageParam = encodeURIComponent(this.state.page);
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
@@ -127,7 +129,7 @@ class ViewRequestList extends React.Component {
             {request.id}
           </Col>
         </td>
-        <td>{request.amount} VND</td>
+        <td>{this.numberWithCommas(request.amount)} VND</td>
         <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>

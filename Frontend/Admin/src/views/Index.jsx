@@ -44,7 +44,7 @@ class Index extends React.Component {
         this.state.chartExample1Data === "data1" ? "data2" : "data1"
     });
     let wow = () => {
-      console.log(this.state);
+      // console.log(this.state);
     };
     wow.bind(this);
     setTimeout(() => wow(), 1000);
