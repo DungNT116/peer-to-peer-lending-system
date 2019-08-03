@@ -222,9 +222,18 @@ class Profile extends React.Component {
         //   documentType: this.state.documentID.documentType,
         //   file: this.state.documentID.listImage
         // })
-      }).then(result => {
+      }).then(async result => {
         if (result.status === 200) {
           alert("save success");
+
+          //load document again
+          await this.setState({
+            loadingID: true,
+            loadingPP: true,
+            loadingDL: true,
+            loadingVideo: true,
+          })
+          this.getDocument();
           // this.props.history.push("/view-request-trading");
         } else if (result.status === 401) {
           localStorage.removeItem("isLoggedIn");
@@ -707,6 +716,7 @@ class Profile extends React.Component {
                                   size={15}
                                   color={"#123abc"}
                                   loading={this.state.loadingID}
+
                                 />
                               ) : this.state.documentID.length !== 0 ? (
                                 <div>
@@ -763,6 +773,7 @@ class Profile extends React.Component {
                                   </Button>
                                 </div>
                               )}
+
                             </CardBody>
                           </Collapse>
                         </Card>
@@ -792,6 +803,7 @@ class Profile extends React.Component {
                                   size={15}
                                   color={"#123abc"}
                                   loading={this.state.loadingPP}
+
                                 />
                               ) : this.state.documentPP.length !== 0 ? (
                                 <div>
@@ -931,6 +943,7 @@ class Profile extends React.Component {
                                   </Button>
                                 </div>
                               )}
+
                             </CardBody>
                           </Collapse>
                         </Card>
