@@ -6,8 +6,6 @@ import capstone.p2plend.service.UserService;
 import capstone.p2plend.service.JwtService;
 import capstone.p2plend.service.RequestService;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

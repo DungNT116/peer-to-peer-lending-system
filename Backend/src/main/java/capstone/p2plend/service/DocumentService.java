@@ -1,7 +1,6 @@
 package capstone.p2plend.service;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.tomcat.util.codec.binary.Base64;

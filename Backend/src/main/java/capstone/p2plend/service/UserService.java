@@ -33,7 +33,7 @@ public class UserService {
 
 	@Autowired
 	EmailService emailService;
-	
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
@@ -93,27 +93,22 @@ public class UserService {
 	}
 
 	public User checkLogin(User account) {
+		if (account.getUsername() == null || account.getPassword() == null)
+			return null;
+		String userId = account.getUsername();
+		String rawPassword = account.getPassword();
 
-		if(account.getUsername() == null || account.getPassword() == null) return null;
-		
-		String username = account.getUsername();
-//		String rawPassword = account.getPassword();
-		
-//		String password = passwordEncoder.encode(rawPassword);
-		
-		String a = passwordEncoder.encode("1A2");
-		System.out.println(a);
-		String b = passwordEncoder.encode("1A2");
-		System.out.println(b);
-		System.out.println(passwordEncoder.matches(a, b));
-		
-		
-		String password = account.getPassword();
-		
-		User checkExist = userRepo.findByUsernameAndPassword(username, password);
-		if (checkExist != null && checkExist.getStatus().equals("active")) {
-			return checkExist;
+		User checkExist = userRepo.findByUsernameOrEmail(userId, userId).get();
+
+		if (checkExist != null) {
+			if (passwordEncoder.matches(rawPassword, checkExist.getPassword())
+					&& checkExist.getStatus().equalsIgnoreCase("active")) {
+				return checkExist;
+			}
+		} else {
+			return null;
 		}
+
 		return null;
 	}
 
@@ -121,9 +116,12 @@ public class UserService {
 		if (account.getUsername() == null) {
 			return "Error";
 		}
+
 		if (account.getPassword() == null) {
 			return "Error";
 		}
+
+		String rawPassword = account.getPassword();
 
 		if (account.getFirstName() == null) {
 			return "Error";
@@ -152,6 +150,7 @@ public class UserService {
 		account.setRole("ROLE_USER");
 		account.setStatus("active");
 		account.setLoanLimit(0L);
+		account.setPassword(passwordEncoder.encode(rawPassword));
 
 		account = userRepo.save(account);
 
@@ -288,35 +287,38 @@ public class UserService {
 		return false;
 	}
 
-	public boolean changePassword(String oldPassword, String newPassword, String token) {
-		if (oldPassword == null || newPassword == null || token == null) {
-			return false;
+	public String changePassword(String oldPassword, String newPassword, String token) {
+		if (oldPassword == null || newPassword == null) {
+			return "old password or new password is null";
 		}
+		
 		if (oldPassword.equalsIgnoreCase(newPassword))
-			return false;
+			return "old password and new password is similar";
+		
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
-
 		if (user == null) {
-			return false;
+			return "no user found";
 		}
 
-		if (user.getPassword() != oldPassword)
-			return false;
-
-		user.setPassword(newPassword);
-		userRepo.save(user);
-
-		return true;
+		boolean valid = passwordEncoder.matches(oldPassword, user.getPassword());
+		if (valid) {
+			user.setPassword(passwordEncoder.encode(newPassword));
+			User savedUser = userRepo.saveAndFlush(user);
+			if(savedUser != null) {
+				return "success";
+			}
+		}
+		return "error";
 	}
 
-	public boolean forgotPassword(String username, String email) {
+	public String forgotPassword(String username, String email) {
 		if (username == null || email == null) {
-			return false;
+			return "username or password is null";
 		}
 		User user = userRepo.findByUsernameAndEmail(username, email);
 		if (user == null) {
-			return false;
+			return "there are no user match that username or email";
 		}
 
 		String SETCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -329,12 +331,15 @@ public class UserService {
 		}
 		String str = strb.toString();
 
-		user.setPassword(str);
+		user.setPassword(passwordEncoder.encode(str));
 		emailService.sendSimpleMessage(email, "You have request a new Password from PPLS site",
 				"Your new password: " + str);
 
-		userRepo.save(user);
+		User savedUser = userRepo.saveAndFlush(user);
+		if(savedUser != null) {
+			return "success";
+		}
 
-		return true;
+		return "error";
 	}
 }
