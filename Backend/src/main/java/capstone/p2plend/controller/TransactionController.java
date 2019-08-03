@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import capstone.p2plend.dto.PageDTO;
-import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.Transaction;
-import capstone.p2plend.entity.User;
-import capstone.p2plend.payload.LoginRespone;
 import capstone.p2plend.service.TransactionService;
 
 @RestController

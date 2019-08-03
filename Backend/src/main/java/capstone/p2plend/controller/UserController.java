@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import capstone.p2plend.dto.PageDTO;
-import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.payload.LoginRespone;
 import capstone.p2plend.service.UserService;
@@ -116,7 +115,7 @@ public class UserController {
 		}
 		return new ResponseEntity<Integer>(httpStatus.value(), httpStatus);
 	}
-	
+
 	@CrossOrigin
 	@PostMapping(value = "/rest/user/forgotPassword")
 	public ResponseEntity<Integer> forgotPassword(@RequestParam("username") String username,

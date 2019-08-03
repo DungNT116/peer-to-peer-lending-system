@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.Deal;
@@ -111,10 +110,10 @@ public class TransactionService {
 			return false;
 		}
 		Milestone milestone = milestoneRepo.findById(idMilestone).get();
-		if(milestone == null) {
+		if (milestone == null) {
 			return false;
 		}
-		
+
 		Transaction trx = new Transaction();
 		trx.setAmount(transaction.getAmount());
 		trx.setCreateDate(transaction.getCreateDate());
