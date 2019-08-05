@@ -93,7 +93,7 @@ class DemoNavbar extends React.Component {
     }
   }
   //reset count view by clicking notification
-  onResetCountView(event) {
+  async onResetCountView(event) {
     event.preventDefault();
     var upvotesRef = database.ref(
       "/ppls/" + this.state.keyUserFb + "/countNew"
@@ -104,7 +104,7 @@ class DemoNavbar extends React.Component {
   }
 
   //function add new message to firebase when something happen
-  onAddMessage(event) {
+  async onAddMessage(event) {
     event.preventDefault();
     var upvotesRef = database.ref(
       "/ppls/" + this.state.keyUserFb + "/countNew"
