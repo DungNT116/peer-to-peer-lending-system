@@ -20,7 +20,7 @@ import {
 
 import classnames from "classnames";
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import MainNavbar from "../MainNavbar/MainNavbar.jsx";
 import Pagination from "../../views/IndexSections/Pagination.jsx";
 
 //api link
@@ -144,7 +144,7 @@ class HistoryRequest extends React.Component {
     ));
     return (
       <>
-        <DemoNavbar />
+        <MainNavbar />
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}
