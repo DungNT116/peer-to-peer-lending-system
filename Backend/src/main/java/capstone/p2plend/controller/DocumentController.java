@@ -26,7 +26,7 @@ public class DocumentController {
 	DocumentService docService;
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@PostMapping("/rest/document/uploadFile")
 	public ResponseEntity<Integer> uploadFile(@RequestParam("documentTypeId") Integer documentTypeId,
 			@RequestHeader("Authorization") String token, @RequestParam("file") MultipartFile[] file) {
@@ -40,13 +40,14 @@ public class DocumentController {
 				status = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@PostMapping("/rest/document/uploadVideo")
 	public ResponseEntity<Integer> uploadVideo(@RequestParam("documentTypeId") Integer documentTypeId,
 			@RequestParam("fileType") String fileType, @RequestHeader("Authorization") String token,
@@ -67,7 +68,7 @@ public class DocumentController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@GetMapping("/rest/document/getUserDocument")
 	public ResponseEntity<List<Document>> getUserDocument(@RequestHeader("Authorization") String token) {
 		HttpStatus httpStatus = null;

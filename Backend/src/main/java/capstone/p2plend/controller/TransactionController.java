@@ -44,7 +44,7 @@ public class TransactionController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@GetMapping(value = "/rest/transaction/getAllUserTransaction")
 	public ResponseEntity<PageDTO<Transaction>> getAllUserTransaction(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
@@ -64,7 +64,7 @@ public class TransactionController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@PostMapping(value = "/rest/transaction/newTransaction")
 	public ResponseEntity<Integer> newTransaction(@RequestBody Transaction transaction) {
 		HttpStatus status = null;

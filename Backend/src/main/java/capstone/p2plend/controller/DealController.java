@@ -40,7 +40,7 @@ public class DealController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@PutMapping(value = "/rest/deal/makeDeal")
 	public ResponseEntity<Integer> makeDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
@@ -60,7 +60,7 @@ public class DealController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@PutMapping(value = "/rest/deal/acceptDeal")
 	public ResponseEntity<Integer> acceptDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
@@ -79,7 +79,7 @@ public class DealController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@PutMapping(value = "/rest/deal/cancelDeal")
 	public ResponseEntity<Integer> cancelDeal(@RequestBody Deal deal, @RequestHeader("Authorization") String token) {
 		HttpStatus status = null;

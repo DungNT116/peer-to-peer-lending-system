@@ -12,11 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface DocumentFileRepository extends JpaRepository<DocumentFile, Integer> {
 
-	@Query(value = "SELECT * FROM document_file WHERE document_id = :id", nativeQuery = true)
-	List<DocumentFile> findDocumentFiles(@Param("id") Integer id);
+	@Query(value = "SELECT * FROM document_file WHERE document_id = :documentId", nativeQuery = true)
+	List<DocumentFile> findDocumentFiles(@Param("documentId") Integer documentId);
 
 	@Transactional
 	@Modifying
-	@Query(value = "DELETE FROM document_file WHERE document_id = :id;", nativeQuery = true)
-	void deleteByDocId(@Param("id") Integer id);
+	@Query(value = "DELETE FROM document_file WHERE document_id = :documentId", nativeQuery = true)
+	void deleteAllByDocId(@Param("documentId") Integer documentId);
 }

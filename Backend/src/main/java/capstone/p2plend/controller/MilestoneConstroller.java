@@ -20,7 +20,7 @@ public class MilestoneConstroller {
 	MilestoneService milestoneService;
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@PostMapping(value = "/rest/milestone/newMilestone")
 	public ResponseEntity<Integer> newMilestone(@RequestBody Milestone milestone) {
 		HttpStatus status = null;
@@ -39,7 +39,7 @@ public class MilestoneConstroller {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@PutMapping(value = "/rest/milestone/updateMilestone")
 	public ResponseEntity<Integer> updateMilestone(@RequestBody Milestone milestone) {
 		HttpStatus status = null;

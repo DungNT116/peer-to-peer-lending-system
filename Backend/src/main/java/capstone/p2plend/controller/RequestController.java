@@ -32,7 +32,7 @@ public class RequestController {
 	JwtService jwtService;
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@PostMapping(value = "/rest/request/createRequest")
 	public ResponseEntity<Integer> createAccount(@RequestBody Request request,
 			@RequestHeader("Authorization") String token) {
@@ -90,28 +90,28 @@ public class RequestController {
 		return new ResponseEntity<PageDTO<Request>>(result, status);
 	}
 
-	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/request/user/allNewRequest")
-	public ResponseEntity<PageDTO<Request>> findAllOtherUserNewRequest(@RequestParam Integer page,
-			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
-		HttpStatus status = null;
-		PageDTO<Request> result = null;
-		try {
-			result = requestService.findAllOtherUserRequestSortByDateDesc(page, element, token);
-			if (result != null) {
-				status = HttpStatus.OK;
-			} else {
-				status = HttpStatus.BAD_REQUEST;
-			}
-		} catch (Exception e) {
-			status = HttpStatus.INTERNAL_SERVER_ERROR;
-		}
-		return new ResponseEntity<PageDTO<Request>>(result, status);
-	}
+//	@CrossOrigin
+//	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+//	@GetMapping(value = "/rest/request/user/allNewRequest")
+//	public ResponseEntity<PageDTO<Request>> findAllOtherUserNewRequest(@RequestParam Integer page,
+//			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+//		HttpStatus status = null;
+//		PageDTO<Request> result = null;
+//		try {
+//			result = requestService.findAllOtherUserRequestSortByDateDesc(page, element, token);
+//			if (result != null) {
+//				status = HttpStatus.OK;
+//			} else {
+//				status = HttpStatus.BAD_REQUEST;
+//			}
+//		} catch (Exception e) {
+//			status = HttpStatus.INTERNAL_SERVER_ERROR;
+//		}
+//		return new ResponseEntity<PageDTO<Request>>(result, status);
+//	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@GetMapping(value = "/rest/request/allRequestHistoryDone")
 	public ResponseEntity<PageDTO<Request>> findAllRequestHistoryStatusDone(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
@@ -131,7 +131,7 @@ public class RequestController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@GetMapping(value = "/rest/request/all_request_dealing_by_borrower_or_lender")
 	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusDealingWithLenderOrBorrower(
 			@RequestParam Integer page, @RequestParam Integer element, @RequestHeader("Authorization") String token) {
@@ -151,7 +151,7 @@ public class RequestController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@GetMapping(value = "/rest/request/all_request_trading_by_borrower")
 	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithBorrower(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
@@ -172,7 +172,7 @@ public class RequestController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@GetMapping(value = "/rest/request/all_request_trading_by_lender")
 	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithLender(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
@@ -192,7 +192,7 @@ public class RequestController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@GetMapping(value = "/rest/request/allRequestHistoryPending")
 	public ResponseEntity<PageDTO<Request>> findAllUserRequestStatusPending(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
@@ -212,7 +212,7 @@ public class RequestController {
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@DeleteMapping(value = "/rest/request/delete")
 	public ResponseEntity<Integer> deleteRequest(@RequestBody Request request,
 			@RequestHeader("Authorization") String token) {
