@@ -73,6 +73,10 @@ class HistoryRequest extends React.Component {
 
   setDataToDetailPage(id) {
     this.props.setRequest(id);
+    this.props.setIsHistory(true);
+    this.props.setIsViewDetail(true);
+    this.props.setIsHistoryDetail(true);
+    
   }
 
   changePage(index) {
@@ -181,24 +185,41 @@ class HistoryRequest extends React.Component {
 const mapStateToProps = (state) => {
   return {
     request: state.request,
-    // tokenReducer: state.tokenReducer,
-    // paging: state.paging
   }
 }
 const mapDispatchToProps = (dispatch) => {
   return {
-    // setToken: (token) => {
-    //   dispatch({
-    //     type: "SET_TOKEN",
-    //     payload: token
-    //   })
-    // },
     setRequest: (id) => {
       dispatch({
         type: "SET_REQUEST",
         payload: id
       });
+    },
+    setIsTrading: (status) => {
+      dispatch({
+        type: "SET_IS_TRADING",
+        payload: status
+      });
+    },
+    setIsViewDetail: (status) => {
+      dispatch({
+        type: "SET_IS_VIEWDETAIL",
+        payload: status
+      });
+    },
+    setIsHistory: (status) => {
+      dispatch({
+        type: "SET_IS_HISTORY",
+        payload: status
+      });
+    },
+    setIsHistoryDetail: (status) => {
+      dispatch({
+        type: "SET_IS_HISTORY_DETAIL",
+        payload: status
+      });
     }
+    
   }
 }
 
