@@ -35,142 +35,169 @@ public class DealService {
 	@Autowired
 	JwtService jwtService;
 
-	public boolean newDeal(Deal deal) {
-		try {
-
-			dealRepo.saveAndFlush(deal);
-
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	public boolean updateDeal(Deal deal) {
-		try {
-
-			dealRepo.saveAndFlush(deal);
-
-			return true;
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
 	public List<Deal> findAll() {
 		return dealRepo.findAll();
 	}
 
-	public Deal getOneById(int id) {
+	public Deal getOneById(Integer id) {
+		if (id == null) {
+			return null;
+		}
 		return dealRepo.findById(id).get();
 	}
 
 	public boolean makeDeal(Deal deal, String token) {
-		try {
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
-			List<Milestone> listMilestone = deal.getMilestone();
+		if (deal.getMilestone() == null || deal.getId() == null || deal.getBorrowTime() == null
+				|| deal.getPaybackTime() == null)
+			return false;
 
-			Deal existDeal = dealRepo.findById(deal.getId()).get();
-			
-			User existUser = existDeal.getUser();
-			if(existUser.getId() == user.getId()) {
-				return false;
-			}
-			
-			existDeal.setStatus("dealing");
-			existDeal.setBorrowTime(deal.getBorrowTime());
-			existDeal.setPaybackTime(deal.getPaybackTime());
-			existDeal.setUser(user);
-			
-			
-			List<Milestone> lstMs = existDeal.getMilestone();
-			for(Milestone m : lstMs) {
-				milestoneRepo.deleteMilestoneByDealId(m.getDeal().getId());	
-			}			
-			
-			for (Milestone m : listMilestone) {
-				m.setDeal(existDeal);
-			}
-			existDeal.setMilestone(listMilestone);
-			Deal savedDeal = dealRepo.saveAndFlush(existDeal);
-
-			Request existRequest = savedDeal.getRequest();
-			if (existRequest.getLender() == null) {
-				existRequest.setLender(user);
-			}
-			existRequest.setStatus("dealing");
-			requestRepo.saveAndFlush(existRequest);
-
-			return true;
-		} catch (Exception e) {
+		String username = jwtService.getUsernameFromToken(token);
+		if (username == null) {
 			return false;
 		}
+		User user = userRepo.findByUsername(username);
+		if (user == null) {
+			return false;
+		}
+		List<Milestone> listMilestone = deal.getMilestone();
+		if (listMilestone == null) {
+			return false;
+		}
+
+		Deal existDeal = dealRepo.findById(deal.getId()).get();
+		if (existDeal == null) {
+			return false;
+		}
+
+		User currentUser = existDeal.getUser();
+		if (currentUser.getId() == user.getId()) {
+			return false;
+		}
+
+		existDeal.setStatus("dealing");
+		existDeal.setBorrowTime(deal.getBorrowTime());
+		existDeal.setPaybackTime(deal.getPaybackTime());
+		existDeal.setUser(user);
+
+		List<Milestone> lstMs = existDeal.getMilestone();
+
+		for (Milestone m : lstMs) {
+			milestoneRepo.deleteMilestoneByDealId(m.getDeal().getId());
+		}
+
+		for (Milestone m : listMilestone) {
+			m.setDeal(existDeal);
+		}
+		existDeal.setMilestone(listMilestone);
+		Deal savedDeal = dealRepo.saveAndFlush(existDeal);
+
+		Request existRequest = savedDeal.getRequest();
+		if (existRequest == null) {
+			return false;
+		}
+
+		if (existRequest.getLender() == null) {
+			existRequest.setLender(user);
+		}
+
+		existRequest.setStatus("dealing");
+		requestRepo.saveAndFlush(existRequest);
+
+		return true;
 	}
 
 	public boolean acceptDeal(Deal deal, String token) {
-		try {
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
-
-			Deal dealExist = dealRepo.findById(deal.getId()).get();
-			dealExist.setStatus("accepted");
-			dealRepo.saveAndFlush(dealExist);
-
-			Request request = dealExist.getRequest();
-			request.setStatus("trading");
-			request.setBorrowDate(deal.getRequest().getBorrowDate());
-			if (request.getLender() == null) {
-				request.setLender(user);
-			}
-			requestRepo.saveAndFlush(request);
-			
-			return true;
-		} catch (Exception e) {
+		if(deal.getId() == null) return false;
+		
+		String username = jwtService.getUsernameFromToken(token);
+		if (username == null) {
 			return false;
 		}
+		User user = userRepo.findByUsername(username);
+		if (user == null) {
+			return false;
+		}
+
+		Deal dealExist = dealRepo.findById(deal.getId()).get();
+		if (dealExist == null) {
+			return false;
+		}
+
+		dealExist.setStatus("accepted");
+		dealRepo.save(dealExist);
+
+		Request request = dealExist.getRequest();
+		if (request == null) {
+			return false;
+		}
+
+		request.setStatus("trading");
+		request.setBorrowDate(deal.getRequest().getBorrowDate());
+		if (request.getLender() == null) {
+			request.setLender(user);
+		}
+		requestRepo.save(request);
+
+		return true;
 	}
-	
-	public boolean cancelDeal(int id, String token) {
-		try {
-			
-			Deal deal = dealRepo.findById(id).get();
-			BackupDeal backupDeal = deal.getBackupDeal();
-			List<BackupMilestone> lstBackupMilestone = backupDeal.getBackupMilestone();
-			
-			Request request = deal.getRequest();
-			request.setLender(null);
-			request.setStatus("pending");
-			requestRepo.saveAndFlush(request);
-			
-			List<Milestone> lstMs = deal.getMilestone();
-			for(Milestone m : lstMs) {
-				milestoneRepo.deleteMilestoneByDealId(m.getDeal().getId());	
-			}
-			
-			deal.setBorrowTime(backupDeal.getBorrowTime());
-			deal.setPaybackTime(backupDeal.getPaybackTime());
-			deal.setStatus(backupDeal.getStatus());
-			deal.setUser(request.getBorrower());
-			Deal savedDeal = dealRepo.saveAndFlush(deal);
-			
-			List<Milestone> newLstMilestone = new ArrayList<>();
-			for(BackupMilestone bm : lstBackupMilestone) {
-				Milestone milestone = new Milestone();
-				milestone.setPercent(bm.getPercent());
-				milestone.setPresentDate(bm.getPresentDate());
-				milestone.setPreviousDate(bm.getPreviousDate());
-				milestone.setType(bm.getType());
-				milestone.setDeal(savedDeal);
-				newLstMilestone.add(milestone);
-			}
-			savedDeal.setMilestone(newLstMilestone);
-			dealRepo.saveAndFlush(deal);
-			
-			return true;
-		} catch (Exception e) {
+
+	public boolean cancelDeal(Deal dealGet, String token) {
+		if(dealGet.getId() == null) {
 			return false;
 		}
+		
+		Deal deal = dealRepo.findById(dealGet.getId()).get();
+		if (deal == null) {
+			return false;
+		}
+		BackupDeal backupDeal = deal.getBackupDeal();
+		if (backupDeal == null) {
+			return false;
+		}
+
+		List<BackupMilestone> lstBackupMilestone = backupDeal.getBackupMilestone();
+		if (lstBackupMilestone == null) {
+			return false;
+		}
+
+		Request request = deal.getRequest();
+		if (request == null) {
+			return false;
+		}
+
+		request.setLender(null);
+		request.setStatus("pending");
+		requestRepo.saveAndFlush(request);
+
+		List<Milestone> lstMs = deal.getMilestone();
+		if (lstMs == null) {
+			return false;
+		}
+
+		for (Milestone m : lstMs) {
+			milestoneRepo.deleteMilestoneByDealId(m.getDeal().getId());
+		}
+
+		deal.setBorrowTime(backupDeal.getBorrowTime());
+		deal.setPaybackTime(backupDeal.getPaybackTime());
+		deal.setStatus(backupDeal.getStatus());
+		deal.setUser(request.getBorrower());
+		Deal savedDeal = dealRepo.saveAndFlush(deal);
+
+		List<Milestone> newLstMilestone = new ArrayList<>();
+		for (BackupMilestone bm : lstBackupMilestone) {
+			Milestone milestone = new Milestone();
+			milestone.setPercent(bm.getPercent());
+			milestone.setPresentDate(bm.getPresentDate());
+			milestone.setPreviousDate(bm.getPreviousDate());
+			milestone.setType(bm.getType());
+			milestone.setDeal(savedDeal);
+			newLstMilestone.add(milestone);
+		}
+		savedDeal.setMilestone(newLstMilestone);
+		dealRepo.saveAndFlush(deal);
+
+		return true;
 	}
 
 }

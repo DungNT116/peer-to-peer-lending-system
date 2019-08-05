@@ -9,12 +9,10 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.DocumentFile;
 import capstone.p2plend.service.DocumentFileService;
 
@@ -30,38 +28,55 @@ public class DocumentFileController {
 	public ResponseEntity<Integer> uploadFile(@RequestParam("file") MultipartFile[] file) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = dfService.uploadDocument(file);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = dfService.uploadDocument(file);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
+
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping("/rest/documentFile/downloadFile")
-	public DocumentFile uploadFile(@RequestParam("id") Integer id) {
-		return dfService.downloadDocument(id);
+	public ResponseEntity<DocumentFile> uploadFile(@RequestParam("id") Integer id) {
+		HttpStatus status = null;
+		DocumentFile result = null;
+		try {
+			result = dfService.downloadDocument(id);
+			if (result != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<DocumentFile>(result, status);
 	}
-	
-	
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping("/rest/documentFile/getDocumentFiles")
 	public ResponseEntity<List<DocumentFile>> getDocumentFiles(@RequestParam("id") Integer id) {
-		
 		HttpStatus httpStatus = null;
 		List<DocumentFile> result = null;
 		try {
 			result = dfService.getDocumentFiles(id);
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		
 		return new ResponseEntity<List<DocumentFile>>(result, httpStatus);
 	}
 }

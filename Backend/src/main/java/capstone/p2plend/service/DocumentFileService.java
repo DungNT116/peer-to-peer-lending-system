@@ -1,5 +1,6 @@
 package capstone.p2plend.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,52 +19,53 @@ public class DocumentFileService {
 	@Autowired
 	DocumentFileRepository docFileRepo;
 
-	public boolean uploadDocument(MultipartFile[] mf) {
-		try {
-
-			int number = mf.length;
-			for (int i = 0; i < number; i++) {
-				String fileName = StringUtils.cleanPath(mf[i].getOriginalFilename());
-
-				DocumentFile df = new DocumentFile();
-				df.setFileName(fileName);
-				df.setFileType(mf[i].getContentType());
-				df.setData(mf[i].getBytes());
-
-				docFileRepo.saveAndFlush(df);
-			}
-
-			return true;
-		} catch (Exception e) {
+	public boolean uploadDocument(MultipartFile[] mf) throws IOException {
+		if (mf == null) {
 			return false;
 		}
+
+		int number = mf.length;
+		for (int i = 0; i < number; i++) {
+			String fileName = StringUtils.cleanPath(mf[i].getOriginalFilename());
+
+			DocumentFile df = new DocumentFile();
+			df.setFileName(fileName);
+			df.setFileType(mf[i].getContentType());
+			df.setData(mf[i].getBytes());
+
+			docFileRepo.saveAndFlush(df);
+		}
+
+		return true;
 	}
 
-	public DocumentFile downloadDocument(int id) {
-		return docFileRepo.findById(id).get();
+	public DocumentFile downloadDocument(Integer id) {
+		if (id == null) {
+			return null;
+		}
+		DocumentFile df = docFileRepo.findById(id).get();
+		if (df == null) {
+			return null;
+		}
+		return df;
 	}
 
 	public List<DocumentFile> getDocumentFiles(Integer id) {
-		try {
-
-			List<DocumentFile> lstDocFile = docFileRepo.findDocumentFiles(id);
-
-			for (DocumentFile df : lstDocFile) {
-				User user = df.getDocument().getUser();
-				Document document = new Document();
-
-				User attachUser = new User();
-				attachUser.setUsername(user.getUsername());
-				attachUser.setFirstName(user.getFirstName());
-				attachUser.setLastName(user.getLastName());
-				document.setUser(attachUser);
-				df.setDocument(document);
-			}
-
-			return lstDocFile;
-
-		} catch (Exception e) {
+		List<DocumentFile> lstDocFile = docFileRepo.findDocumentFiles(id);
+		if (lstDocFile == null) {
 			return null;
 		}
+		for (DocumentFile df : lstDocFile) {
+			User user = df.getDocument().getUser();
+			Document document = new Document();
+
+			User attachUser = new User();
+			attachUser.setUsername(user.getUsername());
+			attachUser.setFirstName(user.getFirstName());
+			attachUser.setLastName(user.getLastName());
+			document.setUser(attachUser);
+			df.setDocument(document);
+		}
+		return lstDocFile;
 	}
 }
