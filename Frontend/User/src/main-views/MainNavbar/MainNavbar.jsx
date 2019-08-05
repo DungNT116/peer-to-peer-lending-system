@@ -26,7 +26,7 @@ import NotificationBadge from "react-notification-badge";
 import { Effect } from "react-notification-badge";
 import { database } from "../../firebase";
 
-class DemoNavbar extends React.Component {
+class MainNavbar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -181,8 +181,8 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                      ""
-                    )}
+                    ""
+                  )}
                   {localStorage.getItem("isLoggedIn") ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
@@ -196,8 +196,8 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                      ""
-                    )}
+                    ""
+                  )}
                   {localStorage.getItem("isLoggedIn") ? (
                     <UncontrolledDropdown nav>
                       <DropdownToggle nav>
@@ -210,11 +210,12 @@ class DemoNavbar extends React.Component {
                         <DropdownItem to="/view-new-request" tag={Link}>
                           Own Requests
                         </DropdownItem>
+
+                        <DropdownItem to="/view-request-trading" tag={Link}>
+                          Trading Requests
+                        </DropdownItem>
                         <DropdownItem to="/view-own-transactions" tag={Link}>
                           Own Transactions
-                        </DropdownItem>
-                        <DropdownItem to="/view-request-trading" tag={Link}>
-                          Requests Trading
                         </DropdownItem>
                         <DropdownItem to="/view-history-request" tag={Link}>
                           History Requests
@@ -222,8 +223,8 @@ class DemoNavbar extends React.Component {
                       </DropdownMenu>
                     </UncontrolledDropdown>
                   ) : (
-                      ""
-                    )}
+                    ""
+                  )}
                 </Nav>
                 <Nav
                   className="align-items-lg-center navbar-nav-hover ml-lg-auto"
@@ -233,33 +234,33 @@ class DemoNavbar extends React.Component {
                     {localStorage.getItem("isLoggedIn") ? (
                       ""
                     ) : (
-                        <Button
-                          className="btn-neutral btn-icon"
-                          color="default"
-                          href="/login-page"
-                        >
-                          <span className="btn-inner--icon">
-                            <i className="fa fa-user mr-2" />
-                          </span>
-                          <span className="nav-link-inner--text ml-1">Login</span>
-                        </Button>
-                      )}
+                      <Button
+                        className="btn-neutral btn-icon"
+                        color="default"
+                        href="/login-page"
+                      >
+                        <span className="btn-inner--icon">
+                          <i className="fa fa-user mr-2" />
+                        </span>
+                        <span className="nav-link-inner--text ml-1">Login</span>
+                      </Button>
+                    )}
                     {localStorage.getItem("isLoggedIn") ? (
                       ""
                     ) : (
-                        <Button
-                          className="btn-neutral btn-icon"
-                          color="default"
-                          href="/register-page"
-                        >
-                          <span className="btn-inner--icon">
-                            <i className="ni ni-key-25 mr-2" />
-                          </span>
-                          <span className="nav-link-inner--text ml-1">
-                            register
+                      <Button
+                        className="btn-neutral btn-icon"
+                        color="default"
+                        href="/register-page"
+                      >
+                        <span className="btn-inner--icon">
+                          <i className="ni ni-key-25 mr-2" />
                         </span>
-                        </Button>
-                      )}
+                        <span className="nav-link-inner--text ml-1">
+                          register
+                        </span>
+                      </Button>
+                    )}
                     {localStorage.getItem("isLoggedIn") ? (
                       <div>
                         <UncontrolledDropdown nav>
@@ -363,8 +364,8 @@ class DemoNavbar extends React.Component {
                         </UncontrolledDropdown>
                       </div>
                     ) : (
-                        ""
-                      )}
+                      ""
+                    )}
                   </NavItem>
                 </Nav>
               </UncontrolledCollapse>
@@ -376,4 +377,4 @@ class DemoNavbar extends React.Component {
   }
 }
 
-export default DemoNavbar;
+export default MainNavbar;

@@ -20,7 +20,7 @@ import { css } from "@emotion/core";
 
 import { PulseLoader } from "react-spinners";
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import MainNavbar from "../MainNavbar/MainNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
 import { apiLink } from "../../api.jsx";
 class Profile extends React.Component {
@@ -677,7 +677,7 @@ class Profile extends React.Component {
     // }
     return (
       <>
-        <DemoNavbar />
+        <MainNavbar />
         <main className="profile-page" ref="main">
           <section className="section-profile-cover section-shaped my-0 bg-gradient-info">
             {/* <div className="shape shape-style-1 shape-default alpha-4">
