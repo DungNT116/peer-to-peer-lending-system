@@ -24,6 +24,8 @@ class Login extends React.Component {
       isForgotPassword: false,
       usernameForgotPassword: '',
       emailForgotPassword: '',
+      validUsername: false,
+      validEmail: false
     }
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -37,50 +39,73 @@ class Login extends React.Component {
   }
 
   handleEmailForgotPassword(event) {
-    this.setState({
-      emailForgotPassword: event.target.value
-    })
+    const tmp = event.target.value.trim();
+    if (tmp.match(/^[a-zA-Z0-9]{5,30}@[a-z]{3,10}(.[a-z]{2,3})+$/)) {
+      document.getElementById("emailError").innerHTML = "";
+      this.setState({
+        emailForgotPassword: tmp,
+        validEmail: true
+      });
+    } else {
+      document.getElementById("emailError").innerHTML =
+        "<div class='alert alert-danger' role='alert'><strong>Email only contain alphabet character!</strong></div>";
+      this.setState({
+        emailForgotPassword: tmp,
+        validEmail: false
+      });
+    }
   }
 
   handleUsernameForgotPassword(event) {
-    this.setState({
-      usernameForgotPassword: event.target.value
-    })
+    const tmp = event.target.value.trim();
+    if (!tmp.match(/^\w*$/)) {
+      document.getElementById("usernameError").innerHTML =
+        "<div class='alert alert-danger' role='alert'><strong>Username does not contain special character!</strong></div>";
+      this.setState({
+        usernameForgotPassword: tmp,
+        validUsername: false
+      });
+    } else {
+      document.getElementById("usernameError").innerHTML = "";
+      this.setState({
+        usernameForgotPassword: tmp,
+        validUsername: true
+      });
+    }
   }
 
   forgotPassword() {
     // if (this.state.isSamePassword === true) {
-      // console.log("gooooooooooooooo")
+    // console.log("gooooooooooooooo")
+    console.log(this.state.validUsername)
+    console.log(this.state.validEmail)
+    if(this.state.validEmail && this.state.validUsername) {
       var formData = new FormData();
-      formData.append("username", this.state.oldPassword);
-      formData.append("email", this.state.newPassword);
+    formData.append("username", this.state.usernameForgotPassword);
+    formData.append("email", this.state.emailForgotPassword);
 
-      fetch(apiLink + "/rest/user/changePassword", {
-        method: "POST",
-        headers: {
-          // "Content-Type": "application/json",
-          Authorization: localStorage.getItem("token")
-        },
-        body: formData
-      }).then(result => {
-        console.log(result);
-        console.log(result.status)
-        if (result.status === 200) {
-          this.changeIsChangePassword();
-          alert("change Password success")
-          this.setState({
-            newPassword: '',
-            oldPassword: '',
-            confirmPassword: '',
-          })
-          // console.log(result);
-          // this.changeEditable();
-          // this.getProfile();
-        } else if (result.status === 401) {
-          localStorage.removeItem("isLoggedIn");
-          this.props.history.push("/login-page");
-        }
-      })
+    fetch(apiLink + "/rest/user/forgotPassword", {
+      method: "POST",
+      headers: {
+        // "Content-Type": "application/json",
+        // Authorization: localStorage.getItem("token")
+      },
+      body: formData
+    }).then(result => {
+      console.log(result);
+      console.log(result.status)
+      if (result.status === 200) {
+        // this.changeIsChangePassword();
+        alert("Forgot Password")
+      } else if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login-page");
+      } else if(result.status === 400) {
+        alert("email or username is not exist")
+      }
+    })
+
+    } 
     // }
   }
 
@@ -142,32 +167,25 @@ class Login extends React.Component {
     }).then(
       (result) => {
         result.json().then((data) => {
-            if (result.status === 200) {
-              if (data.role === "ROLE_USER") {
-              // this.setToken(data);
-              //                   let header = document.getElementsByTagName("head")[0];
-              // // console.log("header" + header);
-              // var meta = document.createElement("meta");
-              // meta.name = "token";
-              // meta.content = data;
-              // header.appendChild(meta);
+          if (result.status === 200) {
+            if (data.role === "ROLE_USER") {
               localStorage.setItem("token", data.token);
               localStorage.setItem("isLoggedIn", true);
               localStorage.setItem("user", data.username);
               this.getUsername();
               this.props.history.push('view-request-list');
 
-              } else {
-                document.getElementById("loginError").innerHTML =
-                      "<div class='alert alert-danger' role='alert'><strong>Your account is not user account</strong><br/> Please try again!</div>";
-              }
+            } else {
+              document.getElementById("loginError").innerHTML =
+                "<div class='alert alert-danger' role='alert'><strong>Your account is not user account</strong><br/> Please try again!</div>";
             }
-            if (result.status !== 200) {
-              // event.preventDefault();
-              if (data.message === "Wrong userId and password")
-                document.getElementById("loginError").innerHTML =
-                  "<div class='alert alert-danger' role='alert'><strong>Username or password is incorrect!</strong><br/> Please try again!</div>";
-            }
+          }
+          if (result.status !== 200) {
+            // event.preventDefault();
+            if (data.message === "Wrong userId and password")
+              document.getElementById("loginError").innerHTML =
+                "<div class='alert alert-danger' role='alert'><strong>Username or password is incorrect!</strong><br/> Please try again!</div>";
+          }
         });
       }
 
@@ -237,63 +255,105 @@ class Login extends React.Component {
                         <p>Sign in here</p>
                       </div>
                       <Form>
-                      {/* role="form" */}
-                      {/* onSubmit={this.handleSubmit} */}
-                        <FormGroup className="mb-3">
-                          <InputGroup className="input-group-alternative">
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="ni ni-email-83" />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <Input placeholder="Username" type="text" value={this.state.username} onChange={this.handleNameChange} />
-                          </InputGroup>
-                        </FormGroup>
-                        <FormGroup>
-                          <InputGroup className="input-group-alternative">
-                            <InputGroupAddon addonType="prepend">
-                              <InputGroupText>
-                                <i className="ni ni-lock-circle-open" />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                            <Input
-                              placeholder="Password"
-                              type="password"
-                              autoComplete="off"
-                              value={this.state.password} onChange={this.handlePasswordChange}
-                            />
-                          </InputGroup>
-                        </FormGroup>
-                        <div>
-                          <p style={{ color: "red" }} id="loginError"></p>
-                        </div>
-                        <div className="text-center my-4">
-                        {/* type="submit"  */}
-                          <Button size="md" outline color="primary" onClick={() => this.handleSubmit()}>Sign In</Button>
-                        </div>
+                        {/* role="form" */}
+                        {/* onSubmit={this.handleSubmit} */}
+                        {this.state.isForgotPassword === false ?
+                          (
+                            <div>
+                              <FormGroup className="mb-3">
+                                <InputGroup className="input-group-alternative">
+                                  <InputGroupAddon addonType="prepend">
+                                    <InputGroupText>
+                                      <i className="ni ni-email-83" />
+                                    </InputGroupText>
+                                  </InputGroupAddon>
+                                  <Input placeholder="Username" type="text" value={this.state.username} onChange={this.handleNameChange} />
+                                </InputGroup>
+                              </FormGroup>
+                              <FormGroup>
+                                <InputGroup className="input-group-alternative">
+                                  <InputGroupAddon addonType="prepend">
+                                    <InputGroupText>
+                                      <i className="ni ni-lock-circle-open" />
+                                    </InputGroupText>
+                                  </InputGroupAddon>
+                                  <Input
+                                    placeholder="Password"
+                                    type="password"
+                                    autoComplete="off"
+                                    value={this.state.password} onChange={this.handlePasswordChange}
+                                  />
+                                </InputGroup>
+                              </FormGroup>
+                              <div>
+                                <p style={{ color: "red" }} id="loginError"></p>
+                              </div>
+                              <div className="text-center my-4">
+                                {/* type="submit"  */}
+                                <Button size="md" outline color="primary" onClick={() => this.handleSubmit()}>Sign In</Button>
+                              </div>
+                            </div>
+                          )
+                          :
+                          (
+                            <div>
+                              <FormGroup>
+                                <Input
+                                  placeholder="Username"
+                                  type="text"
+                                  autoComplete="off"
+                                  value={this.state.usernameForgotPassword}
+                                  onChange={this.handleUsernameForgotPassword}
+                                />
+                                <p id="usernameError"></p>
+                              </FormGroup>
+                              <FormGroup>
+                                <Input
+                                  placeholder="Email"
+                                  type="email"
+                                  autoComplete="off"
+                                  value={this.state.emailForgotPassword}
+                                  onChange={this.handleEmailForgotPassword}
+                                />
+                                <p id="emailError"></p>
+                              </FormGroup>
+                              <div className="text-center my-4">
+                                <Button size="md" outline color="primary" onClick={() => this.forgotPassword()}>Send</Button>
+                              </div>
+                            </div>
+                          )}
+
                       </Form>
                     </CardBody>
                   </Card>
-                  <Row className="mt-3">
-                    <Col xs="6">
-                      <p
-                        className="text-white"
-                        style={{cursor:'pointer'}}
-                        // href="#pablo"
-                        onClick={() => this.changeIsForgotPassword()}
-                      >
-                        <small>Forgot password?</small>
-                      </p>
-                    </Col>
-                    <Col className="text-right" xs="6">
-                      <a
-                        className="text-white"
-                        href="/register-page"
-                      >
-                        <small>Create new account</small>
-                      </a>
-                    </Col>
-                  </Row>
+                  {this.state.isForgotPassword === false ?
+                    (
+                      <Row className="mt-3">
+                        <Col xs="6">
+                          <p
+                            className="text-white"
+                            style={{ cursor: 'pointer' }}
+                            // href="#pablo"
+                            onClick={() => this.changeIsForgotPassword()}
+                          >
+                            <small>Forgot password?</small>
+                          </p>
+                        </Col>
+                        <Col className="text-right" xs="6">
+                          <a
+                            className="text-white"
+                            href="/register-page"
+                          >
+                            <small>Create new account</small>
+                          </a>
+                        </Col>
+                      </Row>
+                    )
+                    :
+                    (
+                      ""
+                    )}
+
                 </Col>
               </Row>
             </Container>
