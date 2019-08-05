@@ -18,33 +18,41 @@ public class MilestoneConstroller {
 
 	@Autowired
 	MilestoneService milestoneService;
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PostMapping(value = "/rest/milestone/newMilestone")
 	public ResponseEntity<Integer> newMilestone(@RequestBody Milestone milestone) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = milestoneService.newMilestone(milestone);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = milestoneService.newMilestone(milestone);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/milestone/updateMilestone")
 	public ResponseEntity<Integer> updateMilestone(@RequestBody Milestone milestone) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = milestoneService.updateMilestone(milestone);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = milestoneService.updateMilestone(milestone);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}

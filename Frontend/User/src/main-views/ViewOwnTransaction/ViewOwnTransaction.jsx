@@ -96,7 +96,7 @@ class ViewOwnTransaction extends React.Component {
       }
     ).then(result => {
       result.json().then(data => {
-        console.log(data)
+        // console.log(data)
         this.setState({
           transactions: data.data
         });
@@ -105,7 +105,7 @@ class ViewOwnTransaction extends React.Component {
         // alert("create success");
       }
 
-      console.log(this.state.transactions);
+      // console.log(this.state.transactions);
     });
   }
 
@@ -133,6 +133,8 @@ class ViewOwnTransaction extends React.Component {
       })
     }).then(result => {
       result.json().then(data => {
+        console.log(transactionInput);
+        console.log(data);
         let dateCreate = new Date(data.asset.data.createDate);
         setTimeout(
           function() {
@@ -162,7 +164,7 @@ class ViewOwnTransaction extends React.Component {
         );
         setTimeout(
           function() {
-            if (Number(data.asset.data.amount) === transactionInput.amount) {
+            if (Number(data.asset.data.amount) === transactionInput.amountValid) {
               this.setState({
                 validTx: {
                   ...this.state.validTx,
@@ -268,7 +270,7 @@ class ViewOwnTransaction extends React.Component {
                     <Col md="6">
                       {this.state.validTx.sender ? (
                         <i
-                          class="ni ni-check-bold"
+                          className="ni ni-check-bold"
                           style={{ color: "green" }}
                         />
                       ) : (
@@ -286,7 +288,7 @@ class ViewOwnTransaction extends React.Component {
                     <Col md="6">
                       {this.state.validTx.receiver ? (
                         <i
-                          class="ni ni-check-bold"
+                          className="ni ni-check-bold"
                           style={{ color: "green" }}
                         />
                       ) : (
@@ -304,7 +306,7 @@ class ViewOwnTransaction extends React.Component {
                     <Col md="6">
                       {this.state.validTx.amount ? (
                         <i
-                          class="ni ni-check-bold"
+                        className="ni ni-check-bold"
                           style={{ color: "green" }}
                         />
                       ) : (
@@ -322,7 +324,7 @@ class ViewOwnTransaction extends React.Component {
                     <Col md="6">
                       {this.state.validTx.createDate ? (
                         <i
-                          class="ni ni-check-bold"
+                        className="ni ni-check-bold"
                           style={{ color: "green" }}
                         />
                       ) : (
@@ -347,7 +349,7 @@ class ViewOwnTransaction extends React.Component {
                     <Col md="6">
                       {this.state.validTx.status}
                       <i
-                        class="ni ni-check-bold"
+                        className="ni ni-check-bold"
                         style={{ color: "green", fontSize: "20px" }}
                       />
                     </Col>

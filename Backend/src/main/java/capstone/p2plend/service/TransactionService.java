@@ -10,11 +10,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import capstone.p2plend.dto.PageDTO;
+import capstone.p2plend.entity.Deal;
 import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.entity.Request;
 import capstone.p2plend.entity.Transaction;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.repo.MilestoneRepository;
+import capstone.p2plend.repo.RequestRepository;
 import capstone.p2plend.repo.TransactionRepository;
 import capstone.p2plend.repo.UserRepository;
 
@@ -31,11 +33,17 @@ public class TransactionService {
 	UserRepository userRepo;
 
 	@Autowired
+	RequestRepository requestRepo;
+
+	@Autowired
 	JwtService jwtService;
 
 	public List<Transaction> getTopTransactionOrderByCreateDateDesc() {
 
 		List<Transaction> listTrans = transactionRepo.findTop20ByOrderByCreateDateDesc();
+		if (listTrans == null) {
+			return null;
+		}
 
 		List<Transaction> transactions = new ArrayList<>();
 		for (Transaction t : listTrans) {
@@ -47,6 +55,7 @@ public class TransactionService {
 			transaction.setAmount(t.getAmount());
 			transaction.setStatus(t.getStatus());
 			transaction.setIdTrx(t.getIdTrx());
+			transaction.setAmountValid(t.getAmountValid());
 			transactions.add(transaction);
 		}
 
@@ -54,70 +63,100 @@ public class TransactionService {
 	}
 
 	public PageDTO<Transaction> getAllUserTransaction(Integer page, Integer element, String token) {
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
 
-		try {
-			String username = jwtService.getUsernameFromToken(token);
-			User user = userRepo.findByUsername(username);
-
-			if (user == null)
-				return null;
-
-			Pageable pageable = PageRequest.of(page - 1, element);
-			Page<Transaction> listTrx = transactionRepo.findAllUserTransaction(pageable, username);
-			
-			List<Transaction> transactions = new ArrayList<>();
-			for (Transaction t : listTrx) {
-				Transaction transaction = new Transaction();
-				transaction.setId(t.getId());
-				transaction.setSender(t.getSender());
-				transaction.setReceiver(t.getReceiver());
-				transaction.setCreateDate(t.getCreateDate());
-				transaction.setAmount(t.getAmount());
-				transaction.setStatus(t.getStatus());
-				transaction.setIdTrx(t.getIdTrx());
-				transactions.add(transaction);
-			}
-			
-			PageDTO<Transaction> pageDTO = new PageDTO<>();
-			pageDTO.setMaxPage(listTrx.getTotalPages());
-			pageDTO.setData(transactions);
-			return pageDTO;
-		} catch (Exception e) {
+		if (user == null)
 			return null;
+
+		Pageable pageable = PageRequest.of(page - 1, element);
+		Page<Transaction> listTrx = transactionRepo.findAllUserTransaction(pageable, username);
+
+		if (listTrx == null)
+			return null;
+
+		List<Transaction> transactions = new ArrayList<>();
+		for (Transaction t : listTrx) {
+			Transaction transaction = new Transaction();
+			transaction.setId(t.getId());
+			transaction.setSender(t.getSender());
+			transaction.setReceiver(t.getReceiver());
+			transaction.setCreateDate(t.getCreateDate());
+			transaction.setAmount(t.getAmount());
+			transaction.setStatus(t.getStatus());
+			transaction.setIdTrx(t.getIdTrx());
+			transaction.setAmountValid(t.getAmountValid());
+			transactions.add(transaction);
 		}
+
+		PageDTO<Transaction> pageDTO = new PageDTO<>();
+		pageDTO.setMaxPage(listTrx.getTotalPages());
+		pageDTO.setData(transactions);
+		return pageDTO;
 	}
 
 	public boolean newTransaction(Transaction transaction) {
-		try {
-
-			if (transaction.getId() != null) {
-				return false;
-			}
-
-			if (transaction.getMilestone().getId() == null) {
-				return false;
-			}
-
-			Milestone existMilestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
-			if (existMilestone.getTransaction() != null) {
-				return false;
-			}
-
-			Milestone milestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
-
-			if (transaction.getAmount() == null || transaction.getCreateDate() == null || transaction.getIdTrx() == null
-					|| transaction.getReceiver() == null || transaction.getSender() == null
-					|| transaction.getStatus() == null) {
-				return false;
-			}
-
-			transaction.setMilestone(milestone);
-			transactionRepo.saveAndFlush(transaction);
-
-			return true;
-		} catch (Exception e) {
+		if (transaction.getMilestone().getId() == null) {
 			return false;
 		}
+		if (transaction.getAmount() == null || transaction.getCreateDate() == null || transaction.getIdTrx() == null
+				|| transaction.getReceiver() == null || transaction.getSender() == null
+				|| transaction.getStatus() == null || transaction.getAmountValid() == null) {
+			return false;
+		}
+		int idMilestone = transaction.getMilestone().getId();
+		Milestone existMilestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
+		if (existMilestone.getTransaction() != null) {
+			return false;
+		}
+		Milestone milestone = milestoneRepo.findById(idMilestone).get();
+		if (milestone == null) {
+			return false;
+		}
+
+		Transaction trx = new Transaction();
+		trx.setAmount(transaction.getAmount());
+		trx.setCreateDate(transaction.getCreateDate());
+		trx.setIdTrx(transaction.getIdTrx());
+		trx.setReceiver(transaction.getReceiver());
+		trx.setSender(transaction.getSender());
+		trx.setStatus(transaction.getStatus());
+		trx.setAmountValid(transaction.getAmountValid());
+		milestone.setTransaction(trx);
+		trx.setMilestone(milestone);
+		Transaction savedTrx = transactionRepo.saveAndFlush(trx);
+		if (savedTrx == null) {
+			return false;
+		}
+
+		Milestone getMilestone = milestoneRepo.findById(idMilestone).get();
+		Deal savedDeal = getMilestone.getDeal();
+		System.out.println(savedDeal.getId());
+
+		List<Milestone> lstMilestone = milestoneRepo.findListMilestoneByDealId(savedDeal.getId());
+
+		for (int i = 0; i < lstMilestone.size(); i++) {
+			Milestone m = lstMilestone.get(i);
+			if (m.getPercent() == null) {
+				lstMilestone.remove(i);
+			}
+		}
+
+		int countComplete = 0;
+		for (int i = 0; i < lstMilestone.size(); i++) {
+			Milestone m = lstMilestone.get(i);
+			if (m.getTransaction() != null) {
+				if (m.getTransaction().getStatus().equalsIgnoreCase("COMPLETED")) {
+					countComplete++;
+				}
+			}
+		}
+		if (countComplete == lstMilestone.size()) {
+			Request request = savedTrx.getMilestone().getDeal().getRequest();
+			request.setStatus("done");
+			requestRepo.save(request);
+		}
+		return true;
 	}
 
 	public boolean updateTransaction(Transaction transaction) {

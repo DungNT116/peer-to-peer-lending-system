@@ -178,9 +178,6 @@ class CreateRequestPage extends React.Component {
   async handleSubmit(event) {
     event.preventDefault();
     var invalidLoanLimit = this.checkLoanLimit();
-
-    console.log(invalidLoanLimit);
-    console.log(this.state.invalidAmount);
     if (this.state.invalidAmount === false && invalidLoanLimit === false) {
       console.log("gooooooooooooooo")
       fetch(apiLink + "/rest/request/createRequest", {

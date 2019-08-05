@@ -209,7 +209,7 @@ class Register extends React.Component {
         // console.log(result)
       } else if (result.status === 200) {
         result.text().then(async data => {
-          console.log(data);
+          // console.log(data);
 
           await database.ref("ppls/").push({
             username: this.state.username,
@@ -228,7 +228,7 @@ class Register extends React.Component {
                 this.setState({ keyUserFb: Object.keys(userData)[0] });
               }
             });
-          database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+          await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
             message: "Congratulations ! You have just create account !",
             sender: "System"
           });
@@ -443,7 +443,7 @@ class Register extends React.Component {
                           <InputGroup className="input-group-alternative mb-3">
                             <InputGroupAddon addonType="prepend">
                               <InputGroupText>
-                                <i class="ni ni-align-left-2" />
+                                <i className="ni ni-align-left-2" />
                               </InputGroupText>
                             </InputGroupAddon>
                             <Input

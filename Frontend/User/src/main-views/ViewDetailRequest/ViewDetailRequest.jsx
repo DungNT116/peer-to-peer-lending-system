@@ -27,6 +27,7 @@ import { apiLink, bigchainAPI, client_API } from "../../api.jsx";
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
 import ApplyTimeline from "../ApplyTimeline/ApplyTimeline";
+import { isFulfilled } from "q";
 
 class ViewDetailRequest extends React.Component {
   constructor(props) {
@@ -99,8 +100,8 @@ class ViewDetailRequest extends React.Component {
 
   saveTransaction(data, data_transaction) {
     console.log(data);
-    console.log(data_transaction);
-    console.log(this.props.request.data.deal.milestone[1].id);
+    // console.log(data_transaction);
+    // console.log(this.props.request.data.deal.milestone[1].id);
     fetch(apiLink + "/rest/transaction/newTransaction", {
       method: "POST",
       headers: {
@@ -110,7 +111,11 @@ class ViewDetailRequest extends React.Component {
       body: JSON.stringify({
         sender: data_transaction.data_tx.data.sender,
         receiver: data_transaction.data_tx.data.receiver,
-        amount: Number(data_transaction.data_tx.data.amount),
+        amount: Number(
+          this.props.request.data.amount *
+            this.props.request.data.deal.milestone[1].percent
+        ),
+        amountValid: Number(data.amount),
         status: data.status,
         idTrx: data.id,
         createDate: this.convertDateToTimestamp(
@@ -133,7 +138,7 @@ class ViewDetailRequest extends React.Component {
 
   validRedux() {
     // console.log(this.props.request.data.amount)
-    console.log(Object.keys(this.props.request.data).length === 0);
+    // console.log(Object.keys(this.props.request.data).length === 0);
     if (Object.keys(this.props.request.data).length === 0) {
       // localStorage.removeItem("isLoggedIn");
       this.props.history.push(localStorage.getItem("previousPage"));
@@ -159,21 +164,20 @@ class ViewDetailRequest extends React.Component {
       })
     }).then(async result => {
       if (result.status === 200) {
-        console.log("username", this.props.request.data.borrower.username);
         await database
           .ref("ppls")
           .orderByChild("username")
-          .equalTo(this.props.request.data.borrower.username)
+          .equalTo(this.props.request.data.borrowerUser)
           .once("value", snapshot => {
             if (snapshot.exists()) {
               const userData = snapshot.val();
               this.setState({ keyUserFb: Object.keys(userData)[0] });
             }
           });
-        database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+        await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
           message:
             localStorage.getItem("user") +
-            " accepted your request" +
+            " accepted request number : " +
             this.props.request.data.id +
             " !",
           sender: localStorage.getItem("user"),
@@ -182,11 +186,16 @@ class ViewDetailRequest extends React.Component {
         var upvotesRef = database.ref(
           "/ppls/" + this.state.keyUserFb + "/countNew"
         );
-        upvotesRef.transaction(function(current_value) {
+        await upvotesRef.transaction(function(current_value) {
           return (current_value || 0) + 1;
         });
         alert("create success");
-        this.props.history.push("/view-request-trading");
+        await setTimeout(
+          function() {
+            this.props.history.push("/view-request-trading");
+          }.bind(this),
+          5000
+        );
       } else if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
@@ -204,7 +213,7 @@ class ViewDetailRequest extends React.Component {
     };
     for (let i = 0; i < this.state.lendingTimeline.length; i++) {
       const element = this.state.lendingTimeline[i];
-      console.log(element);
+      // console.log(element);
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
         previousDate: "",
@@ -252,14 +261,16 @@ class ViewDetailRequest extends React.Component {
       }
       milestones.push(milestone);
     }
-    console.log(milestones);
+    // console.log(milestones);
     return milestones;
   }
 
   saveNewDealInformationToDB() {
     // console.log(this.state.lendingTimeline);
     // console.log(this.state.paybackTimeline);
-    console.log("username", this.props.request.data.borrower.username);
+    // console.log("username", this.props.request.data.borrower.username);
+
+    console.log("username", this.props.request);
     fetch(apiLink + "/rest/deal/makeDeal", {
       method: "PUT",
       headers: {
@@ -273,27 +284,27 @@ class ViewDetailRequest extends React.Component {
         milestone: this.createMileStone()
       })
     }).then(async result => {
-      console.log(result);
+      // console.log(result);
       if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       } else if (result.status === 200) {
         // alert("create success");
-        console.log("success");
+        // console.log("success");
         await database
           .ref("ppls")
           .orderByChild("username")
-          .equalTo(this.props.request.data.borrower.username)
+          .equalTo(this.props.request.data.deal.user.username)
           .once("value", snapshot => {
             if (snapshot.exists()) {
               const userData = snapshot.val();
               this.setState({ keyUserFb: Object.keys(userData)[0] });
             }
           });
-        database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+        await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
           message:
             localStorage.getItem("user") +
-            " make deal your request" +
+            " make deal request number : " +
             this.props.request.data.id +
             " !",
           sender: localStorage.getItem("user"),
@@ -302,7 +313,7 @@ class ViewDetailRequest extends React.Component {
         var upvotesRef = database.ref(
           "/ppls/" + this.state.keyUserFb + "/countNew"
         );
-        upvotesRef.transaction(function(current_value) {
+        await upvotesRef.transaction(function(current_value) {
           return (current_value || 0) + 1;
         });
       } else if (result.status === 400) {
@@ -401,7 +412,7 @@ class ViewDetailRequest extends React.Component {
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data);
+        // console.log(data);
         this.acceptDeal();
         this.saveTransaction(data, data_transaction);
       });
@@ -451,7 +462,11 @@ class ViewDetailRequest extends React.Component {
     });
     //button visiable and invisible
     document.getElementById("dealButton").style.display = "none";
-    document.getElementById("acceptButton").style.display = "none";
+    if (
+      this.props.request.data.borrower.username !== localStorage.getItem("user")
+    ) {
+      document.getElementById("acceptButton").style.display = "none";
+    }
     document.getElementById("saveDealButton").style.display = "";
 
     //display field to edit data
@@ -488,7 +503,11 @@ class ViewDetailRequest extends React.Component {
     this.setState({ editable: !this.state.editable });
     //button
     document.getElementById("dealButton").style.display = "none";
-    document.getElementById("acceptButton").style.display = "none";
+    if (
+      this.props.request.data.borrower.username !== localStorage.getItem("user")
+    ) {
+      document.getElementById("acceptButton").style.display = "none";
+    }
     document.getElementById("saveDealButton").style.display = "none";
 
     //hidden field to edit data
@@ -536,6 +555,13 @@ class ViewDetailRequest extends React.Component {
   }
   render() {
     const isHistoryDetail = this.props.viewDetail.isHistoryDetail;
+    let lenderUsername = "";
+    if (
+      this.props.request.data.lender !== undefined &&
+      this.props.request.data.lender !== null
+    )
+      lenderUsername = this.props.request.data.lender.username;
+    else lenderUsername = "";
     return (
       <>
         {this.validRedux()}
@@ -605,11 +631,13 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                             <Col xs="12" md="9">
                               <p className="h6">
-                                {this.numberWithCommas(this.props.request.data.amount +
-                                  (this.props.request.data.amount *
-                                    (this.props.request.data.duration / 30) *
-                                    1.5) /
-                                    100)}{" "}
+                                {this.numberWithCommas(
+                                  this.props.request.data.amount +
+                                    (this.props.request.data.amount *
+                                      (this.props.request.data.duration / 30) *
+                                      1.5) /
+                                      100
+                                )}{" "}
                                 VND
                               </p>
                             </Col>
@@ -620,7 +648,10 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                             <Col xs="12" md="9">
                               <p className="h6">
-                                {this.numberWithCommas(this.props.request.data.amount)} VND
+                                {this.numberWithCommas(
+                                  this.props.request.data.amount
+                                )}{" "}
+                                VND
                               </p>
                             </Col>
                           </FormGroup>
@@ -751,13 +782,15 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                             <Col xs="12" md="9">
                               <p className="h6">
-                                {this.numberWithCommas(Math.round(
-                                  ((this.props.request.data.amount *
-                                    (this.props.request.data.duration / 30) *
-                                    1.5) /
-                                    100) *
-                                    1000
-                                ) / 1000)}{" "}
+                                {this.numberWithCommas(
+                                  Math.round(
+                                    ((this.props.request.data.amount *
+                                      (this.props.request.data.duration / 30) *
+                                      1.5) /
+                                      100) *
+                                      1000
+                                  ) / 1000
+                                )}{" "}
                                 VND
                               </p>
                             </Col>
@@ -775,8 +808,12 @@ class ViewDetailRequest extends React.Component {
                             isLendMany={this.state.isLendMany}
                             isPayMany={this.state.isPayMany}
                             borrowerUser={
-                              this.props.request.data.borrower.username
+                              this.props.request.data.borrower.username !==
+                              undefined
+                                ? this.props.request.data.borrower.username
+                                : ""
                             }
+                            lenderUser={lenderUsername}
                             goToViewRequestTrading={() =>
                               this.goToViewRequestTrading()
                             }
@@ -808,19 +845,21 @@ class ViewDetailRequest extends React.Component {
                                 <i className="ni ni-cloud-download-95" /> Save
                                 Deal
                               </Button>{" "}
-                              {this.props.borrowerUser == localStorage.getItem("user") ? ("") : (
-                                 <Button
-                                 type="submit"
-                                 id="acceptButton"
-                                 size="md"
-                                 className="btn btn-outline-primary"
-                                 onClick={this.toggleModal}
-                                 disabled={this.state.editable}
-                               >
-                                 <i className="ni ni-check-bold" /> Accept
-                               </Button>
+                              {this.props.request.data.borrower.username ===
+                              localStorage.getItem("user") ? (
+                                ""
+                              ) : (
+                                <Button
+                                  type="submit"
+                                  id="acceptButton"
+                                  size="md"
+                                  className="btn btn-outline-primary"
+                                  onClick={this.toggleModal}
+                                  disabled={this.state.editable}
+                                >
+                                  <i className="ni ni-check-bold" /> Accept
+                                </Button>
                               )}
-                             
                             </CardFooter>
                             {/* save deal */}
                             <Modal
@@ -873,8 +912,8 @@ class ViewDetailRequest extends React.Component {
                                         txId: details.id,
                                         createDate: new Date(),
                                         status: details.status,
-                                        amount: details.purchase_units[0].amount
-                                            .value
+                                        amount:
+                                          details.purchase_units[0].amount.value
                                       }
                                     });
                                     this.send_tx();

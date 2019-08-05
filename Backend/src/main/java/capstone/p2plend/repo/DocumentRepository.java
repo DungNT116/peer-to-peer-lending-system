@@ -9,13 +9,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface DocumentRepository extends JpaRepository<Document, Integer> {
-	
+
 	@Query(value = "SELECT * FROM document WHERE document_id = :documentId AND document_type_id = :documentTypeId", nativeQuery = true)
-	Document findByDocumentIdAndDocumentType(@Param("documentId") String documentId, @Param("documentTypeId") Integer documentTypeId);
-	
+	Document findByDocumentIdAndDocumentType(@Param("documentId") String documentId,
+			@Param("documentTypeId") Integer documentTypeId);
+
 	@Query(value = "SELECT * FROM document WHERE status = :status", nativeQuery = true)
 	Page<Document> findAllDocumentWithStatus(Pageable pageable, @Param("status") String status);
-		
-	@Query(value = "SELECT * FROM document WHERE document_type_id = :documentTypeId AND user_id = :id", nativeQuery = true)
-	Document findUserDocument(@Param("documentTypeId") Integer documentTypeId, @Param("id") Integer id);
+
+	@Query(value = "SELECT * FROM document WHERE document_type_id = :documentTypeId AND user_id = :id AND status <> :status", nativeQuery = true)
+	Document findUserDocumentExceptStatus(@Param("documentTypeId") Integer documentTypeId, @Param("id") Integer id,
+			@Param("status") String status);
+	
+	@Query(value = "SELECT * FROM document WHERE document_type_id = :documentTypeId AND user_id = :id AND status = :status", nativeQuery = true)
+	Document findUserDocumentWithStatus(@Param("documentTypeId") Integer documentTypeId, @Param("id") Integer id,
+			@Param("status") String status);
 }

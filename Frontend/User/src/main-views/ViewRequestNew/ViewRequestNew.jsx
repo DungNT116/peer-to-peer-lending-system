@@ -105,8 +105,8 @@ class ViewRequestNew extends React.Component {
               this.setState({ keyUserFb: Object.keys(userData)[0] });
             }
           });
-        database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
-          message: localStorage.getItem("user") + " cancel your request " + request.id + " !" ,
+        await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
+          message: localStorage.getItem("user") + " cancel request number :  " + request.id + " !" ,
           sender: localStorage.getItem("user"),
           requestId: request.id
         });
@@ -114,7 +114,7 @@ class ViewRequestNew extends React.Component {
         var upvotesRef = database.ref(
           "/ppls/" + this.state.keyUserFb + "/countNew"
         );
-        upvotesRef.transaction(function (current_value) {
+        await upvotesRef.transaction(function (current_value) {
           return (current_value || 0) + 1;
         });
       } else if (result.status === 401) {
@@ -125,6 +125,7 @@ class ViewRequestNew extends React.Component {
   }
 
   setDataToDetailPage(id, where) {
+    
     this.props.setRequest(id);
     if (where === "dealing") {
       this.props.setIsHistoryDetail(false);
@@ -201,7 +202,7 @@ class ViewRequestNew extends React.Component {
       if (result.status === 200) {
         // console.log("create success");
         result.json().then(data => {
-          console.log("data dealing", data);
+          // console.log("data dealing", data);
           this.setState({
             dealingRequests: data.data,
             dealingMaxPage: data.maxPage
@@ -257,7 +258,7 @@ class ViewRequestNew extends React.Component {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
   render() {
-    console.log(this.state.newRequests);
+    // console.log(this.state.newRequests);
     const newListItems = this.state.newRequests.map(request => (
       <tr>
         <td>
@@ -357,7 +358,7 @@ class ViewRequestNew extends React.Component {
                   <Row>
                     <Col lg="10">
                       <h1 className="display-3 text-white">
-                        My Own Request <span>View your own new request</span>
+                        My Own Requests <span>View your own new requests</span>
                       </h1>
                       <p className="lead text-white">
                         View your new borrow request more easier. Every where,

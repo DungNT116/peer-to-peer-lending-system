@@ -98,7 +98,7 @@ class DemoNavbar extends React.Component {
     var upvotesRef = database.ref(
       "/ppls/" + this.state.keyUserFb + "/countNew"
     );
-    upvotesRef.transaction(function (current_value) {
+    await upvotesRef.transaction(function(current_value) {
       return (current_value -= current_value);
     });
   }
@@ -109,11 +109,11 @@ class DemoNavbar extends React.Component {
     var upvotesRef = database.ref(
       "/ppls/" + this.state.keyUserFb + "/countNew"
     );
-    upvotesRef.transaction(function (current_value) {
+    await upvotesRef.transaction(function(current_value) {
       return (current_value || 0) + 1;
     });
 
-    database
+    await database
       .ref("/ppls/" + this.state.keyUserFb + "/notification/")
       .push({ message: this.input.value, sender: this.state.username });
   }
@@ -191,7 +191,7 @@ class DemoNavbar extends React.Component {
                       </DropdownToggle>
                       <DropdownMenu>
                         <DropdownItem to="/view-request-list" tag={Link}>
-                          View Request
+                          Lending Requests
                         </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>
@@ -217,7 +217,7 @@ class DemoNavbar extends React.Component {
                           Requests Trading
                         </DropdownItem>
                         <DropdownItem to="/view-history-request" tag={Link}>
-                          View History Request
+                          History Requests
                         </DropdownItem>
                       </DropdownMenu>
                     </UncontrolledDropdown>

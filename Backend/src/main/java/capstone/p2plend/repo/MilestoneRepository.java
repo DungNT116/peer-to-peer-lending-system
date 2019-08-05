@@ -2,6 +2,8 @@ package capstone.p2plend.repo;
 
 import capstone.p2plend.entity.Milestone;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,5 +16,8 @@ public interface MilestoneRepository extends JpaRepository<Milestone, Integer> {
 	@Modifying
 	@Query(value = "DELETE FROM milestone WHERE deal_id = :dealId", nativeQuery = true)
 	void deleteMilestoneByDealId(@Param("dealId") Integer dealId);
+	
+	@Query(value = "SELECT * FROM milestone WHERE deal_id = :dealId", nativeQuery = true)
+	List<Milestone> findListMilestoneByDealId(@Param("dealId") Integer dealId);
 	
 }

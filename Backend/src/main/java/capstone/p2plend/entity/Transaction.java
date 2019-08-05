@@ -1,5 +1,6 @@
 package capstone.p2plend.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -30,10 +31,13 @@ public class Transaction {
 	private String idTrx;
 
 	@Column
+	private Double amountValid;
+
+	@Column
 	private String receiver;
 
 	@Column
-	private Integer amount;
+	private Double amount;
 
 	@JsonInclude(JsonInclude.Include.ALWAYS)
 	@Column
@@ -43,7 +47,7 @@ public class Transaction {
 	private Long createDate;
 
 	@JsonIgnoreProperties(value = { "transaction" })
-	@OneToOne(fetch = FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@JoinColumn(name = "milestone_id", referencedColumnName = "id")
 	private Milestone milestone;
 
@@ -66,6 +70,22 @@ public class Transaction {
 		this.sender = sender;
 	}
 
+	public String getIdTrx() {
+		return idTrx;
+	}
+
+	public void setIdTrx(String idTrx) {
+		this.idTrx = idTrx;
+	}
+
+	public Double getAmountValid() {
+		return amountValid;
+	}
+
+	public void setAmountValid(Double amountValid) {
+		this.amountValid = amountValid;
+	}
+
 	public String getReceiver() {
 		return receiver;
 	}
@@ -74,11 +94,11 @@ public class Transaction {
 		this.receiver = receiver;
 	}
 
-	public Integer getAmount() {
+	public Double getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Integer amount) {
+	public void setAmount(Double amount) {
 		this.amount = amount;
 	}
 
@@ -104,14 +124,6 @@ public class Transaction {
 
 	public void setMilestone(Milestone milestone) {
 		this.milestone = milestone;
-	}
-
-	public String getIdTrx() {
-		return idTrx;
-	}
-
-	public void setIdTrx(String idTrx) {
-		this.idTrx = idTrx;
 	}
 
 }

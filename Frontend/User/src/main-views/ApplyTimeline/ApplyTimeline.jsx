@@ -21,6 +21,7 @@ import {
   DropdownItem
 } from "reactstrap";
 
+import { database } from "../../firebase";
 import { PayPalButton } from "react-paypal-button-v2";
 import { apiLink, bigchainAPI, client_API } from "../../api.jsx";
 //api link
@@ -670,36 +671,46 @@ class ApplyTimeline extends React.Component {
   //End Function Payback
   send_tx = () => {
     let user = localStorage.getItem("user");
-    let data_transaction = {
-      data_tx: {
-        data: {
-          //change amount later
-          txId: this.state.data_tx.txId,
-          sender: user,
-          receiver: this.props.borrowerUser,
-          amount: this.state.data_tx.amount,
+    let receiver = "";
+    if (user == this.props.borrowerUser) {
+      receiver = this.props.lenderUser;
+    } else {
+      receiver = this.props.borrowerUser;
+    }
+    if (receiver != "") {
+      let data_transaction = {
+        data_tx: {
+          data: {
+            //change amount later
+            txId: this.state.data_tx.txId,
+            sender: user,
+            receiver: receiver,
+            amount: this.state.data_tx.amount,
+            createDate: this.state.data_tx.createDate
+          }
+        },
+        metadata_tx: {
+          // userId: this.state.userId,
+          // createDate: this.state.createDate
+          userId: user,
           createDate: this.state.data_tx.createDate
         }
-      },
-      metadata_tx: {
-        // userId: this.state.userId,
-        // createDate: this.state.createDate
-        userId: user,
-        createDate: this.state.data_tx.createDate
-      }
-    };
-    fetch(bigchainAPI + "/send_tx", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data_transaction)
-    })
-      .then(response => response.json())
-      .then(data => {
-        this.saveTransaction(data, data_transaction);
-      });
+      };
+      fetch(bigchainAPI + "/send_tx", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data_transaction)
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.saveTransaction(data, data_transaction);
+        });
+    } else {
+      alert("Receiver is null");
+    }
   };
   saveTransaction(data, data_transaction) {
     let idMilestone = -1;
@@ -717,7 +728,10 @@ class ApplyTimeline extends React.Component {
       body: JSON.stringify({
         sender: data_transaction.data_tx.data.sender,
         receiver: data_transaction.data_tx.data.receiver,
-        amount: Number(data_transaction.data_tx.data.amount),
+        amount: Number(
+          this.props.amountProps * this.state.curDatePayback.percent
+        ),
+        amountValid: Number(data.amount),
         status: data.status,
         idTrx: data.id,
         createDate: this.convertDateToTimestamp(
@@ -727,9 +741,35 @@ class ApplyTimeline extends React.Component {
           id: Number(idMilestone)
         }
       })
-    }).then(result => {
+    }).then(async result => {
       if (result.status === 200) {
         alert("create success");
+        await database
+          .ref("ppls")
+          .orderByChild("username")
+          .equalTo(data_transaction.data_tx.data.receiver)
+          .once("value", snapshot => {
+            if (snapshot.exists()) {
+              const userData = snapshot.val();
+              this.setState({ keyUserFb: Object.keys(userData)[0] });
+            }
+          });
+        await database
+          .ref("/ppls/" + this.state.keyUserFb + "/notification")
+          .push({
+            message:
+              localStorage.getItem("user") +
+              " paid for milestone number : " +
+              idMilestone +
+              " ",
+            sender: localStorage.getItem("user"),
+          });
+        var upvotesRef = database.ref(
+          "/ppls/" + this.state.keyUserFb + "/countNew"
+        );
+        await upvotesRef.transaction(function(current_value) {
+          return (current_value || 0) + 1;
+        });
         this.props.goToViewRequestTrading();
       } else if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
@@ -939,6 +979,8 @@ class ApplyTimeline extends React.Component {
                       <Col md="3">
                         {this.props.borrowerUser ===
                         localStorage.getItem("user") ? (
+                          ""
+                        ) : (
                           <Button
                             id="acceptButton"
                             size="md"
@@ -952,8 +994,6 @@ class ApplyTimeline extends React.Component {
                           >
                             <i className="fa" /> Check Timeline
                           </Button>
-                        ) : (
-                          ""
                         )}
 
                         <Modal
@@ -1015,7 +1055,7 @@ class ApplyTimeline extends React.Component {
                                       <PayPalButton
                                         amount={this.roundUp(
                                           (this.state.amountProps *
-                                            this.state.curDateLending) /
+                                            this.state.curDateLending.percent) /
                                             23000
                                         )}
                                         onSuccess={(details, data) => {
@@ -1243,8 +1283,6 @@ class ApplyTimeline extends React.Component {
                     <Col md="3">
                       {this.props.borrowerUser ===
                       localStorage.getItem("user") ? (
-                        ""
-                      ) : (
                         <Button
                           id="acceptButton"
                           size="md"
@@ -1258,6 +1296,8 @@ class ApplyTimeline extends React.Component {
                         >
                           <i className="fa" /> Check Timeline
                         </Button>
+                      ) : (
+                        ""
                       )}
 
                       <Modal
@@ -1315,7 +1355,7 @@ class ApplyTimeline extends React.Component {
                                     <PayPalButton
                                       amount={this.roundUp(
                                         (this.state.amountProps *
-                                          this.state.curDatePayback) /
+                                          this.state.curDatePayback.percent) /
                                           23000
                                       )}
                                       onSuccess={(details, data) => {

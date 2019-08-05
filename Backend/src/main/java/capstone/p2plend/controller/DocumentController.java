@@ -32,11 +32,15 @@ public class DocumentController {
 			@RequestHeader("Authorization") String token, @RequestParam("file") MultipartFile[] file) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = docService.uploadDocument(documentTypeId, token, file);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = docService.uploadDocument(documentTypeId, token, file);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
@@ -49,11 +53,15 @@ public class DocumentController {
 			@RequestParam("base64Video") String base64Video) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = docService.uploadVideo(documentTypeId, fileType, token, base64Video);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = docService.uploadVideo(documentTypeId, fileType, token, base64Video);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
@@ -66,9 +74,13 @@ public class DocumentController {
 		List<Document> result = null;
 		try {
 			result = docService.getUserDocument(token);
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<List<Document>>(result, httpStatus);
 	}
@@ -78,12 +90,16 @@ public class DocumentController {
 	@PostMapping("/rest/admin/document/validDocument")
 	public ResponseEntity<Integer> validDocument(@RequestBody Document document) {
 		HttpStatus status = null;
-		boolean valid = false;
-		valid = docService.validDocumentId(document);
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		Boolean valid = null;
+		try {
+			valid = docService.validDocumentId(document);
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
@@ -94,11 +110,15 @@ public class DocumentController {
 	public ResponseEntity<Integer> invalidDocument(@RequestBody Document document) {
 		HttpStatus status = null;
 		boolean valid = false;
-		valid = docService.invalidDocumentId(document.getId());
-		if (valid == true) {
-			status = HttpStatus.OK;
-		} else {
-			status = HttpStatus.BAD_REQUEST;
+		try {
+			valid = docService.invalidDocumentId(document.getId());
+			if (valid == true) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
@@ -112,9 +132,13 @@ public class DocumentController {
 		PageDTO<Document> result = null;
 		try {
 			result = docService.getAllPendingDocument(page, element);
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Document>>(result, httpStatus);
 	}
@@ -127,9 +151,13 @@ public class DocumentController {
 		List<Document> result = null;
 		try {
 			result = docService.getAllUserDocument(username);
-			httpStatus = HttpStatus.OK;
+			if (result != null) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
 		} catch (Exception e) {
-			httpStatus = HttpStatus.BAD_REQUEST;
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<List<Document>>(result, httpStatus);
 	}
