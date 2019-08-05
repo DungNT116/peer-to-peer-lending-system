@@ -179,6 +179,7 @@ class CreateRequestPage extends React.Component {
     event.preventDefault();
     var invalidLoanLimit = this.checkLoanLimit();
     if (this.state.invalidAmount === false && invalidLoanLimit === false) {
+      console.log("gooooooooooooooo")
       fetch(apiLink + "/rest/request/createRequest", {
         method: "POST",
         headers: {
@@ -197,8 +198,10 @@ class CreateRequestPage extends React.Component {
           }
         })
       }).then(result => {
+        console.log(result)
         if (result.status === 200) {
           // alert("create success");
+          console.log("goooooo")
           this.props.history.push("view-new-request");
         } else if (result.status === 401) {
           localStorage.removeItem("isLoggedIn");

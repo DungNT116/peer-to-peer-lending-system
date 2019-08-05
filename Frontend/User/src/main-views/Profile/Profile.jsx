@@ -51,6 +51,20 @@ class Profile extends React.Component {
       timeout: 300,
       isUploadedVideo: false,
       loadingVideo: true,
+      editable: false,
+      validPhone: true,
+      validEmail: true,
+      validLastname: true,
+      newFirstName: "",
+      newLastName: "",
+      newEmail: "",
+      newPhoneNumber: "",
+
+      isChangePassword: false,
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+      isSamePassword: false,
       isVideoSaved:false
     };
     this.getProfile = this.getProfile.bind(this);
@@ -67,6 +81,213 @@ class Profile extends React.Component {
     this.stopRecording = this.stopRecording.bind(this);
     this.handleDataAvailable = this.handleDataAvailable.bind(this);
     this.uploadVideo = this.uploadVideo.bind(this);
+    this.changeEditable = this.changeEditable.bind(this);
+
+    this.onPhoneNumberChange = this.onPhoneNumberChange.bind(this);
+    this.onEmailChange = this.onEmailChange.bind(this);
+    this.onFirstNameChange = this.onFirstNameChange.bind(this);
+    this.onLastNameChange = this.onLastNameChange.bind(this);
+
+    this.saveUserInformation = this.saveUserInformation.bind(this);
+
+    this.changeIsChangePassword = this.changeIsChangePassword.bind(this);
+    this.changePassword = this.changePassword.bind(this);
+    this.changeOldPassword = this.changeOldPassword.bind(this);
+    this.changeNewPassword = this.changeNewPassword.bind(this);
+    this.changeConfirmPassword = this.changeConfirmPassword.bind(this);
+  }
+
+  changeOldPassword(event) {
+    this.setState({
+      oldPassword: event.target.value
+    })
+  }
+
+  changeNewPassword(event) {
+    // console.log(event.target.value)
+    var errorElement = document.getElementById("confirmError");
+    if (event.target.value === this.state.confirmPassword) {
+      errorElement.innerHTML = ""
+      this.setState({
+        newPassword: event.target.value,
+        isSamePassword: true
+      })
+    } else {
+      errorElement.innerHTML = "<div class='alert alert-danger' role='alert'><strong>Confirm password is not match</strong></div>"
+      this.setState({
+        newPassword: event.target.value,
+        isSamePassword: false
+      })
+    }
+  }
+
+  changeConfirmPassword(event) {
+    // console.log(event.target.value)
+    // console.log(this.state.newPassword)
+    // console.log(this.state.confirmPassword)
+    var errorElement = document.getElementById("confirmError");
+    if (this.state.newPassword === event.target.value) {
+      errorElement.innerHTML = ""
+      this.setState({
+        confirmPassword: event.target.value,
+        isSamePassword: true
+      })
+    } else {
+      errorElement.innerHTML = "<div class='alert alert-danger' role='alert'><strong>Confirm password is not match</strong></div>"
+      this.setState({
+        confirmPassword: event.target.value,
+        isSamePassword: false
+      })
+    }
+  }
+
+  changePassword() {
+    // console.log(this.state.isSamePassword)
+    // console.log(this.state.oldPassword);
+    // console.log(this.state.newPassword);
+    if (this.state.isSamePassword === true) {
+      // console.log("gooooooooooooooo")
+      var formData = new FormData();
+      formData.append("oldPassword", this.state.oldPassword);
+      formData.append("newPassword", this.state.newPassword);
+
+      fetch(apiLink + "/rest/user/changePassword", {
+        method: "POST",
+        headers: {
+          // "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token")
+        },
+        body: formData
+      }).then(result => {
+        console.log(result);
+        console.log(result.status)
+        if (result.status === 200) {
+          this.changeIsChangePassword();
+          alert("change Password success")
+          this.setState({
+            newPassword: '',
+            oldPassword: '',
+            confirmPassword: '',
+          })
+          // console.log(result);
+          // this.changeEditable();
+          // this.getProfile();
+        } else if (result.status === 401) {
+          localStorage.removeItem("isLoggedIn");
+          this.props.history.push("/login-page");
+        } 
+      })
+    }
+
+  }
+  
+  changeIsChangePassword() {
+    this.setState({
+      isChangePassword: !this.state.isChangePassword
+    })
+  }
+
+  saveUserInformation() {
+    fetch(apiLink + "/rest/user/changeUserInfo", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: localStorage.getItem("token")
+      },
+      body: JSON.stringify({
+        firstName: this.state.newFirstName,
+        lastName: this.state.newLastName,
+        email: this.state.newEmail,
+        phoneNumber: this.state.newPhoneNumber
+      })
+    }).then(result => {
+      if (result.status === 200) {
+        console.log(result);
+        this.changeEditable();
+        this.getProfile();
+      } else if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login-page");
+      }
+    })
+  }
+
+  onPhoneNumberChange(event) {
+    const tmp = event.target.value.trim();
+    if (!tmp.match(/^(\d{10,12})*$/)) {
+      document.getElementById("phoneError").innerHTML =
+        "<div class='alert alert-danger' role='alert'><strong>Phone only contain number!</strong></div>";
+      this.setState({
+        newPhoneNumber: tmp,
+        validPhone: false
+      });
+    } else {
+      document.getElementById("phoneError").innerHTML = "";
+      this.setState({
+        newPhoneNumber: tmp,
+        validPhone: true
+      });
+    }
+  }
+
+  onEmailChange(event) {
+    const tmp = event.target.value.trim();
+    if (tmp.match(/^[a-zA-Z0-9]{5,30}@[a-z]{3,10}(.[a-z]{2,3})+$/)) {
+      document.getElementById("emailError").innerHTML = "";
+      this.setState({
+        newEmail: tmp,
+        validEmail: true
+      });
+    } else {
+      document.getElementById("emailError").innerHTML =
+        "<div class='alert alert-danger' role='alert'><strong>Email only contain alphabet character!</strong></div>";
+      this.setState({
+        newEmail: tmp,
+        validEmail: false
+      });
+    }
+  }
+
+  onFirstNameChange(event) {
+    const tmp = event.target.value;
+    if (!tmp.match(/^[a-z A-Z]*$/)) {
+      document.getElementById("firstnameError").innerHTML =
+        "<div class='alert alert-danger' role='alert'><strong>First name only contain alphabet character!</strong></div>";
+      this.setState({
+        newFirstName: tmp,
+        validFirstname: false
+      });
+    } else {
+      document.getElementById("firstnameError").innerHTML = "";
+      this.setState({
+        newFirstName: tmp,
+        validFirstname: true
+      });
+    }
+  }
+
+  onLastNameChange(event) {
+    const tmp = event.target.value;
+    if (tmp.match(/^[a-z A-Z]*$/)) {
+      document.getElementById("lastnameError").innerHTML = "";
+      this.setState({
+        newLastName: tmp,
+        validLastname: true
+      });
+    } else {
+      document.getElementById("lastnameError").innerHTML =
+        "<div class='alert alert-danger' role='alert'><strong>Last name only contain alphabet character!</strong></div>";
+      this.setState({
+        newLastName: tmp,
+        validLastname: false
+      });
+    }
+  }
+
+  changeEditable() {
+    this.setState({
+      editable: !this.state.editable
+    })
   }
 
   handleDataAvailable(event) {
@@ -381,7 +602,11 @@ class Profile extends React.Component {
             lastName: data.lastName,
             loanLimit: data.loanLimit,
             email: data.email,
-            phoneNumber: data.phoneNumber
+            phoneNumber: data.phoneNumber,
+            newFirstName: data.firstName,
+            newLastName: data.lastName,
+            newEmail: data.email,
+            newPhoneNumber: data.phoneNumber,
           });
         });
       } else if (result.status === 401) {
@@ -588,24 +813,41 @@ class Profile extends React.Component {
                           <h3 className="mb-0">My account</h3>
                         </Col>
                         <Col className="text-right" xs="3">
-                          <Button
-                            color="primary"
-                            href="#pablo"
-                            onClick={e => e.preventDefault()}
-                            size="sm"
-                          >
-                            Edit Profile
-                          </Button>
+                          {this.state.editable === false ?
+                            (
+                              <Button
+                                id="editProfile"
+                                color="primary"
+                                href="#pablo"
+                                onClick={() => this.changeEditable()}
+                                disabled={this.state.isChangePassword === true ? true : false}
+                                size="sm"
+                              >
+                                Edit Profile
+                              </Button>
+                            )
+                            :
+                            (
+                              ""
+                            )}
                         </Col>
                         <Col className="text-right" xs="3">
-                          <Button
-                            color="primary"
-                            href="#pablo"
-                            onClick={e => e.preventDefault()}
-                            size="sm"
-                          >
-                            Change Password
+                          {this.state.isChangePassword === false ?
+                            (
+                              <Button
+                                color="primary"
+                                href="#pablo"
+                                onClick={() => this.changeIsChangePassword()}
+                                disabled={this.state.editable === true ? true : false}
+                                size="sm"
+                              >
+                                Change Password
                           </Button>
+                            )
+                            :
+                            (
+                              ""
+                            )}
                         </Col>
                       </Row>
                     </CardHeader>
@@ -615,80 +857,260 @@ class Profile extends React.Component {
                           User information
                         </h6>
                         <div className="pl-lg-4">
-                          <Row>
-                            <Col lg="6">
-                              <FormGroup>
-                                <label
-                                  className="form-control-label"
-                                  htmlFor="input-phonenumber"
-                                >
-                                  Phone Number
+                          {this.state.isChangePassword === false ?
+                            (
+                              <div>
+                                <Row>
+                                  <Col lg="6">
+                                    <FormGroup>
+                                      <label
+                                        className="form-control-label"
+                                        htmlFor="input-phonenumber"
+                                      >
+                                        Phone Number
                                 </label>
-                                <p>{this.state.phoneNumber}</p>
-                                <Input
-                                  className="form-control-alternative"
-                                  value={this.state.phoneNumber}
-                                  id="input-phonenumber"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col lg="6">
-                              <FormGroup>
-                                <label
-                                  className="form-control-label"
-                                  htmlFor="input-email"
-                                >
-                                  Email address
+                                      {this.state.editable === true ?
+                                        (
+                                          <div>
+                                            <Input
+                                              className="form-control-alternative"
+                                              value={this.state.newPhoneNumber}
+                                              id="input-phonenumber"
+                                              type="text"
+                                              onChange={this.onPhoneNumberChange}
+                                            />
+                                            <p
+                                              style={{ color: "red" }}
+                                              id="phoneError"
+                                            />
+                                          </div>
+                                        )
+                                        :
+                                        (
+                                          <p>{this.state.phoneNumber}</p>
+                                        )}
+                                    </FormGroup>
+                                  </Col>
+                                  <Col lg="6">
+                                    <FormGroup>
+                                      <label
+                                        className="form-control-label"
+                                        htmlFor="input-email"
+                                      >
+                                        Email address
                                 </label>
-                                <p>{this.state.email}</p>
-                                <Input
-                                  className="form-control-alternative"
-                                  value={this.state.email}
-                                  id="input-email"
-                                  type="email"
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
-                          <Row>
-                            <Col lg="6">
-                              <FormGroup>
-                                <label
-                                  className="form-control-label"
-                                  htmlFor="input-first-name"
-                                >
-                                  First name
+                                      {this.state.editable === true ?
+                                        (
+                                          <div>
+                                            <Input
+                                              className="form-control-alternative"
+                                              value={this.state.newEmail}
+                                              id="input-email"
+                                              type="email"
+                                              onChange={this.onEmailChange}
+                                            />
+                                            <p
+                                              style={{ color: "red" }}
+                                              id="emailError"
+                                            />
+                                          </div>
+                                        )
+                                        :
+                                        (
+                                          <p>{this.state.email}</p>
+                                        )}
+                                    </FormGroup>
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Col lg="6">
+                                    <FormGroup>
+                                      <label
+                                        className="form-control-label"
+                                        htmlFor="input-first-name"
+                                      >
+                                        First name
                                 </label>
-                                <p>{this.state.firstName}</p>
-                                <Input
-                                  className="form-control-alternative"
-                                  value={this.state.firstName}
-                                  id="input-first-name"
-                                  placeholder="First name"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                            <Col lg="6">
-                              <FormGroup>
-                                <label
-                                  className="form-control-label"
-                                  htmlFor="input-last-name"
-                                >
-                                  Last name
+                                      {this.state.editable === true ?
+                                        (
+                                          <div>
+                                            <Input
+                                              className="form-control-alternative"
+                                              value={this.state.newFirstName}
+                                              id="input-first-name"
+                                              placeholder="First name"
+                                              type="text"
+                                              onChange={this.onFirstNameChange}
+                                            />
+                                            <p
+                                              style={{ color: "red" }}
+                                              id="firstnameError"
+                                            />
+                                          </div>
+                                        )
+                                        :
+                                        (
+                                          <p>{this.state.firstName}</p>
+                                        )}
+                                    </FormGroup>
+                                  </Col>
+                                  <Col lg="6">
+                                    <FormGroup>
+                                      <label
+                                        className="form-control-label"
+                                        htmlFor="input-last-name"
+                                      >
+                                        Last name
                                 </label>
-                                <p>{this.state.lastName}</p>
-                                <Input
-                                  className="form-control-alternative"
-                                  value={this.state.lastName}
-                                  id="input-last-name"
-                                  placeholder="Last name"
-                                  type="text"
-                                />
-                              </FormGroup>
-                            </Col>
-                          </Row>
+                                      {this.state.editable === true ?
+                                        (
+                                          <div>
+                                            <Input
+                                              className="form-control-alternative"
+                                              value={this.state.newLastName}
+                                              id="input-last-name"
+                                              placeholder="Last name"
+                                              type="text"
+                                              onChange={this.onLastNameChange}
+                                            />
+                                            <p
+                                              style={{ color: "red" }}
+                                              id="lastnameError"
+                                            />
+                                          </div>
+                                        )
+                                        :
+                                        (
+                                          <p>{this.state.lastName}</p>
+                                        )}
+                                    </FormGroup>
+                                  </Col>
+                                </Row>
+                                {this.state.editable === true ?
+                                  (
+                                    <Row>
+                                      <Col className="text-right" xs="3">
+                                        <Button
+                                          id="saveProfile"
+                                          color="primary"
+                                          href="#pablo"
+                                          onClick={() => this.saveUserInformation()}
+                                          size="sm"
+                                        >
+                                          save Profile
+                                  </Button>
+                                      </Col>
+                                      <Col className="text-right" xs="3">
+                                        <Button
+                                          id="cancelProfile"
+                                          color="primary"
+                                          href="#pablo"
+                                          onClick={() => this.changeEditable()}
+                                          size="sm"
+                                        >
+                                          cancel
+                                  </Button>
+                                      </Col>
+                                    </Row>
+                                  )
+                                  :
+                                  (
+                                    ""
+                                  )
+                                }
+                              </div>
+                            )
+                            :
+                            (
+                              <div>
+                                <Row>
+                                  <Col lg="6">
+                                    <FormGroup>
+                                      <label
+                                        className="form-control-label"
+                                        htmlFor="input-oldPassword"
+                                      >
+                                        Old Password
+                                      </label>
+                                      <div>
+                                        <Input
+                                          className="form-control-alternative"
+                                          value={this.state.oldPassword}
+                                          id="input-oldPassword"
+                                          type="password"
+                                          onChange={this.changeOldPassword}
+                                        />
+                                      </div>
+                                    </FormGroup>
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Col lg="6">
+                                    <FormGroup>
+                                      <label
+                                        className="form-control-label"
+                                        htmlFor="input-newPassword"
+                                      >
+                                        New Password
+                                      </label>
+                                      <div>
+                                        <Input
+                                          className="form-control-alternative"
+                                          value={this.state.newPassword}
+                                          id="input-newPassword"
+                                          type="password"
+                                          onChange={this.changeNewPassword}
+                                        />
+                                      </div>
+                                    </FormGroup>
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Col lg="6">
+                                    <FormGroup>
+                                      <label
+                                        className="form-control-label"
+                                        htmlFor="input-comfirmPassword"
+                                      >
+                                        Confirm Password
+                                      </label>
+                                      <div>
+                                        <Input
+                                          className="form-control-alternative"
+                                          value={this.state.confirmPassword}
+                                          id="input-confirmPassword"
+                                          type="password"
+                                          onChange={this.changeConfirmPassword}
+                                        />
+                                        <p id="confirmError"></p>
+                                      </div>
+                                    </FormGroup>
+                                  </Col>
+                                </Row>
+                                <Row>
+                                  <Button
+                                    id="savePassword"
+                                    color="primary"
+                                    href="#pablo"
+                                    onClick={() => this.changePassword()}
+                                    size="sm"
+                                  >
+                                    save
+                                  </Button>
+                                  {' '}
+                                  <Button
+                                    id="cancelChangePassword"
+                                    color="primary"
+                                    href="#pablo"
+                                    onClick={() => this.changeIsChangePassword()}
+                                    size="sm"
+                                  >
+                                    cancel
+                                  </Button>
+                                </Row>
+                              </div>
+                            )
+                          }
                         </div>
                         <Card className="mb-0">
                           <CardHeader id="headingTwo">
@@ -716,7 +1138,6 @@ class Profile extends React.Component {
                                   size={15}
                                   color={"#123abc"}
                                   loading={this.state.loadingID}
-
                                 />
                               ) : this.state.documentID.length !== 0 ? (
                                 <div>
@@ -773,7 +1194,6 @@ class Profile extends React.Component {
                                   </Button>
                                 </div>
                               )}
-
                             </CardBody>
                           </Collapse>
                         </Card>
