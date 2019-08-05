@@ -1,11 +1,11 @@
 {
-  "name": "argon-design-system-react",
+  "name": "peer-to-peer-lending-system",
   "version": "1.0.0",
-  "description": "React version of Argon Design System by Creative Tim",
+  "description": "Web-based system that allows individuals lending money to others",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/creativetimofficial/argon-design-system-react.git"
+    "url": "git+https://github.com/bizu116/peer-to-peer-lending-system"
   },
   "keywords": [
     "react",
@@ -22,12 +22,8 @@
     "argon-design-system-react",
     "design-system-react"
   ],
-  "author": "Creative Tim",
+  "author": "PPLS-Team",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/creativetimofficial/argon-design-system-react/issues"
-  },
-  "homepage": "https://demos.creative-tim.com/argon-design-system-react/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -49,8 +45,11 @@
   ],
   "dependencies": {
     "@babel/plugin-proposal-export-default-from": "^7.2.0",
-    "@material-ui/core": "^4.1.1",
+    "@material-ui/core": "^4.2.1",
+    "bootstrap": "^4.3.1",
     "classnames": "2.2.6",
+    "cleave.js": "^1.5.3",
+    "firebase": "^6.3.2",
     "glamor": "^2.20.40",
     "glamorous": "^5.0.0",
     "govuk-colours": "^1.0.3",
@@ -59,17 +58,20 @@
     "moment": "2.24.0",
     "node-sass": "4.12.0",
     "nouislider": "13.1.5",
-    "react": "16.8.6",
+    "react": "^16.8.6",
+    "react-currency-input": "^1.3.6",
     "react-datetime": "2.16.3",
-    "react-dom": "16.8.6",
+    "react-dom": "^16.8.6",
     "react-horizontal-timeline": "^1.5.3",
     "react-icons": "^3.7.0",
+    "react-notification-badge": "^1.5.1",
     "react-paypal-button-v2": "^2.3.1",
     "react-redux": "^7.0.3",
     "react-router": "5.0.0",
     "react-router-dom": "5.0.0",
     "react-scripts": "3.0.0",
-    "reactstrap": "8.0.0",
+    "react-spinners": "^0.5.13",
+    "reactstrap": "^8.0.0",
     "redux": "^4.0.1"
   },
   "devDependencies": {

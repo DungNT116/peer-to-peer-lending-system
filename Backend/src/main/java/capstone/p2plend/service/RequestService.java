@@ -52,7 +52,7 @@ public class RequestService {
 	public PageDTO<Request> findAllOtherUserRequest(Integer page, Integer element, String token) {
 		String username = jwtService.getUsernameFromToken(token);
 		User account = accountRepo.findByUsername(username);
-		Pageable pageable = PageRequest.of(page - 1, element);
+		Pageable pageable = PageRequest.of(page - 1, element, Sort.by("create_date").descending());
 		Page<Request> listRq = requestRepo.findAllOtherUserRequest(pageable, account.getId());
 
 		for (Request r : listRq) {

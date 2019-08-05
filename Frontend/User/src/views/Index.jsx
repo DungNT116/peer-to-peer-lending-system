@@ -1,46 +1,49 @@
 import React from "react";
 
 // reactstrap components
-import { Container, Row, Table } from "reactstrap";
+import {
+  Container,
+  Row,
+  Table,
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  FormGroup,
+  Col
+} from "reactstrap";
 
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
-// import CardsFooter from "components/Footers/CardsFooter.jsx";
 
 // index page sections
 import Hero from "./IndexSections/Hero.jsx";
-// import Buttons from "./IndexSections/Buttons.jsx";
-// import Inputs from "./IndexSections/Inputs.jsx";
-// import CustomControls from "./IndexSections/CustomControls.jsx";
-// import Menus from "./IndexSections/Menus.jsx";
-// import Navbars from "./IndexSections/Navbars.jsx";
-// import Tabs from "./IndexSections/Tabs.jsx";
-// import Progress from "./IndexSections/Progress.jsx";
-import Pagination from "./IndexSections/Pagination.jsx";
-// import Pills from "./IndexSections/Pills.jsx";
-// import Labels from "./IndexSections/Labels.jsx";
-// import Alerts from "./IndexSections/Alerts.jsx";
-// import Typography from "./IndexSections/Typography.jsx";
-// import Modals from "./IndexSections/Modals.jsx";
-// import Datepicker from "./IndexSections/Datepicker.jsx";
-// import TooltipPopover from "./IndexSections/TooltipPopover.jsx";
-// import Carousel from "./IndexSections/Carousel.jsx";
-// import Icons from "./IndexSections/Icons.jsx";
-// import Login from "./IndexSections/Login.jsx";
-// import Download from "./IndexSections/Download.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter";
-import Datepicker from "./IndexSections/Datepicker";
-import { apiLink } from "api";
+import { apiLink, bigchainAPI } from "api";
+import { BeatLoader } from "react-spinners";
 
 class Index extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      transactions: []
-    }
+      transactions: [],
+      modalValid: false,
+      position: 0,
+      validTx: {},
+      loading: true
+    };
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
+    this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
+    // this.test = this.test.bind(this);
   }
 
+  convertDateToTimestamp(date) {
+    return Math.round(date.getTime() / 1000);
+  }
+  convertTimeStampToDate(date) {
+    var timestampToDate = new Date(date * 1000);
+    return timestampToDate.toLocaleDateString();
+  }
   // /rest/transaction/getTop20Transaction
   componentDidMount() {
     document.documentElement.scrollTop = 0;
@@ -49,146 +52,320 @@ class Index extends React.Component {
 
     //get transaction
     fetch(apiLink + "/rest/transaction/getTop20Transaction", {
-      method: 'GET',
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
         // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
-      },
-    }).then(
-      (result) => {
-
-        result.json().then((data) => {
-          this.setState({ 
-            transactions: data
-          });
-        })
-        if (result.status === 200) {
-          // alert("create success");
-        }
-
       }
-    )
-    // event.preventDefault();
-    // this.props.history.push('/')
+    }).then(result => {
+      result.json().then(data => {
+        this.setState({
+          transactions: data
+        });
+      });
+      if (result.status === 200) {
+        // alert("create success");
+      }
+    });
+  }
+  roundUp(num) {
+    let precision = Math.pow(10, 2);
+    return Math.ceil(num * precision) / precision;
+  }
+  toggleModalValid() {
+    this.setState({ modalValid: !this.state.modalValid });
   }
 
-  convertTimeStampToDate(date) {
-    var timestampToDate = new Date(date * 1000);
-    return timestampToDate.toLocaleDateString();
+  changeCurrency(inputMoney) {
+    var money;
+    if (inputMoney % 500000 !== 0) {
+      money = inputMoney - (inputMoney % 500000);
+    }
+    return money;
   }
-
+  
+  validateTransaction(transactionInput) {
+    this.setState({
+      validTx: {
+        idTrx: "",
+        status: "",
+        sender: false,
+        receiver: false,
+        amount: false,
+        createDate: false
+      }
+    });
+    fetch(bigchainAPI + "/search_transaction_by_id", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        id: transactionInput.idTrx
+      })
+    }).then(result => {
+      result.json().then(data => {
+        let dateCreate = new Date(data.asset.data.createDate);
+        setTimeout(
+          function() {
+            if (data.asset.data.sender === transactionInput.sender) {
+              this.setState({
+                validTx: {
+                  ...this.state.validTx,
+                  sender: true
+                }
+              });
+            }
+          }.bind(this),
+          1000
+        );
+        setTimeout(
+          function() {
+            if (data.asset.data.receiver === transactionInput.receiver) {
+              this.setState({
+                validTx: {
+                  ...this.state.validTx,
+                  receiver: true
+                }
+              });
+            }
+          }.bind(this),
+          2000
+        );
+        setTimeout(
+          function() {
+            
+            if (this.changeCurrency(Number(data.asset.data.amount)) === transactionInput.amount) {
+              this.setState({
+                validTx: {
+                  ...this.state.validTx,
+                  amount: true
+                }
+              });
+            }
+          }.bind(this),
+          3000
+        );
+        setTimeout(
+          function() {
+            if (
+              Math.round(dateCreate.getTime() / 1000) ===
+              transactionInput.createDate
+            ) {
+              this.setState({
+                validTx: {
+                  ...this.state.validTx,
+                  createDate: true
+                }
+              });
+            }
+          }.bind(this),
+          4000
+        );
+        setTimeout(
+          function() {
+            if (
+              this.state.validTx.sender === true &&
+              this.state.validTx.receiver === true &&
+              this.state.validTx.amount === true &&
+              this.state.validTx.createDate === true
+            ) {
+              this.setState({
+                validTx: {
+                  idTrx: data.asset.data.txId,
+                  status: "VALID TRANSACTION"
+                }
+              });
+            } else {
+              this.setState({
+                validTx: {
+                  idTrx: data.asset.data.txId,
+                  status: "INVALID TRANSACTION"
+                }
+              });
+            }
+          }.bind(this),
+          4500
+        );
+      });
+    });
+  }
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   render() {
-    const listItems = this.state.transactions.map((transaction, index) =>
+    const listItems = this.state.transactions.map((transaction, index) => (
       <tr key={index}>
-        <td>
-          {transaction.id}
+        <td
+          style={{
+            width: 200,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "inline-block"
+          }}
+        >
+          {transaction.idTrx}
         </td>
         <td>{transaction.sender}</td>
         <td>{transaction.receiver}</td>
-        <td>{transaction.amount} VND</td>
+        <td>{this.numberWithCommas(transaction.amount)} VND</td>
         <td>{this.convertTimeStampToDate(transaction.createDate)}</td>
-        <td>{transaction.status}</td>
+        {/* <td>{transaction.status}</td> */}
+        <td>
+          <Button
+            id="acceptButton"
+            size="md"
+            color="primary"
+            onClick={() => {
+              this.toggleModalValid();
+              this.validateTransaction(transaction);
+            }}
+            disabled={this.state.editable}
+          >
+            <i className="fa" /> Validate
+          </Button>
+          <Modal
+            isOpen={this.state.modalValid}
+            toggle={() => this.toggleModalValid()}
+            className={this.props.className}
+          >
+            <ModalHeader toggle={() => this.toggleModalValid()}>
+              Valid transaction
+            </ModalHeader>
+            <ModalBody>
+              {this.state.validTx.idTrx === "" ? (
+                <div>
+                  <FormGroup row className="py-2">
+                    <Col md="6">Check Sender</Col>
+                    <Col md="6">
+                      {this.state.validTx.sender ? (
+                        <i
+                          class="ni ni-check-bold"
+                          style={{ color: "green" }}
+                        />
+                      ) : (
+                        <BeatLoader
+                          sizeUnit={"px"}
+                          size={10}
+                          color={"#123abc"}
+                          loading={this.state["loading-sender"]}
+                        />
+                      )}
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row className="py-2">
+                    <Col md="6">Check Receiver</Col>
+                    <Col md="6">
+                      {this.state.validTx.receiver ? (
+                        <i
+                          class="ni ni-check-bold"
+                          style={{ color: "green" }}
+                        />
+                      ) : (
+                        <BeatLoader
+                          sizeUnit={"px"}
+                          size={10}
+                          color={"#123abc"}
+                          loading={this.state["loading-receiver"]}
+                        />
+                      )}
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row className="py-2">
+                    <Col md="6">Check Amount</Col>
+                    <Col md="6">
+                      {this.state.validTx.amount ? (
+                        <i
+                          class="ni ni-check-bold"
+                          style={{ color: "green" }}
+                        />
+                      ) : (
+                        <BeatLoader
+                          sizeUnit={"px"}
+                          size={10}
+                          color={"#123abc"}
+                          loading={this.state["loading-amount"]}
+                        />
+                      )}
+                    </Col>
+                  </FormGroup>
+                  <FormGroup row className="py-2">
+                    <Col md="6">Check Create Date</Col>
+                    <Col md="6">
+                      {this.state.validTx.createDate ? (
+                        <i
+                          class="ni ni-check-bold"
+                          style={{ color: "green" }}
+                        />
+                      ) : (
+                        <BeatLoader
+                          sizeUnit={"px"}
+                          size={10}
+                          color={"#123abc"}
+                          loading={this.state["loading-createDate"]}
+                        />
+                      )}
+                    </Col>
+                  </FormGroup>
+                </div>
+              ) : (
+                <div>
+                  <FormGroup row className="py-2">
+                    <Col md="6">ID Transaction</Col>
+                    <Col md="6">Status</Col>
+                  </FormGroup>
+                  <FormGroup row className="py-2">
+                    <Col md="6">{this.state.validTx.idTrx}</Col>
+                    <Col md="6">
+                      {this.state.validTx.status}
+                      <i
+                        class="ni ni-check-bold"
+                        style={{ color: "green", fontSize: "20px" }}
+                      />
+                    </Col>
+                  </FormGroup>
+                </div>
+              )}
+            </ModalBody>
+          </Modal>
+        </td>
       </tr>
-    );
+    ));
     return (
       <>
         <DemoNavbar />
         <main ref="main">
           <Hero />
-          {/* <Buttons />
-          <Inputs />
-          <section className="section">
+          <section className="section section-sm ">
             <Container>
-              <CustomControls />
-              <Menus />
-            </Container>
-          </section> */}
-          {/* <Navbars /> */}
-          {/* <section className="section section-components">
-            <Container>
-              <Tabs />
-              <Row className="row-grid justify-content-between align-items-center mt-lg">
-                <Progress />
-                <Pagination />
-              </Row>
-              <Row className="row-grid justify-content-between">
-                <Pills />
-                <Labels />
-              </Row>
-              <Alerts />
-              <Typography />
-              <Modals />
-              <Datepicker />
-              <TooltipPopover />
-            </Container>
-          </section> */}
-          {/* <Carousel /> */}
-          {/* <Icons /> */}
-          {/* <Login /> */}
-          {/* <Download /> */}
-          <section className="section section-sm">
-            <Container>
+              {/* <CustomControls /> */}
               <Row className="justify-content-center text-center">
-                <p className="h3">
-                  History Transactions
-                </p>
+                <p className="h3">History Transactions</p>
               </Row>
               <Row className="justify-content-center text-center">
-              {/* <Datepicker /> */}
+                {/* <Datepicker /> */}
                 <Table>
                   <thead>
                     <tr>
-                      <th>Id</th>
-                      <th>sender</th>
-                      <th>receiver</th>
-                      <th>amount</th>
-                      <th>createDate</th>
+                      <th>Id Tx Blockchain</th>
+                      <th>Sender</th>
+                      <th>Receiver</th>
+                      <th>Amount</th>
+                      <th>Create Date</th>
                       <th>Status</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {listItems}
-                    {/* <tr>
-                      <td>1</td>
-                      <td>DungNT</td>
-                      <td>MinhLN</td>
-                      <td>1000 VND</td>
-                      <td>05/06/2019</td>
-                      <td>Completed</td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>DungNT</td>
-                      <td>LocHV</td>
-                      <td>1000 VND</td>
-                      <td>05/06/2019</td>
-                      <td>Completed</td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>LocHV</td>
-                      <td>MinhLN</td>
-                      <td>1000 VND</td>
-                      <td>05/06/2019</td>
-                      <td>Completed</td>
-                    </tr>
-                    <tr>
-                      <td>4</td>
-                      <td>DungNT</td>
-                      <td>LocHV</td>
-                      <td>1000 VND</td>
-                      <td>05/06/2019</td>
-                      <td>Completed</td>
-                    </tr> */}
-                  </tbody>
-
+                  <tbody>{listItems}</tbody>
                 </Table>
-
               </Row>
               {/* <Row className="align-items-center justify-content-center text-center">
                 <Pagination />
               </Row> */}
+
+              {/* <video autoplay></video> */}
+              {/* <input type="file" accept="video/*" capture="camera" id="recorder" />
+              <video id="player" controls></video> */}
             </Container>
           </section>
         </main>

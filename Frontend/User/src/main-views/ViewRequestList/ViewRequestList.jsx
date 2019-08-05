@@ -2,41 +2,35 @@ import React from "react";
 
 // nodejs library that concatenates classes
 // import classnames from "classnames";
-import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
-import { SET_PAGE_NUMBER } from "../../redux/action/types";
 // reactstrap components
 import {
-  // Badge,
   Button,
-  // Card,
-  // CardBody,
-  // CardImg,
-  // FormGroup,
-  // Input,
-  // InputGroupAddon,
-  // InputGroupText,
-  // InputGroup,
   Container,
   Row,
   Col,
-  // Label,
-  // Form,
-  Table
+  Table,
+  NavLink,
+  Card,
+  CardBody,
+  TabContent,
+  TabPane,
+  Nav,
+  NavItem
 } from "reactstrap";
 
+import classnames from "classnames";
 // core components
 import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
-// import CardsFooter from "components/Footers/CardsFooter.jsx";
 
 import Pagination from "../../views/IndexSections/Pagination.jsx";
 //api link
-import { apiLink } from '../../api.jsx';
+import { apiLink } from "../../api.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter";
 
 // index page sections
-// import Download from "../../views/IndexSections/Download.jsx";
 
 class ViewRequestList extends React.Component {
   constructor(props) {
@@ -46,55 +40,70 @@ class ViewRequestList extends React.Component {
       page: 1,
       pageSize: 5,
       maxPage: 0,
-    }
+      iconTabs: 1,
+      plainTabs: 1
+    };
     this.getRequest = this.getRequest.bind(this);
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.changePage = this.changePage.bind(this);
   }
 
+  toggleNavs = (e, state, index) => {
+    e.preventDefault();
+    this.setState({
+      [state]: index
+    });
+  };
   changePage(index) {
     this.setState({
       page: index
-    })
+    });
   }
-
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
   getRequest() {
     let pageParam = encodeURIComponent(this.state.page);
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
-    fetch(apiLink + "/rest/request/user/allRequest?page=" + pageParam + "&element=" + pageSizeParam, {
-      method: 'GET',
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": localStorage.getItem("token")
-        // "Authorization": this.props.tokenReducer.token
-        // 'Access-Control-Allow-Origin': '*'
-      },
-    }).then(
-      (result) => {
-        console.log(result);
-        if(result.status === 401) {
-          localStorage.setItem("isLoggedIn", false);
-          this.props.history.push('/login-page')
-        } else 
-        if (result.status === 200) {
-          // alert("create success");
-          result.json().then((data) => {
-            this.setState({ 
-              requests: data.data,
-              maxPage: data.maxPage
-            });
-          })
+    fetch(
+      apiLink +
+        "/rest/request/user/allRequest?page=" +
+        pageParam +
+        "&element=" +
+        pageSizeParam,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem("token")
+          // "Authorization": this.props.tokenReducer.token
+          // 'Access-Control-Allow-Origin': '*'
         }
-
       }
-    )
-    // event.preventDefault();
-    // this.props.history.push('/')
+    ).then(result => {
+      if (result.status === 401) {
+        localStorage.removeItem("isLoggedIn");
+        this.props.history.push("/login-page");
+      } else if (result.status === 200) {
+        // alert("create success");
+        result.json().then(data => {
+          this.setState({
+            requests: data.data,
+            maxPage: data.maxPage
+          });
+        });
+      }
+    });
   }
 
   setDataToDetailPage(id) {
     this.props.setRequest(id);
+    this.props.setIsHistory(true);
+    this.props.setIsTrading(false);
+    this.props.setIsViewDetail(true);
+    this.props.setIsHistoryDetail(false);
+    localStorage.setItem("previousPage", window.location.pathname);
   }
 
   componentWillMount() {
@@ -105,49 +114,48 @@ class ViewRequestList extends React.Component {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
-    // console.log(localStorage.getItem("token"));
-    
-    //change timestamp to date String and vice versa
-    // var date = "07/22/2018";
-    // var dateToTimestamp = Math.round(new Date(date).getTime() / 1000);
-    // var timestampToDate = new Date(dateToTimestamp * 1000);
-
-    // console.log("dateToTimestamp: " + dateToTimestamp);
-    // console.log("timestampToDate: " +timestampToDate.toLocaleDateString())
   }
 
   convertTimeStampToDate(date) {
     var timestampToDate = new Date(date * 1000);
     return timestampToDate.toLocaleDateString();
   }
-  
+
   render() {
-    const listItems = this.state.requests.map((request, index) =>
+    const listItems = this.state.requests.map((request, index) => (
       <tr key={index}>
-        <td><Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
-          {request.id}
-        </Col></td>
-        <td>{request.amount} VND</td>
+        <td>
+          <Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
+            {request.id}
+          </Col>
+        </td>
+        <td>{this.numberWithCommas(request.amount)} VND</td>
         <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
         <td>{request.duration} days</td>
         <td>
           <Link to="/view-detail-request">
-            <Button type="button" id="dealButton" size="md" color="primary" onClick={() => this.setDataToDetailPage(request)}>
-              <i className="fa fa-dot-circle-o"></i> View Detail
-            </Button>{' '}
+            <Button
+              type="button"
+              id="dealButton"
+              size="md"
+              className="btn btn-outline-primary"
+              onClick={() => this.setDataToDetailPage(request)}
+            >
+              View Detail
+            </Button>{" "}
           </Link>
         </td>
       </tr>
-    );
+    ));
     return (
       <>
         <DemoNavbar />
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}
-            <section className="section section-lg section-shaped">
-              <div className="shape shape-style-1 shape-default">
+            <section className="section section-lg section-shaped bg-gradient-info">
+              {/* <div className="shape shape-style-1 shape-default">
                 <span />
                 <span />
                 <span />
@@ -157,13 +165,13 @@ class ViewRequestList extends React.Component {
                 <span />
                 <span />
                 <span />
-              </div>
+              </div> */}
               <Container className="py-lg-md d-flex">
                 <div className="col px-0">
                   <Row>
                     <Col lg="10">
                       <h1 className="display-3 text-white">
-                        View Request List{" "}
+                        View Requests Lending{" "}
                         <span>View request for your lending </span>
                       </h1>
                       <p className="lead text-white">
@@ -177,31 +185,61 @@ class ViewRequestList extends React.Component {
             {/* 1st Hero Variation */}
           </div>
 
-
-          <section className="section section-lg">
+          <section className="section section-lg mt--200">
             <Container>
-              <Row className="justify-content-center text-center">
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Id</th>
-                      <th>Amount</th>
-                      <th>user</th>
-                      <th>CreateDate</th>
-                      <th>Duration</th>
-                      <th>View Detail</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {listItems}
-                  </tbody>
-                </Table>
-
-              </Row>
-              <Row className="align-items-center justify-content-center text-center">
-                <Pagination maxPage={this.state.maxPage} currentPage={this.state.page}
-                 onChange={this.getRequest} changePage={this.changePage}/>
-              </Row>
+              <div className="nav-wrapper">
+                <Nav
+                  className="nav-fill flex-column flex-md-row"
+                  id="tabs-icons-text"
+                  pills
+                  role="tablist"
+                >
+                  <NavItem>
+                    <NavLink
+                      aria-selected={this.state.plainTabs === 1}
+                      className={classnames("mb-sm-6 mb-md-0", {
+                        active: this.state.plainTabs === 1
+                      })}
+                      onClick={e => this.toggleNavs(e, "plainTabs", 1)}
+                      href="#pablo"
+                      role="tab"
+                    >
+                      Lending Requests
+                    </NavLink>
+                  </NavItem>
+                </Nav>
+              </div>
+              <Card className="shadow">
+                <CardBody>
+                  <TabContent activeTab={"plainTabs" + this.state.plainTabs}>
+                    <TabPane tabId="plainTabs1">
+                      <Row className="justify-content-center text-center">
+                        <Table>
+                          <thead>
+                            <tr>
+                              <th>Id</th>
+                              <th>Amount</th>
+                              <th>User</th>
+                              <th>Create Date</th>
+                              <th>Duration</th>
+                              <th>View Detail</th>
+                            </tr>
+                          </thead>
+                          <tbody>{listItems}</tbody>
+                        </Table>
+                      </Row>
+                      <Row className="align-items-center justify-content-center text-center">
+                        <Pagination
+                          maxPage={this.state.maxPage}
+                          currentPage={this.state.page}
+                          onChange={this.getRequest}
+                          changePage={this.changePage}
+                        />
+                      </Row>
+                    </TabPane>
+                  </TabContent>
+                </CardBody>
+              </Card>
             </Container>
           </section>
         </main>
@@ -211,29 +249,47 @@ class ViewRequestList extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
-    request: state.request,
-    // tokenReducer: state.tokenReducer,
-    // paging: state.paging
-  }
-}
-const mapDispatchToProps = (dispatch) => {
+    request: state.request
+  };
+};
+const mapDispatchToProps = dispatch => {
   return {
-    setRequest: (id) => {
+    setRequest: id => {
       dispatch({
         type: "SET_REQUEST",
         payload: id
       });
+    },
+    setIsTrading: status => {
+      dispatch({
+        type: "SET_IS_TRADING",
+        payload: status
+      });
+    },
+    setIsViewDetail: status => {
+      dispatch({
+        type: "SET_IS_VIEWDETAIL",
+        payload: status
+      });
+    },
+    setIsHistory: status => {
+      dispatch({
+        type: "SET_IS_HISTORY",
+        payload: status
+      });
+    },
+    setIsHistoryDetail: status => {
+      dispatch({
+        type: "SET_IS_HISTORY_DETAIL",
+        payload: status
+      });
     }
-    // ,
-    // setPage: (page) => {
-    //   dispatch({
-    //     type: "SET_PAGE_NUMBER",
-    //     payload: page
-    //   });
-    // }
-  }
-}
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(ViewRequestList);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ViewRequestList);
