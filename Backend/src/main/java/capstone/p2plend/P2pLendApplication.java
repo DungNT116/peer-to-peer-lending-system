@@ -1,19 +1,26 @@
 package capstone.p2plend;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import capstone.p2plend.service.EmailService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 public class P2pLendApplication {
 
 	@Autowired
-	EmailService emailService;
-	
+	private PasswordEncoder passwordEncoder;
+
 	public static void main(String[] args) {
 		SpringApplication.run(P2pLendApplication.class, args);
 	}
 
+//	@Bean
+//	public CommandLineRunner demo() {
+//		return (args) -> {
+//			System.out.println(passwordEncoder.encode("admin"));
+//		};
+//	}
 }
