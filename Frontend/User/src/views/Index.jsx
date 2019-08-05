@@ -63,6 +63,9 @@ class Index extends React.Component {
         this.setState({
           transactions: data
         });
+        localStorage.setItem("token","");
+        localStorage.setItem("profile","");
+        localStorage.setItem("user","");
       });
       if (result.status === 200) {
         // alert("create success");
