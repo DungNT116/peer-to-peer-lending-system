@@ -34,6 +34,7 @@ public class Scheduler {
 	public void sendMailScheduler() {
 		try {
 			System.out.println("Start scaning system...");
+			System.out.println("Checking system for deadline of milestone...");
 			List<Request> lstRequest = requestRepo.findAllRequestByStatus("trading");
 			for (int i = 0; i < lstRequest.size(); i++) {
 				Request r = lstRequest.get(i);
@@ -50,7 +51,8 @@ public class Scheduler {
 					Timestamp stamp = new Timestamp(time);
 					Date deadLine = new Date(stamp.getTime());
 					Date currentDate = new Date();
-					System.out.println("Current system date checking for deadline: " + currentDate);
+					System.out.println(
+							"Current system date checking for deadline of milestone start checking at: " + currentDate);
 					Long diff = deadLine.getTime() - currentDate.getTime();
 					if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) >= 3 && m.getTransaction() == null) {
 						if (m.getType().equalsIgnoreCase("lend")) {
@@ -100,8 +102,10 @@ public class Scheduler {
 				Timestamp stamp = new Timestamp(time);
 				Date createDate = new Date(stamp.getTime());
 				Date currentDate = new Date();
+				System.out
+						.println("System check the request for more than 5 days... start checking at: " + currentDate);
 				Long diff = currentDate.getTime() - createDate.getTime();
-				if(TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) > 5) {
+				if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) > 5) {
 					r.setStatus("expired");
 					requestRepo.saveAndFlush(r);
 				}
