@@ -9,9 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@EnableScheduling
 @SpringBootApplication
-@Configuration
+@EnableScheduling
 public class P2pLendApplication {
 
 	@Autowired
