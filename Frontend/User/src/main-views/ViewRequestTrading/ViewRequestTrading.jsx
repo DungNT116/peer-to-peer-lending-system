@@ -22,7 +22,7 @@ import {
 } from "reactstrap";
 
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import MainNavbar from "../MainNavbar/MainNavbar.jsx";
 // import CardsFooter from "components/Footers/CardsFooter.jsx";
 
 import Pagination from "../../views/IndexSections/Pagination.jsx";
@@ -235,7 +235,7 @@ class ViewRequestTrading extends React.Component {
     ));
     return (
       <>
-        <DemoNavbar />
+        <MainNavbar />
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}
@@ -256,7 +256,7 @@ class ViewRequestTrading extends React.Component {
                   <Row>
                     <Col lg="10">
                       <h1 className="display-3 text-white">
-                        View Request Trading <span>View request trading </span>
+                        Trading Requests <span>View your trading requests </span>
                       </h1>
                       <p className="lead text-white">
                         View status borrow and lend request

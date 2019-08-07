@@ -24,7 +24,7 @@ import classnames from "classnames";
 
 import { database } from "../../firebase";
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import MainNavbar from "../MainNavbar/MainNavbar.jsx";
 import Pagination from "../../views/IndexSections/Pagination.jsx";
 
 //api link
@@ -337,7 +337,7 @@ class ViewRequestNew extends React.Component {
     ));
     return (
       <>
-        <DemoNavbar />
+        <MainNavbar />
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}
