@@ -166,7 +166,7 @@ class ApplyTimeline extends React.Component {
   }
   convertTimeStampToDate(date) {
     var timestampToDate = new Date(date * 1000);
-    return timestampToDate;
+    return timestampToDate.toLocaleDateString();
   }
   formatDate(date) {
     var d = new Date(date),

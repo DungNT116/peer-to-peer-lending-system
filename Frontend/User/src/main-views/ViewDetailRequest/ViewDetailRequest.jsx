@@ -167,7 +167,7 @@ class ViewDetailRequest extends React.Component {
         await database
           .ref("ppls")
           .orderByChild("username")
-          .equalTo(this.props.request.data.borrowerUser)
+          .equalTo(this.props.request.data.borrower.username)
           .once("value", snapshot => {
             if (snapshot.exists()) {
               const userData = snapshot.val();
