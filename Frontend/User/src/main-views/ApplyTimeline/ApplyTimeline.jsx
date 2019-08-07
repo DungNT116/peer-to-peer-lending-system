@@ -166,7 +166,7 @@ class ApplyTimeline extends React.Component {
   }
   convertTimeStampToDate(date) {
     var timestampToDate = new Date(date * 1000);
-    return timestampToDate;
+    return timestampToDate.toLocaleDateString();
   }
   formatDate(date) {
     var d = new Date(date),
@@ -672,12 +672,12 @@ class ApplyTimeline extends React.Component {
   send_tx = () => {
     let user = localStorage.getItem("user");
     let receiver = "";
-    if (user == this.props.borrowerUser) {
+    if (user === this.props.borrowerUser) {
       receiver = this.props.lenderUser;
     } else {
       receiver = this.props.borrowerUser;
     }
-    if (receiver != "") {
+    if (receiver !== "") {
       let data_transaction = {
         data_tx: {
           data: {
@@ -785,9 +785,7 @@ class ApplyTimeline extends React.Component {
   render() {
     const {
       curLendingId,
-      prevLendingId,
       curPaybackId,
-      prevPaybackId
     } = this.state;
     const curLendingStatus = this.state.timeline_lending[curLendingId].percent;
     // const prevLendingStatus =

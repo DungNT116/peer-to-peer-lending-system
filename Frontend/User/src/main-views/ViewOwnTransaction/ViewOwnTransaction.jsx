@@ -26,7 +26,7 @@ import {
 
 import classnames from "classnames";
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import MainNavbar from "../MainNavbar/MainNavbar.jsx";
 
 import { BeatLoader } from "react-spinners";
 import Pagination from "../../views/IndexSections/Pagination.jsx";
@@ -363,7 +363,7 @@ class ViewOwnTransaction extends React.Component {
     ));
     return (
       <>
-        <DemoNavbar />
+        <MainNavbar />
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}
@@ -384,7 +384,7 @@ class ViewOwnTransaction extends React.Component {
                   <Row>
                     <Col lg="10">
                       <h1 className="display-3 text-white">
-                        View Own Transactions{" "}
+                        My Own Transactions{" "}
                         <span>View your own transactions </span>
                       </h1>
                       <p className="lead text-white">

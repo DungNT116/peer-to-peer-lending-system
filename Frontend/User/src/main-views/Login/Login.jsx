@@ -1,15 +1,11 @@
 import React from "react";
-import { connect } from 'react-redux';
-// import {reducer} from '../../reducers/reducer';
-// import { store } from '../../store/store';
-// import  { Redirect } from 'react-router-dom';
 // reactstrap components
 import {
   Card, CardHeader, CardBody, FormGroup, Form, Input, InputGroupAddon,
   InputGroupText, InputGroup, Container, Row, Col, Button
 } from "reactstrap";
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import MainNavbar from "../MainNavbar/MainNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
 
 //api link
@@ -212,25 +208,10 @@ class Login extends React.Component {
 
   }
   render() {
-    // back up save token in meta tags
-    // document.getElementsByTagName("META")[3].content="Your description about the page or site here to set dynamically";
-    // let header = document.getElementsByTagName("head")[0];
-    // // console.log("header" + header);
-    // var meta = document.createElement("meta");
-    // meta.name = "token";
-    // meta.content = "aaaaa";
-    // header.appendChild(meta);
-    // let metaTags = document.getElementsByTagName("META");
-    // for (let index = 0; index < metaTags.length; index++) {
-    //   if(metaTags[index].getAttribute("name") === "token") {
-    //     metaTags[index].content= this.state.savedToken;
-    //   }
-
-    // }
     return (
       <>
 
-        <DemoNavbar />
+        <MainNavbar />
         <main ref="main">
           <section className="section section-shaped section-lg bg-gradient-info">
             {/* <div className="shape shape-style-1 shape-default">
@@ -365,23 +346,4 @@ class Login extends React.Component {
   }
 }
 
-// const mapStateToProps = (state) => {
-//   return {
-//     tokenReducer: state.tokenReducer
-//   };
-// }
-
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     setToken: (token) => {
-//       dispatch({
-//         type: "SET_TOKEN",
-//         payload: token
-//       });
-//     }
-//   }
-// }
-
-
-// export default connect(mapStateToProps, mapDispatchToProps)(Login);
 export default Login;
