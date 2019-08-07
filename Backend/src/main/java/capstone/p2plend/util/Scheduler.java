@@ -58,16 +58,14 @@ public class Scheduler {
 						if (m.getType().equalsIgnoreCase("lend")) {
 							emailService.sendSimpleMessage(lender.getEmail(),
 									"PPLS Remind Deadline of the current lend for loan request(lender)",
-									"Your current lend deadline is near, Deadline" + deadLine + ", you have "
-											+ TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
-											+ " to complete this trasaction, Login to our website to make the transaction for request number: "
+									"Your current lend deadline is near, Deadline" + deadLine
+											+ ", to complete this trasaction, Login to our website to make the transaction for request number: "
 											+ r.getId());
 						}
 						if (m.getType().equalsIgnoreCase("payback")) {
 							emailService.sendSimpleMessage(borrower.getEmail(),
 									"PPLS Remind Deadline of the current payback for loan request(borrower)",
-									"Your current payback deadline is near, Deadline" + deadLine + ", you have "
-											+ TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
+									"Your current payback deadline is near, Deadline" + deadLine
 											+ " to complete this trasaction, Login to our website to make the transaction for request number: "
 											+ r.getId());
 						}
