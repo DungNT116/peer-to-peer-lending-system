@@ -98,7 +98,7 @@ public class UserService {
 		String userId = account.getUsername();
 		String rawPassword = account.getPassword();
 
-		User checkExist = userRepo.findByUsernameOrEmail(userId, userId).get();
+		User checkExist = userRepo.findByUsernameOrEmail(userId, userId);
 
 		if (checkExist != null) {
 			if (passwordEncoder.matches(rawPassword, checkExist.getPassword())
