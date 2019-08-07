@@ -62,20 +62,8 @@ public class Scheduler {
 											+ TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
 											+ " to complete this trasaction, Login to our website to make the transaction for request number: "
 											+ r.getId());
-							emailService.sendSimpleMessage(borrower.getEmail(),
-									"PPLS Remind Deadline of the current lend for loan request(borrower)",
-									"The payment for lend of request number " + r.getId()
-											+ " still not yet done, User: " + r.getLender() + "still have "
-											+ TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
-											+ "to lend you money or will be fined, Deadline: " + deadLine);
 						}
 						if (m.getType().equalsIgnoreCase("payback")) {
-							emailService.sendSimpleMessage(lender.getEmail(),
-									"PPLS Remind Deadline of the current payback for loan request(lender)",
-									"The payment for payback of request number " + r.getId()
-											+ " still not yet done, User: " + r.getBorrower() + "still have "
-											+ TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
-											+ "to payback you money or will be fined, Deadline: " + deadLine);
 							emailService.sendSimpleMessage(borrower.getEmail(),
 									"PPLS Remind Deadline of the current payback for loan request(borrower)",
 									"Your current payback deadline is near, Deadline" + deadLine + ", you have "
@@ -106,8 +94,7 @@ public class Scheduler {
 						.println("System check the request for more than 5 days... start checking at: " + currentDate);
 				Long diff = currentDate.getTime() - createDate.getTime();
 				if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) > 5) {
-					r.setStatus("expired");
-					requestRepo.saveAndFlush(r);
+					requestRepo.deleteById(r.getId());
 				}
 			}
 
