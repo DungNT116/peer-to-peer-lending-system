@@ -134,7 +134,8 @@ class ApplyTimeline extends React.Component {
         {
           data: this.formatDate(
             new Date(
-              (new Date(Date.now()).getTime() / 1000 + 86400 * duration * 2) * 1000
+              (new Date(Date.now()).getTime() / 1000 + 86400 * duration * 2) *
+                1000
             )
           ),
           percent: 1.0
@@ -166,7 +167,7 @@ class ApplyTimeline extends React.Component {
   }
   convertTimeStampToDate(date) {
     var timestampToDate = new Date(date * 1000);
-    return timestampToDate;
+    return timestampToDate.toLocaleDateString();
   }
   formatDate(date) {
     var d = new Date(date),
@@ -211,7 +212,7 @@ class ApplyTimeline extends React.Component {
               ).getTime() /
                 1000 +
                 86400 * this.state.duration) *
-              1000
+                1000
             )
           ),
           percent:
@@ -299,7 +300,7 @@ class ApplyTimeline extends React.Component {
           new Date(
             (new Date(payback[0].data).getTime() / 1000 +
               86400 * this.state.duration) *
-            1000
+              1000
           )
         );
         this.setState({ timeline_payback: payback });
@@ -479,7 +480,7 @@ class ApplyTimeline extends React.Component {
               ).getTime() /
                 1000 +
                 86400 * this.state.duration) *
-              1000
+                1000
             )
           ),
           status: "ABC"
@@ -541,7 +542,7 @@ class ApplyTimeline extends React.Component {
                   ).getTime() /
                     1000 +
                     86400 * this.state.duration) *
-                  1000
+                    1000
                 )
               );
             }
@@ -672,12 +673,12 @@ class ApplyTimeline extends React.Component {
   send_tx = () => {
     let user = localStorage.getItem("user");
     let receiver = "";
-    if (user == this.props.borrowerUser) {
+    if (user === this.props.borrowerUser) {
       receiver = this.props.lenderUser;
     } else {
       receiver = this.props.borrowerUser;
     }
-    if (receiver != "") {
+    if (receiver !== "") {
       let data_transaction = {
         data_tx: {
           data: {
@@ -762,7 +763,7 @@ class ApplyTimeline extends React.Component {
               " paid for milestone number : " +
               idMilestone +
               " ",
-            sender: localStorage.getItem("user"),
+            sender: localStorage.getItem("user")
           });
         var upvotesRef = database.ref(
           "/ppls/" + this.state.keyUserFb + "/countNew"
@@ -783,12 +784,7 @@ class ApplyTimeline extends React.Component {
     return Math.ceil(num * precision) / precision;
   }
   render() {
-    const {
-      curLendingId,
-      prevLendingId,
-      curPaybackId,
-      prevPaybackId
-    } = this.state;
+    const { curLendingId, curPaybackId } = this.state;
     const curLendingStatus = this.state.timeline_lending[curLendingId].percent;
     // const prevLendingStatus =
     //   prevLendingId >= 0
@@ -1049,7 +1045,13 @@ class ApplyTimeline extends React.Component {
                                     </p>
                                   </Col>
                                   {this.state.isMilestoneLendingPaid ? (
-                                    <p>Milestone is Paid</p>
+                                    <Row>
+                                      <Col md="4" />
+                                      <Col md="4">
+                                        <p>Milestone is Paid</p>
+                                      </Col>
+                                      <Col md="4" />
+                                    </Row>
                                   ) : (
                                     <Col>
                                       <PayPalButton
@@ -1087,9 +1089,13 @@ class ApplyTimeline extends React.Component {
                                 </FormGroup>
                               </div>
                             ) : (
-                              <FormGroup row>
-                                <p>Today is not in Timeline</p>
-                              </FormGroup>
+                              <Row>
+                                <Col md="4" />
+                                <Col md="4">
+                                  <p>Today is not in Timeline</p>
+                                </Col>
+                                <Col md="4" />
+                              </Row>
                             )}
                           </ModalBody>
                         </Modal>

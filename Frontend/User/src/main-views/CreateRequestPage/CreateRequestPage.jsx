@@ -18,7 +18,7 @@ import {
 } from "reactstrap";
 
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import MainNavbar from "../MainNavbar/MainNavbar";
 import ApplyTimeline from "../ApplyTimeline/ApplyTimeline.jsx";
 
 //api link
@@ -52,7 +52,6 @@ class CreateRequestPage extends React.Component {
     this.handleDataTimeline = this.handleDataTimeline.bind(this);
     this.createMileStone = this.createMileStone.bind(this);
     this.onAmountCleaveChange = this.onAmountCleaveChange.bind(this);
-    this.onCreditCardFocus = this.onCreditCardFocus.bind(this);
     this.checkLoanLimit = this.checkLoanLimit.bind(this);
   }
 
@@ -197,8 +196,10 @@ class CreateRequestPage extends React.Component {
           }
         })
       }).then(result => {
+        console.log(result)
         if (result.status === 200) {
           // alert("create success");
+          console.log("goooooo")
           this.props.history.push("view-new-request");
         } else if (result.status === 401) {
           localStorage.removeItem("isLoggedIn");
@@ -293,13 +294,10 @@ class CreateRequestPage extends React.Component {
     }
   }
 
-  onCreditCardFocus(event) {
-    // update some state
-  }
   render() {
     return (
       <>
-        <DemoNavbar />
+        <MainNavbar />
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}
@@ -321,10 +319,10 @@ class CreateRequestPage extends React.Component {
                     <Col lg="10">
                       <h1 className="display-3 text-white">
                         Create Lending Request{" "}
-                        <span>create your own request</span>
+                        <span>Create your own request</span>
                       </h1>
                       <p className="lead text-white">
-                        create borrow request more easier. Every where, every
+                        Lending money more easier. Every where, every
                         times, ...
                       </p>
                     </Col>

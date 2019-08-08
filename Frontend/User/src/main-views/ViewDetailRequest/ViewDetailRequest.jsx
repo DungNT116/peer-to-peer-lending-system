@@ -24,7 +24,7 @@ import { database } from "../../firebase";
 import { PayPalButton } from "react-paypal-button-v2";
 import { apiLink, bigchainAPI, client_API } from "../../api.jsx";
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import MainNavbar from "../MainNavbar/MainNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
 import ApplyTimeline from "../ApplyTimeline/ApplyTimeline";
 import { isFulfilled } from "q";
@@ -167,7 +167,7 @@ class ViewDetailRequest extends React.Component {
         await database
           .ref("ppls")
           .orderByChild("username")
-          .equalTo(this.props.request.data.borrowerUser)
+          .equalTo(this.props.request.data.borrower.username)
           .once("value", snapshot => {
             if (snapshot.exists()) {
               const userData = snapshot.val();
@@ -565,7 +565,7 @@ class ViewDetailRequest extends React.Component {
     return (
       <>
         {this.validRedux()}
-        <DemoNavbar />
+        <MainNavbar />
         <main className="profile-page" ref="main">
           <section className="section-profile-cover section-shaped my-0 bg-gradient-info">
             {/* Circles background */}

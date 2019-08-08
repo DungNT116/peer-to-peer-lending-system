@@ -14,7 +14,7 @@ import {
 } from "reactstrap";
 
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import MainNavbar from "../main-views/MainNavbar/MainNavbar.jsx";
 
 // index page sections
 import Hero from "./IndexSections/Hero.jsx";
@@ -63,6 +63,9 @@ class Index extends React.Component {
         this.setState({
           transactions: data
         });
+        localStorage.setItem("token","");
+        localStorage.setItem("profile","");
+        localStorage.setItem("user","");
       });
       if (result.status === 200) {
         // alert("create success");
@@ -334,7 +337,7 @@ class Index extends React.Component {
     ));
     return (
       <>
-        <DemoNavbar />
+        <MainNavbar />
         <main ref="main">
           <Hero />
           <section className="section section-sm ">

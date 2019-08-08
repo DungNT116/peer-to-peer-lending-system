@@ -19,7 +19,7 @@ import {
 } from "reactstrap";
 
 // core components
-import DemoNavbar from "../../components/Navbars/DemoNavbar";
+import MainNavbar from "../MainNavbar/MainNavbar";
 import { PayPalButton } from "react-paypal-button-v2";
 //api link
 import {bigchainAPI, client_API } from "../../api.jsx";
@@ -90,7 +90,7 @@ class ApplyPaypal extends React.Component {
 
     return (
       <>
-        <DemoNavbar />
+        <MainNavbar />
         <main ref="main">
           <div className="position-relative">
             {/* shape Hero */}

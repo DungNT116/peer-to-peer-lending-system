@@ -19,7 +19,7 @@ import {
 
 import { database } from "../../firebase";
 // core components
-import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import MainNavbar from "../MainNavbar/MainNavbar.jsx";
 import SimpleFooter from "components/Footers/SimpleFooter.jsx";
 //api link
 import { apiLink } from "../../api.jsx";
@@ -288,7 +288,7 @@ class Register extends React.Component {
     };
     return (
       <>
-        <DemoNavbar />
+        <MainNavbar />
         <main ref="main">
           <section className="section section-shaped section-lg bg-gradient-info">
             {/* <div className="shape shape-style-1 bg-gradient-default">
