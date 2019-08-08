@@ -1238,7 +1238,7 @@ class Profile extends React.Component {
                                       />
                                     )
                                   )}
-                                  {this.state.documentID.status ===
+                                  {this.state.documentPP.status ===
                                   "invalid" ? (
                                     <div>
                                       <Input
@@ -1255,7 +1255,7 @@ class Profile extends React.Component {
                                         Save
                                       </Button>
                                     </div>
-                                  ) : this.state.documentID.status ===
+                                  ) : this.state.documentPP.status ===
                                     "pending" ? (
                                     "Document is waiting for validation"
                                   ) : (
@@ -1322,7 +1322,7 @@ class Profile extends React.Component {
                                       />
                                     )
                                   )}
-                                  {this.state.documentID.status ===
+                                  {this.state.documentDL.status ===
                                   "invalid" ? (
                                     <div>
                                       <Input
@@ -1339,7 +1339,7 @@ class Profile extends React.Component {
                                         Save
                                       </Button>
                                     </div>
-                                  ) : this.state.documentID.status ===
+                                  ) : this.state.documentDL.status ===
                                     "pending" ? (
                                     "Document is waiting for validation"
                                   ) : (
