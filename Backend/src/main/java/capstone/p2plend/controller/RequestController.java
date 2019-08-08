@@ -34,7 +34,7 @@ public class RequestController {
 	@CrossOrigin
 	@Secured({ "ROLE_USER" })
 	@PostMapping(value = "/rest/request/createRequest")
-	public ResponseEntity<Integer> createAccount(@RequestBody Request request,
+	public ResponseEntity<Integer> createRequest(@RequestBody Request request,
 			@RequestHeader("Authorization") String token) {
 		HttpStatus status = null;
 		boolean valid = false;
