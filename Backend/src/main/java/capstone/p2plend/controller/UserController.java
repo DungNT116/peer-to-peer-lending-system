@@ -192,24 +192,24 @@ public class UserController {
 		return new ResponseEntity<List<User>>(result, httpStatus);
 	}
 
-	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-	@GetMapping(value = "/rest/user/getByUsername")
-	public ResponseEntity<Object> getAccountByUsername(@RequestBody User user) {
-		HttpStatus status = null;
-		User account = null;
-		try {
-			account = userService.findUsername(user.getUsername());
-			if (account != null) {
-				status = HttpStatus.OK;
-			} else {
-				status = HttpStatus.BAD_REQUEST;
-			}
-		} catch (Exception e) {
-			status = HttpStatus.INTERNAL_SERVER_ERROR;
-		}
-		return new ResponseEntity<Object>(account, status);
-	}
+//	@CrossOrigin
+//	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+//	@GetMapping(value = "/rest/user/getByUsername")
+//	public ResponseEntity<Object> getAccountByUsername(@RequestBody User user) {
+//		HttpStatus status = null;
+//		User account = null;
+//		try {
+//			account = userService.findUsername(user.getUsername());
+//			if (account != null) {
+//				status = HttpStatus.OK;
+//			} else {
+//				status = HttpStatus.BAD_REQUEST;
+//			}
+//		} catch (Exception e) {
+//			status = HttpStatus.INTERNAL_SERVER_ERROR;
+//		}
+//		return new ResponseEntity<Object>(account, status);
+//	}
 
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
