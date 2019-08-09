@@ -16,7 +16,7 @@ public class DocumentTypeService {
 
 	public List<DocumentType> listDocumentType() {
 		List<DocumentType> lstDocType = docTypeRepo.findAll();
-		if (listDocumentType() == null) {
+		if (lstDocType == null) {
 			return null;
 		}
 		for (DocumentType dt : lstDocType) {
