@@ -1356,12 +1356,13 @@ class Profile extends React.Component {
                                         Save
                                   </Button>
                                     </div>
-                                  ) : this.state.documentPP.status ===
+                                  )}
+                                   {/* : this.state.documentPP.status ===
                                     "pending" ? (
                                     "Document is waiting for validation"
                                   ) : (
                                     ""
-                                  )}
+                                  )} */}
                             </CardBody>
                           </Collapse>
                         </Card>
@@ -1447,12 +1448,13 @@ class Profile extends React.Component {
                                         Save
                                   </Button>
                                     </div>
-                                  ) : this.state.documentDL.status ===
+                                  )}
+                                   {/* : this.state.documentDL.status ===
                                     "pending" ? (
                                     "Document is waiting for validation"
                                   ) : (
                                     ""
-                                  )}
+                                  )} */}
 
                             </CardBody>
                           </Collapse>
