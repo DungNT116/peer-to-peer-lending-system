@@ -63,9 +63,9 @@ class Index extends React.Component {
         this.setState({
           transactions: data
         });
-        localStorage.setItem("token","");
-        localStorage.setItem("profile","");
-        localStorage.setItem("user","");
+        localStorage.setItem("token", "");
+        localStorage.setItem("profile", "");
+        localStorage.setItem("user", "");
       });
       if (result.status === 200) {
         // alert("create success");
@@ -80,14 +80,6 @@ class Index extends React.Component {
     this.setState({ modalValid: !this.state.modalValid });
   }
 
-  changeCurrency(inputMoney) {
-    var money;
-    if (inputMoney % 500000 !== 0) {
-      money = inputMoney - (inputMoney % 500000);
-    }
-    return money;
-  }
-  
   validateTransaction(transactionInput) {
     this.setState({
       validTx: {
@@ -138,8 +130,9 @@ class Index extends React.Component {
         );
         setTimeout(
           function() {
-            
-            if (this.changeCurrency(Number(data.asset.data.amount)) === transactionInput.amount) {
+            if (
+              Number(data.asset.data.amount) === transactionInput.amountValid
+            ) {
               this.setState({
                 validTx: {
                   ...this.state.validTx,
@@ -321,11 +314,24 @@ class Index extends React.Component {
                   <FormGroup row className="py-2">
                     <Col md="6">{this.state.validTx.idTrx}</Col>
                     <Col md="6">
-                      {this.state.validTx.status}
-                      <i
-                        class="ni ni-check-bold"
-                        style={{ color: "green", fontSize: "20px" }}
-                      />
+                      {this.state.validTx.status == "VALID TRANSACTION" ? (
+                        <span>
+                          {this.state.validTx.status}
+                          <i
+                            class="ni ni-check-bold"
+                            style={{ color: "green", fontSize: "20px" }}
+                          />
+                        </span>
+                      ) : (
+                        <span>
+                          {this.state.validTx.status}
+
+                          <i
+                            className="ni ni-fat-remove"
+                            style={{ color: "red", fontSize: "20px" }}
+                          />
+                        </span>
+                      )}
                     </Col>
                   </FormGroup>
                 </div>
