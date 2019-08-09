@@ -401,6 +401,7 @@ class ApplyTimeline extends React.Component {
     this.setState({ modalPayback: !this.state.modalPayback });
   }
   checkTimeline(typePayment) {
+    console.log(this.state.rawMilestone);
     const dateNow = this.convertDateToTimestamp(new Date());
     for (let i = 0; i < this.state.rawMilestone.length; i++) {
       const element = this.state.rawMilestone[i];
@@ -538,7 +539,7 @@ class ApplyTimeline extends React.Component {
                   (new Date(
                     this.state.backup_timeline_payback[
                       this.state.backup_timeline_payback.length - 1
-                    ].data
+                    ].data 
                   ).getTime() /
                     1000 +
                     86400 * this.state.duration) *
@@ -970,7 +971,7 @@ class ApplyTimeline extends React.Component {
                           {this.createLendingTimeline()}
                         </div>
 
-                        <div className="text-center">{curLendingStatus}</div>
+                        <div className="text-center">{"Amount Percent to lend in milstone "+ curLendingId + " is" + curLendingStatus*100 +"%"}</div>
                       </Col>
                       <Col md="3">
                         {this.props.borrowerUser ===
@@ -1045,13 +1046,11 @@ class ApplyTimeline extends React.Component {
                                     </p>
                                   </Col>
                                   {this.state.isMilestoneLendingPaid ? (
-                                    <Row>
-                                      <Col md="4" />
-                                      <Col md="4">
-                                        <p>Milestone is Paid</p>
-                                      </Col>
-                                      <Col md="4" />
-                                    </Row>
+                                    <Col md="10">
+                                      <p style={{ paddingLeft: "40%" }}>
+                                        Milestone is Paid
+                                      </p>
+                                    </Col>
                                   ) : (
                                     <Col>
                                       <PayPalButton
@@ -1089,13 +1088,13 @@ class ApplyTimeline extends React.Component {
                                 </FormGroup>
                               </div>
                             ) : (
-                              <Row>
-                                <Col md="4" />
-                                <Col md="4">
-                                  <p>Today is not in Timeline</p>
+                              <FormGroup row>
+                                <Col md="10">
+                                  <p style={{ paddingLeft: "40%" }}>
+                                    Today is not in timeline
+                                  </p>
                                 </Col>
-                                <Col md="4" />
-                              </Row>
+                              </FormGroup>
                             )}
                           </ModalBody>
                         </Modal>
@@ -1116,7 +1115,7 @@ class ApplyTimeline extends React.Component {
                       {this.createLendingTimeline()}
                     </div>
 
-                    <div className="text-center">{curLendingStatus}</div>
+                    <div className="text-center">{"Amount Percent to lend in milestone "+ curLendingId + " is " +curLendingStatus*100 +"%"}</div>
                   </div>
                 )}
               </div>
@@ -1139,9 +1138,9 @@ class ApplyTimeline extends React.Component {
                   <UncontrolledDropdown>
                     <DropdownToggle caret color="secondary">
                       {isPaybackMany ? (
-                        <span>Lend Many</span>
+                        <span>Payback Many</span>
                       ) : (
-                        <span>Lend Once</span>
+                        <span>Payback Once</span>
                       )}
                     </DropdownToggle>
                     <DropdownMenu>
@@ -1284,7 +1283,7 @@ class ApplyTimeline extends React.Component {
                       >
                         {this.createPaybackTimeline()}
                       </div>
-                      <div className="text-center">{curPaybackStatus}</div>
+                      <div className="text-center">{"Amount Percent to pay in milestone "+ curPaybackId + " is " +curPaybackStatus*100+"%"}</div>
                     </Col>
                     <Col md="3">
                       {this.props.borrowerUser ===
@@ -1355,7 +1354,11 @@ class ApplyTimeline extends React.Component {
                                   </p>
                                 </Col>
                                 {this.state.isMilestonePaybackPaid ? (
-                                  <p>Milestone is Paid</p>
+                                  <Col md="10">
+                                    <p style={{ paddingLeft: "40%" }}>
+                                      Milestone is Paid
+                                    </p>
+                                  </Col>
                                 ) : (
                                   <Col>
                                     <PayPalButton
@@ -1394,7 +1397,11 @@ class ApplyTimeline extends React.Component {
                             </div>
                           ) : (
                             <FormGroup row>
-                              <p>Today is not in Timeline</p>
+                              <Col md="10">
+                                <p style={{ paddingLeft: "40%" }}>
+                                  Today is not in timeline
+                                </p>
+                              </Col>
                             </FormGroup>
                           )}
                         </ModalBody>
@@ -1415,7 +1422,7 @@ class ApplyTimeline extends React.Component {
                   >
                     {this.createPaybackTimeline()}
                   </div>
-                  <div className="text-center">{curPaybackStatus}</div>
+                  <div className="text-center">{"Amount Percent to pay in milestone " + curPaybackId+ " is " + curPaybackStatus*100+"%"}</div>
                 </div>
               )}
             </div>

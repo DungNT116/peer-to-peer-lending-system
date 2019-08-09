@@ -186,7 +186,7 @@ class CreateRequestPage extends React.Component {
         },
         body: JSON.stringify({
           amount: this.state.amount,
-          duration: this.state.borrowDuration,
+          duration: 30,
           interestRate: 18,
           createDate: this.state.createDate,
           deal: {
@@ -397,7 +397,7 @@ class CreateRequestPage extends React.Component {
                               </small>
                             </Col>
                           </FormGroup>
-                          <FormGroup
+                          {/* <FormGroup
                             row
                             className={classnames({
                               focused: this.state.durationFocused
@@ -437,7 +437,7 @@ class CreateRequestPage extends React.Component {
                               </Input>
                               <p id="durationError" />
                             </Col>
-                          </FormGroup>
+                          </FormGroup> */}
                           <FormGroup row>
                             <Col lg="3" md="3">
                               <Label
@@ -448,7 +448,7 @@ class CreateRequestPage extends React.Component {
                               </Label>
                             </Col>
                             <Col lg="9" md="9">
-                              <p>18% per year</p>
+                              <span>18% per Year</span>
                               {/* <Input
                                   name="interestedRate"
                                   type="text"

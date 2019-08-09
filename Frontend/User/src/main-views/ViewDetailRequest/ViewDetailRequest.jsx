@@ -125,10 +125,17 @@ class ViewDetailRequest extends React.Component {
           id: Number(this.props.request.data.deal.milestone[1].id)
         }
       })
-    }).then(result => {
+    }).then(async result => {
       if (result.status === 200) {
         alert("create success");
-        this.props.history.push("/view-request-trading");
+
+        await setTimeout(
+          function() {
+            this.props.history.push("/view-request-trading");
+          }.bind(this),
+          5000
+        );
+        // this.props.history.push("/view-request-trading");
       } else if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
@@ -167,40 +174,36 @@ class ViewDetailRequest extends React.Component {
         await database
           .ref("ppls")
           .orderByChild("username")
-          .equalTo(this.props.request.data.borrower.username)
+          .equalTo(this.state.borrowUsername)
           .once("value", snapshot => {
             if (snapshot.exists()) {
               const userData = snapshot.val();
               this.setState({ keyUserFb: Object.keys(userData)[0] });
             }
           });
-        await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
-          message:
-            localStorage.getItem("user") +
-            " accepted request number : " +
-            this.props.request.data.id +
-            " !",
-          sender: localStorage.getItem("user"),
-          requestId: this.props.request.data.id
-        });
+        await database
+          .ref("/ppls/" + this.state.keyUserFb + "/notification")
+          .push({
+            message:
+              localStorage.getItem("user") +
+              " accepted request number : " +
+              this.props.request.data.id +
+              " !",
+            sender: localStorage.getItem("user"),
+            requestId: this.props.request.data.id
+          });
         var upvotesRef = database.ref(
           "/ppls/" + this.state.keyUserFb + "/countNew"
         );
         await upvotesRef.transaction(function(current_value) {
           return (current_value || 0) + 1;
         });
-        alert("create success");
-        await setTimeout(
-          function() {
-            this.props.history.push("/view-request-trading");
-          }.bind(this),
-          5000
-        );
       } else if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       }
     });
+
   }
 
   createMileStone() {
@@ -266,11 +269,6 @@ class ViewDetailRequest extends React.Component {
   }
 
   saveNewDealInformationToDB() {
-    // console.log(this.state.lendingTimeline);
-    // console.log(this.state.paybackTimeline);
-    // console.log("username", this.props.request.data.borrower.username);
-
-    console.log("username", this.props.request);
     fetch(apiLink + "/rest/deal/makeDeal", {
       method: "PUT",
       headers: {
@@ -284,32 +282,32 @@ class ViewDetailRequest extends React.Component {
         milestone: this.createMileStone()
       })
     }).then(async result => {
-      // console.log(result);
+      console.log(this.state.makeDealUsername);
       if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       } else if (result.status === 200) {
-        // alert("create success");
-        // console.log("success");
         await database
           .ref("ppls")
           .orderByChild("username")
-          .equalTo(this.props.request.data.deal.user.username)
+          .equalTo(this.state.makeDealUsername)
           .once("value", snapshot => {
             if (snapshot.exists()) {
               const userData = snapshot.val();
               this.setState({ keyUserFb: Object.keys(userData)[0] });
             }
           });
-        await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
-          message:
-            localStorage.getItem("user") +
-            " make deal request number : " +
-            this.props.request.data.id +
-            " !",
-          sender: localStorage.getItem("user"),
-          requestId: this.props.request.data.id
-        });
+        await database
+          .ref("/ppls/" + this.state.keyUserFb + "/notification")
+          .push({
+            message:
+              localStorage.getItem("user") +
+              " make deal request number : " +
+              this.props.request.data.id +
+              " !",
+            sender: localStorage.getItem("user"),
+            requestId: this.props.request.data.id
+          });
         var upvotesRef = database.ref(
           "/ppls/" + this.state.keyUserFb + "/countNew"
         );
@@ -411,10 +409,13 @@ class ViewDetailRequest extends React.Component {
       body: JSON.stringify(data_transaction)
     })
       .then(response => response.json())
-      .then(data => {
-        // console.log(data);
+      .then(async data => {
+        this.setState({
+          borrowUsername :this.props.request.data.borrower.username
+        })
         this.acceptDeal();
         this.saveTransaction(data, data_transaction);
+        
       });
   };
 
@@ -432,8 +433,8 @@ class ViewDetailRequest extends React.Component {
       document.getElementById("saveDealButton").style.display = "none";
     }
 
-    document.getElementById("duration").style.display = "none";
-    document.getElementById("dueDay").style.display = "none";
+    // document.getElementById("duration").style.display = "none";
+    // document.getElementById("dueDay").style.display = "none";
   }
 
   convertTimeStampToDate(date) {
@@ -471,22 +472,22 @@ class ViewDetailRequest extends React.Component {
 
     //display field to edit data
     // document.getElementById("createDay").style.display = "";
-    document.getElementById("duration").style.display = "";
-    document.getElementById("dueDay").style.display = "";
+    // document.getElementById("duration").style.display = "";
+    // document.getElementById("dueDay").style.display = "";
 
     //hidden p tags
     // document.getElementById("createDayText").style.display = "none";
-    document.getElementById("durationText").style.display = "none";
-    document.getElementById("dueDateText").style.display = "none";
+    // document.getElementById("durationText").style.display = "none";
+    // document.getElementById("dueDateText").style.display = "none";
 
     //select default value
     // document.getElementById("createDay").value = this.formatDate(this.state.createDay);
-    document.getElementById("dueDay").value = this.formatDate(
-      this.state.dueDay
-    );
+    // document.getElementById("dueDay").value = this.formatDate(
+    //   this.state.dueDay
+    // );
     // document.getElementById("createDay").value = this.convertTimeStampToDate(this.state.createDay);
     // document.getElementById("dueDay").value = this.convertTimeStampToDate(this.state.dueDay);
-    document.getElementById("duration").value = this.state.borrowDuration;
+    // document.getElementById("duration").value = this.state.borrowDuration;
   }
 
   saveDeal() {
@@ -495,7 +496,9 @@ class ViewDetailRequest extends React.Component {
 
     //set UI timeline
     this.props.setIsHistory(true);
-
+    this.setState({
+      makeDealUsername : this.props.request.data.deal.user.username
+    })
     //save db
     this.saveNewDealInformationToDB();
 
@@ -512,23 +515,23 @@ class ViewDetailRequest extends React.Component {
 
     //hidden field to edit data
     // document.getElementById("createDay").style.display = "none";
-    document.getElementById("duration").style.display = "none";
-    document.getElementById("dueDay").style.display = "none";
+    // document.getElementById("duration").style.display = "none";
+    // document.getElementById("dueDay").style.display = "none";
 
     //display p tags
     // document.getElementById("createDayText").style.display = "";
-    document.getElementById("durationText").style.display = "";
-    document.getElementById("dueDateText").style.display = "";
+    // document.getElementById("durationText").style.display = "";
+    // document.getElementById("dueDateText").style.display = "";
 
     // document.getElementById("createDayText").innerHTML = this.state.createDay;
-    if (this.state.borrowDuration < 12) {
-      document.getElementById("durationText").innerHTML =
-        this.state.borrowDuration * 30 + " days";
-    } else {
-      document.getElementById("durationText").innerHTML =
-        this.state.borrowDuration + " days";
-    }
-    document.getElementById("dueDateText").innerHTML = this.state.dueDay;
+    // if (this.state.borrowDuration < 12) {
+    //   document.getElementById("durationText").innerHTML =
+    //     this.state.borrowDuration * 30 + " days";
+    // } else {
+    //   document.getElementById("durationText").innerHTML =
+    //     this.state.borrowDuration + " days";
+    // }
+    // document.getElementById("dueDateText").innerHTML = this.state.dueDay;
   }
 
   onCreateDayChange(event) {
@@ -631,6 +634,7 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                             <Col xs="12" md="9">
                               <p className="h6">
+                                {/* đổi công thức như trong doc */}
                                 {this.numberWithCommas(
                                   this.props.request.data.amount +
                                     (this.props.request.data.amount *
@@ -655,7 +659,7 @@ class ViewDetailRequest extends React.Component {
                               </p>
                             </Col>
                           </FormGroup>
-                          <FormGroup row className="py-2">
+                          {/* <FormGroup row className="py-2">
                             <Col md="3">
                               <Label className="h6">Borrow Duration</Label>
                             </Col>
@@ -743,12 +747,7 @@ class ViewDetailRequest extends React.Component {
                                   this.props.request.data.createDate
                                 )}
                               </p>
-                              {/* <Input
-                                id="borrowDay"
-                                type="date"
-                                disabled={!this.state.editable}
-                                // onChange={this.onCreateDayChange}
-                              /> */}
+                              
                             </Col>
                             <Col md="4">
                               <p className="h6" id="dueDateText">
@@ -767,7 +766,7 @@ class ViewDetailRequest extends React.Component {
                                 onChange={this.onDueDayChange}
                               />
                             </Col>
-                          </FormGroup>
+                          </FormGroup> */}
                           <FormGroup row className="py-2">
                             <Col md="3">
                               <Label className="h6">Interest Rate</Label>
