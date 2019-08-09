@@ -19,6 +19,9 @@ public class DocumentTypeService {
 		if (listDocumentType() == null) {
 			return null;
 		}
+		for (DocumentType dt : lstDocType) {
+			dt.setDocument(null);
+		}
 		return lstDocType;
 	}
 
