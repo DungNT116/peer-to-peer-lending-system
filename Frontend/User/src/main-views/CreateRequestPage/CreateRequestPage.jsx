@@ -196,10 +196,10 @@ class CreateRequestPage extends React.Component {
           }
         })
       }).then(result => {
-        console.log(result)
+        console.log(result);
         if (result.status === 200) {
           // alert("create success");
-          console.log("goooooo")
+          console.log("goooooo");
           this.props.history.push("view-new-request");
         } else if (result.status === 401) {
           localStorage.removeItem("isLoggedIn");
@@ -257,39 +257,44 @@ class CreateRequestPage extends React.Component {
     // raw value
     // console.log(event.target.rawValue);
     var rawValue = event.target.rawValue;
-
-    if (rawValue % 500000 !== 0) {
-      if (rawValue >= 1000000000) {
-        //1 billion
-        this.setState({
-          invalidAmount: true,
-          errorAmount: "The amount must be lower than 1 billion!"
-        });
-      } else {
-        this.setState({
-          invalidAmount: true,
-          errorAmount: "The amount must be a multiple of 500.000 VNĐ !"
-        });
-      }
+    if (rawValue > this.state.maxloadlimit) {
+      this.setState({
+        invalidAmount: true,
+        errorAmount: "The amount must be lower loan limit !"
+      });
     } else {
-      if (rawValue >= 1000000000) {
-        //1 billion
-        this.setState({
-          invalidAmount: true,
-          errorAmount: "The amount must be lower than 1 billion!"
-        });
-      } else if (rawValue === "") {
-        this.setState({
-          invalidAmount: true,
-          errorAmount: ""
-        });
+      if (rawValue % 500000 !== 0) {
+        if (rawValue >= 1000000000) {
+          //1 billion
+          this.setState({
+            invalidAmount: true,
+            errorAmount: "The amount must be lower than 1 billion!"
+          });
+        } else {
+          this.setState({
+            invalidAmount: true,
+            errorAmount: "The amount must be a multiple of 500.000 VNĐ !"
+          });
+        }
       } else {
-        
-        this.setState({
-          amount : rawValue,
-          invalidAmount: false,
-          errorAmount: ""
-        });
+        if (rawValue >= 1000000000) {
+          //1 billion
+          this.setState({
+            invalidAmount: true,
+            errorAmount: "The amount must be lower than 1 billion!"
+          });
+        } else if (rawValue === "") {
+          this.setState({
+            invalidAmount: true,
+            errorAmount: ""
+          });
+        } else {
+          this.setState({
+            amount: rawValue,
+            invalidAmount: false,
+            errorAmount: ""
+          });
+        }
       }
     }
   }
@@ -322,8 +327,7 @@ class CreateRequestPage extends React.Component {
                         <span>Create your own request</span>
                       </h1>
                       <p className="lead text-white">
-                        Lending money more easier. Every where, every
-                        times, ...
+                        Lending money more easier. Every where, every times, ...
                       </p>
                     </Col>
                   </Row>

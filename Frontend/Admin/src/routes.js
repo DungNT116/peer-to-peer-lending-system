@@ -8,7 +8,7 @@ import Icons from "views/examples/Icons.jsx";
 import UserList from "views/UserList.jsx";
 import PendingDocuments from "views/PendingDocuments.jsx";
 import DocumentDetail from "views/DocumentDetail.jsx";
-
+import ListDocumentType from "views/ListDocumentType.jsx";
 var routes = [
   {
     path: "/userList",
@@ -53,6 +53,13 @@ var routes = [
     component: DocumentDetail,
     layout: "/admin"
   },
+  {
+    path: "/listDocumentType",
+    name: "Document Type",
+    icon: "ni ni-archive-2 text-pink",
+    component: ListDocumentType,
+    layout: "/admin"
+  },
   // {
   //   path: "/user-profile",
   //   name: "User Profile",
@@ -74,12 +81,5 @@ var routes = [
     component: Login,
     layout: "/auth"
   }
-  // {
-  //   path: "/register",
-  //   name: "Register",
-  //   icon: "ni ni-circle-08 text-pink",
-  //   component: Register,
-  //   layout: "/auth"
-  // }
 ];
 export default routes;
