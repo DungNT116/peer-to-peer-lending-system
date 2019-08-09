@@ -102,6 +102,7 @@ class DocumentDetail extends React.Component {
           await upvotesRef.transaction(function(current_value) {
             return (current_value || 0) + 1;
           });
+          this.getUserDocument();
         });
       }
     });
@@ -149,6 +150,7 @@ class DocumentDetail extends React.Component {
           upvotesRef.transaction(function(current_value) {
             return (current_value || 0) + 1;
           });
+          this.getUserDocument();
         });
       }
     });
@@ -169,7 +171,7 @@ class DocumentDetail extends React.Component {
     ) {
       this.props.history.push("/login");
     } else {
-      this.getUserDocument();
+      // this.getUserDocument();
     }
   }
 

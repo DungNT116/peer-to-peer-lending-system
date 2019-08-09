@@ -125,7 +125,7 @@ class HistoryRequest extends React.Component {
         <td>{this.numberWithCommas(request.amount)} VND</td>
         {/* <td>{request.dueDate}</td> */}
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
-        <td>{request.duration} days</td>
+        {/* <td>{request.duration} days</td> */}
         <td>{request.status}</td>
         <td>
           <Link to="/view-detail-request">
@@ -216,7 +216,7 @@ class HistoryRequest extends React.Component {
                               <th>Amount</th>
                               {/* <th>DueDate</th> */}
                               <th>Create Date</th>
-                              <th>Duration</th>
+                              {/* <th>Duration</th> */}
                               <th>Status</th>
                               <th>Detail</th>
                             </tr>

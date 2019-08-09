@@ -132,7 +132,7 @@ class ViewRequestList extends React.Component {
         <td>{this.numberWithCommas(request.amount)} VND</td>
         <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
-        <td>{request.duration} days</td>
+        {/* <td>{request.duration} days</td> */}
         <td>
           <Link to="/view-detail-request">
             <Button
@@ -221,7 +221,7 @@ class ViewRequestList extends React.Component {
                               <th>Amount</th>
                               <th>User</th>
                               <th>Create Date</th>
-                              <th>Duration</th>
+                              {/* <th>Duration</th> */}
                               <th>View Detail</th>
                             </tr>
                           </thead>
