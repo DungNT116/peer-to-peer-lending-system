@@ -32,6 +32,7 @@ class ListDocumentType extends React.Component {
       amountDoc: "",
       documentTypes: [],
       invalidAmount: true,
+      invalidName: true,
       errorAmount: "",
       loading: true
     };
@@ -149,7 +150,20 @@ class ListDocumentType extends React.Component {
   }
   handleNameChange(event) {
     // console.log(event.target.value);
-    this.setState({ nameDoc: event.target.value });
+    var nameDocument = event.target.value;
+    if (nameDocument == undefined || nameDocument == "") {
+      this.setState({
+        nameDoc: nameDocument,
+        errorNameDoc: "Document name can not be blank !",
+        invalidName: true
+      });
+    } else {
+      this.setState({
+        nameDoc: nameDocument,
+        errorNameDoc: "",
+        invalidName: false
+      });
+    }
   }
   handleAmountChange(event) {
     this.setState({ amountDoc: event.target.value });
@@ -161,14 +175,16 @@ class ListDocumentType extends React.Component {
     var rawValue = event.target.rawValue;
 
     if (rawValue % 500000 !== 0) {
-      if (rawValue >= 1000000000) {
+      if (rawValue >= 10000000) {
         //1 billion
         this.setState({
+          amountDoc: rawValue,
           invalidAmount: true,
-          errorAmount: "The amount must be lower than 1 billion!"
+          errorAmount: "The amount must be lower than 10 Million!"
         });
       } else {
         this.setState({
+          amountDoc: rawValue,
           invalidAmount: true,
           errorAmount: "The amount must be a multiple of 500.000 VNĐ !"
         });
@@ -177,11 +193,13 @@ class ListDocumentType extends React.Component {
       if (rawValue > 10000000) {
         //10 million
         this.setState({
+          amountDoc: rawValue,
           invalidAmount: true,
           errorAmount: "The amount must be lower than 10 Million!"
         });
       } else if (rawValue === "") {
         this.setState({
+          amountDoc: rawValue,
           invalidAmount: true,
           errorAmount: ""
         });
@@ -300,7 +318,18 @@ class ListDocumentType extends React.Component {
                 </Col>
               </FormGroup>
               <FormGroup row>
-                <Col md="4">Amount</Col>
+                <Col md="12">
+                  <strong
+                    style={{
+                      color: "red"
+                    }}
+                  >
+                    {this.state.errorNameDoc}
+                  </strong>
+                </Col>
+              </FormGroup>
+              <FormGroup row>
+                <Col md="4">Amount Limit</Col>
                 <Col md="8">
                   <Cleave
                     placeholder="Amount Document Type"
@@ -342,7 +371,7 @@ class ListDocumentType extends React.Component {
                       color: "red"
                     }}
                   >
-                    {this.state.errorAmount}{" "}
+                    {this.state.errorAmount}
                   </strong>
                 </Col>
               </FormGroup>
@@ -362,6 +391,7 @@ class ListDocumentType extends React.Component {
                 color="primary"
                 type="button"
                 outline
+                disabled={this.state.invalidAmount || this.state.invalidName}
                 onClick={() => {
                   this.editDocument();
                   this.toggleModal("defaultModal-" + index);
@@ -430,8 +460,7 @@ class ListDocumentType extends React.Component {
                   <div className="modal-body">
                     <p>
                       {" "}
-                      Input information of Document :{" "}
-                      <strong>{this.state.nameDoc}</strong>
+                      Input information of Document :
                       {/* <strong>{user.username}</strong>? */}
                     </p>
                     <FormGroup row>
@@ -448,7 +477,18 @@ class ListDocumentType extends React.Component {
                       </Col>
                     </FormGroup>
                     <FormGroup row>
-                      <Col md="4">Amount</Col>
+                      <Col md="12">
+                        <strong
+                          style={{
+                            color: "red"
+                          }}
+                        >
+                          {this.state.errorNameDoc}
+                        </strong>
+                      </Col>
+                    </FormGroup>
+                    <FormGroup row>
+                      <Col md="4">Amount Limit</Col>
                       <Col md="8">
                         <Cleave
                           placeholder="Amount Document Type"
@@ -501,7 +541,9 @@ class ListDocumentType extends React.Component {
                       color="primary"
                       type="button"
                       outline
-                      disabled={this.state.invalidAmount}
+                      disabled={
+                        this.state.invalidAmount || this.state.invalidName
+                      }
                       onClick={() => {
                         this.addNewDocument();
                         this.toggleModal("modalAdd");

@@ -91,10 +91,12 @@ class DocumentDetail extends React.Component {
                 this.setState({ keyUserFb: Object.keys(userData)[0] });
               }
             });
-          await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
-            message: "Your " + docName + " is approved !",
-            sender: localStorage.getItem("user")
-          });
+          await database
+            .ref("/ppls/" + this.state.keyUserFb + "/notification")
+            .push({
+              message: "Your " + docName + " is approved !",
+              sender: localStorage.getItem("user")
+            });
 
           var upvotesRef = database.ref(
             "/ppls/" + this.state.keyUserFb + "/countNew"
@@ -139,10 +141,12 @@ class DocumentDetail extends React.Component {
                 this.setState({ keyUserFb: Object.keys(userData)[0] });
               }
             });
-          await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
-            message: "Your " + docName + " is rejected !",
-            sender: localStorage.getItem("user")
-          });
+          await database
+            .ref("/ppls/" + this.state.keyUserFb + "/notification")
+            .push({
+              message: "Your " + docName + " is rejected !",
+              sender: localStorage.getItem("user")
+            });
 
           var upvotesRef = database.ref(
             "/ppls/" + this.state.keyUserFb + "/countNew"
@@ -414,6 +418,7 @@ class DocumentDetail extends React.Component {
                                       placeholder="Validation ID Document"
                                       type="text"
                                       autoComplete="off"
+                                      required
                                       value={
                                         this.state[
                                           "idDocValidation-" + docData.id
@@ -423,6 +428,11 @@ class DocumentDetail extends React.Component {
                                         this.handleIDChange(e, docData.id)
                                       }
                                     />
+                                    <small style={{ color: "red" }}>
+                                      <strong>
+                                        {this.state.errorValidationDoc}
+                                      </strong>
+                                    </small>
                                   </Col>
                                   <Col lg="4">
                                     <FormGroup>
@@ -430,11 +440,28 @@ class DocumentDetail extends React.Component {
                                         type="button"
                                         size="md"
                                         className="btn btn-outline-primary"
-                                        onClick={() =>
-                                          this.toggleModal(
-                                            "defaultModal-approve-" + index
-                                          )
-                                        }
+                                        onClick={() => {
+                                          if (
+                                            this.state[
+                                              "idDocValidation-" + docData.id
+                                            ] !== undefined &&
+                                            this.state[
+                                              "idDocValidation-" + docData.id
+                                            ] !== ""
+                                          ) {
+                                            this.setState({
+                                              errorValidationDoc: ""
+                                            });
+                                            this.toggleModal(
+                                              "defaultModal-approve-" + index
+                                            );
+                                          } else {
+                                            this.setState({
+                                              errorValidationDoc:
+                                                "Validation ID Document can not be blank !"
+                                            });
+                                          }
+                                        }}
                                       >
                                         Approve
                                       </Button>
