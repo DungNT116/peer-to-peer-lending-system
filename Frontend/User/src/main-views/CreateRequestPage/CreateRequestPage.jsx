@@ -260,7 +260,7 @@ class CreateRequestPage extends React.Component {
     if (rawValue > this.state.maxloadlimit) {
       this.setState({
         invalidAmount: true,
-        errorAmount: "The amount must be lower loan limit !"
+        errorAmount: "The amount must be lower than loan limit !"
       });
     } else {
       if (rawValue % 500000 !== 0) {
@@ -273,7 +273,7 @@ class CreateRequestPage extends React.Component {
         } else {
           this.setState({
             invalidAmount: true,
-            errorAmount: "The amount must be a multiple of 500.000 VNĐ !"
+            errorAmount: "The amount must be a multiple of 500.000 VND !"
           });
         }
       } else {
