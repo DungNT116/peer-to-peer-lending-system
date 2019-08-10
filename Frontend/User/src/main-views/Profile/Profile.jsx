@@ -61,11 +61,11 @@ class Profile extends React.Component {
       newPhoneNumber: "",
 
       isChangePassword: false,
-      oldPassword: '',
-      newPassword: '',
-      confirmPassword: '',
+      oldPassword: "",
+      newPassword: "",
+      confirmPassword: "",
       isSamePassword: false,
-      isVideoSaved: false,
+      isVideoSaved: false
     };
     this.getProfile = this.getProfile.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -100,24 +100,25 @@ class Profile extends React.Component {
   changeOldPassword(event) {
     this.setState({
       oldPassword: event.target.value
-    })
+    });
   }
 
   changeNewPassword(event) {
     // console.log(event.target.value)
     var errorElement = document.getElementById("confirmError");
     if (event.target.value === this.state.confirmPassword) {
-      errorElement.innerHTML = ""
+      errorElement.innerHTML = "";
       this.setState({
         newPassword: event.target.value,
         isSamePassword: true
-      })
+      });
     } else {
-      errorElement.innerHTML = "<div class='alert alert-danger' role='alert'><strong>Confirm password is not match</strong></div>"
+      errorElement.innerHTML =
+        "<div class='alert alert-danger' role='alert'><strong>Confirm password is not match</strong></div>";
       this.setState({
         newPassword: event.target.value,
         isSamePassword: false
-      })
+      });
     }
   }
 
@@ -127,17 +128,18 @@ class Profile extends React.Component {
     // console.log(this.state.confirmPassword)
     var errorElement = document.getElementById("confirmError");
     if (this.state.newPassword === event.target.value) {
-      errorElement.innerHTML = ""
+      errorElement.innerHTML = "";
       this.setState({
         confirmPassword: event.target.value,
         isSamePassword: true
-      })
+      });
     } else {
-      errorElement.innerHTML = "<div class='alert alert-danger' role='alert'><strong>Confirm password is not match</strong></div>"
+      errorElement.innerHTML =
+        "<div class='alert alert-danger' role='alert'><strong>Confirm password is not match</strong></div>";
       this.setState({
         confirmPassword: event.target.value,
         isSamePassword: false
-      })
+      });
     }
   }
 
@@ -160,15 +162,15 @@ class Profile extends React.Component {
         body: formData
       }).then(result => {
         console.log(result);
-        console.log(result.status)
+        console.log(result.status);
         if (result.status === 200) {
           this.changeIsChangePassword();
-          alert("change Password success")
+          alert("change Password success");
           this.setState({
-            newPassword: '',
-            oldPassword: '',
-            confirmPassword: '',
-          })
+            newPassword: "",
+            oldPassword: "",
+            confirmPassword: ""
+          });
           // console.log(result);
           // this.changeEditable();
           // this.getProfile();
@@ -176,15 +178,14 @@ class Profile extends React.Component {
           localStorage.removeItem("isLoggedIn");
           this.props.history.push("/login-page");
         }
-      })
+      });
     }
-
   }
 
   changeIsChangePassword() {
     this.setState({
       isChangePassword: !this.state.isChangePassword
-    })
+    });
   }
 
   saveUserInformation() {
@@ -209,7 +210,7 @@ class Profile extends React.Component {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       }
-    })
+    });
   }
 
   onPhoneNumberChange(event) {
@@ -287,7 +288,7 @@ class Profile extends React.Component {
   changeEditable() {
     this.setState({
       editable: !this.state.editable
-    })
+    });
   }
 
   handleDataAvailable(event) {
@@ -325,7 +326,7 @@ class Profile extends React.Component {
     window.mediaRecorder.ondataavailable = this.handleDataAvailable;
     window.mediaRecorder.start();
 
-    var startCameraButton = document.querySelector("button#start")
+    var startCameraButton = document.querySelector("button#start");
     startCameraButton.disabled = true;
 
     var playButton = document.querySelector("button#play");
@@ -344,7 +345,7 @@ class Profile extends React.Component {
     recordButton.textContent = "Start Recording";
     recordButton.disabled = false;
 
-    var startCameraButton = document.querySelector("button#start")
+    var startCameraButton = document.querySelector("button#start");
     startCameraButton.disabled = false;
 
     var playButton = document.querySelector("button#play");
@@ -402,12 +403,12 @@ class Profile extends React.Component {
                 if (element.status === "invalid") {
                   this.setState({
                     isVideoSaved: false,
-                    isUploadedVideo: false,
+                    isUploadedVideo: false
                   });
                 } else {
                   this.setState({
                     isUploadedVideo: true,
-                    isVideoSaved: true,
+                    isVideoSaved: true
                   });
                 }
                 this.setState({
@@ -445,13 +446,13 @@ class Profile extends React.Component {
   }
 
   uploadVideo() {
-    console.log("gooooo")
+    console.log("gooooo");
     const superBuffer = new Blob(window.recordedBlobs, { type: "video/webm" });
     var base64data = "";
     var reader = new FileReader();
     reader.readAsDataURL(superBuffer);
-    reader.onloadend = function () {
-      console.log("gooooo2")
+    reader.onloadend = function() {
+      console.log("gooooo2");
       base64data = reader.result;
       // console.log(base64data);
 
@@ -482,20 +483,20 @@ class Profile extends React.Component {
             loadingID: true,
             loadingPP: true,
             loadingDL: true,
-            loadingVideo: true,
-          })
+            loadingVideo: true
+          });
           this.getDocument();
-          console.log("success")
+          console.log("success");
           // this.props.history.push("/view-request-trading");
         } else if (result.status === 401) {
           localStorage.removeItem("isLoggedIn");
           this.props.history.push("/login-page");
         } else if (result.status === 400) {
           alert("error");
-          console.log("fail")
+          console.log("fail");
         } else {
-          console.log(result)
-          console.log("error not found")
+          console.log(result);
+          console.log("error not found");
         }
       });
     };
@@ -567,7 +568,7 @@ class Profile extends React.Component {
         } else if (result.status === 400) {
           alert("error");
         } else {
-          console.log(result)
+          console.log(result);
         }
       });
     } else {
@@ -580,7 +581,7 @@ class Profile extends React.Component {
     var validFilesCount = 0;
     for (let i = 0; i < files.length; i++) {
       const element = files[i];
-      console.log(element.type)
+      console.log(element.type);
       if (!element.type.includes("image")) {
         validFilesCount--;
       } else {
@@ -609,7 +610,6 @@ class Profile extends React.Component {
     } else {
       alert("please select image files");
     }
-
   }
 
   toggle() {
@@ -635,7 +635,6 @@ class Profile extends React.Component {
       if (saveButton !== null) {
         saveButton.disabled = true;
       }
-
     }
   }
 
@@ -674,7 +673,7 @@ class Profile extends React.Component {
             newFirstName: data.firstName,
             newLastName: data.lastName,
             newEmail: data.email,
-            newPhoneNumber: data.phoneNumber,
+            newPhoneNumber: data.phoneNumber
           });
         });
       } else if (result.status === 401) {
@@ -706,11 +705,9 @@ class Profile extends React.Component {
           var recordButton = document.querySelector("button#record");
           recordButton.disabled = false;
         });
-
     } catch (e) {
       console.error("navigator.getUserMedia error:", e);
     }
-
   }
   autoPlayVideo(event) {
     event.preventDefault();
@@ -887,41 +884,41 @@ class Profile extends React.Component {
                           <h3 className="mb-0">My account</h3>
                         </Col>
                         <Col className="text-right" xs="3">
-                          {this.state.editable === false ?
-                            (
-                              <Button
-                                id="editProfile"
-                                color="primary"
-                                href="#pablo"
-                                onClick={() => this.changeEditable()}
-                                disabled={this.state.isChangePassword === true ? true : false}
-                                size="sm"
-                              >
-                                Edit Profile
-                              </Button>
-                            )
-                            :
-                            (
-                              ""
-                            )}
+                          {this.state.editable === false ? (
+                            <Button
+                              id="editProfile"
+                              color="primary"
+                              href="#pablo"
+                              onClick={() => this.changeEditable()}
+                              disabled={
+                                this.state.isChangePassword === true
+                                  ? true
+                                  : false
+                              }
+                              size="sm"
+                            >
+                              Edit Profile
+                            </Button>
+                          ) : (
+                            ""
+                          )}
                         </Col>
                         <Col className="text-right" xs="3">
-                          {this.state.isChangePassword === false ?
-                            (
-                              <Button
-                                color="primary"
-                                href="#pablo"
-                                onClick={() => this.changeIsChangePassword()}
-                                disabled={this.state.editable === true ? true : false}
-                                size="sm"
-                              >
-                                Change Password
-                          </Button>
-                            )
-                            :
-                            (
-                              ""
-                            )}
+                          {this.state.isChangePassword === false ? (
+                            <Button
+                              color="primary"
+                              href="#pablo"
+                              onClick={() => this.changeIsChangePassword()}
+                              disabled={
+                                this.state.editable === true ? true : false
+                              }
+                              size="sm"
+                            >
+                              Change Password
+                            </Button>
+                          ) : (
+                            ""
+                          )}
                         </Col>
                       </Row>
                     </CardHeader>
@@ -931,261 +928,262 @@ class Profile extends React.Component {
                           User information
                         </h6>
                         <div className="pl-lg-4">
-                          {this.state.isChangePassword === false ?
-                            (
-                              <div>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-phonenumber"
-                                      >
-                                        Phone Number
-                                </label>
-                                      {this.state.editable === true ?
-                                        (
-                                          <div>
-                                            <Input
-                                              className="form-control-alternative"
-                                              value={this.state.newPhoneNumber}
-                                              id="input-phonenumber"
-                                              type="text"
-                                              onChange={this.onPhoneNumberChange}
-                                            />
-                                            <p
-                                              style={{ color: "red" }}
-                                              id="phoneError"
-                                            />
-                                          </div>
-                                        )
-                                        :
-                                        (
-                                          <p>{this.state.phoneNumber}</p>
-                                        )}
-                                    </FormGroup>
-                                  </Col>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-email"
-                                      >
-                                        Email address
-                                </label>
-                                      {this.state.editable === true ?
-                                        (
-                                          <div>
-                                            <Input
-                                              className="form-control-alternative"
-                                              value={this.state.newEmail}
-                                              id="input-email"
-                                              type="email"
-                                              onChange={this.onEmailChange}
-                                            />
-                                            <p
-                                              style={{ color: "red" }}
-                                              id="emailError"
-                                            />
-                                          </div>
-                                        )
-                                        :
-                                        (
-                                          <p>{this.state.email}</p>
-                                        )}
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-first-name"
-                                      >
-                                        First name
-                                </label>
-                                      {this.state.editable === true ?
-                                        (
-                                          <div>
-                                            <Input
-                                              className="form-control-alternative"
-                                              value={this.state.newFirstName}
-                                              id="input-first-name"
-                                              placeholder="First name"
-                                              type="text"
-                                              onChange={this.onFirstNameChange}
-                                            />
-                                            <p
-                                              style={{ color: "red" }}
-                                              id="firstnameError"
-                                            />
-                                          </div>
-                                        )
-                                        :
-                                        (
-                                          <p>{this.state.firstName}</p>
-                                        )}
-                                    </FormGroup>
-                                  </Col>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-last-name"
-                                      >
-                                        Last name
-                                </label>
-                                      {this.state.editable === true ?
-                                        (
-                                          <div>
-                                            <Input
-                                              className="form-control-alternative"
-                                              value={this.state.newLastName}
-                                              id="input-last-name"
-                                              placeholder="Last name"
-                                              type="text"
-                                              onChange={this.onLastNameChange}
-                                            />
-                                            <p
-                                              style={{ color: "red" }}
-                                              id="lastnameError"
-                                            />
-                                          </div>
-                                        )
-                                        :
-                                        (
-                                          <p>{this.state.lastName}</p>
-                                        )}
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                {this.state.editable === true ?
-                                  (
-                                    <Row>
-                                      <Col className="text-right" xs="3">
-                                        <Button
-                                          id="saveProfile"
-                                          color="primary"
-                                          href="#pablo"
-                                          onClick={() => this.saveUserInformation()}
-                                          size="sm"
-                                        >
-                                          save Profile
-                                  </Button>
-                                      </Col>
-                                      <Col className="text-right" xs="3">
-                                        <Button
-                                          id="cancelProfile"
-                                          color="primary"
-                                          href="#pablo"
-                                          onClick={() => this.changeEditable()}
-                                          size="sm"
-                                        >
-                                          cancel
-                                  </Button>
-                                      </Col>
-                                    </Row>
-                                  )
-                                  :
-                                  (
-                                    ""
-                                  )
-                                }
-                              </div>
-                            )
-                            :
-                            (
-                              <div>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-oldPassword"
-                                      >
-                                        Old Password
-                                      </label>
+                          {this.state.isChangePassword === false ? (
+                            <div>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-phonenumber"
+                                    >
+                                      Loan Limit
+                                    </label>
+                                  </FormGroup>
+                                </Col>
+                                <Col lg="6">{this.state.loanLimit} VND</Col>
+                              </Row>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-phonenumber"
+                                    >
+                                      Phone Number
+                                    </label>
+                                    {this.state.editable === true ? (
                                       <div>
                                         <Input
                                           className="form-control-alternative"
-                                          value={this.state.oldPassword}
-                                          id="input-oldPassword"
-                                          type="password"
-                                          onChange={this.changeOldPassword}
+                                          value={this.state.newPhoneNumber}
+                                          id="input-phonenumber"
+                                          type="text"
+                                          onChange={this.onPhoneNumberChange}
+                                        />
+                                        <p
+                                          style={{ color: "red" }}
+                                          id="phoneError"
                                         />
                                       </div>
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-newPassword"
-                                      >
-                                        New Password
-                                      </label>
+                                    ) : (
+                                      <p>{this.state.phoneNumber}</p>
+                                    )}
+                                  </FormGroup>
+                                </Col>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-email"
+                                    >
+                                      Email address
+                                    </label>
+                                    {this.state.editable === true ? (
                                       <div>
                                         <Input
                                           className="form-control-alternative"
-                                          value={this.state.newPassword}
-                                          id="input-newPassword"
-                                          type="password"
-                                          onChange={this.changeNewPassword}
+                                          value={this.state.newEmail}
+                                          id="input-email"
+                                          type="email"
+                                          onChange={this.onEmailChange}
+                                        />
+                                        <p
+                                          style={{ color: "red" }}
+                                          id="emailError"
                                         />
                                       </div>
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-comfirmPassword"
-                                      >
-                                        Confirm Password
-                                      </label>
+                                    ) : (
+                                      <p>{this.state.email}</p>
+                                    )}
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-first-name"
+                                    >
+                                      First name
+                                    </label>
+                                    {this.state.editable === true ? (
                                       <div>
                                         <Input
                                           className="form-control-alternative"
-                                          value={this.state.confirmPassword}
-                                          id="input-confirmPassword"
-                                          type="password"
-                                          onChange={this.changeConfirmPassword}
+                                          value={this.state.newFirstName}
+                                          id="input-first-name"
+                                          placeholder="First name"
+                                          type="text"
+                                          onChange={this.onFirstNameChange}
                                         />
-                                        <p id="confirmError"></p>
+                                        <p
+                                          style={{ color: "red" }}
+                                          id="firstnameError"
+                                        />
                                       </div>
-                                    </FormGroup>
+                                    ) : (
+                                      <p>{this.state.firstName}</p>
+                                    )}
+                                  </FormGroup>
+                                </Col>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-last-name"
+                                    >
+                                      Last name
+                                    </label>
+                                    {this.state.editable === true ? (
+                                      <div>
+                                        <Input
+                                          className="form-control-alternative"
+                                          value={this.state.newLastName}
+                                          id="input-last-name"
+                                          placeholder="Last name"
+                                          type="text"
+                                          onChange={this.onLastNameChange}
+                                        />
+                                        <p
+                                          style={{ color: "red" }}
+                                          id="lastnameError"
+                                        />
+                                      </div>
+                                    ) : (
+                                      <p>{this.state.lastName}</p>
+                                    )}
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+
+                              {this.state.editable === true ? (
+                                <Row>
+                                  <Col className="text-right" xs="3">
+                                    <Button
+                                      id="saveProfile"
+                                      color="primary"
+                                      href="#pablo"
+                                      onClick={() => this.saveUserInformation()}
+                                      size="sm"
+                                    >
+                                      save Profile
+                                    </Button>
+                                  </Col>
+                                  <Col className="text-right" xs="3">
+                                    <Button
+                                      id="cancelProfile"
+                                      color="primary"
+                                      href="#pablo"
+                                      onClick={() => this.changeEditable()}
+                                      size="sm"
+                                    >
+                                      cancel
+                                    </Button>
                                   </Col>
                                 </Row>
-                                <Row>
-                                  <Button
-                                    id="savePassword"
-                                    color="primary"
-                                    href="#pablo"
-                                    onClick={() => this.changePassword()}
-                                    size="sm"
-                                  >
-                                    save
-                                  </Button>
-                                  {' '}
-                                  <Button
-                                    id="cancelChangePassword"
-                                    color="primary"
-                                    href="#pablo"
-                                    onClick={() => this.changeIsChangePassword()}
-                                    size="sm"
-                                  >
-                                    cancel
-                                  </Button>
-                                </Row>
-                              </div>
-                            )
-                          }
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          ) : (
+                            <div>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-oldPassword"
+                                    >
+                                      Old Password
+                                    </label>
+                                    <div>
+                                      <Input
+                                        className="form-control-alternative"
+                                        value={this.state.oldPassword}
+                                        id="input-oldPassword"
+                                        type="password"
+                                        onChange={this.changeOldPassword}
+                                      />
+                                    </div>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-newPassword"
+                                    >
+                                      New Password
+                                    </label>
+                                    <div>
+                                      <Input
+                                        className="form-control-alternative"
+                                        value={this.state.newPassword}
+                                        id="input-newPassword"
+                                        type="password"
+                                        onChange={this.changeNewPassword}
+                                      />
+                                    </div>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-comfirmPassword"
+                                    >
+                                      Confirm Password
+                                    </label>
+                                    <div>
+                                      <Input
+                                        className="form-control-alternative"
+                                        value={this.state.confirmPassword}
+                                        id="input-confirmPassword"
+                                        type="password"
+                                        onChange={this.changeConfirmPassword}
+                                      />
+                                      <p id="confirmError" />
+                                    </div>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Button
+                                  id="savePassword"
+                                  color="primary"
+                                  href="#pablo"
+                                  onClick={() => this.changePassword()}
+                                  size="sm"
+                                >
+                                  save
+                                </Button>{" "}
+                                <Button
+                                  id="cancelChangePassword"
+                                  color="primary"
+                                  href="#pablo"
+                                  onClick={() => this.changeIsChangePassword()}
+                                  size="sm"
+                                >
+                                  cancel
+                                </Button>
+                              </Row>
+                            </div>
+                          )}
                         </div>
+
+                        <small style={{ color: "red" }}>
+                          <strong>
+                            *Identity Card and Identity Video are required to
+                            increase loan limit
+                          </strong>
+                        </small>
+
                         <Card className="mb-0">
                           <CardHeader id="headingTwo">
                             <Button
@@ -1205,6 +1203,28 @@ class Profile extends React.Component {
                             id="collapseOne"
                           >
                             <CardBody style={style.sameSizeWithParent}>
+                              {this.state.documentID.status === "invalid" ? (
+                                <div>
+                                  <Input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={event =>
+                                      this.handleFileInput(event, "ID")
+                                    }
+                                  />{" "}
+                                  <Button
+                                    type="button"
+                                    onClick={() => this.saveDocument("ID")}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              ) : this.state.documentID.status === "pending" ? (
+                                "Document is waiting for validation"
+                              ) : (
+                                ""
+                              )}
                               {this.state.loadingID === true ? (
                                 <PulseLoader
                                   css={override}
@@ -1226,50 +1246,26 @@ class Profile extends React.Component {
                                       />
                                     )
                                   )}
-                                  {this.state.documentID.status ===
-                                    "invalid" ? (
-                                      <div>
-                                        <Input
-                                          type="file"
-                                          multiple
-                                          accept="image/*"
-                                          onChange={event =>
-                                            this.handleFileInput(event, "ID")
-                                          }
-                                        />{" "}
-                                        <Button
-                                          type="button"
-                                          onClick={() => this.saveDocument("ID")}
-                                        >
-                                          Save
-                                      </Button>
-                                      </div>
-                                    ) : this.state.documentID.status ===
-                                      "pending" ? (
-                                        "Document is waiting for validation"
-                                      ) : (
-                                        ""
-                                      )}
                                 </div>
                               ) : (
-                                    <div>
-                                      {/* {console.log(this.state.documentID)} */}
-                                      <Input
-                                        type="file"
-                                        multiple
-                                        accept="image/*"
-                                        onChange={event =>
-                                          this.handleFileInput(event, "ID")
-                                        }
-                                      />{" "}
-                                      <Button
-                                        type="button"
-                                        onClick={() => this.saveDocument("ID")}
-                                      >
-                                        Save
+                                <div>
+                                  {/* {console.log(this.state.documentID)} */}
+                                  <Input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={event =>
+                                      this.handleFileInput(event, "ID")
+                                    }
+                                  />{" "}
+                                  <Button
+                                    type="button"
+                                    onClick={() => this.saveDocument("ID")}
+                                  >
+                                    Save
                                   </Button>
-                                    </div>
-                                  )}
+                                </div>
+                              )}
                             </CardBody>
                           </Collapse>
                         </Card>
@@ -1281,199 +1277,13 @@ class Profile extends React.Component {
                               className="text-left m-0 p-0"
                               onClick={() => this.toggleAccordion(1)}
                               aria-expanded={this.state.accordion[1]}
-                              aria-controls="collapseTwo"
-                            >
-                              <h5 className="m-0 p-0">Passport</h5>
-                            </Button>
-                          </CardHeader>
-                          <Collapse
-                            isOpen={this.state.accordion[1]}
-                            data-parent="#accordion"
-                            id="collapseTwo"
-                          >
-                            <CardBody style={style.sameSizeWithParent}>
-                              {this.state.loadingPP === true ? (
-                                <PulseLoader
-                                  css={override}
-                                  sizeUnit={"px"}
-                                  size={15}
-                                  color={"#123abc"}
-                                  loading={this.state.loadingPP}
-
-                                />
-                              ) : this.state.documentPP.length !== 0 ? (
-                                <div>
-                                  {this.state.documentPP.documentFile.map(
-                                    imageData => (
-                                      <img
-                                        src={this.setSrcImgBase64(
-                                          imageData.fileType,
-                                          imageData.data
-                                        )}
-                                        style={style.sameSizeWithParent}
-                                      />
-                                    )
-                                  )}
-                                  {this.state.documentPP.status ===
-                                    "invalid" ? (
-                                      <div>
-                                        <Input
-                                          type="file"
-                                          multiple
-                                          accept="image/*"
-                                          onChange={event =>
-                                            this.handleFileInput(event, "PP")
-                                          }
-                                        />{" "}
-                                        <Button
-                                          type="button"
-                                          onClick={() => this.saveDocument("PP")}
-                                        >
-                                          Save
-                                      </Button>
-                                      </div>
-                                    ) : this.state.documentPP.status ===
-                                      "pending" ? (
-                                        "Document is waiting for validation"
-                                      ) : (
-                                        ""
-                                      )}
-                                </div>
-                              ) : (
-                                    <div>
-                                      <Input
-                                        type="file"
-                                        multiple
-                                        accept="image/*"
-                                        onChange={event =>
-                                          this.handleFileInput(event, "PP")
-                                        }
-                                      />{" "}
-                                      <Button
-                                        type="button"
-                                        onClick={() => this.saveDocument("PP")}
-                                      >
-                                        Save
-                                  </Button>
-                                    </div>
-                                  )}
-                                   {/* : this.state.documentPP.status ===
-                                    "pending" ? (
-                                    "Document is waiting for validation"
-                                  ) : (
-                                    ""
-                                  )} */}
-                            </CardBody>
-                          </Collapse>
-                        </Card>
-                        <Card className="mb-0">
-                          <CardHeader id="headingThree">
-                            <Button
-                              block
-                              color="link"
-                              className="text-left m-0 p-0"
-                              onClick={() => this.toggleAccordion(2)}
-                              aria-expanded={this.state.accordion[2]}
-                              aria-controls="collapseThree"
-                            >
-                              <h5 className="m-0 p-0">Driving License</h5>
-                            </Button>
-                          </CardHeader>
-                          <Collapse
-                            isOpen={this.state.accordion[2]}
-                            data-parent="#accordion"
-                            id="collapseThree"
-                          >
-                            <CardBody style={style.sameSizeWithParent}>
-                              {this.state.loadingDL === true ? (
-                                <PulseLoader
-                                  css={override}
-                                  sizeUnit={"px"}
-                                  size={15}
-                                  color={"#123abc"}
-                                  loading={this.state.loadingDL}
-                                />
-                              ) : this.state.documentDL.length !== 0 ? (
-                                <div>
-                                  {this.state.documentDL.documentFile.map(
-                                    imageData => (
-                                      <img
-                                        src={this.setSrcImgBase64(
-                                          imageData.fileType,
-                                          imageData.data
-                                        )}
-                                        style={style.sameSizeWithParent}
-                                      />
-                                    )
-                                  )}
-                                  {this.state.documentDL.status ===
-                                    "invalid" ? (
-                                      <div>
-                                        <Input
-                                          type="file"
-                                          multiple
-                                          accept="image/*"
-                                          onChange={event =>
-                                            this.handleFileInput(event, "DL")
-                                          }
-                                        />{" "}
-                                        <Button
-                                          type="button"
-                                          onClick={() => this.saveDocument("DL")}
-                                        >
-                                          Save
-                                      </Button>
-                                      </div>
-                                    ) : this.state.documentDL.status ===
-                                      "pending" ? (
-                                        "Document is waiting for validation"
-                                      ) : (
-                                        ""
-                                      )}
-                                </div>
-                              ) : (
-                                    <div>
-                                      <Input
-                                        type="file"
-                                        multiple
-                                        accept="image/*"
-                                        onChange={event =>
-                                          this.handleFileInput(event, "DL")
-                                        }
-                                      />{" "}
-                                      <Button
-                                        type="button"
-                                        onClick={() => this.saveDocument("DL")}
-                                      >
-                                        Save
-                                  </Button>
-                                    </div>
-                                  )}
-                                   {/* : this.state.documentDL.status ===
-                                    "pending" ? (
-                                    "Document is waiting for validation"
-                                  ) : (
-                                    ""
-                                  )} */}
-
-                            </CardBody>
-                          </Collapse>
-                        </Card>
-                        <Card className="mb-0">
-                          <CardHeader id="headingThree">
-                            <Button
-                              block
-                              color="link"
-                              className="text-left m-0 p-0"
-                              onClick={() => this.toggleAccordion(3)}
-                              aria-expanded={this.state.accordion[3]}
                               aria-controls="collapseThree"
                             >
                               <h5 className="m-0 p-0">Identity Video</h5>
                             </Button>
                           </CardHeader>
                           <Collapse
-                            isOpen={this.state.accordion[3]}
+                            isOpen={this.state.accordion[1]}
                             data-parent="#accordion"
                             id="collapseThree"
                           >
@@ -1506,14 +1316,13 @@ class Profile extends React.Component {
                                           Video
                                         </strong>
                                       </h5>
-
                                     </Row>
                                     <Row>
                                       <Button
                                         size="md"
                                         className="btn btn-outline-primary"
                                         id="start"
-                                        onClick={(event) => {
+                                        onClick={event => {
                                           this.openCamera(event);
                                         }}
                                       >
@@ -1535,11 +1344,11 @@ class Profile extends React.Component {
                                           ) {
                                             this.startRecording();
                                             setTimeout(
-                                              function () {
+                                              function() {
                                                 this.stopRecording();
                                                 window.stream
                                                   .getTracks()
-                                                  .forEach(function (track) {
+                                                  .forEach(function(track) {
                                                     track.stop();
                                                   });
                                               }.bind(this),
@@ -1577,21 +1386,194 @@ class Profile extends React.Component {
                                     </Row>
                                   </div>
                                 ) : (
-                                    <div>
-                                      <p>
-                                        You had already upload video, waiting for
-                                        validating from Admin
+                                  <div>
+                                    <p>
+                                      You had already upload video, waiting for
+                                      validating from Admin
                                     </p>
-                                    </div>
-                                  )
+                                  </div>
+                                )
                               ) : (
-                                    <div>
-                                      <p>
-                                        You had already upload video, system will keep
-                                        your Identity Video due to User Privacy
+                                <div>
+                                  <p>
+                                    You had already upload video, system will
+                                    keep your Identity Video due to User Privacy
                                   </p>
+                                </div>
+                              )}
+                            </CardBody>
+                          </Collapse>
+                        </Card>
+
+                        <Card className="mb-0">
+                          <CardHeader id="headingThree">
+                            <Button
+                              block
+                              color="link"
+                              className="text-left m-0 p-0"
+                              onClick={() => this.toggleAccordion(2)}
+                              aria-expanded={this.state.accordion[2]}
+                              aria-controls="collapseTwo"
+                            >
+                              <h5 className="m-0 p-0">Passport</h5>
+                            </Button>
+                          </CardHeader>
+                          <Collapse
+                            isOpen={this.state.accordion[2]}
+                            data-parent="#accordion"
+                            id="collapseTwo"
+                          >
+                            <CardBody style={style.sameSizeWithParent}>
+                              {this.state.loadingPP === true ? (
+                                <PulseLoader
+                                  css={override}
+                                  sizeUnit={"px"}
+                                  size={15}
+                                  color={"#123abc"}
+                                  loading={this.state.loadingPP}
+                                />
+                              ) : this.state.documentPP.length !== 0 ? (
+                                <div>
+                                  {this.state.documentPP.status ===
+                                  "invalid" ? (
+                                    <div>
+                                      <Input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={event =>
+                                          this.handleFileInput(event, "PP")
+                                        }
+                                      />{" "}
+                                      <Button
+                                        type="button"
+                                        onClick={() => this.saveDocument("PP")}
+                                      >
+                                        Save
+                                      </Button>
                                     </div>
+                                  ) : this.state.documentPP.status ===
+                                    "pending" ? (
+                                    "Document is waiting for validation"
+                                  ) : (
+                                    ""
                                   )}
+                                  {this.state.documentPP.documentFile.map(
+                                    imageData => (
+                                      <img
+                                        src={this.setSrcImgBase64(
+                                          imageData.fileType,
+                                          imageData.data
+                                        )}
+                                        style={style.sameSizeWithParent}
+                                      />
+                                    )
+                                  )}
+                                </div>
+                              ) : (
+                                <div>
+                                  <Input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={event =>
+                                      this.handleFileInput(event, "PP")
+                                    }
+                                  />{" "}
+                                  <Button
+                                    type="button"
+                                    onClick={() => this.saveDocument("PP")}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              )}
+                            </CardBody>
+                          </Collapse>
+                        </Card>
+                        <Card className="mb-0">
+                          <CardHeader id="headingThree">
+                            <Button
+                              block
+                              color="link"
+                              className="text-left m-0 p-0"
+                              onClick={() => this.toggleAccordion(3)}
+                              aria-expanded={this.state.accordion[3]}
+                              aria-controls="collapseThree"
+                            >
+                              <h5 className="m-0 p-0">Driving License</h5>
+                            </Button>
+                          </CardHeader>
+                          <Collapse
+                            isOpen={this.state.accordion[3]}
+                            data-parent="#accordion"
+                            id="collapseThree"
+                          >
+                            <CardBody style={style.sameSizeWithParent}>
+                              {this.state.loadingDL === true ? (
+                                <PulseLoader
+                                  css={override}
+                                  sizeUnit={"px"}
+                                  size={15}
+                                  color={"#123abc"}
+                                  loading={this.state.loadingDL}
+                                />
+                              ) : this.state.documentDL.length !== 0 ? (
+                                <div>
+                                  {this.state.documentDL.status ===
+                                  "invalid" ? (
+                                    <div>
+                                      <Input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={event =>
+                                          this.handleFileInput(event, "DL")
+                                        }
+                                      />{" "}
+                                      <Button
+                                        type="button"
+                                        onClick={() => this.saveDocument("DL")}
+                                      >
+                                        Save
+                                      </Button>
+                                    </div>
+                                  ) : this.state.documentDL.status ===
+                                    "pending" ? (
+                                    "Document is waiting for validation"
+                                  ) : (
+                                    ""
+                                  )}
+                                  {this.state.documentDL.documentFile.map(
+                                    imageData => (
+                                      <img
+                                        src={this.setSrcImgBase64(
+                                          imageData.fileType,
+                                          imageData.data
+                                        )}
+                                        style={style.sameSizeWithParent}
+                                      />
+                                    )
+                                  )}
+                                </div>
+                              ) : (
+                                <div>
+                                  <Input
+                                    type="file"
+                                    multiple
+                                    accept="image/*"
+                                    onChange={event =>
+                                      this.handleFileInput(event, "DL")
+                                    }
+                                  />{" "}
+                                  <Button
+                                    type="button"
+                                    onClick={() => this.saveDocument("DL")}
+                                  >
+                                    Save
+                                  </Button>
+                                </div>
+                              )}
                             </CardBody>
                           </Collapse>
                         </Card>
