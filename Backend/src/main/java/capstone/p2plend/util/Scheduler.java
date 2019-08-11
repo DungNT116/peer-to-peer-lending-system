@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import capstone.p2plend.entity.Deal;
 import capstone.p2plend.entity.Milestone;
@@ -30,6 +31,7 @@ public class Scheduler {
 //		System.out.println("run ..");
 //	}
 
+	@Transactional
 	@Scheduled(cron = "0 0 4 * * ?")
 	public void sendMailScheduler() {
 		try {
@@ -47,36 +49,40 @@ public class Scheduler {
 					if (m.getPercent() == null) {
 						continue;
 					}
-					Long time = m.getPresentDate() * 1000;
+					Long time = m.getPresentDate() * 1000L;
 					Timestamp stamp = new Timestamp(time);
 					Date deadLine = new Date(stamp.getTime());
 					Date currentDate = new Date();
 					System.out.println(
 							"Current system date checking for deadline of milestone start checking at: " + currentDate);
 					Long diff = deadLine.getTime() - currentDate.getTime();
-					if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) >= 3 && m.getTransaction() == null) {
+					if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) <= 3L && m.getTransaction() == null) {
 						if (m.getType().equalsIgnoreCase("lend")) {
+							System.out.println(lender.getEmail());
 							emailService.sendSimpleMessage(lender.getEmail(),
 									"PPLS Remind Deadline of the current lend for loan request(lender)",
-									"Your current lend deadline is near, Deadline" + deadLine
+									"Your current lend deadline is near, Deadline " + deadLine
 											+ ", to complete this trasaction, Login to our website to make the transaction for request number: "
 											+ r.getId());
 						}
 						if (m.getType().equalsIgnoreCase("payback")) {
+							System.out.println(borrower.getEmail());
 							emailService.sendSimpleMessage(borrower.getEmail(),
 									"PPLS Remind Deadline of the current payback for loan request(borrower)",
-									"Your current payback deadline is near, Deadline" + deadLine
+									"Your current payback deadline is near, Deadline " + deadLine
 											+ " to complete this trasaction, Login to our website to make the transaction for request number: "
 											+ r.getId());
 						}
 					}
 				}
 			}
+			System.out.println("Finish checking system...");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+//	@Scheduled(cron = "0 * * ? * *")
 	@Scheduled(cron = "0 0 1 * * ?")
 	public void deletePendingRequestWhenExpired() {
 		try {
