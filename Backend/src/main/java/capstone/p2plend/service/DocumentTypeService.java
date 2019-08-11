@@ -26,7 +26,8 @@ public class DocumentTypeService {
 	}
 
 	public boolean newDocumentType(DocumentType documentType) {
-		if (documentType.getName() == null || documentType.getAmountLimit() == null) {
+		if (documentType.getName() == null || documentType.getAmountLimit() == null
+				|| documentType.getAcronym() == null) {
 			return false;
 		}
 		DocumentType savedDocumentType = docTypeRepo.save(documentType);
@@ -49,6 +50,10 @@ public class DocumentTypeService {
 
 		if (documentType.getAmountLimit() != null) {
 			existedDocType.setAmountLimit(documentType.getAmountLimit());
+		}
+
+		if (documentType.getAcronym() != null) {
+			existedDocType.setAcronym(documentType.getAcronym());
 		}
 
 		DocumentType savedDocType = docTypeRepo.save(existedDocType);
