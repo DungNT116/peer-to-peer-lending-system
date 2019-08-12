@@ -97,6 +97,7 @@ class ListDocumentType extends React.Component {
   componentWillMount() {
     this.getDocumentTypeList();
   }
+  
   componentWillUpdate() {
     if (
       localStorage.getItem("isLoggedIn") == "" ||
@@ -234,7 +235,7 @@ class ListDocumentType extends React.Component {
         height: "100%"
       }
     };
-    const listUsers = this.state.documentTypes.map((documentType, index) => (
+    const listDocumentType = this.state.documentTypes.map((documentType, index) => (
       <tr key={index}>
         <td>
           <Col col="6" sm="4" md="2" xl className="mb-3 mb-xl-0">
@@ -568,10 +569,10 @@ class ListDocumentType extends React.Component {
                       {/* <th scope="col" /> */}
                     </tr>
                   </thead>
-                  {listUsers == "" ? (
+                  {listDocumentType == "" ? (
                     "No data is matching"
                   ) : (
-                    <tbody>{listUsers}</tbody>
+                    <tbody>{listDocumentType}</tbody>
                   )}
                 </Table>
                 <PulseLoader
