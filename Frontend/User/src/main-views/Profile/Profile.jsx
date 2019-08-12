@@ -13,7 +13,7 @@ import {
   Form,
   Input,
   Collapse,
-  Spinner,
+  Modal,
 } from 'reactstrap';
 
 import {css} from '@emotion/core';
@@ -66,6 +66,8 @@ class Profile extends React.Component {
       confirmPassword: '',
       isSamePassword: false,
       isVideoSaved: false,
+      loading: true,
+      isOpen: true,
     };
     this.getProfile = this.getProfile.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -143,7 +145,11 @@ class Profile extends React.Component {
       });
     }
   }
-
+  toggleModal = stateParam => {
+    this.setState({
+      [stateParam]: !this.state[stateParam],
+    });
+  };
   changePassword() {
     // console.log(this.state.isSamePassword)
     // console.log(this.state.oldPassword);
@@ -387,6 +393,7 @@ class Profile extends React.Component {
       },
     }).then(result => {
       if (result.status === 200) {
+        this.setState({docs: []});
         result.json().then(async data => {
           for (let i = 0; i < this.state.documentTypes.length; i++) {
             //get element in doc type
@@ -402,18 +409,18 @@ class Profile extends React.Component {
                     this.state.docs
                   )
                 ) {
-                  await this.setState(previousState => ({
+                  await this.setState({
                     docs: [
-                      ...previousState.docs,
+                      ...this.state.docs,
                       {
                         ['document' + elementType.name.replace(/\s+/g, '')]: {
                           documentType: elementType,
                         },
-                        
                       },
-                    ],['loading' +
-                    elementType.name.replace(/\s+/g, '')]: false
-                  }));
+                    ],
+                    ['loading' +
+                    elementType.acronym.replace(/\s+/g, '')]: false,
+                  });
                 }
               } else if (elementType.name === element.documentType.name) {
                 //check exist in the state docs
@@ -423,17 +430,17 @@ class Profile extends React.Component {
                 );
                 if (checkExist === false) {
                   //set data to docs if element exist in user document
-                  await this.setState(previousState => ({
+                  await this.setState({
                     docs: [
-                      ...previousState.docs,
+                      ...this.state.docs,
                       {
                         ['document' +
                         element.documentType.name.replace(/\s+/g, '')]: element,
-                        
                       },
-                    ],['loading' +
-                    element.documentType.name.replace(/\s+/g, '')]: false
-                  }));
+                    ],
+                    ['loading' +
+                    element.documentType.acronym.replace(/\s+/g, '')]: false,
+                  });
                 }
                 //special with Video type
                 if (element.documentType.name === 'Video') {
@@ -466,12 +473,17 @@ class Profile extends React.Component {
                 'document' + element.documentType.name.replace(/\s+/g, '')
               ] === null
             ) {
-              await this.setState(previousState => ({
+              await this.setState({
                 ['loading' +
-                element.documentType.name.replace(/\s+/g, '')]: false
-              }));
+                element.documentType.acronym.replace(/\s+/g, '')]: false,
+              });
             }
           }
+
+          this.setState({
+            isOpen:false,
+            loading: false
+          });
         });
         // this.props.history.push("/view-request-trading");
       } else if (result.status === 401) {
@@ -508,17 +520,7 @@ class Profile extends React.Component {
         // })
       }).then(async result => {
         if (result.status === 200) {
-          alert('save success');
-          //load document again
-          await this.setState({
-            loadingID: true,
-            loadingPP: true,
-            loadingDL: true,
-            loadingVideo: true,
-          });
-          this.getDocument();
           console.log('success');
-          // this.props.history.push("/view-request-trading");
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
           this.props.history.push('/login-page');
@@ -532,8 +534,11 @@ class Profile extends React.Component {
       });
     };
     this.setState({
-      isVideoSaved: true,
+      isOpen:true,
+      loading: true,
+      isVideoSaved :true
     });
+    this.getDocument();
   }
 
   saveDocument(idDoc, type) {
@@ -544,10 +549,8 @@ class Profile extends React.Component {
     //   var base64data = reader.result;
     //   console.log(base64data);
     // }
-
     let document = this.state['uploadDocument' + type];
     let typeId = idDoc;
-
     if (document.listImage !== undefined) {
       // console.log("typeId: ", typeId)
       var formData = new FormData();
@@ -572,8 +575,6 @@ class Profile extends React.Component {
         // })
       }).then(async result => {
         if (result.status === 200) {
-          alert('save success');
-
           //load document again
           await this.setState({
             loadingID: true,
@@ -581,7 +582,11 @@ class Profile extends React.Component {
             loadingDL: true,
             loadingVideo: true,
           });
-          this.getDocument();
+          await this.getDocument();
+          this.setState({
+            isOpen:true,
+            loading: true
+          });
           // this.props.history.push("/view-request-trading");
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
@@ -597,12 +602,11 @@ class Profile extends React.Component {
     }
   }
 
-  handleFileInput(event, type) {
+  async handleFileInput(event, type) {
     var files = event.target.files;
     var validFilesCount = 0;
     for (let i = 0; i < files.length; i++) {
       const element = files[i];
-      console.log(element.type);
       if (!element.type.includes('image')) {
         validFilesCount--;
       } else {
@@ -611,12 +615,14 @@ class Profile extends React.Component {
     }
     if (validFilesCount === files.length) {
       var document = {documentType: type, listImage: event.target.files};
-      this.setState({
+      await this.setState({
         ['uploadDocument' + type]: document,
       });
+      // console.log(this.state['uploadDocument' + type])
     } else {
       alert('please select image files');
     }
+    // console.log(this.state)
   }
 
   toggle() {
@@ -830,7 +836,7 @@ class Profile extends React.Component {
     `;
     const listDocumentType = this.state.docs.map((doc, index) => (
       <Card className="mb-0">
-        <CardHeader id="headingTwo">
+        <CardHeader id={'heading' + index}>
           <Button
             block
             color="link"
@@ -842,60 +848,22 @@ class Profile extends React.Component {
               )
             }
             aria-expanded={this.state.accordion[index]}
-            aria-controls="collapseOne"
+            aria-controls={'collapse' + index}
           >
             <h5 className="m-0 p-0">
               {/* {console.log(this.getIdOfDocument('Identity card'))} */}
               {doc[Object.keys(doc)[0]].documentType.name}
-              {console.log(doc[Object.keys(doc)[0]].documentType.acronym)}
             </h5>
           </Button>
         </CardHeader>
         <Collapse
           isOpen={this.state.accordion[index]}
           data-parent="#accordion"
-          id="collapseOne"
+          id={'collapse' + index}
         >
           <CardBody style={style.sameSizeWithParent}>
-            {doc[Object.keys(doc)[0]].status === 'invalid' ? (
-              <div>
-                <small style={{color: 'red'}}>
-                  <strong>
-                    Your document is rejected, please upload again for
-                    validation !
-                  </strong>
-                </small>
-                <Input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={event =>
-                    this.handleFileInput(
-                      event,
-                      doc[Object.keys(doc)[0]].documentType.acronym
-                    )
-                  }
-                />{' '}
-                <Button
-                  type="button"
-                  onClick={() =>
-                    this.saveDocument(
-                      doc[Object.keys(doc)[0]].documentType.id,
-                      doc[Object.keys(doc)[0]].documentType.acronym
-                    )
-                  }
-                >
-                  Save
-                </Button>
-              </div>
-            ) : doc[Object.keys(doc)[0]].status === 'pending' ? (
-              'Document is waiting for validation'
-            ) : (
-              ''
-            )}
             {this.state[
-              'loading' +
-                doc[Object.keys(doc)[0]].documentType.name.replace(/\s+/g, '')
+              'loading' + doc[Object.keys(doc)[0]].documentType.acronym
             ] === true ? (
               <PulseLoader
                 css={override}
@@ -904,11 +872,7 @@ class Profile extends React.Component {
                 color={'#123abc'}
                 loading={
                   this.state[
-                    'loading' +
-                      doc[Object.keys(doc)[0]].documentType.name.replace(
-                        /\s+/g,
-                        ''
-                      )
+                    'loading' + doc[Object.keys(doc)[0]].documentType.acronym
                   ]
                 }
               />
@@ -916,6 +880,44 @@ class Profile extends React.Component {
               doc[Object.keys(doc)[0]].documentType.name !== 'Video' ? (
               //
               <div>
+                {/*  */}
+                {doc[Object.keys(doc)[0]].status === 'invalid' ? (
+                  <div>
+                    <small style={{color: 'red'}}>
+                      <strong>
+                        Your document is rejected, please upload again for
+                        validation !
+                      </strong>
+                    </small>
+                    <Input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={event =>
+                        this.handleFileInput(
+                          event,
+                          doc[Object.keys(doc)[0]].documentType.acronym
+                        )
+                      }
+                    />{' '}
+                    <Button
+                      type="button"
+                      onClick={async () =>
+                        await this.saveDocument(
+                          doc[Object.keys(doc)[0]].documentType.id,
+                          doc[Object.keys(doc)[0]].documentType.acronym
+                        )
+                      }
+                    >
+                      Save
+                    </Button>
+                  </div>
+                ) : doc[Object.keys(doc)[0]].status === 'pending' ? (
+                  'Document is waiting for validation'
+                ) : (
+                  ''
+                )}
+                {/*  */}
                 {doc[Object.keys(doc)[0]].documentFile.map(imageData => (
                   <img
                     src={this.setSrcImgBase64(
@@ -928,8 +930,7 @@ class Profile extends React.Component {
               </div>
             ) : doc[Object.keys(doc)[0]].documentType.name === 'Video' ? (
               this.state[
-                'loading' +
-                  doc[Object.keys(doc)[0]].documentType.name.replace(/\s+/g, '')
+                'loading' + doc[Object.keys(doc)[0]].documentType.acronym
               ] === true ? (
                 <PulseLoader
                   css={override}
@@ -939,7 +940,7 @@ class Profile extends React.Component {
                   loading={
                     this.state[
                       'loading' +
-                        doc[Object.keys(doc)[0]].documentType.name.replace(
+                        doc[Object.keys(doc)[0]].documentType.acronym.replace(
                           /\s+/g,
                           ''
                         )
@@ -1059,8 +1060,9 @@ class Profile extends React.Component {
                 />{' '}
                 <Button
                   type="button"
-                  onClick={() =>
-                    this.saveDocument(
+                  onClick={async () =>
+                    await this.saveDocument(
+                      doc[Object.keys(doc)[0]].documentType.id,
                       doc[Object.keys(doc)[0]].documentType.acronym
                     )
                   }
@@ -1106,8 +1108,28 @@ class Profile extends React.Component {
           </section>
           <section className="section">
             <Container className="mt--7" style={style.profileComponent}>
-              {' '}
-              {/* fluid */}
+              
+              <Modal
+                className="modal-dialog-centered"
+                isOpen={this.state.isOpen}
+                toggle={() => this.toggleModal('defaultModal')}
+                style={style.sameSizeWithParent}
+              >
+                <div className="modal-header">
+                  <h3 className="modal-title" id="modal-title-default">
+                    Loading
+                  </h3>
+                </div>
+                <div className="modal-body">
+                  <PulseLoader
+                    css={override}
+                    sizeUnit={'px'}
+                    size={15}
+                    color={'#123abc'}
+                    loading={this.state.loading}
+                  />
+                </div>
+              </Modal>
               <Row>
                 <Col className="order-xl-1 mb-5 mb-xl-0" xl="4">
                   <Card className="card-profile shadow">
