@@ -44,12 +44,12 @@ public class DocumentTypeController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@PostMapping(value = "/rest/admin/documentType/newDocumentType")
-	public ResponseEntity<Integer> newDocumentType(@RequestBody DocumentType docType) {
+	public ResponseEntity<String> newDocumentType(@RequestBody DocumentType docType) {
 		HttpStatus status = null;
-		boolean result = false;
+		String result = null;
 		try {
 			result = docTypeService.newDocumentType(docType);
-			if (result == true) {
+			if (result.equalsIgnoreCase("success")) {
 				status = HttpStatus.OK;
 			} else {
 				status = HttpStatus.BAD_REQUEST;
@@ -57,18 +57,18 @@ public class DocumentTypeController {
 		} catch (Exception e) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<Integer>(status.value(), status);
+		return new ResponseEntity<String>(result, status);
 	}
 	
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@PutMapping(value = "/rest/admin/documentType/updateDocumentType")
-	public ResponseEntity<Integer> updateDocumentType(@RequestBody DocumentType docType) {
+	public ResponseEntity<String> updateDocumentType(@RequestBody DocumentType docType) {
 		HttpStatus status = null;
-		boolean result = false;
+		String result = null;
 		try {
 			result = docTypeService.updateDocumentType(docType);
-			if (result == true) {
+			if (result.equalsIgnoreCase("success")) {
 				status = HttpStatus.OK;
 			} else {
 				status = HttpStatus.BAD_REQUEST;
@@ -76,6 +76,6 @@ public class DocumentTypeController {
 		} catch (Exception e) {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<Integer>(status.value(), status);
+		return new ResponseEntity<String>(result, status);
 	}
 }

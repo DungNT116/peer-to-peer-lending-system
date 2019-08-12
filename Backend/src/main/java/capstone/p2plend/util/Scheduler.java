@@ -61,17 +61,25 @@ public class Scheduler {
 							System.out.println(lender.getEmail());
 							emailService.sendSimpleMessage(lender.getEmail(),
 									"PPLS Remind Deadline of the current lend for loan request(lender)",
-									"Your current lend deadline is near, Deadline " + deadLine
+									"Your current lend deadline is, Deadline " + deadLine
 											+ ", to complete this trasaction, Login to our website to make the transaction for request number: "
-											+ r.getId());
+											+ r.getId() + ", Milestone number: " + m.getId());
+							emailService.sendSimpleMessage(borrower.getEmail(),
+									"PPLS notice of the loan has not been paid(borrower)",
+									"Current deadline of the lend milestone still not been paid, dealine: " + deadLine
+											+ " We will remind the other person about this");
 						}
 						if (m.getType().equalsIgnoreCase("payback")) {
 							System.out.println(borrower.getEmail());
 							emailService.sendSimpleMessage(borrower.getEmail(),
 									"PPLS Remind Deadline of the current payback for loan request(borrower)",
-									"Your current payback deadline is near, Deadline " + deadLine
+									"Your current payback deadline is, Deadline " + deadLine
 											+ " to complete this trasaction, Login to our website to make the transaction for request number: "
-											+ r.getId());
+											+ r.getId() + ", Milestone number: " + m.getId());
+							emailService.sendSimpleMessage(lender.getEmail(),
+									"PPLS notice of the loan has not been paid(lender)",
+									"Current deadline of the payback milestone still not been paid, dealine: "
+											+ deadLine + " We will remind the other person about this");
 						}
 					}
 				}
