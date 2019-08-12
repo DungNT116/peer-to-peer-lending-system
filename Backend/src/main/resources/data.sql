@@ -1,5 +1,4 @@
-INSERT INTO user (username, password, email, role, first_name, last_name, status) VALUES ('admin', '$2a$10$shj62R5X7ItfVo2J/7zJw.Ym8q176VyjW5KO5tQG446spoPSYEVFS
-', 'mail@admin.com', 'ROLE_ADMIN', 'admin', 'admin', 'active');
+INSERT INTO user (username, password, email, role, first_name, last_name, status) VALUES ('admin', '$2a$10$shj62R5X7ItfVo2J/7zJw.Ym8q176VyjW5KO5tQG446spoPSYEVFS', 'mail@admin.com', 'ROLE_ADMIN', 'admin', 'admin', 'active');
 
 INSERT INTO document_type(name, amount_limit, acronym) VALUES ('Identity Card', 1000000, "ID");
 INSERT INTO document_type(name, amount_limit, acronym) VALUES ('Video', 1000000, "IV");

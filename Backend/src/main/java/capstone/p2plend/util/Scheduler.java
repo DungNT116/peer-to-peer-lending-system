@@ -11,10 +11,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import capstone.p2plend.entity.Deal;
+import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.Milestone;
 import capstone.p2plend.entity.Request;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.repo.RequestRepository;
+import capstone.p2plend.repo.UserRepository;
 import capstone.p2plend.service.EmailService;
 
 @Component
@@ -25,6 +27,9 @@ public class Scheduler {
 
 	@Autowired
 	RequestRepository requestRepo;
+
+	@Autowired
+	UserRepository userRepo;
 
 //	@Scheduled(cron = "* * * * * ?")
 //	public void testScheduler() {				
@@ -110,6 +115,73 @@ public class Scheduler {
 				}
 			}
 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Transactional
+	@Scheduled(cron = "0 */5 * ? * *")
+	public void adjustUserLoanLimit() {
+		try {
+			
+			System.out.println("Startin to scan and adjust user loan limit");
+			
+			List<User> lstUser = userRepo.findAll();
+			for (int q = 0; q < lstUser.size(); q++) {
+				User user = lstUser.get(q);
+
+				if (user.getRole().equalsIgnoreCase("role_admin")) {
+					continue;
+				}
+
+				List<Document> lstUserDocument = user.getDocument();
+				if (lstUserDocument == null) {
+					continue;
+				}
+
+				Long limit = 0L;
+				int count = 0;
+				for (int i = 0; i < lstUserDocument.size(); i++) {
+					Document d = lstUserDocument.get(i);
+					if (d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
+							&& d.getStatus().equalsIgnoreCase("valid")) {
+						limit += d.getDocumentType().getAmountLimit();
+						count = 1;
+						lstUserDocument.remove(i);
+						break;
+					}
+				}
+
+				if (count == 1) {
+					for (int i = 0; i < lstUserDocument.size(); i++) {
+						Document d = lstUserDocument.get(i);
+						if (d.getDocumentType().getName().equalsIgnoreCase("Video")
+								&& d.getStatus().equalsIgnoreCase("valid")) {
+							limit += d.getDocumentType().getAmountLimit();
+							user.setLoanLimit(limit);
+							user = userRepo.save(user);
+							count = 2;
+							lstUserDocument.remove(i);
+							break;
+						}
+					}
+				}
+
+				if (count == 2) {
+					for (int i = 0; i < lstUserDocument.size(); i++) {
+						Document d = lstUserDocument.get(i);
+						if (!d.getDocumentType().getName().equalsIgnoreCase("Identity Card")
+								&& !d.getDocumentType().getName().equalsIgnoreCase("Video")
+								&& d.getStatus().equalsIgnoreCase("valid")) {
+							limit += d.getDocumentType().getAmountLimit();
+							user.setLoanLimit(limit);
+							user = userRepo.save(user);
+						}
+					}
+				}
+			}
+			System.out.println("Done adjusting user loan limit");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
