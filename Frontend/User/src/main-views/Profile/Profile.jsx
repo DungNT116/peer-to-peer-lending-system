@@ -481,8 +481,7 @@ class Profile extends React.Component {
           }
 
           this.setState({
-            isOpen:false,
-            loading: false
+            isOpen:false
           });
         });
         // this.props.history.push("/view-request-trading");
@@ -788,7 +787,6 @@ class Profile extends React.Component {
 
           await this.setState({
             documentTypes: data,
-            loading: false,
           });
         });
       }

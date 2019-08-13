@@ -80,24 +80,29 @@ class ListDocumentType extends React.Component {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         Authorization: localStorage.getItem('token'),
       },
       body: JSON.stringify({
         id: this.state.idDoc,
         name: this.state.nameDoc,
         amountLimit: Number(this.state.amountDoc),
-        acronymDoc : this.state.acronymDoc
+        acronym: this.state.acronymDoc
       }),
     }).then(result => {
       if (result.status === 200) {
         window.alert('save success !');
-
+        
         this.getDocumentTypeList();
       } else if (result.status === 401) {
         localStorage.removeItem('isLoggedIn');
         this.props.history.push('/login-page');
+      } else if (result.status === 400) {
+        result.json().then(data => {
+          console.log(data);
+        });
       }
-    });
+    }).then((messages) => {console.log(messages);});
   }
   componentWillMount() {
     this.getDocumentTypeList();
@@ -146,7 +151,7 @@ class ListDocumentType extends React.Component {
       body: JSON.stringify({
         name: this.state.nameDoc,
         amountLimit: Number(this.state.amountDoc),
-        acronymDoc : this.state.acronymDoc
+        acronym: this.state.acronymDoc,
       }),
     }).then(result => {
       if (result.status === 200) {
@@ -437,11 +442,7 @@ class ListDocumentType extends React.Component {
                   color="primary"
                   type="button"
                   outline
-                  disabled={
-                    this.state.invalidAmount ||
-                    this.state.invalidName ||
-                    this.state.invalidAcronym
-                  }
+                  disabled={this.state.invalidAmount || this.state.invalidName}
                   onClick={() => {
                     this.editDocument();
                     this.toggleModal('defaultModal-' + index);
