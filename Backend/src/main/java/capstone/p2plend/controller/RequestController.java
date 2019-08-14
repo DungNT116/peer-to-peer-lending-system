@@ -51,25 +51,6 @@ public class RequestController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
-//	@CrossOrigin
-//	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-//	@GetMapping(value = "/rest/request/getById")
-//	public ResponseEntity<Request> getOne(@RequestBody Request request) {
-//		HttpStatus status = null;
-//		Request result = null;
-//		try {
-//			result = requestService.getOneById(request.getId());
-//			if (result != null) {
-//				status = HttpStatus.OK;
-//			} else {
-//				status = HttpStatus.BAD_REQUEST;
-//			}
-//		} catch (Exception e) {
-//			status = HttpStatus.INTERNAL_SERVER_ERROR;
-//		}
-//		return new ResponseEntity<Request>(result, status);
-//	}
-
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@GetMapping(value = "/rest/request/user/allRequest")
