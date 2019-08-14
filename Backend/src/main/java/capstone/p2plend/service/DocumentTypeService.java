@@ -50,11 +50,14 @@ public class DocumentTypeService {
 	}
 
 	public String updateDocumentType(DocumentType documentType) {
-		if (documentType.getId() == null)
+		if (documentType.getId() == null) {
 			return "Field Id cannot be null";
+		}
+
 		DocumentType existedDocType = docTypeRepo.findById(documentType.getId()).get();
-		if (existedDocType == null)
+		if (existedDocType == null) {
 			return "There no document type with existed id";
+		}
 
 		List<DocumentType> lstDocumentType = docTypeRepo.findAll();
 		for (int i = 0; i < lstDocumentType.size(); i++) {
@@ -84,7 +87,7 @@ public class DocumentTypeService {
 			existedDocType.setAcronym(documentType.getAcronym());
 		}
 
-		DocumentType savedDocType = docTypeRepo.save(existedDocType);
+		DocumentType savedDocType = docTypeRepo.saveAndFlush(existedDocType);
 		if (savedDocType != null)
 			return "success";
 
