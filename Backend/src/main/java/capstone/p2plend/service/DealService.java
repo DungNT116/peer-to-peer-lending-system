@@ -47,8 +47,8 @@ public class DealService {
 	}
 
 	public boolean makeDeal(Deal deal, String token) {
-		if (deal.getMilestone() == null || deal.getId() == null || deal.getBorrowTime() == null
-				|| deal.getPaybackTime() == null)
+		if (deal.getMilestone() == null || deal.getId() == null || deal.getBorrowTimes() == null
+				|| deal.getPaybackTimes() == null)
 			return false;
 
 		String username = jwtService.getUsernameFromToken(token);
@@ -75,8 +75,8 @@ public class DealService {
 		}
 
 		existDeal.setStatus("dealing");
-		existDeal.setBorrowTime(deal.getBorrowTime());
-		existDeal.setPaybackTime(deal.getPaybackTime());
+		existDeal.setBorrowTimes(deal.getBorrowTimes());
+		existDeal.setPaybackTimes(deal.getPaybackTimes());
 		existDeal.setUser(user);
 
 		List<Milestone> lstMs = existDeal.getMilestone();
@@ -178,8 +178,8 @@ public class DealService {
 			milestoneRepo.deleteMilestoneByDealId(m.getDeal().getId());
 		}
 
-		deal.setBorrowTime(backupDeal.getBorrowTime());
-		deal.setPaybackTime(backupDeal.getPaybackTime());
+		deal.setBorrowTimes(backupDeal.getBorrowTimes());
+		deal.setPaybackTimes(backupDeal.getPaybackTimes());
 		deal.setStatus(backupDeal.getStatus());
 		deal.setUser(request.getBorrower());
 		Deal savedDeal = dealRepo.saveAndFlush(deal);

@@ -33,10 +33,10 @@ public class BackupDeal {
 	private String status;
 
 	@Column
-	private Integer borrowTime;
+	private Integer borrowTimes;
 
 	@Column
-	private Integer paybackTime;
+	private Integer paybackTimes;
 
 	@JsonIgnoreProperties(value = { "backupDeal" })
 	@OneToOne(fetch = FetchType.LAZY)
@@ -66,20 +66,20 @@ public class BackupDeal {
 		this.status = status;
 	}
 
-	public Integer getBorrowTime() {
-		return borrowTime;
+	public Integer getBorrowTimes() {
+		return borrowTimes;
 	}
 
-	public void setBorrowTime(Integer borrowTime) {
-		this.borrowTime = borrowTime;
+	public void setBorrowTimes(Integer borrowTimes) {
+		this.borrowTimes = borrowTimes;
 	}
 
-	public Integer getPaybackTime() {
-		return paybackTime;
+	public Integer getPaybackTimes() {
+		return paybackTimes;
 	}
 
-	public void setPaybackTime(Integer paybackTime) {
-		this.paybackTime = paybackTime;
+	public void setPaybackTimes(Integer paybackTimes) {
+		this.paybackTimes = paybackTimes;
 	}
 
 	public Deal getDeal() {

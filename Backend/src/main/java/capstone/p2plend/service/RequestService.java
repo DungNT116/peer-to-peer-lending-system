@@ -350,6 +350,7 @@ public class RequestService {
 	}
 
 	public boolean createRequest(Request request, String token) {
+		
 		Deal deal = new Deal();
 		if (request.getDeal() != null) {
 			deal = request.getDeal();
@@ -375,10 +376,10 @@ public class RequestService {
 			}
 		}
 
-		if (countPayback != deal.getPaybackTime()) {
+		if (countPayback != deal.getPaybackTimes()) {
 			return false;
 		}
-		if (countLend != deal.getBorrowTime()) {
+		if (countLend != deal.getBorrowTimes()) {
 			return false;
 		}
 
@@ -406,8 +407,8 @@ public class RequestService {
 		Deal dealObj = dealRepo.saveAndFlush(deal);
 
 		BackupDeal backupDealObj = new BackupDeal();
-		backupDealObj.setBorrowTime(dealObj.getBorrowTime());
-		backupDealObj.setPaybackTime(dealObj.getPaybackTime());
+		backupDealObj.setBorrowTimes(dealObj.getBorrowTimes());
+		backupDealObj.setPaybackTimes(dealObj.getPaybackTimes());
 		backupDealObj.setStatus(dealObj.getStatus());
 		backupDealObj.setDeal(dealObj);
 		backupDealObj = backupDealRepo.saveAndFlush(backupDealObj);
