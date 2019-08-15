@@ -90,6 +90,7 @@ class ListDocumentType extends React.Component {
         acronym: this.state.acronymDoc
       }),
     }).then(result => {
+      
       if (result.status === 200) {
         window.alert('save success !');
         
@@ -100,9 +101,9 @@ class ListDocumentType extends React.Component {
       } else if (result.status === 400) {
         result.json().then(data => {
           console.log(data);
-        });
+        })
       }
-    }).then((messages) => {console.log(messages);});
+    })
   }
   componentWillMount() {
     this.getDocumentTypeList();

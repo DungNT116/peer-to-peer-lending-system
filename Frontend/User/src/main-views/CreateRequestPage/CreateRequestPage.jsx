@@ -213,9 +213,10 @@ class CreateRequestPage extends React.Component {
     }).then(result => {
       if (result.status === 200) {
         result.json().then(data => {
-          console.log('set loan limit');
+          console.log(data);
           this.setState({
-            maxloadlimit: data,
+            maxloadlimit: data.loanLimit,
+            interestRate : data.interestRate
           });
         });
       } else if (result.status === 401) {
@@ -412,7 +413,7 @@ class CreateRequestPage extends React.Component {
                               </Label>
                             </Col>
                             <Col lg="9" md="9">
-                              <span>18% per Year</span>
+                              <span>{this.state.interestRate}% per Year</span>
                             </Col>
                           </FormGroup>
                           <ApplyTimeline
