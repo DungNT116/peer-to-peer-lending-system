@@ -267,9 +267,9 @@ class ViewRequestNew extends React.Component {
           </Col>
         </td>
         <td>{this.numberWithCommas(request.amount)} VND</td>
-        {/* <td>{request.dueDate}</td> */}
+        <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
-        <td>{request.duration} days</td>
+        
         <td>{request.status}</td>
         <td>
           <Link to="/view-detail-request">
@@ -305,9 +305,9 @@ class ViewRequestNew extends React.Component {
           </Col>
         </td>
         <td>{this.numberWithCommas(request.amount)} VND</td>
-        {/* <td>{request.dueDate}</td> */}
+        <td>{request.borrower.username} days</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
-        <td>{request.duration} days</td>
+        
         <td>{request.status}</td>
         <td>
           <Link to="/view-detail-request">
@@ -423,8 +423,8 @@ class ViewRequestNew extends React.Component {
                                 <tr>
                                   <th>Id</th>
                                   <th>Amount</th>
+                                  <th>Borrower</th>
                                   <th>Create Date</th>
-                                  <th>Duration</th>
                                   <th>Status</th>
                                   <th>View detail</th>
                                   <th>Delete</th>
@@ -449,8 +449,8 @@ class ViewRequestNew extends React.Component {
                                 <tr>
                                   <th>Id</th>
                                   <th>Amount</th>
+                                  <th>Borrower</th>
                                   <th>Create Date</th>
-                                  <th>Duration</th>
                                   <th>Status</th>
                                   <th>View detail</th>
                                   <th>Cancel</th>
