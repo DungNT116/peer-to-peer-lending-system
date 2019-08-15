@@ -60,6 +60,7 @@ public class DocumentTypeService {
 		}
 
 		List<DocumentType> lstDocumentType = docTypeRepo.findAll();
+		lstDocumentType.remove(existedDocType);
 		for (int i = 0; i < lstDocumentType.size(); i++) {
 			DocumentType dt = lstDocumentType.get(i);
 			if (documentType.getName() != null) {
