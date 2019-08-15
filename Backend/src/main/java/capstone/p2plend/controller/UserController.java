@@ -1,6 +1,7 @@
 package capstone.p2plend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -20,6 +21,7 @@ import java.util.List;
 import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.payload.LoginRespone;
+import capstone.p2plend.payload.ParaRespone;
 import capstone.p2plend.service.UserService;
 import capstone.p2plend.service.JwtService;
 
@@ -192,25 +194,6 @@ public class UserController {
 		return new ResponseEntity<List<User>>(result, httpStatus);
 	}
 
-//	@CrossOrigin
-//	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-//	@GetMapping(value = "/rest/user/getByUsername")
-//	public ResponseEntity<Object> getAccountByUsername(@RequestBody User user) {
-//		HttpStatus status = null;
-//		User account = null;
-//		try {
-//			account = userService.findUsername(user.getUsername());
-//			if (account != null) {
-//				status = HttpStatus.OK;
-//			} else {
-//				status = HttpStatus.BAD_REQUEST;
-//			}
-//		} catch (Exception e) {
-//			status = HttpStatus.INTERNAL_SERVER_ERROR;
-//		}
-//		return new ResponseEntity<Object>(account, status);
-//	}
-
 	@CrossOrigin
 	@Secured("ROLE_ADMIN")
 	@PutMapping(value = "/rest/admin/user/activateUser")
@@ -273,23 +256,30 @@ public class UserController {
 		return new ResponseEntity<Integer>(status.value(), status);
 	}
 
+	@Value("#{T(java.lang.Float).parseFloat('${project.interest_rate}')}")
+	private Float interestRate;
+	
 	@CrossOrigin
 	@Secured({ "ROLE_USER" })
 	@GetMapping(value = "/rest/user/getUserMaximunLoanLimit")
-	public ResponseEntity<Long> userMaximumLoanLimit(@RequestHeader("Authorization") String token) {
+	public ResponseEntity<ParaRespone> userMaximumLoanLimit(@RequestHeader("Authorization") String token) {
 		HttpStatus httpStatus = null;
+		ParaRespone paraRespone = null;
 		Long result = null;
 		try {
 			result = userService.getUserMaximunLoanLimit(token);
 			if (result != null) {
+				paraRespone = new ParaRespone(result, interestRate);
 				httpStatus = HttpStatus.OK;
 			} else {
+				paraRespone = new ParaRespone(result, interestRate);
 				httpStatus = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception e) {
+			paraRespone = new ParaRespone(result, interestRate);
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<Long>(result, httpStatus);
+		return new ResponseEntity<ParaRespone>(paraRespone, httpStatus);
 	}
 
 	@CrossOrigin

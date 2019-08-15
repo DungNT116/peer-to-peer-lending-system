@@ -23,7 +23,7 @@ public class P2pLendApplication {
 //	@Bean
 //	public CommandLineRunner demo() {
 //		return (args) -> {
-//			System.out.println(passwordEncoder.encode("admin"));
+//			System.out.println(passwordEncoder.encode("1"));
 //		};
 //	}
 }
