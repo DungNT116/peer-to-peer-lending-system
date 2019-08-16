@@ -81,6 +81,7 @@ class Index extends React.Component {
   }
 
   validateTransaction(transactionInput) {
+    
     this.setState({
       validTx: {
         idTrx: "",
@@ -101,10 +102,11 @@ class Index extends React.Component {
       })
     }).then(result => {
       result.json().then(data => {
-        let dateCreate = new Date(data.asset.data.createDate);
-        setTimeout(
+        console.log(data)
+        let dateCreate = new Date(data.asset.data.tx_data.createDate);
+        setTimeout( 
           function() {
-            if (data.asset.data.sender === transactionInput.sender) {
+            if (data.asset.data.tx_data.sender === transactionInput.sender) {
               this.setState({
                 validTx: {
                   ...this.state.validTx,
@@ -117,7 +119,7 @@ class Index extends React.Component {
         );
         setTimeout(
           function() {
-            if (data.asset.data.receiver === transactionInput.receiver) {
+            if (data.asset.data.tx_data.receiver === transactionInput.receiver) {
               this.setState({
                 validTx: {
                   ...this.state.validTx,
@@ -131,7 +133,7 @@ class Index extends React.Component {
         setTimeout(
           function() {
             if (
-              Number(data.asset.data.amount) === transactionInput.amountValid
+              Number(data.asset.data.tx_data.amountTx) === transactionInput.amountValid
             ) {
               this.setState({
                 validTx: {
@@ -169,14 +171,14 @@ class Index extends React.Component {
             ) {
               this.setState({
                 validTx: {
-                  idTrx: data.asset.data.txId,
+                  idTrx: data.asset.data.tx_data.txId,
                   status: "VALID TRANSACTION"
                 }
               });
             } else {
               this.setState({
                 validTx: {
-                  idTrx: data.asset.data.txId,
+                  idTrx: data.asset.data.tx_data.txId,
                   status: "INVALID TRANSACTION"
                 }
               });
