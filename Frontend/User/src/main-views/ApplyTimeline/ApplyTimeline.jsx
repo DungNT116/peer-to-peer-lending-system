@@ -1078,7 +1078,7 @@ class ApplyTimeline extends React.Component {
                                           this.setState({
                                             data_tx: {
                                               txId: details.id,
-                                              createDate: new Date(),
+                                              createDate:  this.convertDateToTimestamp(new Date()),
                                               status: details.status,
                                               amount:
                                                 details.purchase_units[0].amount
@@ -1398,7 +1398,7 @@ class ApplyTimeline extends React.Component {
                                         this.setState({
                                           data_tx: {
                                             txId: details.id,
-                                            createDate: new Date(),
+                                            createDate:  this.convertDateToTimestamp(new Date()),
                                             status: details.status,
                                             amount:
                                               details.purchase_units[0].amount
