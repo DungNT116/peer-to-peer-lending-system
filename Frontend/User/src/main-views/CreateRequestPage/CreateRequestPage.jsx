@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
 // nodejs library that concatenates classes
-import classnames from "classnames";
-import { connect } from "react-redux";
+import classnames from 'classnames';
+import {connect} from 'react-redux';
 // reactstrap components
 import {
   Card,
@@ -14,39 +14,39 @@ import {
   Col,
   Label,
   Form,
-  Button
-} from "reactstrap";
+  Button,
+  Modal
+} from 'reactstrap';
 
 // core components
-import MainNavbar from "../MainNavbar/MainNavbar";
-import ApplyTimeline from "../ApplyTimeline/ApplyTimeline.jsx";
+import MainNavbar from '../MainNavbar/MainNavbar';
+import ApplyTimeline from '../ApplyTimeline/ApplyTimeline.jsx';
 
 //api link
-import { apiLink } from "../../api.jsx";
-import SimpleFooter from "components/Footers/SimpleFooter";
-import Cleave from "cleave.js/react";
+import {apiLink} from '../../api.jsx';
+import SimpleFooter from 'components/Footers/SimpleFooter';
+import Cleave from 'cleave.js/react';
 const textVerticalCenter = {
-  display: "flex",
-  alignItems: "center",
-  height: "100%"
+  display: 'flex',
+  alignItems: 'center',
+  height: '100%',
 };
 class CreateRequestPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       amount: 0,
-      borrowDuration: "",
-      interestRate: "",
-      createDate: "",
+      borrowDuration: '',
+      interestRate: '',
+      createDate: '',
       lendingTimeline: [],
       paybackTimeline: [],
       invalidAmount: true,
-      errorAmount: "",
-      maxloadlimit: 0
-      // invalidLoanLimit: true
+      errorAmount: '',
+      maxloadlimit: 0,
+      isOpen : false
     };
 
-    this.onAmountChange = this.onAmountChange.bind(this);
     this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDataTimeline = this.handleDataTimeline.bind(this);
@@ -62,64 +62,40 @@ class CreateRequestPage extends React.Component {
       // })
       return false;
     } else {
-      alert("your loan limit is not enough to use this function");
+      alert('your loan limit is not enough to use this function');
       return true;
     }
-  }
-
-  formatCurrency(number) {
-    let count = 0;
-    let tmpString = "";
-    if (number.length > 3) {
-      for (let i = number.length; i > 0; i--) {
-        const element = number[i - 1];
-        if (count === 3 && i !== number.length) {
-          count = 0;
-          tmpString += "," + element;
-        } else if (count !== 3) {
-          tmpString += element;
-        }
-        count++;
-      }
-    }
-
-    let output = "";
-    for (let i = tmpString.length; i > 0; i--) {
-      const element = tmpString[i - 1];
-      output += element;
-    }
-    return output;
   }
 
   createMileStone() {
     let milestones = [];
     let milestone = {
-      previousDate: "",
-      presentDate: "",
-      percent: "",
-      type: ""
+      previousDate: '',
+      presentDate: '',
+      percent: '',
+      type: '',
     };
     for (let i = 0; i < this.state.lendingTimeline.length; i++) {
       const element = this.state.lendingTimeline[i];
       // console.log(new Date(element.data).getTime() / 1000)
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
-        previousDate: "",
-        presentDate: "",
-        percent: "",
-        type: ""
+        previousDate: '',
+        presentDate: '',
+        percent: '',
+        type: '',
       };
       if (i === 0) {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = dateToTimestamp;
-        milestone.type = "lend";
+        milestone.type = 'lend';
         milestone.percent = element.percent;
       } else {
         const preElement = this.state.lendingTimeline[i - 1];
         var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = preDateToTimestamp;
-        milestone.type = "lend";
+        milestone.type = 'lend';
         milestone.percent = element.percent;
       }
       milestones.push(milestone);
@@ -130,22 +106,22 @@ class CreateRequestPage extends React.Component {
       // console.log(new Date(element.data).getTime() / 1000)
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
-        previousDate: "",
-        presentDate: "",
-        percent: "",
-        type: ""
+        previousDate: '',
+        presentDate: '',
+        percent: '',
+        type: '',
       };
       if (i === 0) {
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = dateToTimestamp;
-        milestone.type = "payback";
+        milestone.type = 'payback';
         milestone.percent = element.percent;
       } else {
         const preElement = this.state.paybackTimeline[i - 1];
         var preDateToTimestamp = new Date(preElement.data).getTime() / 1000;
         milestone.presentDate = dateToTimestamp;
         milestone.previousDate = preDateToTimestamp;
-        milestone.type = "payback";
+        milestone.type = 'payback';
         milestone.percent = element.percent;
       }
       milestones.push(milestone);
@@ -156,21 +132,15 @@ class CreateRequestPage extends React.Component {
   async handleDataTimeline(lendingTimeline, paybackTimeline) {
     await this.setState({
       lendingTimeline: lendingTimeline,
-      paybackTimeline: paybackTimeline
-    });
-  }
-
-  onAmountChange(event, maskedvalue, floatvalue) {
-    this.setState({
-      amount: maskedvalue
+      paybackTimeline: paybackTimeline,
     });
   }
 
   onBorrowDurationChange(event) {
     var index = event.target.selectedIndex;
-    var text = event.target[index].innerText.split(" ")[0];
+    var text = event.target[index].innerText.split(' ')[0];
     this.setState({
-      borrowDuration: text
+      borrowDuration: text,
     });
   }
 
@@ -178,11 +148,11 @@ class CreateRequestPage extends React.Component {
     event.preventDefault();
     var invalidLoanLimit = this.checkLoanLimit();
     if (this.state.invalidAmount === false && invalidLoanLimit === false) {
-      fetch(apiLink + "/rest/request/createRequest", {
-        method: "POST",
+      fetch(apiLink + '/rest/request/createRequest', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: localStorage.getItem("token")
+          'Content-Type': 'application/json',
+          Authorization: localStorage.getItem('token'),
         },
         body: JSON.stringify({
           amount: this.state.amount,
@@ -190,20 +160,25 @@ class CreateRequestPage extends React.Component {
           interestRate: 18,
           createDate: this.state.createDate,
           deal: {
-            borrowTime: this.state.lendingTimeline.length,
-            paybackTime: this.state.paybackTimeline.length,
-            milestone: this.createMileStone()
-          }
-        })
+            borrowTimes: this.state.lendingTimeline.length,
+            paybackTimes: this.state.paybackTimeline.length,
+            milestone: this.createMileStone(),
+          },
+        }),
       }).then(result => {
-        console.log(result);
         if (result.status === 200) {
-          // alert("create success");
-          console.log("goooooo");
-          this.props.history.push("view-new-request");
+          this.setState({
+            isOpen: true,
+          });
+          setTimeout(
+            function() {
+              setTimeout(this.props.history.push('view-new-request'), 3000);
+            }.bind(this),
+            3000
+          );
         } else if (result.status === 401) {
-          localStorage.removeItem("isLoggedIn");
-          this.props.history.push("/login-page");
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
         }
       });
     }
@@ -217,7 +192,7 @@ class CreateRequestPage extends React.Component {
     var dateNow = new Date();
     var timeStampeDateNow = Math.round(dateNow.getTime() / 1000);
     this.setState({
-      createDate: timeStampeDateNow
+      createDate: timeStampeDateNow,
     });
     this.props.setIsHistory(false);
     this.props.setIsViewDetail(true);
@@ -226,41 +201,37 @@ class CreateRequestPage extends React.Component {
     this.getLoanLimit();
   }
   numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   getLoanLimit() {
-    fetch(apiLink + "/rest/user/getUserMaximunLoanLimit", {
-      method: "GET",
+    fetch(apiLink + '/rest/user/getUserMaximunLoanLimit', {
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: localStorage.getItem("token")
-      }
+        'Content-Type': 'application/json',
+        Authorization: localStorage.getItem('token'),
+      },
     }).then(result => {
       if (result.status === 200) {
         result.json().then(data => {
-          console.log("set loan limit");
+          console.log(data);
           this.setState({
-            maxloadlimit: data
+            maxloadlimit: data.loanLimit,
+            interestRate : data.interestRate
           });
         });
       } else if (result.status === 401) {
-        localStorage.removeItem("isLoggedIn");
-        this.props.history.push("/login-page");
+        localStorage.removeItem('isLoggedIn');
+        this.props.history.push('/login-page');
       }
     });
   }
 
   onAmountCleaveChange(event) {
-    // formatted pretty value
-    // console.log(event.target.value);
-
-    // raw value
-    // console.log(event.target.rawValue);
     var rawValue = event.target.rawValue;
     if (rawValue > this.state.maxloadlimit) {
       this.setState({
         invalidAmount: true,
-        errorAmount: "The amount must be lower than loan limit !"
+        errorAmount: 'The amount must be lower than loan limit !',
       });
     } else {
       if (rawValue % 500000 !== 0) {
@@ -268,12 +239,12 @@ class CreateRequestPage extends React.Component {
           //1 billion
           this.setState({
             invalidAmount: true,
-            errorAmount: "The amount must be lower than 1 billion!"
+            errorAmount: 'The amount must be lower than 1 billion!',
           });
         } else {
           this.setState({
             invalidAmount: true,
-            errorAmount: "The amount must be a multiple of 500.000 VND !"
+            errorAmount: 'The amount must be a multiple of 500.000 VND !',
           });
         }
       } else {
@@ -281,18 +252,18 @@ class CreateRequestPage extends React.Component {
           //1 billion
           this.setState({
             invalidAmount: true,
-            errorAmount: "The amount must be lower than 1 billion!"
+            errorAmount: 'The amount must be lower than 1 billion!',
           });
-        } else if (rawValue === "") {
+        } else if (rawValue === '') {
           this.setState({
             invalidAmount: true,
-            errorAmount: ""
+            errorAmount: '',
           });
         } else {
           this.setState({
             amount: rawValue,
             invalidAmount: false,
-            errorAmount: ""
+            errorAmount: '',
           });
         }
       }
@@ -300,6 +271,20 @@ class CreateRequestPage extends React.Component {
   }
 
   render() {
+    const style = {
+      profileComponent: {
+        position: 'relative',
+        top: -250,
+      },
+      myAccount: {
+        position: 'relative',
+        top: -150,
+      },
+      sameSizeWithParent: {
+        width: '100%',
+        height: '100%',
+      },
+    };
     return (
       <>
         <MainNavbar />
@@ -323,7 +308,7 @@ class CreateRequestPage extends React.Component {
                   <Row>
                     <Col lg="10">
                       <h1 className="display-3 text-white">
-                        Create Lending Request{" "}
+                        Create Lending Request{' '}
                         <span>Create your own request</span>
                       </h1>
                       <p className="lead text-white">
@@ -341,6 +326,22 @@ class CreateRequestPage extends React.Component {
             <Container>
               <Card className="card-profile shadow mt--200">
                 {/* <div className="px-4"> */}
+                <Modal
+                  className="modal-dialog-centered"
+                  isOpen={this.state.isOpen}
+                  toggle={() => this.toggleModal('defaultModal')}
+                  style={style.sameSizeWithParent}
+                >
+                  <div className="modal-body">
+                    <h3 className="modal-title" id="modal-title-default">
+                      <img
+                        style={{width: 50, height: 50}}
+                        src={require('assets/img/theme/checked.png')}
+                      /> 
+                      Successfully created request !
+                    </h3>
+                  </div>
+                </Modal>
                 <Row className="justify-content-center ">
                   <Col>
                     <h2 className="display-3 text-center">
@@ -352,14 +353,14 @@ class CreateRequestPage extends React.Component {
                           Fill your information into the form
                         </h4>
                         <h5 className="mb-1 text-center mb-5">
-                          Loan limit available:{" "}
+                          Loan limit available:{' '}
                           {this.numberWithCommas(this.state.maxloadlimit)} VNĐ
                         </h5>
                         <Form role="form" onSubmit={this.handleSubmit}>
                           <FormGroup
                             row
                             className={classnames({
-                              focused: this.state.amountFocused
+                              focused: this.state.amountFocused,
                             })}
                           >
                             <Col lg="3" md="3">
@@ -375,73 +376,33 @@ class CreateRequestPage extends React.Component {
                                 placeholder="Enter your Amount"
                                 options={{
                                   numeral: true,
-                                  numeralThousandsGroupStyle: "thousand"
+                                  numeralThousandsGroupStyle: 'thousand',
                                 }}
                                 onFocus={this.onCreditCardFocus}
                                 onChange={this.onAmountCleaveChange}
                                 style={{
-                                  display: "block",
-                                  width: "100%",
-                                  height: "calc(2.75rem + 2px)",
-                                  padding: "0.625rem 0.75rem",
-                                  fontSize: "1rem",
+                                  display: 'block',
+                                  width: '100%',
+                                  height: 'calc(2.75rem + 2px)',
+                                  padding: '0.625rem 0.75rem',
+                                  fontSize: '1rem',
                                   lineHeight: 1.5,
-                                  color: "#8898aa",
-                                  backgroundColor: "#fff",
-                                  backgroundClip: "padding-box",
-                                  border: "1px solid #cad1d7",
-                                  borderRadius: "0.25rem",
-                                  boxShadow: "none"
+                                  color: '#8898aa',
+                                  backgroundColor: '#fff',
+                                  backgroundClip: 'padding-box',
+                                  border: '1px solid #cad1d7',
+                                  borderRadius: '0.25rem',
+                                  boxShadow: 'none',
                                 }}
                               />
                               <small>
-                                <strong style={{ color: "red" }}>
+                                <strong style={{color: 'red'}}>
                                   {this.state.errorAmount}
                                 </strong>
                               </small>
                             </Col>
                           </FormGroup>
-                          {/* <FormGroup
-                            row
-                            className={classnames({
-                              focused: this.state.durationFocused
-                            })}
-                          >
-                            <Col lg="3" md="3">
-                              <Label
-                                htmlFor="duration"
-                                style={textVerticalCenter}
-                              >
-                                Borrow Duration
-                              </Label>
-                            </Col>
-                            <Col lg="3" md="3">
-                              <Input
-                                type="select"
-                                name="duration"
-                                id="duration"
-                                onFocus={e =>
-                                  this.setState({ durationFocused: true })
-                                }
-                                onBlur={e =>
-                                  this.setState({ durationFocused: false })
-                                }
-                                onChange={this.onBorrowDurationChange}
-                                required
-                                defaultValue=""
-                              >
-                                <option value="" disabled>
-                                  Please select
-                                </option>
-                                <option value="1">30 days</option>
-                                <option value="3">90 days</option>
-                                <option value="6">180 days</option>
-                                <option value="9">270 days</option>
-                                <option value="12">360 days</option>
-                              </Input>
-                              <p id="durationError" />
-                            </Col>
-                          </FormGroup> */}
+                          
                           <FormGroup row>
                             <Col lg="3" md="3">
                               <Label
@@ -452,13 +413,7 @@ class CreateRequestPage extends React.Component {
                               </Label>
                             </Col>
                             <Col lg="9" md="9">
-                              <span>18% per Year</span>
-                              {/* <Input
-                                  name="interestedRate"
-                                  type="text"
-                                  disabled
-                                  value="18% per year"
-                                /> */}
+                              <span>{this.state.interestRate}% per Year</span>
                             </Col>
                           </FormGroup>
                           <ApplyTimeline
@@ -493,41 +448,41 @@ class CreateRequestPage extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    request: state.request
+    request: state.request,
   };
 };
 const mapDispatchToProps = dispatch => {
   return {
     setRequest: id => {
       dispatch({
-        type: "SET_REQUEST",
-        payload: id
+        type: 'SET_REQUEST',
+        payload: id,
       });
     },
     setIsTrading: status => {
       dispatch({
-        type: "SET_IS_TRADING",
-        payload: status
+        type: 'SET_IS_TRADING',
+        payload: status,
       });
     },
     setIsViewDetail: status => {
       dispatch({
-        type: "SET_IS_VIEWDETAIL",
-        payload: status
+        type: 'SET_IS_VIEWDETAIL',
+        payload: status,
       });
     },
     setIsHistory: status => {
       dispatch({
-        type: "SET_IS_HISTORY",
-        payload: status
+        type: 'SET_IS_HISTORY',
+        payload: status,
       });
     },
     setIsHistoryDetail: status => {
       dispatch({
-        type: "SET_IS_HISTORY_DETAIL",
-        payload: status
+        type: 'SET_IS_HISTORY_DETAIL',
+        payload: status,
       });
-    }
+    },
   };
 };
 
