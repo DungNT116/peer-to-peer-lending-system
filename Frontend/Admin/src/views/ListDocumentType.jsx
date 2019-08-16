@@ -80,20 +80,19 @@ class ListDocumentType extends React.Component {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
         Authorization: localStorage.getItem('token'),
       },
       body: JSON.stringify({
         id: this.state.idDoc,
         name: this.state.nameDoc,
         amountLimit: Number(this.state.amountDoc),
-        acronym: this.state.acronymDoc
+        acronym: this.state.acronymDoc,
       }),
     }).then(result => {
-      
       if (result.status === 200) {
         window.alert('save success !');
-        
+
         this.getDocumentTypeList();
       } else if (result.status === 401) {
         localStorage.removeItem('isLoggedIn');
@@ -101,9 +100,9 @@ class ListDocumentType extends React.Component {
       } else if (result.status === 400) {
         result.json().then(data => {
           console.log(data);
-        })
+        });
       }
-    })
+    });
   }
   componentWillMount() {
     this.getDocumentTypeList();
@@ -125,23 +124,32 @@ class ListDocumentType extends React.Component {
     this.setState({
       [stateParam]: !this.state[stateParam],
     });
-    if (
-      this.state.idDoc !== '' ||
-      this.state.amountDoc !== '' ||
-      this.state.nameDoc !== '' ||
-      this.state.acronymDoc !== ''
-    ) {
-      await this.setState({
-        idDoc: '',
-        amountDoc: '',
-        acronymDoc: '',
-        nameDoc: '',
-        errorNameDoc: '',
-        errorAmount: '',
-        errorAcronymDoc: '',
-      });
-    }
+    await this.setState({
+      idDoc: '',
+      amountDoc: '',
+      acronymDoc: '',
+      nameDoc: '',
+      errorNameDoc: '',
+      errorAmount: '',
+      errorAcronymDoc: '',
+      invalidName : true,
+      invalidAmount : true,
+      invalidAcronym : true,
+    });
   };
+  toggleModalEdit = async stateParam => {
+    this.setState({
+      [stateParam]: !this.state[stateParam],
+    });
+    await this.setState({
+      invalidName : false,
+      invalidAmount : false,
+      invalidAcronym : false,
+      errorNameDoc: '',
+      errorAmount: '',
+      errorAcronymDoc: '',
+    })
+  }
   addNewDocument() {
     fetch(apiLink + '/rest/admin/documentType/newDocumentType', {
       method: 'POST',
@@ -289,7 +297,7 @@ class ListDocumentType extends React.Component {
                   amountDoc: documentType.amountLimit,
                   acronymDoc: documentType.acronym,
                 });
-                this.toggleModal('defaultModal-' + index);
+                this.toggleModalEdit('defaultModal-' + index);
               }}
             >
               Edit
@@ -306,7 +314,7 @@ class ListDocumentType extends React.Component {
             <Modal
               className="modal-dialog-centered"
               isOpen={this.state['defaultModal-' + index]}
-              toggle={() => this.toggleModal('defaultModal-' + index)}
+              toggle={() => this.toggleModalEdit('defaultModal-' + index)}
             >
               <div className="modal-header">
                 <h6 className="modal-title" id="modal-title-default">

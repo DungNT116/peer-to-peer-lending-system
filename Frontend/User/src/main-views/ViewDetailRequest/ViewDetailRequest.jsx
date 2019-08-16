@@ -676,6 +676,7 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                           </FormGroup>
                           <ApplyTimeline
+                            request={this.props.request}
                             amountProps={this.props.request.data.amount}
                             onDataChange={this.handleDataTimeline}
                             setTimelineData={this.changeMilestoneToTimelineData}
@@ -787,6 +788,7 @@ class ViewDetailRequest extends React.Component {
                                       23000
                                   )}
                                   onSuccess={(details, data) => {
+                                    console.log(details);
                                     this.setState({
                                       data_tx: {
                                         txId: details.id,
