@@ -351,11 +351,24 @@ class ViewOwnTransaction extends React.Component {
                   <FormGroup row className="py-2">
                     <Col md="6">{this.state.validTx.idTrx}</Col>
                     <Col md="6">
-                      {this.state.validTx.status}
-                      <i
-                        className="ni ni-check-bold"
-                        style={{color: 'green', fontSize: '20px'}}
-                      />
+                      {this.state.validTx.status == 'VALID TRANSACTION' ? (
+                        <span>
+                          {this.state.validTx.status}
+                          <i
+                            class="ni ni-check-bold"
+                            style={{color: 'green', fontSize: '20px'}}
+                          />
+                        </span>
+                      ) : (
+                        <span>
+                          {this.state.validTx.status}
+
+                          <i
+                            className="ni ni-fat-remove"
+                            style={{color: 'red', fontSize: '20px'}}
+                          />
+                        </span>
+                      )}
                     </Col>
                   </FormGroup>
                 </div>
