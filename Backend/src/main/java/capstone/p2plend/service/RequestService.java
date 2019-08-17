@@ -350,7 +350,7 @@ public class RequestService {
 	}
 
 	public boolean createRequest(Request request, String token) {
-		
+
 		Deal deal = new Deal();
 		if (request.getDeal() != null) {
 			deal = request.getDeal();
@@ -387,11 +387,26 @@ public class RequestService {
 		User account = accountRepo.findByUsername(username);
 
 		Long loanLimit = account.getLoanLimit();
-		List<Request> lstRequest = requestRepo.findListAllUserRequestByExceptStatus(account.getId(), "done");
+		List<Request> lstRequestTrading = requestRepo.findListAllUserRequestByStatus(account.getId(), "trading");
+		List<Request> lstRequestPending = requestRepo.findListAllUserRequestByStatus(account.getId(), "pending");
+		List<Request> lstRequestDealing = requestRepo.findListAllUserRequestByStatus(account.getId(), "dealing");
+
+		List<Request> lstRequest = new ArrayList<>();
+		if (lstRequestTrading != null) {
+			lstRequest.addAll(lstRequestTrading);
+		}
+		if (lstRequestPending != null) {
+			lstRequest.addAll(lstRequestPending);
+		}
+		if (lstRequestDealing != null) {
+			lstRequest.addAll(lstRequestDealing);
+		}
+
 		Long currentLoanAmount = 0L;
 		for (Request r : lstRequest) {
 			currentLoanAmount += r.getAmount();
 		}
+
 		currentLoanAmount += request.getAmount();
 		if (currentLoanAmount > loanLimit) {
 			return false;
@@ -442,10 +457,10 @@ public class RequestService {
 	}
 
 	public boolean remove(Request requestGet, String token) {
-		if(requestGet.getId() == null) {
+		if (requestGet.getId() == null) {
 			return false;
 		}
-		
+
 		Request request = requestRepo.findById(requestGet.getId()).get();
 		if (request == null) {
 			return false;
@@ -460,8 +475,15 @@ public class RequestService {
 			return false;
 		}
 
-		requestRepo.deleteById(requestGet.getId());
-		return true;
+		Request existedRequest = requestRepo.findById(requestGet.getId()).get();
+		existedRequest.setStatus("deleted");
+		Request savedRq = requestRepo.saveAndFlush(existedRequest);
+
+		if (savedRq != null) {
+			return true;
+		}
+
+		return false;
 	}
 
 }

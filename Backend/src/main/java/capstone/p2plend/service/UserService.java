@@ -236,10 +236,19 @@ public class UserService {
 			return null;
 		}
 
-		List<Request> lstRequest = requestRepo.findListAllUserRequestByExceptStatus(user.getId(), "done");
+		List<Request> lstRequestTrading = requestRepo.findListAllUserRequestByStatus(user.getId(), "trading");
+		List<Request> lstRequestPending = requestRepo.findListAllUserRequestByStatus(user.getId(), "pending");
+		List<Request> lstRequestDealing = requestRepo.findListAllUserRequestByStatus(user.getId(), "dealing");
 
-		if (lstRequest == null) {
-			return null;
+		List<Request> lstRequest = new ArrayList<>();
+		if (lstRequestTrading != null) {
+			lstRequest.addAll(lstRequestTrading);
+		}
+		if (lstRequestPending != null) {
+			lstRequest.addAll(lstRequestPending);
+		}
+		if (lstRequestDealing != null) {
+			lstRequest.addAll(lstRequestDealing);
 		}
 
 		Long currentLoanAmount = 0L;

@@ -111,7 +111,9 @@ public class Scheduler {
 						.println("System check the request for more than 5 days... start checking at: " + currentDate);
 				Long diff = currentDate.getTime() - createDate.getTime();
 				if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) > 5) {
-					requestRepo.deleteById(r.getId());
+					Request existedRq = requestRepo.findById(r.getId()).get();
+					existedRq.setStatus("deleted");
+					Request savedRq = requestRepo.saveAndFlush(existedRq);
 				}
 			}
 
@@ -124,9 +126,9 @@ public class Scheduler {
 	@Scheduled(cron = "0 */5 * ? * *")
 	public void adjustUserLoanLimit() {
 		try {
-			
+
 			System.out.println("Startin to scan and adjust user loan limit");
-			
+
 			List<User> lstUser = userRepo.findAll();
 			for (int q = 0; q < lstUser.size(); q++) {
 				User user = lstUser.get(q);
