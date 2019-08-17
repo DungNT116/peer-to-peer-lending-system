@@ -274,8 +274,8 @@ class ViewDetailRequest extends React.Component {
       },
       body: JSON.stringify({
         id: this.props.request.data.deal.id,
-        borrowTime: this.state.lendingTimeline.length,
-        paybackTime: this.state.paybackTimeline.length,
+        borrowTimes: this.state.lendingTimeline.length,
+        paybackTimes: this.state.paybackTimeline.length,
         milestone: this.createMileStone(),
       }),
     }).then(async result => {
