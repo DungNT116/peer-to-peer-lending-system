@@ -1109,33 +1109,33 @@ class ApplyTimeline extends React.Component {
                                             (this.state.amountProps *
                                               this.state.curDateLending.percent) /
                                             23000
-                                          )}
-                                          onSuccess={(details, data) => {
-                                            this.setState({
-                                              data_tx: {
-                                                txId: details.id,
-                                                createDate: new Date(),
-                                                status: details.status,
-                                                amount:
-                                                  details.purchase_units[0].amount
-                                                    .value,
-                                              },
-                                            });
-                                            this.send_tx();
-                                          }}
-                                          style={{
-                                            layout: 'horizontal',
-                                            shape: 'pill',
-                                            disableFunding: true,
-                                            tagline: false,
-                                            size: 'responsive',
-                                          }}
-                                          options={{
-                                            clientId: client_API,
-                                          }}
-                                        />
-                                      </Col>
-                                    )}
+                                        )}
+                                        onSuccess={(details, data) => {
+                                          this.setState({
+                                            data_tx: {
+                                              txId: details.id,
+                                              createDate:  this.convertDateToTimestamp(new Date()),
+                                              status: details.status,
+                                              amount:
+                                                details.purchase_units[0].amount
+                                                  .value,
+                                            },
+                                          });
+                                          this.send_tx();
+                                        }}
+                                        style={{
+                                          layout: 'horizontal',
+                                          shape: 'pill',
+                                          disableFunding: true,
+                                          tagline: false,
+                                          size: 'responsive',
+                                        }}
+                                        options={{
+                                          clientId: client_API,
+                                        }}
+                                      />
+                                    </Col>
+                                  )}
                                 </FormGroup>
                               </div>
                             ) : (
@@ -1433,33 +1433,33 @@ class ApplyTimeline extends React.Component {
                                           (this.state.amountProps *
                                             this.state.curDatePayback.percent) /
                                           23000
-                                        )}
-                                        onSuccess={(details, data) => {
-                                          this.setState({
-                                            data_tx: {
-                                              txId: details.id,
-                                              createDate: new Date(),
-                                              status: details.status,
-                                              amount:
-                                                details.purchase_units[0].amount
-                                                  .value,
-                                            },
-                                          });
-                                          this.send_tx();
-                                        }}
-                                        style={{
-                                          layout: 'horizontal',
-                                          shape: 'pill',
-                                          disableFunding: true,
-                                          tagline: false,
-                                          size: 'responsive',
-                                        }}
-                                        options={{
-                                          clientId: client_API,
-                                        }}
-                                      />
-                                    </Col>
-                                  )}
+                                      )}
+                                      onSuccess={(details, data) => {
+                                        this.setState({
+                                          data_tx: {
+                                            txId: details.id,
+                                            createDate:  this.convertDateToTimestamp(new Date()),
+                                            status: details.status,
+                                            amount:
+                                              details.purchase_units[0].amount
+                                                .value,
+                                          },
+                                        });
+                                        this.send_tx();
+                                      }}
+                                      style={{
+                                        layout: 'horizontal',
+                                        shape: 'pill',
+                                        disableFunding: true,
+                                        tagline: false,
+                                        size: 'responsive',
+                                      }}
+                                      options={{
+                                        clientId: client_API,
+                                      }}
+                                    />
+                                  </Col>
+                                )}
                               </FormGroup>
                             </div>
                           ) : (
