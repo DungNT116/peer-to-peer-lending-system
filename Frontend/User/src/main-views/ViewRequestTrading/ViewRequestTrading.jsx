@@ -18,7 +18,8 @@ import {
   Card,
   CardBody,
   TabContent,
-  TabPane
+  TabPane,
+  Modal
 } from "reactstrap";
 
 // core components
@@ -36,9 +37,9 @@ class ViewRequestTrading extends React.Component {
     this.state = {
       borrowRequests: [],
       lendRequests: [],
-      
+
       borrowPage: 1,
-      lendPage: 1,      
+      lendPage: 1,
 
       borrowMaxPage: 0,
       lendMaxPage: 0,
@@ -46,7 +47,9 @@ class ViewRequestTrading extends React.Component {
       pageSize: 5,
 
       iconTabs: 1,
-      plainTabs: 1
+      plainTabs: 1,
+      isOpenError: false,
+      message: '',
     };
     this.getRequest = this.getRequest.bind(this);
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
@@ -81,10 +84,10 @@ class ViewRequestTrading extends React.Component {
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
     fetch(
       apiLink +
-        "/rest/request/all_request_trading_by_lender?page=" +
-        lendPageParam +
-        "&element=" +
-        pageSizeParam,
+      "/rest/request/all_request_trading_by_lender?page=" +
+      lendPageParam +
+      "&element=" +
+      pageSizeParam,
       {
         method: "GET",
         headers: {
@@ -99,23 +102,27 @@ class ViewRequestTrading extends React.Component {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       } else if (result.status === 200) {
-        // alert("create success");
         result.json().then(data => {
           this.setState({
             lendRequests: data.data,
             lendMaxPage: data.maxPage
           });
         });
-        // console.log("success");
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
 
     fetch(
       apiLink +
-        "/rest/request/all_request_trading_by_borrower?page=" +
-        borrowPageParam +
-        "&element=" +
-        pageSizeParam,
+      "/rest/request/all_request_trading_by_borrower?page=" +
+      borrowPageParam +
+      "&element=" +
+      pageSizeParam,
       {
         method: "GET",
         headers: {
@@ -137,11 +144,14 @@ class ViewRequestTrading extends React.Component {
             borrowMaxPage: data.maxPage
           });
         });
-        // console.log("success");
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
-    // event.preventDefault();
-    // this.props.history.push('/')
   }
 
   setDataToDetailPage(id) {
@@ -161,15 +171,6 @@ class ViewRequestTrading extends React.Component {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
-    // console.log(localStorage.getItem("token"));
-
-    //change timestamp to date String and vice versa
-    // var date = "07/22/2018";
-    // var dateToTimestamp = Math.round(new Date(date).getTime() / 1000);
-    // var timestampToDate = new Date(dateToTimestamp * 1000);
-
-    // console.log("dateToTimestamp: " + dateToTimestamp);
-    // console.log("timestampToDate: " +timestampToDate.toLocaleDateString())
   }
 
   convertTimeStampToDate(date) {
@@ -200,7 +201,7 @@ class ViewRequestTrading extends React.Component {
               className="btn btn-outline-primary"
               onClick={() => this.setDataToDetailPage(request)}
             >
-               View Detail
+              View Detail
             </Button>{" "}
           </Link>
         </td>
@@ -227,7 +228,7 @@ class ViewRequestTrading extends React.Component {
               className="btn btn-outline-primary"
               onClick={() => this.setDataToDetailPage(request)}
             >
-               View Detail
+              View Detail
             </Button>{" "}
           </Link>
         </td>
@@ -312,56 +313,72 @@ class ViewRequestTrading extends React.Component {
                   <Card className="shadow">
                     <CardBody>
                       <TabContent activeTab={"plainTabs" + this.state.plainTabs}>
-                        <TabPane tabId="plainTabs1">
-                        <Row className="justify-content-center text-center">
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Id</th>
-                      <th>Amount</th>
-                      <th>User</th>
-                      <th>Create Date</th>
-                      {/* <th>Duration</th> */}
-                      <th>View Detail</th>
-                    </tr>
-                  </thead>
-                  <tbody>{borrowListItems}</tbody>
-                </Table>
-              </Row>
-              <Row className="align-items-center justify-content-center text-center">
-                <Pagination
-                  maxPage={this.state.borrowMaxPage}
-                  currentPage={this.state.borrowPage}
-                  onChange={this.getRequest}
-                  changePage={this.changeBorrowPage}
-                />
-              </Row>
-                        </TabPane>
-                        <TabPane tabId="plainTabs2">
-                        <Row className="justify-content-center text-center">
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Id</th>
-                      <th>Amount</th>
-                      <th>User</th>
-                      <th>Create Date</th>
-                      {/* <th>Duration</th> */}
-                      <th>View Detail</th>
-                    </tr>
-                  </thead>
-                  <tbody>{lendListItems}</tbody>
-                </Table>
-              </Row>
-              <Row className="align-items-center justify-content-center text-center">
-                <Pagination
-                  maxPage={this.state.lendMaxPage}
-                  currentPage={this.state.lendPage}
-                  onChange={this.getRequest}
-                  changePage={this.changeLendPage}
-                />
-              </Row>
-                        </TabPane>
+                        {(this.state.borrowRequests.length === 0 &&
+                          this.state.plainTabs === 1) ?
+                          (
+                            <p className="h3" style={{ textAlign: 'center' }}>No data</p>
+                          )
+                          :
+                          (
+                            <TabPane tabId="plainTabs1">
+                              <Row className="justify-content-center text-center">
+                                <Table>
+                                  <thead>
+                                    <tr>
+                                      <th>Id</th>
+                                      <th>Amount</th>
+                                      <th>User</th>
+                                      <th>Create Date</th>
+                                      {/* <th>Duration</th> */}
+                                      <th>View Detail</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>{borrowListItems}</tbody>
+                                </Table>
+                              </Row>
+                              <Row className="align-items-center justify-content-center text-center">
+                                <Pagination
+                                  maxPage={this.state.borrowMaxPage}
+                                  currentPage={this.state.borrowPage}
+                                  onChange={this.getRequest}
+                                  changePage={this.changeBorrowPage}
+                                />
+                              </Row>
+                            </TabPane>
+                          )}
+                        {(this.state.lendRequests.length === 0 &&
+                          this.state.plainTabs === 2) ?
+                          (
+                            <p className="h3" style={{ textAlign: 'center' }}>No data</p>
+                          )
+                          :
+                          (
+                            <TabPane tabId="plainTabs2">
+                              <Row className="justify-content-center text-center">
+                                <Table>
+                                  <thead>
+                                    <tr>
+                                      <th>Id</th>
+                                      <th>Amount</th>
+                                      <th>User</th>
+                                      <th>Create Date</th>
+                                      {/* <th>Duration</th> */}
+                                      <th>View Detail</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>{lendListItems}</tbody>
+                                </Table>
+                              </Row>
+                              <Row className="align-items-center justify-content-center text-center">
+                                <Pagination
+                                  maxPage={this.state.lendMaxPage}
+                                  currentPage={this.state.lendPage}
+                                  onChange={this.getRequest}
+                                  changePage={this.changeLendPage}
+                                />
+                              </Row>
+                            </TabPane>
+                          )}
                       </TabContent>
                     </CardBody>
                   </Card>
@@ -371,6 +388,23 @@ class ViewRequestTrading extends React.Component {
           </section>
         </main>
         <SimpleFooter />
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenError}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">
+            Error
+          </div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              {this.state.message}
+            </h3>
+          </div>
+          <div className="modal-footer">
+            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+          </div>
+        </Modal>
       </>
     );
   }

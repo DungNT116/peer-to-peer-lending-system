@@ -15,7 +15,8 @@ import {
   TabContent,
   TabPane,
   Nav,
-  NavItem
+  NavItem,
+  Modal
 } from "reactstrap";
 
 import classnames from "classnames";
@@ -36,7 +37,9 @@ class HistoryRequest extends React.Component {
       pageSize: 5,
       maxPage: 0,
       iconTabs: 1,
-      plainTabs: 1
+      plainTabs: 1,
+      isOpenError: false,
+      error: '',
     };
     this.getRequest = this.getRequest.bind(this);
     this.changePage = this.changePage.bind(this);
@@ -54,10 +57,10 @@ class HistoryRequest extends React.Component {
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
     fetch(
       apiLink +
-        "/rest/request/allRequestHistoryDone?page=" +
-        pageParam +
-        "&element=" +
-        pageSizeParam,
+      "/rest/request/allRequestHistoryDone?page=" +
+      pageParam +
+      "&element=" +
+      pageSizeParam,
       {
         method: "GET",
         headers: {
@@ -80,6 +83,12 @@ class HistoryRequest extends React.Component {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        error: "Cannot access to server"
+      })
     });
     // event.preventDefault();
     // this.props.history.push('/')
@@ -196,7 +205,7 @@ class HistoryRequest extends React.Component {
                         active: this.state.plainTabs === 1
                       })}
                       onClick={e => this.toggleNavs(e, "plainTabs", 1)}
-                      href="#pablo"
+                      // href="#pablo"
                       role="tab"
                     >
                       History Request
@@ -207,32 +216,39 @@ class HistoryRequest extends React.Component {
               <Card className="shadow">
                 <CardBody>
                   <TabContent activeTab={"plainTabs" + this.state.plainTabs}>
-                    <TabPane tabId="plainTabs1">
-                      <Row className="justify-content-center text-center">
-                        <Table>
-                          <thead>
-                            <tr>
-                              <th>Id</th>
-                              <th>Amount</th>
-                              {/* <th>DueDate</th> */}
-                              <th>Create Date</th>
-                              {/* <th>Duration</th> */}
-                              <th>Status</th>
-                              <th>Detail</th>
-                            </tr>
-                          </thead>
-                          <tbody>{listItems}</tbody>
-                        </Table>
-                      </Row>
-                      <Row className="align-items-center justify-content-center text-center">
-                        <Pagination
-                          maxPage={this.state.maxPage}
-                          currentPage={this.state.page}
-                          onChange={this.getRequest}
-                          changePage={this.changePage}
-                        />
-                      </Row>
-                    </TabPane>
+                    {this.state.historyRequests.length === 0 ?
+                      (
+                        <p className="h3" style={{ textAlign: 'center' }}>No data</p>
+                      )
+                      :
+                      (
+                        <TabPane tabId="plainTabs1">
+                          <Row className="justify-content-center text-center">
+                            <Table>
+                              <thead>
+                                <tr>
+                                  <th>Id</th>
+                                  <th>Amount</th>
+                                  {/* <th>DueDate</th> */}
+                                  <th>Create Date</th>
+                                  {/* <th>Duration</th> */}
+                                  <th>Status</th>
+                                  <th>Detail</th>
+                                </tr>
+                              </thead>
+                              <tbody>{listItems}</tbody>
+                            </Table>
+                          </Row>
+                          <Row className="align-items-center justify-content-center text-center">
+                            <Pagination
+                              maxPage={this.state.maxPage}
+                              currentPage={this.state.page}
+                              onChange={this.getRequest}
+                              changePage={this.changePage}
+                            />
+                          </Row>
+                        </TabPane>
+                      )}
                   </TabContent>
                 </CardBody>
               </Card>
@@ -240,6 +256,23 @@ class HistoryRequest extends React.Component {
           </section>
         </main>
         <SimpleFooter />
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenError}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">
+            Error
+          </div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              {this.state.error}
+            </h3>
+          </div>
+          <div className="modal-footer">
+            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+          </div>
+        </Modal>
       </>
     );
   }

@@ -47,9 +47,6 @@ class PaginationSection extends React.Component {
         </PaginationLink>
       </PaginationItem>);
     } else {
-
-      // }
-      // console.log("currentPage: " + currentPage)
       //3 case: 
       //currentPage in first 9 pages
       //currentPage in last 9 pages
@@ -217,7 +214,9 @@ class PaginationSection extends React.Component {
           <nav aria-label="Page navigation example">
             <Pagination>
               <PaginationItem>
-                <PaginationLink href="#pablo" onClick={e => e.preventDefault()}>
+                <PaginationLink 
+                // href="#pablo" 
+                onClick={e => e.preventDefault()}>
                   <i className="fa fa-angle-left" />
                 </PaginationLink>
               </PaginationItem>
@@ -225,7 +224,9 @@ class PaginationSection extends React.Component {
                 this.renderPagination(this.props.maxPage, this.props.currentPage, index + 1)
               )}
               <PaginationItem>
-                <PaginationLink href="#pablo" onClick={e => e.preventDefault()}>
+                <PaginationLink 
+                // href="#pablo" 
+                onClick={e => e.preventDefault()}>
                   <i className="fa fa-angle-right" />
                 </PaginationLink>
               </PaginationItem>
