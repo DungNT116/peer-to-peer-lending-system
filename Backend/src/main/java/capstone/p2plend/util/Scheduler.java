@@ -96,6 +96,7 @@ public class Scheduler {
 	}
 
 //	@Scheduled(cron = "0 * * ? * *")
+	@Transactional
 	@Scheduled(cron = "0 0 1 * * ?")
 	public void deletePendingRequestWhenExpired() {
 		try {
@@ -113,7 +114,7 @@ public class Scheduler {
 				if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) > 5) {
 					Request existedRq = requestRepo.findById(r.getId()).get();
 					existedRq.setStatus("deleted");
-					Request savedRq = requestRepo.saveAndFlush(existedRq);
+					requestRepo.saveAndFlush(existedRq);
 				}
 			}
 
