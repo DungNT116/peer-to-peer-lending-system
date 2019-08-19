@@ -13,7 +13,8 @@ import {
   Container,
   Row,
   Col,
-  Button
+  Button,
+  Modal
 } from "reactstrap";
 // core components
 import MainNavbar from "../MainNavbar/MainNavbar.jsx";
@@ -32,7 +33,9 @@ class Login extends React.Component {
       usernameForgotPassword: "",
       emailForgotPassword: "",
       validUsername: false,
-      validEmail: false
+      validEmail: false,
+      isOpenError: false,
+      message: '',
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -84,10 +87,6 @@ class Login extends React.Component {
   }
 
   forgotPassword() {
-    // if (this.state.isSamePassword === true) {
-    // console.log("gooooooooooooooo")
-    console.log(this.state.validUsername);
-    console.log(this.state.validEmail);
     if (this.state.validEmail && this.state.validUsername) {
       var formData = new FormData();
       formData.append("username", this.state.usernameForgotPassword);
@@ -100,25 +99,36 @@ class Login extends React.Component {
           // Authorization: localStorage.getItem("token")
         },
         body: formData
-      }).then(result => {
-        console.log(result);
-        console.log(result.status);
+      }).then(async result => {
         if (result.status === 200) {
           // this.changeIsChangePassword();
-          alert("Forgot Password");
+          // alert("Forgot Password");
+          await this.setState({
+            isOpenError: true,
+            message: 'New Password send to your email.',
+          })
         } else if (result.status === 401) {
           localStorage.removeItem("isLoggedIn");
           this.props.history.push("/login-page");
         } else if (result.status === 400) {
-          alert("email or username is not exist");
+          // alert("email or username is not exist");
+          await this.setState({
+            isOpenError: true,
+            message: 'email or username is not exist',
+          })
         }
+      }).catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          message: "Cannot access to server"
+        })
       });
     }
     // }
   }
 
   changeIsForgotPassword() {
-    console.log("aaaaaaaaaaaaaaaaaa");
     this.setState({
       isForgotPassword: !this.state.isForgotPassword
     });
@@ -142,6 +152,12 @@ class Login extends React.Component {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
   }
 
@@ -176,26 +192,31 @@ class Login extends React.Component {
             localStorage.setItem("isLoggedIn", true);
             localStorage.setItem("user", data.username);
             this.getUsername();
-            this.props.history.push("view-request-list");
+            this.props.history.push("/profile-page");
           } else {
             document.getElementById("loginError").innerHTML =
               "<div class='alert alert-danger' role='alert'><strong>Your account is not user account</strong><br/> Please try again!</div>";
           }
         }
-        if (result.status !== 200) {
+        if (result.status === 400) {
           // event.preventDefault();
           if (data.message === "Wrong userId and password")
             document.getElementById("loginError").innerHTML =
               "<div class='alert alert-danger' role='alert'><strong>Username or password is incorrect!</strong><br/> Please try again!</div>";
         }
       });
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
     // event.preventDefault();
     // this.props.history.push('/')
   }
 
   componentWillMount() {
-    // console.log(localStorage.getItem("isLoggedIn"))
     //isLoggedIn = true go back to homepage (prevent go to login page when isLoggedIn = true)
     if (
       localStorage.getItem("isLoggedIn") !== null &&
@@ -363,6 +384,23 @@ class Login extends React.Component {
           </section>
         </main>
         <SimpleFooter />
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenError}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">
+            Notify
+          </div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              {this.state.message}
+            </h3>
+          </div>
+          <div className="modal-footer">
+            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+          </div>
+        </Modal>
       </>
     );
   }

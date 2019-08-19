@@ -238,7 +238,7 @@ class ApplyTimeline extends React.Component {
               </DropdownToggle>
               <DropdownMenu>
                 <DropdownItem
-                  href="#pablo"
+                  // href="#pablo"
                   onClick={e => {
                     if (this.state.timeline_payback.length > 2) {
                       window.alert("Timeline have over 2 milestones.");
@@ -254,7 +254,7 @@ class ApplyTimeline extends React.Component {
                   Payback Once
                 </DropdownItem>
                 <DropdownItem
-                  href="#pablo"
+                  // href="#pablo"
                   onClick={e => {
                     this.setState({
                       isPaybackOnce: false,

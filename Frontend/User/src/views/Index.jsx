@@ -34,7 +34,7 @@ class Index extends React.Component {
     };
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
-    // this.test = this.test.bind(this);
+    this.getTransaction = this.getTransaction.bind(this);
   }
 
   convertDateToTimestamp(date) {
@@ -44,13 +44,8 @@ class Index extends React.Component {
     var timestampToDate = new Date(date * 1000);
     return timestampToDate.toLocaleDateString();
   }
-  // /rest/transaction/getTop20Transaction
-  componentDidMount() {
-    document.documentElement.scrollTop = 0;
-    document.scrollingElement.scrollTop = 0;
-    this.refs.main.scrollTop = 0;
 
-    //get transaction
+  getTransaction() {
     fetch(apiLink + "/rest/transaction/getTop20Transaction", {
       method: "GET",
       headers: {
@@ -70,8 +65,24 @@ class Index extends React.Component {
       if (result.status === 200) {
         // alert("create success");
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
   }
+
+  componentDidMount() {
+    document.documentElement.scrollTop = 0;
+    document.scrollingElement.scrollTop = 0;
+    this.refs.main.scrollTop = 0;
+
+    //get transaction
+    this.getTransaction();
+  }
+  
   roundUp(num) {
     let precision = Math.pow(10, 2);
     return Math.ceil(num * precision) / precision;
@@ -131,7 +142,7 @@ class Index extends React.Component {
           2000
         );
         setTimeout(
-          function() {
+          function () {
             if (
               Number(data.asset.data.tx_data.amountTx) === transactionInput.amountValid
             ) {
@@ -146,7 +157,7 @@ class Index extends React.Component {
           3000
         );
         setTimeout(
-          function() {
+          function () {
             if (
               Math.round(dateCreate.getTime() / 1000) ===
               transactionInput.createDate
@@ -162,7 +173,7 @@ class Index extends React.Component {
           4000
         );
         setTimeout(
-          function() {
+          function () {
             if (
               this.state.validTx.sender === true &&
               this.state.validTx.receiver === true &&
@@ -187,6 +198,12 @@ class Index extends React.Component {
           4500
         );
       });
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
   }
   numberWithCommas(x) {
@@ -243,13 +260,13 @@ class Index extends React.Component {
                           style={{ color: "green" }}
                         />
                       ) : (
-                        <BeatLoader
-                          sizeUnit={"px"}
-                          size={10}
-                          color={"#123abc"}
-                          loading={this.state["loading-sender"]}
-                        />
-                      )}
+                          <BeatLoader
+                            sizeUnit={"px"}
+                            size={10}
+                            color={"#123abc"}
+                            loading={this.state["loading-sender"]}
+                          />
+                        )}
                     </Col>
                   </FormGroup>
                   <FormGroup row className="py-2">
@@ -261,13 +278,13 @@ class Index extends React.Component {
                           style={{ color: "green" }}
                         />
                       ) : (
-                        <BeatLoader
-                          sizeUnit={"px"}
-                          size={10}
-                          color={"#123abc"}
-                          loading={this.state["loading-receiver"]}
-                        />
-                      )}
+                          <BeatLoader
+                            sizeUnit={"px"}
+                            size={10}
+                            color={"#123abc"}
+                            loading={this.state["loading-receiver"]}
+                          />
+                        )}
                     </Col>
                   </FormGroup>
                   <FormGroup row className="py-2">
@@ -279,13 +296,13 @@ class Index extends React.Component {
                           style={{ color: "green" }}
                         />
                       ) : (
-                        <BeatLoader
-                          sizeUnit={"px"}
-                          size={10}
-                          color={"#123abc"}
-                          loading={this.state["loading-amount"]}
-                        />
-                      )}
+                          <BeatLoader
+                            sizeUnit={"px"}
+                            size={10}
+                            color={"#123abc"}
+                            loading={this.state["loading-amount"]}
+                          />
+                        )}
                     </Col>
                   </FormGroup>
                   <FormGroup row className="py-2">
@@ -297,47 +314,47 @@ class Index extends React.Component {
                           style={{ color: "green" }}
                         />
                       ) : (
-                        <BeatLoader
-                          sizeUnit={"px"}
-                          size={10}
-                          color={"#123abc"}
-                          loading={this.state["loading-createDate"]}
-                        />
-                      )}
+                          <BeatLoader
+                            sizeUnit={"px"}
+                            size={10}
+                            color={"#123abc"}
+                            loading={this.state["loading-createDate"]}
+                          />
+                        )}
                     </Col>
                   </FormGroup>
                 </div>
               ) : (
-                <div>
-                  <FormGroup row className="py-2">
-                    <Col md="6">ID Transaction</Col>
-                    <Col md="6">Status</Col>
-                  </FormGroup>
-                  <FormGroup row className="py-2">
-                    <Col md="6">{this.state.validTx.idTrx}</Col>
-                    <Col md="6">
-                      {this.state.validTx.status == "VALID TRANSACTION" ? (
-                        <span>
-                          {this.state.validTx.status}
-                          <i
-                            class="ni ni-check-bold"
-                            style={{ color: "green", fontSize: "20px" }}
-                          />
-                        </span>
-                      ) : (
-                        <span>
-                          {this.state.validTx.status}
+                  <div>
+                    <FormGroup row className="py-2">
+                      <Col md="6">ID Transaction</Col>
+                      <Col md="6">Status</Col>
+                    </FormGroup>
+                    <FormGroup row className="py-2">
+                      <Col md="6">{this.state.validTx.idTrx}</Col>
+                      <Col md="6">
+                        {this.state.validTx.status == "VALID TRANSACTION" ? (
+                          <span>
+                            {this.state.validTx.status}
+                            <i
+                              class="ni ni-check-bold"
+                              style={{ color: "green", fontSize: "20px" }}
+                            />
+                          </span>
+                        ) : (
+                            <span>
+                              {this.state.validTx.status}
 
-                          <i
-                            className="ni ni-fat-remove"
-                            style={{ color: "red", fontSize: "20px" }}
-                          />
-                        </span>
-                      )}
-                    </Col>
-                  </FormGroup>
-                </div>
-              )}
+                              <i
+                                className="ni ni-fat-remove"
+                                style={{ color: "red", fontSize: "20px" }}
+                              />
+                            </span>
+                          )}
+                      </Col>
+                    </FormGroup>
+                  </div>
+                )}
             </ModalBody>
           </Modal>
         </td>
@@ -382,6 +399,23 @@ class Index extends React.Component {
         </main>
         {/* <CardsFooter /> */}
         <SimpleFooter />
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenError}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">
+            Error
+          </div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              {this.state.message}
+            </h3>
+          </div>
+          <div className="modal-footer">
+            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+          </div>
+        </Modal>
       </>
     );
   }

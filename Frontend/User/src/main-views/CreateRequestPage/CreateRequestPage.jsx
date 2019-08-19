@@ -44,7 +44,8 @@ class CreateRequestPage extends React.Component {
       invalidAmount: true,
       errorAmount: '',
       maxloadlimit: 0,
-      isOpen : false
+      isOpen : false,
+      isOpenError: false
     };
 
     this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
@@ -55,14 +56,17 @@ class CreateRequestPage extends React.Component {
     this.checkLoanLimit = this.checkLoanLimit.bind(this);
   }
 
-  checkLoanLimit() {
+  async checkLoanLimit() {
     if (this.state.maxloadlimit > 0) {
       // this.setState({
       //   invalidLoanLimit: false
       // })
       return false;
     } else {
-      alert('your loan limit is not enough to use this function');
+      // alert('your loan limit is not enough to use this function');
+      await this.setState({
+        isOpenError: true
+      })
       return true;
     }
   }
@@ -77,7 +81,6 @@ class CreateRequestPage extends React.Component {
     };
     for (let i = 0; i < this.state.lendingTimeline.length; i++) {
       const element = this.state.lendingTimeline[i];
-      // console.log(new Date(element.data).getTime() / 1000)
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
         previousDate: '',
@@ -103,7 +106,6 @@ class CreateRequestPage extends React.Component {
     for (let i = 0; i < this.state.paybackTimeline.length; i++) {
       const element = this.state.paybackTimeline[i];
 
-      // console.log(new Date(element.data).getTime() / 1000)
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
         previousDate: '',
@@ -180,6 +182,12 @@ class CreateRequestPage extends React.Component {
           localStorage.removeItem('isLoggedIn');
           this.props.history.push('/login-page');
         }
+      }).catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          error: "Cannot access to server"
+        })
       });
     }
     event.preventDefault();
@@ -213,7 +221,6 @@ class CreateRequestPage extends React.Component {
     }).then(result => {
       if (result.status === 200) {
         result.json().then(data => {
-          console.log(data);
           this.setState({
             maxloadlimit: data.loanLimit,
             interestRate : data.interestRate
@@ -223,6 +230,12 @@ class CreateRequestPage extends React.Component {
         localStorage.removeItem('isLoggedIn');
         this.props.history.push('/login-page');
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        error: "Cannot access to server"
+      })
     });
   }
 
@@ -441,6 +454,23 @@ class CreateRequestPage extends React.Component {
           </section>
         </main>
         <SimpleFooter />
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenError}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">
+            Error
+          </div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              {this.state.error}
+            </h3>
+          </div>
+          <div className="modal-footer">
+            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+          </div>
+        </Modal>
       </>
     );
   }

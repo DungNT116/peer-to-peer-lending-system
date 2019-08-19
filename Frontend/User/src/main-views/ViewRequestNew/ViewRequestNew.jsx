@@ -52,6 +52,9 @@ class ViewRequestNew extends React.Component {
 
       cancelDealModal: false,
       cancelRequest: {},
+      isOpenSuccess: false,
+      message: '',
+      isOpenError: false,
     };
     this.getRequest = this.getRequest.bind(this);
     this.deleteRequest = this.deleteRequest.bind(this);
@@ -92,9 +95,21 @@ class ViewRequestNew extends React.Component {
     }).then(async result => {
       if (result.status === 200) {
         // alert("delete success");
+        await this.setState({
+          isOpenSuccess: true,
+          message: 'Canceled',
+        })
         //reload data
         this.toggleCancelDeal();
         this.getRequest();
+        await setTimeout(
+          function () {
+            this.setState({
+              isOpenSuccess: false
+            })
+          }.bind(this),
+          1000
+        );
         await database
           .ref("ppls")
           .orderByChild("username")
@@ -106,7 +121,7 @@ class ViewRequestNew extends React.Component {
             }
           });
         await database.ref("/ppls/" + this.state.keyUserFb + "/notification").push({
-          message: localStorage.getItem("user") + " cancel request number :  " + request.id + " !" ,
+          message: localStorage.getItem("user") + " cancel request number :  " + request.id + " !",
           sender: localStorage.getItem("user"),
           requestId: request.id
         });
@@ -121,11 +136,17 @@ class ViewRequestNew extends React.Component {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
   }
 
   setDataToDetailPage(id, where) {
-    
+
     this.props.setRequest(id);
     if (where === "dealing") {
       this.props.setIsHistoryDetail(false);
@@ -170,7 +191,6 @@ class ViewRequestNew extends React.Component {
       }
     ).then(result => {
       if (result.status === 200) {
-        // console.log("create success");
         result.json().then(data => {
           this.setState({
             newRequests: data.data,
@@ -181,7 +201,13 @@ class ViewRequestNew extends React.Component {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       }
-    });
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
+    });;
 
     fetch(
       apiLink +
@@ -200,9 +226,7 @@ class ViewRequestNew extends React.Component {
       }
     ).then(result => {
       if (result.status === 200) {
-        // console.log("create success");
         result.json().then(data => {
-          // console.log("data dealing", data);
           this.setState({
             dealingRequests: data.data,
             dealingMaxPage: data.maxPage
@@ -212,9 +236,13 @@ class ViewRequestNew extends React.Component {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       }
-    });
-    // event.preventDefault();
-    // this.props.history.push('/')
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
+    });;
   }
 
   convertTimeStampToDate(date) {
@@ -234,16 +262,34 @@ class ViewRequestNew extends React.Component {
       body: JSON.stringify({
         id: id
       })
-    }).then(result => {
+    }).then(async result => {
       if (result.status === 200) {
-        alert("delete success");
+        // alert("delete success");
+        await this.setState({
+          isOpenSuccess: true,
+          message: 'Deleted'
+        })
         //reload data
         this.getRequest();
+        await setTimeout(
+          function () {
+            this.setState({
+              isOpenSuccess: false
+            })
+          }.bind(this),
+          1000
+        );
       } else if (result.status === 401) {
         localStorage.removeItem("isLoggedIn");
         this.props.history.push("/login-page");
       }
-    });
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
+    });;
     // event.preventDefault();
     // this.props.history.push('/')
   }
@@ -258,7 +304,6 @@ class ViewRequestNew extends React.Component {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
   render() {
-    // console.log(this.state.newRequests);
     const newListItems = this.state.newRequests.map(request => (
       <tr>
         <td>
@@ -269,7 +314,7 @@ class ViewRequestNew extends React.Component {
         <td>{this.numberWithCommas(request.amount)} VND</td>
         <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
-        
+
         <td>{request.status}</td>
         <td>
           <Link to="/view-detail-request">
@@ -307,7 +352,7 @@ class ViewRequestNew extends React.Component {
         <td>{this.numberWithCommas(request.amount)} VND</td>
         <td>{request.borrower.username} days</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
-        
+
         <td>{request.status}</td>
         <td>
           <Link to="/view-detail-request">
@@ -390,7 +435,7 @@ class ViewRequestNew extends React.Component {
                             active: this.state.plainTabs === 1
                           })}
                           onClick={e => this.toggleNavs(e, "plainTabs", 1)}
-                          href="#pablo"
+                          // href="#pablo"
                           role="tab"
                         >
                           Pending Request
@@ -403,7 +448,7 @@ class ViewRequestNew extends React.Component {
                             active: this.state.plainTabs === 2
                           })}
                           onClick={e => this.toggleNavs(e, "plainTabs", 2)}
-                          href="#pablo"
+                          // href="#pablo"
                           role="tab"
                         >
                           Dealing Request
@@ -416,58 +461,75 @@ class ViewRequestNew extends React.Component {
                       <TabContent
                         activeTab={"plainTabs" + this.state.plainTabs}
                       >
-                        <TabPane tabId="plainTabs1">
-                          <Row className="justify-content-center text-center">
-                            <Table>
-                              <thead>
-                                <tr>
-                                  <th>Id</th>
-                                  <th>Amount</th>
-                                  <th>Borrower</th>
-                                  <th>Create Date</th>
-                                  <th>Status</th>
-                                  <th>View detail</th>
-                                  <th>Delete</th>
-                                </tr>
-                              </thead>
-                              <tbody>{newListItems}</tbody>
-                            </Table>
-                          </Row>
-                          <Row className="align-items-center justify-content-center text-center">
-                            <Pagination
-                              maxPage={this.state.newMaxPage}
-                              currentPage={this.state.newPage}
-                              onChange={this.getRequest}
-                              changePage={this.changeNewPage}
-                            />
-                          </Row>
-                        </TabPane>
-                        <TabPane tabId="plainTabs2">
-                          <Row className="justify-content-center text-center">
-                            <Table>
-                              <thead>
-                                <tr>
-                                  <th>Id</th>
-                                  <th>Amount</th>
-                                  <th>Borrower</th>
-                                  <th>Create Date</th>
-                                  <th>Status</th>
-                                  <th>View detail</th>
-                                  <th>Cancel</th>
-                                </tr>
-                              </thead>
-                              <tbody>{dealingListItems}</tbody>
-                            </Table>
-                          </Row>
-                          <Row className="align-items-center justify-content-center text-center">
-                            <Pagination
-                              maxPage={this.state.dealingMaxPage}
-                              currentPage={this.state.dealingPage}
-                              onChange={this.getRequest}
-                              changePage={this.changeDealingPage}
-                            />
-                          </Row>
-                        </TabPane>
+                        {(this.state.newRequests.length === 0 &&
+                        this.state.plainTabs === 1) ?
+                          (
+                            <p className="h3" style={{ textAlign: 'center' }}>No data</p>
+                          )
+                          :
+                          (
+
+                            <TabPane tabId="plainTabs1">
+                              <Row className="justify-content-center text-center">
+                                <Table>
+                                  <thead>
+                                    <tr>
+                                      <th>Id</th>
+                                      <th>Amount</th>
+                                      <th>Borrower</th>
+                                      <th>Create Date</th>
+                                      <th>Status</th>
+                                      <th>View detail</th>
+                                      <th>Delete</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>{newListItems}</tbody>
+                                </Table>
+                              </Row>
+                              <Row className="align-items-center justify-content-center text-center">
+                                <Pagination
+                                  maxPage={this.state.newMaxPage}
+                                  currentPage={this.state.newPage}
+                                  onChange={this.getRequest}
+                                  changePage={this.changeNewPage}
+                                />
+                              </Row>
+                            </TabPane>
+                          )}
+                        {(this.state.dealingRequests.length === 0 && 
+                        this.state.plainTabs === 2) ?
+                          (
+                            <p className="h3" style={{ textAlign: 'center' }}>No data</p>
+                          )
+                          :
+                          (
+                            <TabPane tabId="plainTabs2">
+                              <Row className="justify-content-center text-center">
+                                <Table>
+                                  <thead>
+                                    <tr>
+                                      <th>Id</th>
+                                      <th>Amount</th>
+                                      <th>Borrower</th>
+                                      <th>Create Date</th>
+                                      <th>Status</th>
+                                      <th>View detail</th>
+                                      <th>Cancel</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>{dealingListItems}</tbody>
+                                </Table>
+                              </Row>
+                              <Row className="align-items-center justify-content-center text-center">
+                                <Pagination
+                                  maxPage={this.state.dealingMaxPage}
+                                  currentPage={this.state.dealingPage}
+                                  onChange={this.getRequest}
+                                  changePage={this.changeDealingPage}
+                                />
+                              </Row>
+                            </TabPane>
+                          )}
                       </TabContent>
                     </CardBody>
                   </Card>
@@ -502,6 +564,38 @@ class ViewRequestNew extends React.Component {
               Cancel
             </Button>
           </ModalFooter>
+        </Modal>
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenSuccess}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              <img
+                style={{ width: 50, height: 50 }}
+                src={require('assets/img/theme/checked.png')}
+              />
+              Successfully {this.state.message}
+            </h3>
+          </div>
+        </Modal>
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenError}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">
+            Error
+          </div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              {this.state.message}
+            </h3>
+          </div>
+          <div className="modal-footer">
+            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+          </div>
         </Modal>
       </>
     );
