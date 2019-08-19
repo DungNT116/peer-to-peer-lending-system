@@ -1,17 +1,17 @@
 package capstone.p2plend;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 @EnableScheduling
 public class P2pLendApplication {
+	
+//	private static final Logger LOGGER = LoggerFactory.getLogger(P2pLendApplication.class);
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+//	@Autowired
+//	private PasswordEncoder passwordEncoder;
 
 	public static void main(String[] args) {
 		SpringApplication.run(P2pLendApplication.class, args);
@@ -20,7 +20,7 @@ public class P2pLendApplication {
 //	@Bean
 //	public CommandLineRunner demo() {
 //		return (args) -> {
-//			System.out.println(passwordEncoder.encode("1"));
+//			LOGGER.info("CALL method POST");
 //		};
 //	}
 }

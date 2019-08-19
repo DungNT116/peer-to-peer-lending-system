@@ -6,6 +6,8 @@ import capstone.p2plend.service.UserService;
 import capstone.p2plend.service.JwtService;
 import capstone.p2plend.service.RequestService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class RequestController {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(RequestController.class);
 
 	@Autowired
 	RequestService requestService;
@@ -36,6 +40,7 @@ public class RequestController {
 	@PostMapping(value = "/rest/request/createRequest")
 	public ResponseEntity<Integer> createRequest(@RequestBody Request request,
 			@RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method POST /rest/request/createRequest");
 		HttpStatus status = null;
 		boolean valid = false;
 		try {
@@ -46,6 +51,7 @@ public class RequestController {
 				status = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
@@ -56,6 +62,7 @@ public class RequestController {
 	@GetMapping(value = "/rest/request/user/allRequest")
 	public ResponseEntity<PageDTO<Request>> findAllOtherUserRequest(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/request/user/allRequest");
 		HttpStatus status = null;
 		PageDTO<Request> result = null;
 		try {
@@ -66,36 +73,18 @@ public class RequestController {
 				status = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Request>>(result, status);
 	}
-
-//	@CrossOrigin
-//	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
-//	@GetMapping(value = "/rest/request/user/allNewRequest")
-//	public ResponseEntity<PageDTO<Request>> findAllOtherUserNewRequest(@RequestParam Integer page,
-//			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
-//		HttpStatus status = null;
-//		PageDTO<Request> result = null;
-//		try {
-//			result = requestService.findAllOtherUserRequestSortByDateDesc(page, element, token);
-//			if (result != null) {
-//				status = HttpStatus.OK;
-//			} else {
-//				status = HttpStatus.BAD_REQUEST;
-//			}
-//		} catch (Exception e) {
-//			status = HttpStatus.INTERNAL_SERVER_ERROR;
-//		}
-//		return new ResponseEntity<PageDTO<Request>>(result, status);
-//	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_USER" })
 	@GetMapping(value = "/rest/request/allRequestHistoryDone")
 	public ResponseEntity<PageDTO<Request>> findAllRequestHistoryStatusDone(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/request/allRequestHistoryDone");
 		HttpStatus status = null;
 		PageDTO<Request> result = null;
 		try {
@@ -106,6 +95,7 @@ public class RequestController {
 				status = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Request>>(result, status);
@@ -116,6 +106,7 @@ public class RequestController {
 	@GetMapping(value = "/rest/request/all_request_dealing_by_borrower_or_lender")
 	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusDealingWithLenderOrBorrower(
 			@RequestParam Integer page, @RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/request/all_request_dealing_by_borrower_or_lender");
 		HttpStatus httpStatus = null;
 		PageDTO<Request> result = null;
 		try {
@@ -126,6 +117,7 @@ public class RequestController {
 				httpStatus = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception ex) {
+			LOGGER.error("Server Error", ex);
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
@@ -136,6 +128,7 @@ public class RequestController {
 	@GetMapping(value = "/rest/request/all_request_trading_by_borrower")
 	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithBorrower(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/request/all_request_trading_by_borrower");
 		PageDTO<Request> result = null;
 		HttpStatus httpStatus = null;
 		try {
@@ -146,6 +139,7 @@ public class RequestController {
 				httpStatus = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception ex) {
+			LOGGER.error("Server Error", ex);
 			result = null;
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
@@ -157,6 +151,7 @@ public class RequestController {
 	@GetMapping(value = "/rest/request/all_request_trading_by_lender")
 	public ResponseEntity<PageDTO<Request>> findAllRequestByStatusTradingWithLender(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/request/all_request_trading_by_lender");
 		HttpStatus httpStatus = null;
 		PageDTO<Request> result = null;
 		try {
@@ -167,6 +162,7 @@ public class RequestController {
 				httpStatus = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception ex) {
+			LOGGER.error("Server Error", ex);
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
@@ -177,6 +173,7 @@ public class RequestController {
 	@GetMapping(value = "/rest/request/allRequestHistoryPending")
 	public ResponseEntity<PageDTO<Request>> findAllUserRequestStatusPending(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/request/allRequestHistoryPending");
 		HttpStatus httpStatus = null;
 		PageDTO<Request> result = null;
 		try {
@@ -187,6 +184,7 @@ public class RequestController {
 				httpStatus = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception ex) {
+			LOGGER.error("Server Error", ex);
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Request>>(result, httpStatus);
@@ -197,6 +195,7 @@ public class RequestController {
 	@DeleteMapping(value = "/rest/request/delete")
 	public ResponseEntity<Integer> deleteRequest(@RequestBody Request request,
 			@RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method DELETE /rest/request/delete");
 		HttpStatus status = null;
 		boolean valid = false;
 		try {
@@ -207,6 +206,7 @@ public class RequestController {
 				status = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);
