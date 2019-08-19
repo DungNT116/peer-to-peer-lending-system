@@ -63,35 +63,33 @@ public class Scheduler {
 					Timestamp stamp = new Timestamp(time);
 					Date deadLine = new Date(stamp.getTime());
 					Date currentDate = new Date();
-					System.out.println(
-							"Current system date checking for deadline of milestone start checking at: " + currentDate);
 					Long diff = deadLine.getTime() - currentDate.getTime();
 					if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) <= 3L && m.getTransaction() == null) {
 						if (m.getType().equalsIgnoreCase("lend")) {
-							count++;
-							System.out.println(lender.getEmail());
 							emailService.sendSimpleMessage(lender.getEmail(),
 									"PPLS Remind Deadline of the current lend for loan request(lender)",
 									"Your current lend deadline is, Deadline " + deadLine
 											+ ", to complete this trasaction, Login to our website to make the transaction for request number: "
 											+ r.getId() + ", Milestone number: " + m.getId());
+							count++;
 							emailService.sendSimpleMessage(borrower.getEmail(),
 									"PPLS notice of the loan has not been paid(borrower)",
 									"Current deadline of the lend milestone still not been paid, dealine: " + deadLine
 											+ " We will remind the other person about this");
-						}
-						if (m.getType().equalsIgnoreCase("payback")) {
 							count++;
-							System.out.println(borrower.getEmail());
+						}
+						if (m.getType().equalsIgnoreCase("payback")) {							
 							emailService.sendSimpleMessage(borrower.getEmail(),
 									"PPLS Remind Deadline of the current payback for loan request(borrower)",
 									"Your current payback deadline is, Deadline " + deadLine
 											+ " to complete this trasaction, Login to our website to make the transaction for request number: "
 											+ r.getId() + ", Milestone number: " + m.getId());
+							count++;
 							emailService.sendSimpleMessage(lender.getEmail(),
 									"PPLS notice of the loan has not been paid(lender)",
 									"Current deadline of the payback milestone still not been paid, dealine: "
 											+ deadLine + " We will remind the other person about this");
+							count++;
 						}
 
 					}
@@ -117,8 +115,6 @@ public class Scheduler {
 				Timestamp stamp = new Timestamp(time);
 				Date createDate = new Date(stamp.getTime());
 				Date currentDate = new Date();
-				System.out
-						.println("System check the request for more than 5 days... start checking at: " + currentDate);
 				Long diff = currentDate.getTime() - createDate.getTime();
 				if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) > 5) {
 					Request existedRq = requestRepo.findById(r.getId()).get();
