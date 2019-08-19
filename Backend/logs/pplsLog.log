@@ -18,7 +18,7 @@
 2019-08-19 16:02:41.950  INFO 8408 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
 2019-08-19 16:02:45.595  INFO 8408 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
 2019-08-19 16:02:45.822  INFO 8408 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [
-	name: default
+	name: defaulta
 	...]
 2019-08-19 16:02:46.087  INFO 8408 --- [main] org.hibernate.Version                    : HHH000412: Hibernate Core {5.3.10.Final}
 2019-08-19 16:02:46.090  INFO 8408 --- [main] org.hibernate.cfg.Environment            : HHH000206: hibernate.properties not found
