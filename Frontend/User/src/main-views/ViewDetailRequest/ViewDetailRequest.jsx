@@ -51,6 +51,9 @@ class ViewDetailRequest extends React.Component {
       isPayMany: false,
 
       errorModal: false,
+      isOpenSuccess: false,
+      isOpenError: false,
+      message: '',
     };
     this.toggleErrorModal = this.toggleErrorModal.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
@@ -98,9 +101,6 @@ class ViewDetailRequest extends React.Component {
   }
 
   saveTransaction(data, data_transaction) {
-    console.log(data);
-    // console.log(data_transaction);
-    // console.log(this.props.request.data.deal.milestone[1].id);
     fetch(apiLink + '/rest/transaction/newTransaction', {
       method: 'POST',
       headers: {
@@ -124,19 +124,27 @@ class ViewDetailRequest extends React.Component {
       }),
     }).then(async result => {
       if (result.status === 200) {
-        alert('create success');
-
+        // alert('create success');
+        await this.setState({
+          isOpenSuccess: true
+        })
         await setTimeout(
           function() {
             this.props.history.push('/view-request-trading');
           }.bind(this),
-          5000
+          2000
         );
         // this.props.history.push("/view-request-trading");
       } else if (result.status === 401) {
         localStorage.removeItem('isLoggedIn');
         this.props.history.push('/login-page');
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
   }
 
@@ -200,6 +208,12 @@ class ViewDetailRequest extends React.Component {
         localStorage.removeItem('isLoggedIn');
         this.props.history.push('/login-page');
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
   }
 
@@ -213,7 +227,6 @@ class ViewDetailRequest extends React.Component {
     };
     for (let i = 0; i < this.state.lendingTimeline.length; i++) {
       const element = this.state.lendingTimeline[i];
-      // console.log(element);
       var dateToTimestamp = new Date(element.data).getTime() / 1000;
       milestone = {
         previousDate: '',
@@ -234,7 +247,6 @@ class ViewDetailRequest extends React.Component {
         milestone.type = 'lend';
         milestone.percent = element.percent;
       }
-      // console.log(milestone);
       milestones.push(milestone);
     }
     for (let i = 0; i < this.state.paybackTimeline.length; i++) {
@@ -261,7 +273,6 @@ class ViewDetailRequest extends React.Component {
       }
       milestones.push(milestone);
     }
-    // console.log(milestones);
     return milestones;
   }
 
@@ -274,12 +285,11 @@ class ViewDetailRequest extends React.Component {
       },
       body: JSON.stringify({
         id: this.props.request.data.deal.id,
-        borrowTime: this.state.lendingTimeline.length,
-        paybackTime: this.state.paybackTimeline.length,
+        borrowTimes: this.state.lendingTimeline.length,
+        paybackTimes: this.state.paybackTimeline.length,
         milestone: this.createMileStone(),
       }),
     }).then(async result => {
-      console.log(this.state.makeDealUsername);
       if (result.status === 401) {
         localStorage.removeItem('isLoggedIn');
         this.props.history.push('/login-page');
@@ -314,6 +324,12 @@ class ViewDetailRequest extends React.Component {
       } else if (result.status === 400) {
         this.toggleErrorModal();
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
   }
 
@@ -428,6 +444,12 @@ class ViewDetailRequest extends React.Component {
         });
         this.acceptDeal();
         this.saveTransaction(data, data_transaction);
+      }).catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          message: "Cannot access to server"
+        })
       });
   };
 
@@ -788,7 +810,6 @@ class ViewDetailRequest extends React.Component {
                                       23000
                                   )}
                                   onSuccess={(details, data) => {
-                                    console.log(details);
                                     this.setState({
                                       data_tx: {
                                         txId: details.id,
@@ -842,6 +863,38 @@ class ViewDetailRequest extends React.Component {
               OK
             </Button>{' '}
           </ModalFooter>
+        </Modal>
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenSuccess}
+          // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              <img
+                style={{ width: 50, height: 50 }}
+                src={require('assets/img/theme/checked.png')}
+              />
+              Successfully Saved
+              </h3>
+          </div>
+        </Modal>
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenError}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">
+            Error
+          </div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              {this.state.message}
+            </h3>
+          </div>
+          <div className="modal-footer">
+            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+          </div>
         </Modal>
       </>
     );

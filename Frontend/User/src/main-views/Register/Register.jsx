@@ -39,6 +39,7 @@ class Register extends React.Component {
       validFirstname: false,
       validLastname: false,
       validPassword: false,
+      validConfirmPassword: false,
       validEmail: false,
       validPhone: false,
       isDisable: '',
@@ -46,6 +47,7 @@ class Register extends React.Component {
 
       isOpen: false,
       loading: false,
+      isOpenError: false,
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleUserNameChange = this.handleUserNameChange.bind(this);
@@ -61,7 +63,6 @@ class Register extends React.Component {
   }
 
   componentWillMount() {
-    // console.log(localStorage.getItem("isLoggedIn"))
     //isLoggedIn = true go back to homepage (prevent go to login page when isLoggedIn = true)
     if (
       localStorage.getItem('isLoggedIn') === null &&
@@ -83,7 +84,7 @@ class Register extends React.Component {
     const tmp = event.target.value.trim();
     if (!tmp.match(/^\w*$/)) {
       document.getElementById('usernameError').innerHTML =
-        "<div class='alert alert-danger' role='alert'><strong>Username does not contain special character!</strong></div>";
+        "<div class='alert alert-danger' role='alert'><strong>Username not contains special characters</strong></div>";
       this.setState({
         username: tmp,
         validUsername: false,
@@ -98,23 +99,37 @@ class Register extends React.Component {
   }
 
   handlePasswordChange(event) {
-    this.setState({password: event.target.value});
+    var tmpPassword = event.target.value;
+    if(tmpPassword.length < 8) {
+      document.getElementById('passwordError').innerHTML =
+        "<div class='alert alert-danger' role='alert'><strong>Password length at least 8 characters!</strong></div>";
+      this.setState({
+        password: tmpPassword,
+        validPassword: false,
+      });
+    } else {
+      document.getElementById('passwordError').innerHTML = '';
+      this.setState({
+        password: tmpPassword,
+        validPassword: true,
+      });
+    }
   }
   handleConfirmPasswordChange(event) {
     let password = this.state.password;
     let tmpConfirmPassword = event.target.value;
     if (password !== tmpConfirmPassword) {
       document.getElementById('confirmPasswordError').innerHTML =
-        "<div class='alert alert-danger' role='alert'><strong>Confirm Password not be matched with Password!</strong></div>";
+        "<div class='alert alert-danger' role='alert'><strong>Confirm Password is not match Password!</strong></div>";
       this.setState({
         confirmPassword: tmpConfirmPassword,
-        validPassword: false,
+        validConfirmPassword: false,
       });
     } else {
       document.getElementById('confirmPasswordError').innerHTML = '';
       this.setState({
         confirmPassword: tmpConfirmPassword,
-        validPassword: true,
+        validConfirmPassword: true,
       });
     }
   }
@@ -122,7 +137,7 @@ class Register extends React.Component {
     const tmp = event.target.value;
     if (!tmp.match(/^[a-z A-Z]*$/)) {
       document.getElementById('firstnameError').innerHTML =
-        "<div class='alert alert-danger' role='alert'><strong>First name only contain alphabet character!</strong></div>";
+        "<div class='alert alert-danger' role='alert'><strong>First name is wrong format</strong></div>";
       this.setState({
         firstname: tmp,
         validFirstname: false,
@@ -146,7 +161,7 @@ class Register extends React.Component {
       });
     } else {
       document.getElementById('lastnameError').innerHTML =
-        "<div class='alert alert-danger' role='alert'><strong>Last name only contain alphabet character!</strong></div>";
+        "<div class='alert alert-danger' role='alert'><strong>Last name is wrong format!</strong></div>";
       this.setState({
         lastname: tmp,
         validLastname: false,
@@ -164,7 +179,7 @@ class Register extends React.Component {
       });
     } else {
       document.getElementById('emailError').innerHTML =
-        "<div class='alert alert-danger' role='alert'><strong>Email only contain alphabet character!</strong></div>";
+        "<div class='alert alert-danger' role='alert'><strong>Email is wrong format!</strong></div>";
       this.setState({
         email: tmp,
         validEmail: false,
@@ -176,7 +191,7 @@ class Register extends React.Component {
     const tmp = event.target.value.trim();
     if (!tmp.match(/^(\d{10,12})*$/)) {
       document.getElementById('phoneError').innerHTML =
-        "<div class='alert alert-danger' role='alert'><strong>Phone only contain number!</strong></div>";
+        "<div class='alert alert-danger' role='alert'><strong>Phone number contains at least 10 digit and at biggest 12 digit</strong></div>";
       this.setState({
         phone: tmp,
         validPhone: false,
@@ -205,12 +220,15 @@ class Register extends React.Component {
         phoneNumber: this.state.phone,
       }),
     }).then(result => {
-      console.log(result);
-      if (result.status !== 200) {
-        // console.log(result)
+      if (result.status === 400) {
+        result.text().then(async data => {
+          await this.setState({
+            isOpenError: true,
+            message: data,
+          })
+        })
       } else if (result.status === 200) {
         result.text().then(async data => {
-          // console.log(data);
 
           await database.ref('ppls/').push({
             username: this.state.username,
@@ -239,15 +257,24 @@ class Register extends React.Component {
           this.setState({
             isOpen: true,
           });
+          setTimeout(
+            function() {
+              setTimeout(this.props.history.push('/login-page'), 10000);
+            }.bind(this),
+            5000
+          );
         });
+      } else {
+        alert("Error")
       }
+    }).catch(async data => {
+      //CANNOT ACCESS TO SERVER
+      await this.setState({
+        isOpenError: true,
+        message: "Cannot access to server"
+      })
     });
-    setTimeout(
-      function() {
-        setTimeout(this.props.history.push('/login-page'), 10000);
-      }.bind(this),
-      5000
-    );
+    
     event.preventDefault();
   }
   async toggleCheckboxValue() {
@@ -259,6 +286,7 @@ class Register extends React.Component {
       this.state.validEmail === true &&
       this.state.validFirstname === true &&
       this.state.validPassword === true &&
+      this.state.validConfirmPassword === true &&
       this.state.validUsername === true &&
       this.state.validPhone === true
     ) {
@@ -414,6 +442,7 @@ class Register extends React.Component {
                               required
                             />
                           </InputGroup>
+                          <p style={{color: 'red'}} id="passwordError" />
                         </FormGroup>
                         <FormGroup>
                           <InputGroup className="input-group-alternative">
@@ -469,7 +498,7 @@ class Register extends React.Component {
                                 <span>
                                   I agree with the{' '}
                                   <a
-                                    href="#pablo"
+                                    // href="#pablo"
                                     onClick={e => e.preventDefault()}
                                   >
                                     Privacy Policy
@@ -507,6 +536,23 @@ class Register extends React.Component {
           </section>
         </main>
         <SimpleFooter />
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenError}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">
+            Error
+          </div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              {this.state.message}
+            </h3>
+          </div>
+          <div className="modal-footer">
+            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+          </div>
+        </Modal>
       </>
     );
   }
