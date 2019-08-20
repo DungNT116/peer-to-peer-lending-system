@@ -14,8 +14,6 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
-import capstone.p2plend.controller.DocumentFileController;
-
 @Service
 public class JwtService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JwtService.class);
@@ -44,7 +42,6 @@ public class JwtService {
 	}
 
 	private JWTClaimsSet getClaimsFromToken(String token) {
-		LOGGER.info("CALL get claim token");
 		JWTClaimsSet claims = null;
 		try {
 			SignedJWT signedJWT = SignedJWT.parse(token);
@@ -59,12 +56,10 @@ public class JwtService {
 	}
 
 	private Date generateExpirationDate() {
-		LOGGER.info("generate expireation date");
 		return new Date(System.currentTimeMillis() + EXPIRE_TIME);
 	}
 
 	private Date getExpirationDateFromToken(String token) {
-		LOGGER.info("get expireation date");
 		Date expiration = null;
 		JWTClaimsSet claims = getClaimsFromToken(token);
 		expiration = claims.getExpirationTime();
@@ -74,7 +69,6 @@ public class JwtService {
 	public String getUsernameFromToken(String token) {
 		String username = null;
 		try {
-			LOGGER.info("get jwt username");
 			JWTClaimsSet claims = getClaimsFromToken(token);
 			username = claims.getStringClaim(USERNAME);
 		} catch (Exception e) {
@@ -84,7 +78,6 @@ public class JwtService {
 	}
 
 	private byte[] generateShareSecret() {
-		LOGGER.info("generate share secret");
 		// Generate 256-bit (32-byte) shared secret
 		byte[] sharedSecret = new byte[32];
 		sharedSecret = SECRET_KEY.getBytes();
@@ -92,13 +85,11 @@ public class JwtService {
 	}
 
 	private Boolean isTokenExpired(String token) {
-		LOGGER.info("check if token expired");
 		Date expiration = getExpirationDateFromToken(token);
 		return expiration.before(new Date());
 	}
 
 	public Boolean validateTokenLogin(String token) {
-		LOGGER.info("validate token");
 		if (token == null || token.trim().length() == 0) {
 			return false;
 		}
