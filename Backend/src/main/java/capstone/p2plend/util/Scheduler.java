@@ -95,7 +95,7 @@ public class Scheduler {
 					}
 				}
 			}
-			LOGGER.info("Finish check system for milestone near deadline, sent " + count + "mail");
+			LOGGER.info("Finish check system for milestone near deadline, sent " + count + " mail");
 		} catch (Exception e) {
 			LOGGER.error("Error while try to send schedule mail", e);
 		}
