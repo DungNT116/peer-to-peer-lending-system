@@ -7,8 +7,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,8 +20,6 @@ import capstone.p2plend.service.JwtService;
 
 public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationTokenFilter.class);
-
 	private final static String TOKEN_HEADER = "authorization";
 
 	@Autowired
@@ -35,7 +31,6 @@ public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthentication
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		LOGGER.info("Do Filter");
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		String authToken = httpRequest.getHeader(TOKEN_HEADER);
 		if (jwtService.validateTokenLogin(authToken)) {

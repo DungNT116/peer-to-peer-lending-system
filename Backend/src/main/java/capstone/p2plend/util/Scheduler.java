@@ -12,7 +12,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import capstone.p2plend.controller.UserController;
 import capstone.p2plend.entity.Deal;
 import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.Milestone;
