@@ -1,6 +1,9 @@
 package capstone.p2plend.service;
 
 import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -11,8 +14,11 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
+import capstone.p2plend.controller.DocumentFileController;
+
 @Service
 public class JwtService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(JwtService.class);
 	public static final String USERNAME = "username";
 	public static final String SECRET_KEY = "11111111111111111111111111111111";
 	public static final int EXPIRE_TIME = 1800000;
@@ -31,7 +37,7 @@ public class JwtService {
 			signedJWT.sign(signer);
 			token = signedJWT.serialize();
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Server Error", e);
 		}
 		return token;
 	}
@@ -45,7 +51,7 @@ public class JwtService {
 				claims = signedJWT.getJWTClaimsSet();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Server Error", e);
 		}
 		return claims;
 	}
@@ -67,7 +73,7 @@ public class JwtService {
 			JWTClaimsSet claims = getClaimsFromToken(token);
 			username = claims.getStringClaim(USERNAME);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Server Error", e);
 		}
 		return username;
 	}
