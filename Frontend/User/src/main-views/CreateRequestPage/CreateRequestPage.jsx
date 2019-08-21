@@ -53,22 +53,7 @@ class CreateRequestPage extends React.Component {
     this.handleDataTimeline = this.handleDataTimeline.bind(this);
     this.createMileStone = this.createMileStone.bind(this);
     this.onAmountCleaveChange = this.onAmountCleaveChange.bind(this);
-    this.checkLoanLimit = this.checkLoanLimit.bind(this);
-  }
-
-  async checkLoanLimit() {
-    if (this.state.maxloadlimit > 0) {
-      // this.setState({
-      //   invalidLoanLimit: false
-      // })
-      return false;
-    } else {
-      // alert('your loan limit is not enough to use this function');
-      await this.setState({
-        isOpenError: true
-      })
-      return true;
-    }
+    this.handleError = this.handleError.bind(this);
   }
 
   createMileStone() {
@@ -148,8 +133,7 @@ class CreateRequestPage extends React.Component {
 
   async handleSubmit(event) {
     event.preventDefault();
-    var invalidLoanLimit = this.checkLoanLimit();
-    if (this.state.invalidAmount === false && invalidLoanLimit === false) {
+    if (this.state.invalidAmount === false ) {
       fetch(apiLink + '/rest/request/createRequest', {
         method: 'POST',
         headers: {
@@ -184,15 +168,25 @@ class CreateRequestPage extends React.Component {
         }
       }).catch(async data => {
         //CANNOT ACCESS TO SERVER
-        await this.setState({
-          isOpenError: true,
-          error: "Cannot access to server"
-        })
+        await this.handleError(data)
       });
     }
     event.preventDefault();
   }
-
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
+      await this.setState({
+        isOpenError: true,
+        error: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        error: 'Something when wrong !',
+      });
+    }
+  }
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -232,10 +226,7 @@ class CreateRequestPage extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        error: "Cannot access to server"
-      })
+      await this.handleError(data);
     });
   }
 
@@ -298,6 +289,7 @@ class CreateRequestPage extends React.Component {
         height: '100%',
       },
     };
+    
     return (
       <>
         <MainNavbar />

@@ -16,13 +16,13 @@ import {
   Modal,
 } from 'reactstrap';
 
-import { css } from '@emotion/core';
+import {css} from '@emotion/core';
 
-import { PulseLoader } from 'react-spinners';
+import {PulseLoader} from 'react-spinners';
 // core components
 import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
-import { apiLink } from '../../api.jsx';
+import {apiLink} from '../../api.jsx';
 class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -102,6 +102,8 @@ class Profile extends React.Component {
     this.changeNewPassword = this.changeNewPassword.bind(this);
     this.changeConfirmPassword = this.changeConfirmPassword.bind(this);
     this.getDocumentTypeList = this.getDocumentTypeList.bind(this);
+
+    this.handleError = this.handleError.bind(this);
   }
 
   changeOldPassword(event) {
@@ -179,40 +181,38 @@ class Profile extends React.Component {
           Authorization: localStorage.getItem('token'),
         },
         body: formData,
-      }).then(async result => {
-        if (result.status === 200) {
-          this.changeIsChangePassword();
-          await this.setState({
-            newPassword: '',
-            oldPassword: '',
-            confirmPassword: '',
-            isOpenSuccess: true
-          });
-          setTimeout(
-            function () {
-              this.setState({ isOpenSuccess: false });
-            }
-              .bind(this),
-            1000
-          );
-        } else if (result.status === 401) {
-          localStorage.removeItem('isLoggedIn');
-          this.props.history.push('/login-page');
-        } else {
-          result.text().then(async data => {
+      })
+        .then(async result => {
+          if (result.status === 200) {
+            this.changeIsChangePassword();
             await this.setState({
-              isOpenError: true,
-              message: data
-            })
-          })
-        }
-      }).catch(async data => {
-        //CANNOT ACCESS TO SERVER
-        await this.setState({
-          isOpenError: true,
-          message: "Cannot access to server"
+              newPassword: '',
+              oldPassword: '',
+              confirmPassword: '',
+              isOpenSuccess: true,
+            });
+            setTimeout(
+              function() {
+                this.setState({isOpenSuccess: false});
+              }.bind(this),
+              1000
+            );
+          } else if (result.status === 401) {
+            localStorage.removeItem('isLoggedIn');
+            this.props.history.push('/login-page');
+          } else {
+            result.text().then(async data => {
+              await this.setState({
+                isOpenError: true,
+                message: data,
+              });
+            });
+          }
         })
-      });
+        .catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.handleError(data);
+        });
     }
   }
 
@@ -223,10 +223,12 @@ class Profile extends React.Component {
   }
 
   async saveUserInformation() {
-    if (this.state.validEmail === true &&
+    if (
+      this.state.validEmail === true &&
       this.state.validFirstname === true &&
       this.state.validLastname === true &&
-      this.state.validPhone === true) {
+      this.state.validPhone === true
+    ) {
       fetch(apiLink + '/rest/user/changeUserInfo', {
         method: 'PUT',
         headers: {
@@ -239,28 +241,26 @@ class Profile extends React.Component {
           email: this.state.newEmail,
           phoneNumber: this.state.newPhoneNumber,
         }),
-      }).then(result => {
-        if (result.status === 200) {
-          this.changeEditable();
-          this.getProfile();
-        } else if (result.status === 401) {
-          localStorage.removeItem('isLoggedIn');
-          this.props.history.push('/login-page');
-        }
-      }).catch(async data => {
-        //CANNOT ACCESS TO SERVER
-        await this.setState({
-          isOpenError: true,
-          message: "Cannot access to server"
+      })
+        .then(result => {
+          if (result.status === 200) {
+            this.changeEditable();
+            this.getProfile();
+          } else if (result.status === 401) {
+            localStorage.removeItem('isLoggedIn');
+            this.props.history.push('/login-page');
+          }
         })
-      });
+        .catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.handleError(data);
+        });
     } else {
       await this.setState({
         isOpenError: true,
-        message: "Some field is still error, please fix all error field"
-      })
+        message: 'Some field is still error, please fix all error field',
+      });
     }
-
   }
 
   onPhoneNumberChange(event) {
@@ -349,16 +349,16 @@ class Profile extends React.Component {
 
   async startRecording() {
     window.recordedBlobs = [];
-    let options = { mimeType: 'video/webm;codecs=vp9' };
+    let options = {mimeType: 'video/webm;codecs=vp9'};
     if (!MediaRecorder.isTypeSupported(options.mimeType)) {
       console.error(`${options.mimeType} is not Supported`);
-      options = { mimeType: 'video/webm;codecs=vp8' };
+      options = {mimeType: 'video/webm;codecs=vp8'};
       if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         console.error(`${options.mimeType} is not Supported`);
-        options = { mimeType: 'video/webm' };
+        options = {mimeType: 'video/webm'};
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
           console.error(`${options.mimeType} is not Supported`);
-          options = { mimeType: '' };
+          options = {mimeType: ''};
         }
       }
     }
@@ -433,119 +433,121 @@ class Profile extends React.Component {
         'Content-Type': 'application/json',
         Authorization: localStorage.getItem('token'),
       },
-    }).then(result => {
-      if (result.status === 200) {
-        this.setState({ docs: [] });
-        result.json().then(async data => {
-          for (let i = 0; i < this.state.documentTypes.length; i++) {
-            //get element in doc type
-            const elementType = await this.state.documentTypes[i];
-            for (let j = 0; j < this.state.documentTypes.length; j++) {
-              //get element in user doc
-              const element = await data[j];
-              if (element === undefined) {
-                //case elemnt undefined , check key exist in the state docs
-                if (
-                  !this.containKeyInArray(
-                    'document' + elementType.name.replace(/\s+/g, ''),
-                    this.state.docs
-                  )
-                ) {
-                  await this.setState({
-                    docs: [
-                      ...this.state.docs,
-                      {
-                        ['document' + elementType.name.replace(/\s+/g, '')]: {
-                          documentType: elementType,
+    })
+      .then(result => {
+        if (result.status === 200) {
+          this.setState({docs: []});
+          result.json().then(async data => {
+            for (let i = 0; i < this.state.documentTypes.length; i++) {
+              //get element in doc type
+              const elementType = await this.state.documentTypes[i];
+              for (let j = 0; j < this.state.documentTypes.length; j++) {
+                //get element in user doc
+                const element = await data[j];
+                if (element === undefined) {
+                  //case elemnt undefined , check key exist in the state docs
+                  if (
+                    !this.containKeyInArray(
+                      'document' + elementType.name.replace(/\s+/g, ''),
+                      this.state.docs
+                    )
+                  ) {
+                    await this.setState({
+                      docs: [
+                        ...this.state.docs,
+                        {
+                          ['document' + elementType.name.replace(/\s+/g, '')]: {
+                            documentType: elementType,
+                          },
                         },
-                      },
-                    ],
-                    ['loading' +
+                      ],
+                      ['loading' +
                       elementType.acronym.replace(/\s+/g, '')]: false,
-                  });
-                }
-              } else if (elementType.name === element.documentType.name) {
-                //check exist in the state docs
-                var checkExist = await this.containsObject(
-                  element,
-                  this.state.docs
-                );
-                if (checkExist === false) {
-                  //set data to docs if element exist in user document
-                  await this.setState({
-                    docs: [
-                      ...this.state.docs,
-                      {
-                        ['document' +
-                          element.documentType.name.replace(/\s+/g, '')]: element,
-                      },
-                    ],
-                    ['loading' +
-                      element.documentType.acronym.replace(/\s+/g, '')]: false,
-                  });
-                }
-                //special with Video type
-                if (element.documentType.name === 'Video') {
-                  if (element.status === 'invalid') {
-                    this.setState({
-                      isVideoSaved: false,
-                      isUploadedVideo: false,
-                    });
-                  } else {
-                    this.setState({
-                      isUploadedVideo: true,
-                      isVideoSaved: true,
                     });
                   }
-                  this.setState({
-                    loadingVideo: false,
-                  });
-                } else {
-                  await this.setState({
-                    loadingVideo: false,
-                  });
+                } else if (elementType.name === element.documentType.name) {
+                  //check exist in the state docs
+                  var checkExist = await this.containsObject(
+                    element,
+                    this.state.docs
+                  );
+                  if (checkExist === false) {
+                    //set data to docs if element exist in user document
+                    await this.setState({
+                      docs: [
+                        ...this.state.docs,
+                        {
+                          ['document' +
+                          element.documentType.name.replace(
+                            /\s+/g,
+                            ''
+                          )]: element,
+                        },
+                      ],
+                      ['loading' +
+                      element.documentType.acronym.replace(/\s+/g, '')]: false,
+                    });
+                  }
+                  //special with Video type
+                  if (element.documentType.name === 'Video') {
+                    if (element.status === 'invalid') {
+                      this.setState({
+                        isVideoSaved: false,
+                        isUploadedVideo: false,
+                      });
+                    } else {
+                      this.setState({
+                        isUploadedVideo: true,
+                        isVideoSaved: true,
+                      });
+                    }
+                    this.setState({
+                      loadingVideo: false,
+                    });
+                  } else {
+                    await this.setState({
+                      loadingVideo: false,
+                    });
+                  }
                 }
               }
             }
-          }
-          for (let i = 0; i < data.length; i++) {
-            const element = data[i];
-            if (
-              this.state.docs[
-              'document' + element.documentType.name.replace(/\s+/g, '')
-              ] === null
-            ) {
-              await this.setState({
-                ['loading' +
+            for (let i = 0; i < data.length; i++) {
+              const element = data[i];
+              if (
+                this.state.docs[
+                  'document' + element.documentType.name.replace(/\s+/g, '')
+                ] === null
+              ) {
+                await this.setState({
+                  ['loading' +
                   element.documentType.acronym.replace(/\s+/g, '')]: false,
-              });
+                });
+              }
             }
-          }
 
-          this.setState({
-            isOpen: false
+            this.setState({
+              isOpen: false,
+            });
           });
-        });
-        // this.props.history.push("/view-request-trading");
-      } else if (result.status === 401) {
-        localStorage.removeItem('isLoggedIn');
-        this.props.history.push('/login-page');
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
+          // this.props.history.push("/view-request-trading");
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        }
       })
-    });
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
+      });
   }
 
   uploadVideo() {
-    const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
+    const superBuffer = new Blob(window.recordedBlobs, {type: 'video/webm'});
     var base64data = '';
     var reader = new FileReader();
     reader.readAsDataURL(superBuffer);
-    reader.onloadend = function () {
+    reader.onloadend = function() {
       base64data = reader.result;
       var formData = new FormData();
       formData.append('fileType', 'video/webm');
@@ -565,39 +567,38 @@ class Profile extends React.Component {
         //   documentType: this.state.documentID.documentType,
         //   file: this.state.documentID.listImage
         // })
-      }).then(async result => {
-        if (result.status === 200) {
-          await this.setState({
-            isOpenUpload: true
-          })
-          await setTimeout(
-            function () {
-              this.setState({
-                isOpenUpload: false
-              })
-            }.bind(this),
-            2000
-          );
-        } else if (result.status === 401) {
-          localStorage.removeItem('isLoggedIn');
-          this.props.history.push('/login-page');
-        } else if (result.status === 400) {
-          alert('error');
-        } else {
-          alert('error not found');
-        }
-      }).catch(async data => {
-        //CANNOT ACCESS TO SERVER
-        await this.setState({
-          isOpenError: true,
-          message: "Cannot access to server"
+      })
+        .then(async result => {
+          if (result.status === 200) {
+            await this.setState({
+              isOpenUpload: true,
+            });
+            await setTimeout(
+              function() {
+                this.setState({
+                  isOpenUpload: false,
+                });
+              }.bind(this),
+              2000
+            );
+          } else if (result.status === 401) {
+            localStorage.removeItem('isLoggedIn');
+            this.props.history.push('/login-page');
+          } else if (result.status === 400) {
+            alert('error');
+          } else {
+            alert('error not found');
+          }
         })
-      });
+        .catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.handleError(data);
+        });
     };
     this.setState({
       isOpen: true,
       loading: true,
-      isVideoSaved: true
+      isVideoSaved: true,
     });
     this.getDocument();
   }
@@ -619,42 +620,41 @@ class Profile extends React.Component {
           Authorization: localStorage.getItem('token'),
         },
         body: formData,
-      }).then(async result => {
-        if (result.status === 200) {
-          //load document again
-          await this.setState({
-            loadingID: true,
-            loadingPP: true,
-            loadingDL: true,
-            loadingVideo: true,
-          });
-          await this.getDocument();
-          this.setState({
-            isOpen: true,
-            loading: true
-          });
-          // this.props.history.push("/view-request-trading");
-        } else if (result.status === 401) {
-          localStorage.removeItem('isLoggedIn');
-          this.props.history.push('/login-page');
-        } else if (result.status === 400) {
-          alert('error');
-        } else {
-          alert('error not found');
-        }
-      }).catch(async data => {
-        //CANNOT ACCESS TO SERVER
-        await this.setState({
-          isOpenError: true,
-          message: "Cannot access to server"
+      })
+        .then(async result => {
+          if (result.status === 200) {
+            //load document again
+            await this.setState({
+              loadingID: true,
+              loadingPP: true,
+              loadingDL: true,
+              loadingVideo: true,
+            });
+            await this.getDocument();
+            this.setState({
+              isOpen: true,
+              loading: true,
+            });
+            // this.props.history.push("/view-request-trading");
+          } else if (result.status === 401) {
+            localStorage.removeItem('isLoggedIn');
+            this.props.history.push('/login-page');
+          } else if (result.status === 400) {
+            alert('error');
+          } else {
+            alert('error not found');
+          }
         })
-      });
+        .catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.handleError(data);
+        });
     } else {
       // alert('please select image to upload');
       await this.setState({
         isOpenError: true,
-        message: 'please select image to upload'
-      })
+        message: 'please select image to upload',
+      });
     }
   }
 
@@ -674,22 +674,21 @@ class Profile extends React.Component {
     }
     //10 MB
     if (validFilesCount === files.length && totalFilesSize <= 10000000) {
-      var document = { documentType: type, listImage: event.target.files };
+      var document = {documentType: type, listImage: event.target.files};
       await this.setState({
         ['uploadDocument' + type]: document,
       });
     } else {
       await this.setState({
         isOpenError: true,
-        message: 'please select image files or size is lower than 10MB'
-      })
+        message: 'please select image files or size is lower than 10MB',
+      });
     }
   }
 
   toggle() {
-    this.setState({ collapse: !this.state.collapse });
+    this.setState({collapse: !this.state.collapse});
   }
-
 
   async toggleAccordion(tab, docName) {
     var arrAccordition = await this.fillArray(
@@ -749,35 +748,47 @@ class Profile extends React.Component {
         // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       },
-    }).then(result => {
-      if (result.status === 200) {
-        result.json().then(data => {
-          this.setState({
-            username: data.username,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            loanLimit: data.loanLimit,
-            email: data.email,
-            phoneNumber: data.phoneNumber,
-            newFirstName: data.firstName,
-            newLastName: data.lastName,
-            newEmail: data.email,
-            newPhoneNumber: data.phoneNumber,
+    })
+      .then(result => {
+        if (result.status === 200) {
+          result.json().then(data => {
+            this.setState({
+              username: data.username,
+              firstName: data.firstName,
+              lastName: data.lastName,
+              loanLimit: data.loanLimit,
+              email: data.email,
+              phoneNumber: data.phoneNumber,
+              newFirstName: data.firstName,
+              newLastName: data.lastName,
+              newEmail: data.email,
+              newPhoneNumber: data.phoneNumber,
+            });
           });
-        });
-      } else if (result.status === 401) {
-        localStorage.removeItem('isLoggedIn');
-        this.props.history.push('/login-page');
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        }
+      })
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
+      });
+  }
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
       await this.setState({
         isOpenError: true,
-        message: "Cannot access to server"
-      })
-    });
+        error: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        error: 'Something when wrong !',
+      });
+    }
   }
-
   openCamera(event) {
     event.preventDefault();
     const constraints = {
@@ -806,7 +817,7 @@ class Profile extends React.Component {
   autoPlayVideo(event) {
     event.preventDefault();
     const recordedVideo = document.querySelector('video#recorded');
-    const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
+    const superBuffer = new Blob(window.recordedBlobs, {type: 'video/webm'});
     recordedVideo.src = null;
     recordedVideo.srcObject = null;
     recordedVideo.src = window.URL.createObjectURL(superBuffer);
@@ -822,25 +833,23 @@ class Profile extends React.Component {
         // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       },
-    }).then(result => {
-      if (result.status === 401) {
-        localStorage.removeItem('isLoggedIn');
-        this.props.history.push('/login-page');
-      } else if (result.status === 200) {
-        result.json().then(async data => {
-
-          await this.setState({
-            documentTypes: data,
+    })
+      .then(result => {
+        if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        } else if (result.status === 200) {
+          result.json().then(async data => {
+            await this.setState({
+              documentTypes: data,
+            });
           });
-        });
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
+        }
       })
-    });
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
+      });
   }
   getIdOfDocument(name) {
     const arrName = name.split(' ');
@@ -910,6 +919,73 @@ class Profile extends React.Component {
             {this.state[
               'loading' + doc[Object.keys(doc)[0]].documentType.acronym
             ] === true ? (
+              <PulseLoader
+                css={override}
+                sizeUnit={'px'}
+                size={15}
+                color={'#123abc'}
+                loading={
+                  this.state[
+                    'loading' + doc[Object.keys(doc)[0]].documentType.acronym
+                  ]
+                }
+              />
+            ) : doc[Object.keys(doc)[0]].documentFile !== undefined &&
+              doc[Object.keys(doc)[0]].documentType.name !== 'Video' ? (
+              //
+              <div>
+                {/*  */}
+                {doc[Object.keys(doc)[0]].status === 'invalid' ? (
+                  <div>
+                    <small style={{color: 'red'}}>
+                      <strong>
+                        Your document is rejected, please upload again for
+                        validation !
+                      </strong>
+                    </small>
+                    <Input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={event =>
+                        this.handleFileInput(
+                          event,
+                          doc[Object.keys(doc)[0]].documentType.acronym
+                        )
+                      }
+                    />{' '}
+                    <Button
+                      type="button"
+                      onClick={async () =>
+                        await this.saveDocument(
+                          doc[Object.keys(doc)[0]].documentType.id,
+                          doc[Object.keys(doc)[0]].documentType.acronym
+                        )
+                      }
+                    >
+                      Save
+                    </Button>
+                  </div>
+                ) : doc[Object.keys(doc)[0]].status === 'pending' ? (
+                  'Document is waiting for validation'
+                ) : (
+                  ''
+                )}
+                {/*  */}
+                {doc[Object.keys(doc)[0]].documentFile.map(imageData => (
+                  <img
+                    src={this.setSrcImgBase64(
+                      imageData.fileType,
+                      imageData.data
+                    )}
+                    style={style.sameSizeWithParent}
+                  />
+                ))}
+              </div>
+            ) : doc[Object.keys(doc)[0]].documentType.name === 'Video' ? (
+              this.state[
+                'loading' + doc[Object.keys(doc)[0]].documentType.acronym
+              ] === true ? (
                 <PulseLoader
                   css={override}
                   sizeUnit={'px'}
@@ -917,205 +993,138 @@ class Profile extends React.Component {
                   color={'#123abc'}
                   loading={
                     this.state[
-                    'loading' + doc[Object.keys(doc)[0]].documentType.acronym
+                      'loading' +
+                        doc[Object.keys(doc)[0]].documentType.acronym.replace(
+                          /\s+/g,
+                          ''
+                        )
                     ]
                   }
                 />
-              ) : doc[Object.keys(doc)[0]].documentFile !== undefined &&
-                doc[Object.keys(doc)[0]].documentType.name !== 'Video' ? (
-                  //
+              ) : this.state.isUploadedVideo === false ? (
+                this.state.isVideoSaved === false ? (
                   <div>
-                    {/*  */}
-                    {doc[Object.keys(doc)[0]].status === 'invalid' ? (
-                      <div>
-                        <small style={{ color: 'red' }}>
-                          <strong>
-                            Your document is rejected, please upload again for
-                            validation !
-                      </strong>
-                        </small>
-                        <Input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          onChange={event =>
-                            this.handleFileInput(
-                              event,
-                              doc[Object.keys(doc)[0]].documentType.acronym
-                            )
-                          }
-                        />{' '}
-                        <Button
-                          type="button"
-                          onClick={async () =>
-                            await this.saveDocument(
-                              doc[Object.keys(doc)[0]].documentType.id,
-                              doc[Object.keys(doc)[0]].documentType.acronym
-                            )
-                          }
-                        >
-                          Save
-                    </Button>
-                      </div>
-                    ) : doc[Object.keys(doc)[0]].status === 'pending' ? (
-                      'Document is waiting for validation'
-                    ) : (
-                          ''
-                        )}
-                    {/*  */}
-                    {doc[Object.keys(doc)[0]].documentFile.map(imageData => (
-                      <img
-                        src={this.setSrcImgBase64(
-                          imageData.fileType,
-                          imageData.data
-                        )}
-                        style={style.sameSizeWithParent}
-                      />
-                    ))}
-                  </div>
-                ) : doc[Object.keys(doc)[0]].documentType.name === 'Video' ? (
-                  this.state[
-                    'loading' + doc[Object.keys(doc)[0]].documentType.acronym
-                  ] === true ? (
-                      <PulseLoader
-                        css={override}
-                        sizeUnit={'px'}
-                        size={15}
-                        color={'#123abc'}
-                        loading={
-                          this.state[
-                          'loading' +
-                          doc[Object.keys(doc)[0]].documentType.acronym.replace(
-                            /\s+/g,
-                            ''
-                          )
-                          ]
-                        }
-                      />
-                    ) : this.state.isUploadedVideo === false ? (
-                      this.state.isVideoSaved === false ? (
-                        <div>
-                          <Row>
-                            <Col md={2} />
-                            <Col md={8}>
-                              <video autoPlay id="gum" />
-                              <video autoPlay id="recorded" />
-                            </Col>
-                            <Col md={2} />
-                          </Row>
-                          <Row>
-                            <h5>
-                              <strong>
-                                Turn on the camera , show your face clearly in camera
-                                and talk "I agree to use PPLS" to validate your
-                                Identity Video
+                    <Row>
+                      <Col md={2} />
+                      <Col md={8}>
+                        <video autoPlay id="gum" />
+                        <video autoPlay id="recorded" />
+                      </Col>
+                      <Col md={2} />
+                    </Row>
+                    <Row>
+                      <h5>
+                        <strong>
+                          Turn on the camera , show your face clearly in camera
+                          and talk "I agree to use PPLS" to validate your
+                          Identity Video
                         </strong>
-                            </h5>
-                          </Row>
-                          <Row>
-                            <Button
-                              size="md"
-                              className="btn btn-outline-primary"
-                              id="start"
-                              onClick={event => {
-                                this.openCamera(event);
-                              }}
-                            >
-                              Start camera
-                      </Button>
-                            <Button
-                              size="md"
-                              className="btn btn-outline-primary"
-                              id="record"
-                              onClick={event => {
-                                event.preventDefault();
-                                var recordButton = document.querySelector(
-                                  'button#record'
-                                );
-
-                                if (recordButton.textContent === 'Start Recording') {
-                                  this.startRecording();
-                                  setTimeout(
-                                    function () {
-                                      this.stopRecording();
-                                      window.stream
-                                        .getTracks()
-                                        .forEach(function (track) {
-                                          track.stop();
-                                        });
-                                    }.bind(this),
-                                    5000
-                                  );
-                                }
-                              }}
-                            >
-                              Start Recording
-                      </Button>
-                            <Button
-                              size="md"
-                              className="btn btn-outline-primary"
-                              id="play"
-                              onClick={event => {
-                                this.autoPlayVideo(event);
-                              }}
-                            >
-                              Play
-                      </Button>{' '}
-                            <Button
-                              id="saveToDB"
-                              size="md"
-                              className="btn btn-outline-primary"
-                              onClick={event => {
-                                event.preventDefault();
-                                this.uploadVideo();
-                              }}
-                            >
-                              Save video
-                      </Button>
-                          </Row>
-                        </div>
-                      ) : (
-                          <div>
-                            <p>
-                              You had already upload video, waiting for validating from
-                              Admin
-                    </p>
-                          </div>
-                        )
-                    ) : (
-                        <div>
-                          <p>
-                            You had already upload video, system will keep your Identity
-                            Video due to User Privacy
-                  </p>
-                        </div>
-                      )
-                ) : (
-                    <div>
-                      <Input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={event =>
-                          this.handleFileInput(
-                            event,
-                            doc[Object.keys(doc)[0]].documentType.acronym
-                          )
-                        }
-                      />{' '}
+                      </h5>
+                    </Row>
+                    <Row>
                       <Button
-                        type="button"
-                        onClick={async () =>
-                          await this.saveDocument(
-                            doc[Object.keys(doc)[0]].documentType.id,
-                            doc[Object.keys(doc)[0]].documentType.acronym
-                          )
-                        }
+                        size="md"
+                        className="btn btn-outline-primary"
+                        id="start"
+                        onClick={event => {
+                          this.openCamera(event);
+                        }}
                       >
-                        Save
+                        Start camera
+                      </Button>
+                      <Button
+                        size="md"
+                        className="btn btn-outline-primary"
+                        id="record"
+                        onClick={event => {
+                          event.preventDefault();
+                          var recordButton = document.querySelector(
+                            'button#record'
+                          );
+                          this.openCamera(event);
+                          if (recordButton.textContent === 'Start Recording') {
+                            this.startRecording();
+                            setTimeout(
+                              function() {
+                                this.stopRecording();
+                                window.stream
+                                  .getTracks()
+                                  .forEach(function(track) {
+                                    track.stop();
+                                  });
+                              }.bind(this),
+                              5000
+                            );
+                          }
+                        }}
+                      >
+                        Start Recording
+                      </Button>
+                      <Button
+                        size="md"
+                        className="btn btn-outline-primary"
+                        id="play"
+                        onClick={event => {
+                          this.autoPlayVideo(event);
+                        }}
+                      >
+                        Play
+                      </Button>{' '}
+                      <Button
+                        id="saveToDB"
+                        size="md"
+                        className="btn btn-outline-primary"
+                        onClick={event => {
+                          event.preventDefault();
+                          this.uploadVideo();
+                        }}
+                      >
+                        Save video
+                      </Button>
+                    </Row>
+                  </div>
+                ) : (
+                  <div>
+                    <p>
+                      You had already upload video, waiting for validating from
+                      Admin
+                    </p>
+                  </div>
+                )
+              ) : (
+                <div>
+                  <p>
+                    You had already upload video, system will keep your Identity
+                    Video due to User Privacy
+                  </p>
+                </div>
+              )
+            ) : (
+              <div>
+                <Input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={event =>
+                    this.handleFileInput(
+                      event,
+                      doc[Object.keys(doc)[0]].documentType.acronym
+                    )
+                  }
+                />{' '}
+                <Button
+                  type="button"
+                  onClick={async () =>
+                    await this.saveDocument(
+                      doc[Object.keys(doc)[0]].documentType.id,
+                      doc[Object.keys(doc)[0]].documentType.acronym
+                    )
+                  }
+                >
+                  Save
                 </Button>
-                    </div>
-                  )}
+              </div>
+            )}
           </CardBody>
         </Collapse>
       </Card>
@@ -1153,7 +1162,6 @@ class Profile extends React.Component {
           </section>
           <section className="section">
             <Container className="mt--7" style={style.profileComponent}>
-
               <Modal
                 className="modal-dialog-centered"
                 isOpen={this.state.isOpen}
@@ -1182,8 +1190,9 @@ class Profile extends React.Component {
                       <Col className="order-lg-2" lg="3">
                         <div className="card-profile-image">
                           <a
-                            // href="#pablo" 
-                            onClick={e => e.preventDefault()}>
+                            // href="#pablo"
+                            onClick={e => e.preventDefault()}
+                          >
                             <img
                               alt="..."
                               className="rounded-circle"
@@ -1264,8 +1273,8 @@ class Profile extends React.Component {
                               Edit Profile
                             </Button>
                           ) : (
-                              ''
-                            )}
+                            ''
+                          )}
                         </Col>
                         <Col className="text-right" xs="3">
                           {this.state.isChangePassword === false ? (
@@ -1281,8 +1290,8 @@ class Profile extends React.Component {
                               Change Password
                             </Button>
                           ) : (
-                              ''
-                            )}
+                            ''
+                          )}
                         </Col>
                       </Row>
                     </CardHeader>
@@ -1329,13 +1338,13 @@ class Profile extends React.Component {
                                           onChange={this.onPhoneNumberChange}
                                         />
                                         <p
-                                          style={{ color: 'red' }}
+                                          style={{color: 'red'}}
                                           id="phoneError"
                                         />
                                       </div>
                                     ) : (
-                                        <p>{this.state.phoneNumber}</p>
-                                      )}
+                                      <p>{this.state.phoneNumber}</p>
+                                    )}
                                   </FormGroup>
                                 </Col>
                                 <Col lg="6">
@@ -1356,13 +1365,13 @@ class Profile extends React.Component {
                                           onChange={this.onEmailChange}
                                         />
                                         <p
-                                          style={{ color: 'red' }}
+                                          style={{color: 'red'}}
                                           id="emailError"
                                         />
                                       </div>
                                     ) : (
-                                        <p>{this.state.email}</p>
-                                      )}
+                                      <p>{this.state.email}</p>
+                                    )}
                                   </FormGroup>
                                 </Col>
                               </Row>
@@ -1386,13 +1395,13 @@ class Profile extends React.Component {
                                           onChange={this.onFirstNameChange}
                                         />
                                         <p
-                                          style={{ color: 'red' }}
+                                          style={{color: 'red'}}
                                           id="firstnameError"
                                         />
                                       </div>
                                     ) : (
-                                        <p>{this.state.firstName}</p>
-                                      )}
+                                      <p>{this.state.firstName}</p>
+                                    )}
                                   </FormGroup>
                                 </Col>
                                 <Col lg="6">
@@ -1414,13 +1423,13 @@ class Profile extends React.Component {
                                           onChange={this.onLastNameChange}
                                         />
                                         <p
-                                          style={{ color: 'red' }}
+                                          style={{color: 'red'}}
                                           id="lastnameError"
                                         />
                                       </div>
                                     ) : (
-                                        <p>{this.state.lastName}</p>
-                                      )}
+                                      <p>{this.state.lastName}</p>
+                                    )}
                                   </FormGroup>
                                 </Col>
                               </Row>
@@ -1451,98 +1460,101 @@ class Profile extends React.Component {
                                   </Col>
                                 </Row>
                               ) : (
-                                  ''
-                                )}
+                                ''
+                              )}
                             </div>
                           ) : (
-                              <div>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-oldPassword"
-                                      >
-                                        Old Password
+                            <div>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-oldPassword"
+                                    >
+                                      Old Password
                                     </label>
-                                      <div>
-                                        <Input
-                                          className="form-control-alternative"
-                                          value={this.state.oldPassword}
-                                          id="input-oldPassword"
-                                          type="password"
-                                          onChange={this.changeOldPassword}
-                                        />
-                                      </div>
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-newPassword"
-                                      >
-                                        New Password
+                                    <div>
+                                      <Input
+                                        className="form-control-alternative"
+                                        value={this.state.oldPassword}
+                                        id="input-oldPassword"
+                                        type="password"
+                                        onChange={this.changeOldPassword}
+                                      />
+                                    </div>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-newPassword"
+                                    >
+                                      New Password
                                     </label>
-                                      <div>
-                                        <Input
-                                          className="form-control-alternative"
-                                          value={this.state.newPassword}
-                                          id="input-newPassword"
-                                          type="password"
-                                          onChange={this.changeNewPassword}
-                                        />
-                                        <p style={{ color: 'red' }} id="passwordError" />
-                                      </div>
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-comfirmPassword"
-                                      >
-                                        Confirm Password
+                                    <div>
+                                      <Input
+                                        className="form-control-alternative"
+                                        value={this.state.newPassword}
+                                        id="input-newPassword"
+                                        type="password"
+                                        onChange={this.changeNewPassword}
+                                      />
+                                      <p
+                                        style={{color: 'red'}}
+                                        id="passwordError"
+                                      />
+                                    </div>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-comfirmPassword"
+                                    >
+                                      Confirm Password
                                     </label>
-                                      <div>
-                                        <Input
-                                          className="form-control-alternative"
-                                          value={this.state.confirmPassword}
-                                          id="input-confirmPassword"
-                                          type="password"
-                                          onChange={this.changeConfirmPassword}
-                                        />
-                                        <p id="confirmError" />
-                                      </div>
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <Row>
-                                  <Button
-                                    id="savePassword"
-                                    color="primary"
-                                    onClick={() => this.changePassword()}
-                                    size="sm"
-                                  >
-                                    save
+                                    <div>
+                                      <Input
+                                        className="form-control-alternative"
+                                        value={this.state.confirmPassword}
+                                        id="input-confirmPassword"
+                                        type="password"
+                                        onChange={this.changeConfirmPassword}
+                                      />
+                                      <p id="confirmError" />
+                                    </div>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Button
+                                  id="savePassword"
+                                  color="primary"
+                                  onClick={() => this.changePassword()}
+                                  size="sm"
+                                >
+                                  save
                                 </Button>{' '}
-                                  <Button
-                                    id="cancelChangePassword"
-                                    color="primary"
-                                    onClick={() => this.changeIsChangePassword()}
-                                    size="sm"
-                                  >
-                                    cancel
+                                <Button
+                                  id="cancelChangePassword"
+                                  color="primary"
+                                  onClick={() => this.changeIsChangePassword()}
+                                  size="sm"
+                                >
+                                  cancel
                                 </Button>
-                                </Row>
-                              </div>
-                            )}
+                              </Row>
+                            </div>
+                          )}
                         </div>
-                        <small style={{ color: 'red' }}>
+                        <small style={{color: 'red'}}>
                           <strong>
                             *Identity Card and Identity Video are required to
                             increase loan limit
@@ -1561,36 +1573,39 @@ class Profile extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenSuccess}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               <img
-                style={{ width: 50, height: 50 }}
+                style={{width: 50, height: 50}}
                 src={require('assets/img/theme/checked.png')}
               />
               Successfully Saved
-              </h3>
+            </h3>
           </div>
         </Modal>
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenError}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
-          <div className="modal-header">
-            Error
-          </div>
+          <div className="modal-header">Error</div>
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               {this.state.message}
             </h3>
           </div>
           <div className="modal-footer">
-            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+            <Button
+              onClick={() => {
+                this.setState({isOpenError: false});
+              }}
+            >
+              OK
+            </Button>
           </div>
         </Modal>
-
 
         <Modal
           className="modal-dialog-centered"
@@ -1599,11 +1614,11 @@ class Profile extends React.Component {
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               <img
-                style={{ width: 50, height: 50 }}
+                style={{width: 50, height: 50}}
                 src={require('assets/img/theme/checked.png')}
               />
               Successfully Upload Video
-          </h3>
+            </h3>
           </div>
         </Modal>
       </>

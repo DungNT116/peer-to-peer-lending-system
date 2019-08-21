@@ -64,6 +64,7 @@ class ViewRequestNew extends React.Component {
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
     this.cancelRequest = this.cancelRequest.bind(this);
     this.toggleCancelDeal = this.toggleCancelDeal.bind(this);
+    this.handleError = this.handleError.bind(this);
   }
 
   toggleCancelDeal(request) {
@@ -138,13 +139,23 @@ class ViewRequestNew extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data)
     });
   }
-
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
+      await this.setState({
+        isOpenError: true,
+        message: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        message: 'Something when wrong !',
+      });
+    }
+  }
   setDataToDetailPage(id, where) {
 
     this.props.setRequest(id);
@@ -203,10 +214,7 @@ class ViewRequestNew extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data)
     });;
 
     fetch(
@@ -238,10 +246,7 @@ class ViewRequestNew extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data)
     });;
   }
 
@@ -285,10 +290,7 @@ class ViewRequestNew extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data)
     });;
     // event.preventDefault();
     // this.props.history.push('/')
@@ -350,7 +352,7 @@ class ViewRequestNew extends React.Component {
           </Col>
         </td>
         <td>{this.numberWithCommas(request.amount)} VND</td>
-        <td>{request.borrower.username} days</td>
+        <td>{request.borrower.username}</td>
         <td>{this.convertTimeStampToDate(request.createDate)}</td>
 
         <td>{request.status}</td>

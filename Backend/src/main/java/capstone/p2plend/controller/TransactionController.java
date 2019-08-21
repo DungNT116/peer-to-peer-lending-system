@@ -2,6 +2,8 @@ package capstone.p2plend.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import capstone.p2plend.service.TransactionService;
 
 @RestController
 public class TransactionController {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(TransactionController.class);
 
 	@Autowired
 	TransactionService transactionService;
@@ -28,6 +32,7 @@ public class TransactionController {
 	@CrossOrigin
 	@GetMapping(value = "/rest/transaction/getTop20Transaction")
 	public ResponseEntity<List<Transaction>> getTop20TransactionOrderByCreateDateDesc() {
+		LOGGER.info("CALL method GET /rest/transaction/getTop20Transaction");
 		HttpStatus httpStatus = null;
 		List<Transaction> result = null;
 		try {
@@ -38,16 +43,18 @@ public class TransactionController {
 				httpStatus = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<List<Transaction>>(result, httpStatus);
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@GetMapping(value = "/rest/transaction/getAllUserTransaction")
 	public ResponseEntity<PageDTO<Transaction>> getAllUserTransaction(@RequestParam Integer page,
 			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/transaction/getAllUserTransaction");
 		HttpStatus httpStatus = null;
 		PageDTO<Transaction> result = null;
 		try {
@@ -58,34 +65,38 @@ public class TransactionController {
 				httpStatus = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception ex) {
+			LOGGER.error("Server Error", ex);
 			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<PageDTO<Transaction>>(result, httpStatus);
 	}
 
 	@CrossOrigin
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_USER" })
 	@PostMapping(value = "/rest/transaction/newTransaction")
-	public ResponseEntity<Integer> newTransaction(@RequestBody Transaction transaction) {
+	public ResponseEntity<String> newTransaction(@RequestBody Transaction transaction) {
+		LOGGER.info("CALL method POST /rest/transaction/newTransaction");
 		HttpStatus status = null;
-		boolean valid = false;
+		String result = null;
 		try {
-			valid = transactionService.newTransaction(transaction);
-			if (valid == true) {
+			result = transactionService.newTransaction(transaction);
+			if (result.equalsIgnoreCase("success")) {
 				status = HttpStatus.OK;
 			} else {
 				status = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<Integer>(status.value(), status);
+		return new ResponseEntity<String>(result, status);
 	}
 
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	@PutMapping(value = "/rest/transaction/updateTransaction")
 	public ResponseEntity<Integer> updateTransaction(@RequestBody Transaction transaction) {
+		LOGGER.info("CALL method PUT /rest/transaction/updateTransaction");
 		HttpStatus status = null;
 		boolean valid = false;
 		try {
@@ -96,6 +107,7 @@ public class TransactionController {
 				status = HttpStatus.BAD_REQUEST;
 			}
 		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return new ResponseEntity<Integer>(status.value(), status);

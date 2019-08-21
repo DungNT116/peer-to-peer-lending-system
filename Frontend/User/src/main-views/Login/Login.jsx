@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 // reactstrap components
 import {
   Card,
@@ -14,24 +14,24 @@ import {
   Row,
   Col,
   Button,
-  Modal
-} from "reactstrap";
+  Modal,
+} from 'reactstrap';
 // core components
-import MainNavbar from "../MainNavbar/MainNavbar.jsx";
-import SimpleFooter from "components/Footers/SimpleFooter.jsx";
+import MainNavbar from '../MainNavbar/MainNavbar.jsx';
+import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
 
 //api link
-import { apiLink } from "../../api.jsx";
+import {apiLink} from '../../api.jsx';
 
 class Login extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
-      password: "",
+      username: '',
+      password: '',
       isForgotPassword: false,
-      usernameForgotPassword: "",
-      emailForgotPassword: "",
+      usernameForgotPassword: '',
+      emailForgotPassword: '',
       validUsername: false,
       validEmail: false,
       isOpenError: false,
@@ -48,22 +48,23 @@ class Login extends React.Component {
       this
     );
     this.handleEmailForgotPassword = this.handleEmailForgotPassword.bind(this);
+    this.handleError = this.handleError.bind(this);
   }
 
   handleEmailForgotPassword(event) {
     const tmp = event.target.value.trim();
     if (tmp.match(/^[a-zA-Z0-9]{5,30}@[a-z]{3,10}(.[a-z]{2,3})+$/)) {
-      document.getElementById("emailError").innerHTML = "";
+      document.getElementById('emailError').innerHTML = '';
       this.setState({
         emailForgotPassword: tmp,
-        validEmail: true
+        validEmail: true,
       });
     } else {
-      document.getElementById("emailError").innerHTML =
+      document.getElementById('emailError').innerHTML =
         "<div class='alert alert-danger' role='alert'><strong>Email only contain alphabet character!</strong></div>";
       this.setState({
         emailForgotPassword: tmp,
-        validEmail: false
+        validEmail: false,
       });
     }
   }
@@ -71,17 +72,17 @@ class Login extends React.Component {
   handleUsernameForgotPassword(event) {
     const tmp = event.target.value.trim();
     if (!tmp.match(/^\w*$/)) {
-      document.getElementById("usernameError").innerHTML =
+      document.getElementById('usernameError').innerHTML =
         "<div class='alert alert-danger' role='alert'><strong>Username does not contain special character!</strong></div>";
       this.setState({
         usernameForgotPassword: tmp,
-        validUsername: false
+        validUsername: false,
       });
     } else {
-      document.getElementById("usernameError").innerHTML = "";
+      document.getElementById('usernameError').innerHTML = '';
       this.setState({
         usernameForgotPassword: tmp,
-        validUsername: true
+        validUsername: true,
       });
     }
   }
@@ -89,84 +90,97 @@ class Login extends React.Component {
   forgotPassword() {
     if (this.state.validEmail && this.state.validUsername) {
       var formData = new FormData();
-      formData.append("username", this.state.usernameForgotPassword);
-      formData.append("email", this.state.emailForgotPassword);
+      formData.append('username', this.state.usernameForgotPassword);
+      formData.append('email', this.state.emailForgotPassword);
 
-      fetch(apiLink + "/rest/user/forgotPassword", {
-        method: "POST",
+      fetch(apiLink + '/rest/user/forgotPassword', {
+        method: 'POST',
         headers: {
           // "Content-Type": "application/json",
           // Authorization: localStorage.getItem("token")
         },
-        body: formData
-      }).then(async result => {
-        if (result.status === 200) {
-          // this.changeIsChangePassword();
-          // alert("Forgot Password");
-          await this.setState({
-            isOpenError: true,
-            message: 'New Password send to your email.',
-          })
-        } else if (result.status === 401) {
-          localStorage.removeItem("isLoggedIn");
-          this.props.history.push("/login-page");
-        } else if (result.status === 400) {
-          // alert("email or username is not exist");
-          await this.setState({
-            isOpenError: true,
-            message: 'email or username is not exist',
-          })
-        }
-      }).catch(async data => {
-        //CANNOT ACCESS TO SERVER
-        await this.setState({
-          isOpenError: true,
-          message: "Cannot access to server"
+        body: formData,
+      })
+        .then(async result => {
+          if (result.status === 200) {
+            // this.changeIsChangePassword();
+            // alert("Forgot Password");
+            await this.setState({
+              isOpenError: true,
+              message: 'New Password send to your email.',
+            });
+          } else if (result.status === 401) {
+            localStorage.removeItem('isLoggedIn');
+            this.props.history.push('/login-page');
+          } else if (result.status === 400) {
+            // alert("email or username is not exist");
+            await this.setState({
+              isOpenError: true,
+              message: 'email or username is not exist',
+            });
+          }
         })
-      });
+        .catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.handleError(data);
+        });
     }
     // }
   }
-
+  async handleError(data) {
+    if (data.toString() === 'TypeError: Failed to fetch') {
+      await this.setState({
+        isOpenError: true,
+        message: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        message: data,
+      });
+    }
+  }
   changeIsForgotPassword() {
     this.setState({
-      isForgotPassword: !this.state.isForgotPassword
+      isForgotPassword: !this.state.isForgotPassword,
     });
   }
 
   getUsername() {
-    fetch(apiLink + "/rest/user/getUser", {
-      method: "GET",
+    fetch(apiLink + '/rest/user/getUser', {
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: localStorage.getItem("token")
+        'Content-Type': 'application/json',
+        Authorization: localStorage.getItem('token'),
         // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
-      }
-    }).then(result => {
-      if (result.status === 200) {
-        result.json().then(data => {
-          localStorage.setItem("profile", data.firstName + " " + data.lastName);
-        });
-      } else if (result.status === 401) {
-        localStorage.removeItem("isLoggedIn");
-        this.props.history.push("/login-page");
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
+      },
+    })
+      .then(result => {
+        if (result.status === 200) {
+          result.json().then(data => {
+            localStorage.setItem(
+              'profile',
+              data.firstName + ' ' + data.lastName
+            );
+          });
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        }
       })
-    });
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
+      });
   }
 
   handleNameChange(event) {
-    this.setState({ username: event.target.value });
+    this.setState({username: event.target.value});
   }
 
   handlePasswordChange(event) {
-    this.setState({ password: event.target.value });
+    this.setState({password: event.target.value});
   }
 
   // setToken(token) {
@@ -174,44 +188,43 @@ class Login extends React.Component {
   // }
 
   handleSubmit() {
-    fetch(apiLink + "/rest/login", {
-      method: "POST",
+    fetch(apiLink + '/rest/login', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json',
         // 'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
         username: this.state.username,
-        password: this.state.password
-      })
-    }).then(result => {
-      result.json().then(data => {
-        if (result.status === 200) {
-          if (data.role === "ROLE_USER") {
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("isLoggedIn", true);
-            localStorage.setItem("user", data.username);
-            this.getUsername();
-            this.props.history.push("/profile-page");
-          } else {
-            document.getElementById("loginError").innerHTML =
-              "<div class='alert alert-danger' role='alert'><strong>Your account is not user account</strong><br/> Please try again!</div>";
+        password: this.state.password,
+      }),
+    })
+      .then(result => {
+        result.json().then(data => {
+          if (result.status === 200) {
+            if (data.role === 'ROLE_USER') {
+              localStorage.setItem('token', data.token);
+              localStorage.setItem('isLoggedIn', true);
+              localStorage.setItem('user', data.username);
+              this.getUsername();
+              this.props.history.push('/profile-page');
+            } else {
+              document.getElementById('loginError').innerHTML =
+                "<div class='alert alert-danger' role='alert'><strong>Your account is not user account</strong><br/> Please try again!</div>";
+            }
           }
-        }
-        if (result.status === 400) {
-          // event.preventDefault();
-          if (data.message === "Wrong userId and password")
-            document.getElementById("loginError").innerHTML =
-              "<div class='alert alert-danger' role='alert'><strong>Username or password is incorrect!</strong><br/> Please try again!</div>";
-        }
-      });
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
+          if (result.status === 400) {
+            // event.preventDefault();
+            if (data.message === 'Wrong userId and password')
+              document.getElementById('loginError').innerHTML =
+                "<div class='alert alert-danger' role='alert'><strong>Username or password is incorrect!</strong><br/> Please try again!</div>";
+          }
+        });
       })
-    });
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
+      });
     // event.preventDefault();
     // this.props.history.push('/')
   }
@@ -219,13 +232,13 @@ class Login extends React.Component {
   componentWillMount() {
     //isLoggedIn = true go back to homepage (prevent go to login page when isLoggedIn = true)
     if (
-      localStorage.getItem("isLoggedIn") !== null &&
-      localStorage.getItem("token") !== null
+      localStorage.getItem('isLoggedIn') !== null &&
+      localStorage.getItem('token') !== null
     ) {
-      this.props.history.push("/");
+      this.props.history.push('/');
     } else {
       // localStorage.removeItem("token");
-      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem('isLoggedIn');
     }
   }
 
@@ -306,7 +319,7 @@ class Login extends React.Component {
                               </InputGroup>
                             </FormGroup>
                             <div>
-                              <p style={{ color: "red" }} id="loginError" />
+                              <p style={{color: 'red'}} id="loginError" />
                             </div>
                             <div className="text-center my-4">
                               {/* type="submit"  */}
@@ -362,7 +375,7 @@ class Login extends React.Component {
                       <Col xs="6">
                         <p
                           className="text-white"
-                          style={{ cursor: "pointer" }}
+                          style={{cursor: 'pointer'}}
                           // href="#pablo"
                           onClick={() => this.changeIsForgotPassword()}
                         >
@@ -376,7 +389,7 @@ class Login extends React.Component {
                       </Col>
                     </Row>
                   ) : (
-                    ""
+                    ''
                   )}
                 </Col>
               </Row>
@@ -387,18 +400,22 @@ class Login extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenError}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
-          <div className="modal-header">
-            Notify
-          </div>
+          <div className="modal-header">Notify</div>
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               {this.state.message}
             </h3>
           </div>
           <div className="modal-footer">
-            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+            <Button
+              onClick={() => {
+                this.setState({isOpenError: false});
+              }}
+            >
+              OK
+            </Button>
           </div>
         </Modal>
       </>

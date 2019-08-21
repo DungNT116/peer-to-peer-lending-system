@@ -60,6 +60,7 @@ class Register extends React.Component {
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handlePhoneChange = this.handlePhoneChange.bind(this);
     this.toggleCheckboxValue = this.toggleCheckboxValue.bind(this);
+    this.handleError = this.handleError.bind(this);
   }
 
   componentWillMount() {
@@ -269,13 +270,24 @@ class Register extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data)
     });
     
     event.preventDefault();
+  }
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
+      await this.setState({
+        isOpenError: true,
+        error: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        error: 'Something when wrong !',
+      });
+    }
   }
   async toggleCheckboxValue() {
     await this.setState(({checkBoxValue}) => ({

@@ -1,4 +1,44 @@
-INSERT INTO user (username, password, email, role, first_name, last_name, status) VALUES ('admin', 'admin', 'mail@admin.com', 'ROLE_ADMIN', 'minh', 'le', 'active');
+INSERT INTO user (username, password, email, role, first_name, last_name, status) VALUES ('admin', '$2a$10$shj62R5X7ItfVo2J/7zJw.Ym8q176VyjW5KO5tQG446spoPSYEVFS', 'mail@admin.com', 'ROLE_ADMIN', 'admin', 'admin', 'active');
+
+INSERT INTO document_type(name, amount_limit, acronym) VALUES ('Identity Card', 1000000, "ID");
+INSERT INTO document_type(name, amount_limit, acronym) VALUES ('Video', 1000000, "IV");
+INSERT INTO document_type(name, amount_limit, acronym) VALUES ('Passport', 3000000, "PP");
+INSERT INTO document_type(name, amount_limit, acronym) VALUES ('Driving Licence', 2000000, "DL");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 INSERT INTO user (username, password, email, role, first_name, last_name, status, phone_number, loan_limit) VALUES ('user1', 'pass1', 'mail1', 'ROLE_USER', 'loc', 'hv', 'active', '0908070605', 10000000);
 INSERT INTO user (username, password, email, role, first_name, last_name, status, phone_number, loan_limit) VALUES ('user2', 'pass2', 'mail2', 'ROLE_USER', 'dung', 'nt', 'active', '0405060704', 10000000);
 
@@ -37,8 +77,3 @@ INSERT INTO backup_milestone(previous_date, present_date, type, percent, backup_
 
 INSERT INTO transaction(amount, create_date, receiver, sender, status, milestone_id) VALUES (40, 345345345, 'user2', 'user1', 'lend', 1);
 INSERT INTO transaction(amount, create_date, receiver, sender, status, milestone_id) VALUES (40, 345345345, 'user1', 'user2', 'payback', 2);
-
-INSERT INTO document_type(name, amount_limit) VALUES ('Identity Card', 1000000);
-INSERT INTO document_type(name, amount_limit) VALUES ('Video', 1000000);
-INSERT INTO document_type(name, amount_limit) VALUES ('Passport', 3000000);
-INSERT INTO document_type(name, amount_limit) VALUES ('Driving Licence', 2000000);

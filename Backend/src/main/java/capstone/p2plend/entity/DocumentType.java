@@ -31,6 +31,9 @@ public class DocumentType {
 
 	@Column(nullable = false)
 	private Long amountLimit;
+	
+	@Column(nullable = false, unique = true)
+	private String acronym;
 
 	@JsonIgnoreProperties(value = { "documentType" })
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "documentType")
@@ -61,6 +64,14 @@ public class DocumentType {
 
 	public void setAmountLimit(Long amountLimit) {
 		this.amountLimit = amountLimit;
+	}
+
+	public String getAcronym() {
+		return acronym;
+	}
+
+	public void setAcronym(String acronym) {
+		this.acronym = acronym;
 	}
 
 	public List<Document> getDocument() {

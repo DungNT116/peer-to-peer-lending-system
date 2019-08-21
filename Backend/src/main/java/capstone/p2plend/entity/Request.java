@@ -33,9 +33,6 @@ public class Request {
 	private Long borrowDate;
 
 	@Column
-	private Integer duration;
-
-	@Column
 	private Float interestRate;
 
 	@Column
@@ -83,14 +80,6 @@ public class Request {
 
 	public void setBorrowDate(Long borrowDate) {
 		this.borrowDate = borrowDate;
-	}
-
-	public Integer getDuration() {
-		return duration;
-	}
-
-	public void setDuration(Integer duration) {
-		this.duration = duration;
 	}
 
 	public Float getInterestRate() {

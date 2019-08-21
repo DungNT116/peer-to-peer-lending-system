@@ -109,66 +109,6 @@ public class RequestService {
 		return pageDTO;
 	}
 
-	public PageDTO<Request> findAllOtherUserRequestSortByDateDesc(Integer page, Integer element, String token) {
-		String username = jwtService.getUsernameFromToken(token);
-		User account = accountRepo.findByUsername(username);
-		Pageable pageable = PageRequest.of(page - 1, element, Sort.by("create_date").descending());
-		Page<Request> listRq = requestRepo.findAllOtherUserRequest(pageable, account.getId());
-
-		for (Request r : listRq) {
-			if (r.getBorrower() != null) {
-				User borrower = new User();
-				borrower.setId(r.getBorrower().getId());
-				borrower.setUsername(r.getBorrower().getUsername());
-				borrower.setFirstName(r.getBorrower().getFirstName());
-				borrower.setLastName(r.getBorrower().getLastName());
-				r.setBorrower(borrower);
-			}
-			if (r.getLender() != null) {
-				User lender = new User();
-				lender.setId(r.getLender().getId());
-				lender.setUsername(r.getLender().getUsername());
-				lender.setFirstName(r.getLender().getFirstName());
-				lender.setLastName(r.getLender().getLastName());
-				r.setLender(lender);
-			}
-			if (r.getDeal() != null) {
-				Deal deal = new Deal();
-				deal.setId(r.getDeal().getId());
-				deal.setStatus(r.getDeal().getStatus());
-				if (r.getDeal().getMilestone() != null) {
-					List<Milestone> listMilestone = r.getDeal().getMilestone();
-					for (Milestone m : listMilestone) {
-						if (m.getTransaction() != null) {
-							Transaction transaction = new Transaction();
-							transaction.setStatus(m.getTransaction().getStatus());
-							m.setTransaction(transaction);
-						} else {
-							Transaction transaction = new Transaction();
-							m.setTransaction(transaction);
-						}
-					}
-					deal.setMilestone(listMilestone);
-				}
-
-				if (r.getDeal().getUser() != null) {
-					User user = r.getDeal().getUser();
-					User attachUser = new User();
-					attachUser.setUsername(user.getUsername());
-					attachUser.setFirstName(user.getFirstName());
-					attachUser.setLastName(user.getLastName());
-					deal.setUser(attachUser);
-				}
-
-				r.setDeal(deal);
-			}
-		}
-		PageDTO<Request> pageDTO = new PageDTO<>();
-		pageDTO.setMaxPage(listRq.getTotalPages());
-		pageDTO.setData(listRq.getContent());
-		return pageDTO;
-	}
-
 	public PageDTO<Request> findUserAllRequestByStatus(Integer page, Integer element, String token, String status) {
 		String username = jwtService.getUsernameFromToken(token);
 		User account = accountRepo.findByUsername(username);
@@ -410,6 +350,7 @@ public class RequestService {
 	}
 
 	public boolean createRequest(Request request, String token) {
+
 		Deal deal = new Deal();
 		if (request.getDeal() != null) {
 			deal = request.getDeal();
@@ -435,10 +376,10 @@ public class RequestService {
 			}
 		}
 
-		if (countPayback != deal.getPaybackTime()) {
+		if (countPayback != deal.getPaybackTimes()) {
 			return false;
 		}
-		if (countLend != deal.getBorrowTime()) {
+		if (countLend != deal.getBorrowTimes()) {
 			return false;
 		}
 
@@ -446,11 +387,26 @@ public class RequestService {
 		User account = accountRepo.findByUsername(username);
 
 		Long loanLimit = account.getLoanLimit();
-		List<Request> lstRequest = requestRepo.findListAllUserRequestByExceptStatus(account.getId(), "done");
+		List<Request> lstRequestTrading = requestRepo.findListAllUserRequestByStatus(account.getId(), "trading");
+		List<Request> lstRequestPending = requestRepo.findListAllUserRequestByStatus(account.getId(), "pending");
+		List<Request> lstRequestDealing = requestRepo.findListAllUserRequestByStatus(account.getId(), "dealing");
+
+		List<Request> lstRequest = new ArrayList<>();
+		if (lstRequestTrading != null) {
+			lstRequest.addAll(lstRequestTrading);
+		}
+		if (lstRequestPending != null) {
+			lstRequest.addAll(lstRequestPending);
+		}
+		if (lstRequestDealing != null) {
+			lstRequest.addAll(lstRequestDealing);
+		}
+
 		Long currentLoanAmount = 0L;
 		for (Request r : lstRequest) {
 			currentLoanAmount += r.getAmount();
 		}
+
 		currentLoanAmount += request.getAmount();
 		if (currentLoanAmount > loanLimit) {
 			return false;
@@ -466,8 +422,8 @@ public class RequestService {
 		Deal dealObj = dealRepo.saveAndFlush(deal);
 
 		BackupDeal backupDealObj = new BackupDeal();
-		backupDealObj.setBorrowTime(dealObj.getBorrowTime());
-		backupDealObj.setPaybackTime(dealObj.getPaybackTime());
+		backupDealObj.setBorrowTimes(dealObj.getBorrowTimes());
+		backupDealObj.setPaybackTimes(dealObj.getPaybackTimes());
 		backupDealObj.setStatus(dealObj.getStatus());
 		backupDealObj.setDeal(dealObj);
 		backupDealObj = backupDealRepo.saveAndFlush(backupDealObj);
@@ -501,10 +457,10 @@ public class RequestService {
 	}
 
 	public boolean remove(Request requestGet, String token) {
-		if(requestGet.getId() == null) {
+		if (requestGet.getId() == null) {
 			return false;
 		}
-		
+
 		Request request = requestRepo.findById(requestGet.getId()).get();
 		if (request == null) {
 			return false;
@@ -519,8 +475,15 @@ public class RequestService {
 			return false;
 		}
 
-		requestRepo.deleteById(requestGet.getId());
-		return true;
+		Request existedRequest = requestRepo.findById(requestGet.getId()).get();
+		existedRequest.setStatus("deleted");
+		Request savedRq = requestRepo.saveAndFlush(existedRequest);
+
+		if (savedRq != null) {
+			return true;
+		}
+
+		return false;
 	}
 
 }

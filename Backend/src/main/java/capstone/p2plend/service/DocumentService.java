@@ -56,7 +56,7 @@ public class DocumentService {
 		checkExistDocument = docRepo.findUserDocumentWithStatus(docTypeId, user.getId(), "invalid");
 		if (checkExistDocument != null) {
 			iDoc = checkExistDocument;
-			docFileRepo.deleteByDocId(checkExistDocument.getId());
+			docFileRepo.deleteAllByDocId(checkExistDocument.getId());
 		}
 
 		DocumentType docType = docTypeRepo.findById(docTypeId).get();
@@ -111,7 +111,7 @@ public class DocumentService {
 		checkExistDocument = docRepo.findUserDocumentWithStatus(docTypeId, user.getId(), "invalid");
 		if (checkExistDocument != null) {
 			iDoc = checkExistDocument;
-			docFileRepo.deleteByDocId(checkExistDocument.getId());
+			docFileRepo.deleteAllByDocId(checkExistDocument.getId());
 		}
 
 		DocumentType docType = docTypeRepo.findById(docTypeId).get();

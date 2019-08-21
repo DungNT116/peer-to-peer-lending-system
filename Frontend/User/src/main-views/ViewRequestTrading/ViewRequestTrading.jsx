@@ -56,6 +56,7 @@ class ViewRequestTrading extends React.Component {
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.changeLendPage = this.changeLendPage.bind(this);
     this.changeBorrowPage = this.changeBorrowPage.bind(this);
+    this.handleError = this.handleError.bind(this);
   }
 
   toggleNavs = (e, state, index) => {
@@ -111,10 +112,7 @@ class ViewRequestTrading extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data)
     });
 
     fetch(
@@ -147,13 +145,23 @@ class ViewRequestTrading extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data)
     });
   }
-
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
+      await this.setState({
+        isOpenError: true,
+        error: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        error: 'Something when wrong !',
+      });
+    }
+  }
   setDataToDetailPage(id) {
     this.props.setRequest(id);
     this.props.setIsHistory(false);

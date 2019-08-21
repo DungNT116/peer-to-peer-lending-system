@@ -810,6 +810,7 @@ class ViewDetailRequest extends React.Component {
                                       23000
                                   )}
                                   onSuccess={(details, data) => {
+                                    this.toggleModal();
                                     this.setState({
                                       data_tx: {
                                         txId: details.id,
@@ -823,7 +824,6 @@ class ViewDetailRequest extends React.Component {
                                       },
                                     });
                                     this.send_tx();
-                                    this.toggleModal();
                                   }}
                                   style={{
                                     layout: 'horizontal',
