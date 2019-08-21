@@ -105,6 +105,7 @@ public class TransactionService {
 				|| transaction.getStatus() == null || transaction.getAmountValid() == null) {
 			return "Required field are missing";
 		}
+
 		int idMilestone = transaction.getMilestone().getId();
 		Milestone existMilestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
 		if (existMilestone.getTransaction() != null) {
