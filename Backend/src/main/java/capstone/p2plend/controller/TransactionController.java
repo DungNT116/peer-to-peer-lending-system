@@ -74,13 +74,13 @@ public class TransactionController {
 	@CrossOrigin
 	@Secured({ "ROLE_USER" })
 	@PostMapping(value = "/rest/transaction/newTransaction")
-	public ResponseEntity<Integer> newTransaction(@RequestBody Transaction transaction) {
+	public ResponseEntity<String> newTransaction(@RequestBody Transaction transaction) {
 		LOGGER.info("CALL method POST /rest/transaction/newTransaction");
 		HttpStatus status = null;
-		boolean valid = false;
+		String result = null;
 		try {
-			valid = transactionService.newTransaction(transaction);
-			if (valid == true) {
+			result = transactionService.newTransaction(transaction);
+			if (result.equalsIgnoreCase("success")) {
 				status = HttpStatus.OK;
 			} else {
 				status = HttpStatus.BAD_REQUEST;
@@ -89,7 +89,7 @@ public class TransactionController {
 			LOGGER.error("Server Error", e);
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<Integer>(status.value(), status);
+		return new ResponseEntity<String>(result, status);
 	}
 
 	@CrossOrigin

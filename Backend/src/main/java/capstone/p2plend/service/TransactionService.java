@@ -96,23 +96,23 @@ public class TransactionService {
 		return pageDTO;
 	}
 
-	public boolean newTransaction(Transaction transaction) {
+	public String newTransaction(Transaction transaction) {
 		if (transaction.getMilestone().getId() == null) {
-			return false;
+			return "Milestone ID cannot be null";
 		}
 		if (transaction.getAmount() == null || transaction.getCreateDate() == null || transaction.getIdTrx() == null
 				|| transaction.getReceiver() == null || transaction.getSender() == null
 				|| transaction.getStatus() == null || transaction.getAmountValid() == null) {
-			return false;
+			return "Required field are missing";
 		}
 		int idMilestone = transaction.getMilestone().getId();
 		Milestone existMilestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
 		if (existMilestone.getTransaction() != null) {
-			return false;
+			return "Milestone already have a transaction";
 		}
 		Milestone milestone = milestoneRepo.findById(idMilestone).get();
 		if (milestone == null) {
-			return false;
+			return "No milestone found with that ID";
 		}
 
 		Transaction trx = new Transaction();
@@ -127,7 +127,7 @@ public class TransactionService {
 		trx.setMilestone(milestone);
 		Transaction savedTrx = transactionRepo.saveAndFlush(trx);
 		if (savedTrx == null) {
-			return false;
+			return "Error when save transaction to database";
 		}
 
 		Milestone getMilestone = milestoneRepo.findById(idMilestone).get();
@@ -155,9 +155,13 @@ public class TransactionService {
 		if (countComplete == lstMilestone.size()) {
 			Request request = savedTrx.getMilestone().getDeal().getRequest();
 			request.setStatus("done");
-			requestRepo.save(request);
+			Request savedRq = requestRepo.save(request);
+			if (savedRq == null) {
+				return "Error while ajust request status";
+			}
 		}
-		return true;
+
+		return "success";
 	}
 
 	public boolean updateTransaction(Transaction transaction) {
