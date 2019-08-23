@@ -1172,7 +1172,7 @@ class ApplyTimeline extends React.Component {
                         </div>
 
                         <div className="text-center">
-                          {'Amount Percent to lend in milstone ' +
+                          {'Amount Percent to lend in milestone ' +
                             curLendingId +
                             ' is' +
                             curLendingStatus * 100 +
