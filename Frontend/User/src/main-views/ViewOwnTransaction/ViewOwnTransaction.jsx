@@ -2,7 +2,7 @@ import React from 'react';
 
 // nodejs library that concatenates classes
 // import classnames from "classnames";
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
 // reactstrap components
 import {
@@ -28,10 +28,10 @@ import classnames from 'classnames';
 // core components
 import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 
-import { BeatLoader } from 'react-spinners';
+import {BeatLoader} from 'react-spinners';
 import Pagination from '../../views/IndexSections/Pagination.jsx';
 //api link
-import { apiLink, bigchainAPI } from '../../api.jsx';
+import {apiLink, bigchainAPI} from '../../api.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter';
 
 // index page sections
@@ -81,10 +81,10 @@ class ViewOwnTransaction extends React.Component {
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
     fetch(
       apiLink +
-      '/rest/transaction/getAllUserTransaction?page=' +
-      pageParam +
-      '&element=' +
-      pageSizeParam,
+        '/rest/transaction/getAllUserTransaction?page=' +
+        pageParam +
+        '&element=' +
+        pageSizeParam,
       {
         method: 'GET',
         headers: {
@@ -92,21 +92,22 @@ class ViewOwnTransaction extends React.Component {
           Authorization: localStorage.getItem('token'),
         },
       }
-    ).then(result => {
-      result.json().then(data => {
-        this.setState({
-          transactions: data.data,
-          maxPage: data.maxPage
+    )
+      .then(result => {
+        result.json().then(data => {
+          this.setState({
+            transactions: data.data,
+            maxPage: data.maxPage,
+          });
         });
+        if (result.status === 200) {
+          // alert("create success");
+        }
+      })
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
       });
-      if (result.status === 200) {
-        // alert("create success");
-      }
-
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.handleError(data);
-    });
   }
 
   componentDidMount() {
@@ -119,17 +120,17 @@ class ViewOwnTransaction extends React.Component {
   }
 
   toggleModalValid() {
-    this.setState({ modalValid: !this.state.modalValid });
+    this.setState({modalValid: !this.state.modalValid});
   }
   validateTransaction(transactionInput) {
     this.setState({
       validTx: {
         idTrx: '',
         status: '',
-        sender: false,
-        receiver: false,
-        amount: false,
-        createDate: false,
+        sender: null,
+        receiver: null,
+        amount: null,
+        createDate: null,
       },
     });
     fetch(bigchainAPI + '/search_transaction_by_id', {
@@ -140,97 +141,128 @@ class ViewOwnTransaction extends React.Component {
       body: JSON.stringify({
         id: transactionInput.idTrx,
       }),
-    }).then(result => {
-      result.json().then(data => {
-        setTimeout(
-          function () {
-            if (data.asset.data.tx_data.sender === transactionInput.sender) {
-              this.setState({
-                validTx: {
-                  ...this.state.validTx,
-                  sender: true,
-                },
-              });
-            }
-          }.bind(this),
-          1000
-        );
-        setTimeout(
-          function () {
-            if (
-              data.asset.data.tx_data.receiver === transactionInput.receiver
-            ) {
-              this.setState({
-                validTx: {
-                  ...this.state.validTx,
-                  receiver: true,
-                },
-              });
-            }
-          }.bind(this),
-          2000
-        );
-        setTimeout(
-          function () {
-            if (
-              Number(data.asset.data.tx_data.amountTx) ===
-              transactionInput.amountValid
-            ) {
-              this.setState({
-                validTx: {
-                  ...this.state.validTx,
-                  amount: true,
-                },
-              });
-            }
-          }.bind(this),
-          3000
-        );
-        setTimeout(
-          function () {
-            if (
-              data.asset.data.tx_data.createDate === transactionInput.createDate
-            ) {
-              this.setState({
-                validTx: {
-                  ...this.state.validTx,
-                  createDate: true,
-                },
-              });
-            }
-          }.bind(this),
-          4000
-        );
-        setTimeout(
-          function () {
-            if (
-              this.state.validTx.sender === true &&
-              this.state.validTx.receiver === true &&
-              this.state.validTx.amount === true &&
-              this.state.validTx.createDate === true
-            ) {
-              this.setState({
-                validTx: {
-                  idTrx: data.asset.data.tx_data.txId,
-                  status: 'VALID TRANSACTION',
-                },
-              });
-            } else {
-              this.setState({
-                validTx: {
-                  idTrx: data.asset.data.tx_data.txId,
-                  status: 'INVALID TRANSACTION',
-                },
-              });
-            }
-          }.bind(this),
-          4500
-        );
+    })
+      .then(result => {
+        result.json().then(data => {
+          setTimeout(
+            function() {
+              if (data.asset.data.tx_data.sender === transactionInput.sender) {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    sender: true,
+                  },
+                });
+              } else {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    sender: false,
+                  },
+                });
+              }
+            }.bind(this),
+            1000
+          );
+          setTimeout(
+            function() {
+              if (
+                data.asset.data.tx_data.receiver === transactionInput.receiver
+              ) {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    receiver: true,
+                  },
+                });
+              } else {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    receiver: false,
+                  },
+                });
+              }
+            }.bind(this),
+            2000
+          );
+          setTimeout(
+            function() {
+              if (
+                Number(data.asset.data.tx_data.amountTx) ===
+                transactionInput.amountValid
+              ) {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    amount: true,
+                  },
+                });
+              } else {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    amount: false,
+                  },
+                });
+              }
+            }.bind(this),
+            3000
+          );
+          setTimeout(
+            function() {
+              if (
+                data.asset.data.tx_data.createDate ===
+                transactionInput.createDate
+              ) {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    createDate: true,
+                  },
+                });
+              } else {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    createDate: false,
+                  },
+                });
+              }
+            }.bind(this),
+            4000
+          );
+          setTimeout(
+            function() {
+              if (
+                this.state.validTx.sender === true &&
+                this.state.validTx.receiver === true &&
+                this.state.validTx.amount === true &&
+                this.state.validTx.createDate === true
+              ) {
+                this.setState({
+                  validTx: {
+                    idTrx: data.asset.data.tx_data.txId,
+                    status: 'VALID TRANSACTION',
+                  },
+                });
+              } else {
+                this.setState({
+                  validTx: {
+                    idTrx: data.asset.data.tx_data.txId,
+                    status: 'INVALID TRANSACTION',
+                  },
+                });
+              }
+            }.bind(this),
+            4500
+          );
+        });
+      })
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
       });
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.handleError(data)
-    });
   }
   async handleError(data) {
     var error = data.toString();
@@ -298,16 +330,21 @@ class ViewOwnTransaction extends React.Component {
                       {this.state.validTx.sender ? (
                         <i
                           className="ni ni-check-bold"
-                          style={{ color: 'green' }}
+                          style={{color: 'green'}}
+                        />
+                      ) : this.state.validTx.sender === false ? (
+                        <i
+                          className="ni ni-fat-remove"
+                          style={{color: 'red', fontSize: '20px'}}
                         />
                       ) : (
-                          <BeatLoader
-                            sizeUnit={'px'}
-                            size={10}
-                            color={'#123abc'}
-                            loading={this.state['loading-sender']}
-                          />
-                        )}
+                        <BeatLoader
+                          sizeUnit={'px'}
+                          size={10}
+                          color={'#123abc'}
+                          loading={this.state['loading-sender']}
+                        />
+                      )}
                     </Col>
                   </FormGroup>
                   <FormGroup row className="py-2">
@@ -316,16 +353,21 @@ class ViewOwnTransaction extends React.Component {
                       {this.state.validTx.receiver ? (
                         <i
                           className="ni ni-check-bold"
-                          style={{ color: 'green' }}
+                          style={{color: 'green'}}
+                        />
+                      ) : this.state.validTx.receiver === false ? (
+                        <i
+                          className="ni ni-fat-remove"
+                          style={{color: 'red', fontSize: '20px'}}
                         />
                       ) : (
-                          <BeatLoader
-                            sizeUnit={'px'}
-                            size={10}
-                            color={'#123abc'}
-                            loading={this.state['loading-receiver']}
-                          />
-                        )}
+                        <BeatLoader
+                          sizeUnit={'px'}
+                          size={10}
+                          color={'#123abc'}
+                          loading={this.state['loading-receiver']}
+                        />
+                      )}
                     </Col>
                   </FormGroup>
                   <FormGroup row className="py-2">
@@ -334,16 +376,21 @@ class ViewOwnTransaction extends React.Component {
                       {this.state.validTx.amount ? (
                         <i
                           className="ni ni-check-bold"
-                          style={{ color: 'green' }}
+                          style={{color: 'green'}}
+                        />
+                      ) : this.state.validTx.amount === false ? (
+                        <i
+                          className="ni ni-fat-remove"
+                          style={{color: 'red', fontSize: '20px'}}
                         />
                       ) : (
-                          <BeatLoader
-                            sizeUnit={'px'}
-                            size={10}
-                            color={'#123abc'}
-                            loading={this.state['loading-amount']}
-                          />
-                        )}
+                        <BeatLoader
+                          sizeUnit={'px'}
+                          size={10}
+                          color={'#123abc'}
+                          loading={this.state['loading-amount']}
+                        />
+                      )}
                     </Col>
                   </FormGroup>
                   <FormGroup row className="py-2">
@@ -352,16 +399,21 @@ class ViewOwnTransaction extends React.Component {
                       {this.state.validTx.createDate ? (
                         <i
                           className="ni ni-check-bold"
-                          style={{ color: 'green' }}
+                          style={{color: 'green'}}
+                        />
+                      ) : this.state.validTx.createDate === false ? (
+                        <i
+                          className="ni ni-fat-remove"
+                          style={{color: 'red', fontSize: '20px'}}
                         />
                       ) : (
-                          <BeatLoader
-                            sizeUnit={'px'}
-                            size={10}
-                            color={'#123abc'}
-                            loading={this.state['loading-createDate']}
-                          />
-                        )}
+                        <BeatLoader
+                          sizeUnit={'px'}
+                          size={10}
+                          color={'#123abc'}
+                          loading={this.state['loading-createDate']}
+                        />
+                      )}
                     </Col>
                   </FormGroup>
                 </div>
@@ -465,38 +517,37 @@ class ViewOwnTransaction extends React.Component {
               <Card className="shadow">
                 <CardBody>
                   <TabContent activeTab={'plainTabs' + this.state.plainTabs}>
-                    {this.state.transactions.length === 0 ?
-                      (
-                        <p className="h3" style={{ textAlign: 'center' }}>No data</p>
-                      )
-                      :
-                      (
-                        <TabPane tabId="plainTabs1">
-                          <Row className="justify-content-center text-center">
-                            <Table>
-                              <thead>
-                                <tr>
-                                  <th>Id Tx Blockchain</th>
-                                  <th>Sender</th>
-                                  <th>Receiver</th>
-                                  <th>Amount</th>
-                                  <th>Create Date</th>
-                                  <th>Status</th>
-                                </tr>
-                              </thead>
-                              <tbody>{listItems}</tbody>
-                            </Table>
-                          </Row>
-                          <Row className="align-items-center justify-content-center text-center">
-                            <Pagination
-                              maxPage={this.state.maxPage}
-                              currentPage={this.state.page}
-                              onChange={this.getTransaction}
-                              changePage={this.changePage}
-                            />
-                          </Row>
-                        </TabPane>
-                      )}
+                    {this.state.transactions.length === 0 ? (
+                      <p className="h3" style={{textAlign: 'center'}}>
+                        No data
+                      </p>
+                    ) : (
+                      <TabPane tabId="plainTabs1">
+                        <Row className="justify-content-center text-center">
+                          <Table>
+                            <thead>
+                              <tr>
+                                <th>Id Tx Blockchain</th>
+                                <th>Sender</th>
+                                <th>Receiver</th>
+                                <th>Amount</th>
+                                <th>Create Date</th>
+                                <th>Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>{listItems}</tbody>
+                          </Table>
+                        </Row>
+                        <Row className="align-items-center justify-content-center text-center">
+                          <Pagination
+                            maxPage={this.state.maxPage}
+                            currentPage={this.state.page}
+                            onChange={this.getTransaction}
+                            changePage={this.changePage}
+                          />
+                        </Row>
+                      </TabPane>
+                    )}
                   </TabContent>
                 </CardBody>
               </Card>
@@ -507,18 +558,22 @@ class ViewOwnTransaction extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenError}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
-          <div className="modal-header">
-            Error
-          </div>
+          <div className="modal-header">Error</div>
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               {this.state.message}
             </h3>
           </div>
           <div className="modal-footer">
-            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+            <Button
+              onClick={() => {
+                this.setState({isOpenError: false});
+              }}
+            >
+              OK
+            </Button>
           </div>
         </Modal>
       </>
