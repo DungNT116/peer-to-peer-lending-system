@@ -49,10 +49,29 @@ public class RequestService {
 	@Autowired
 	JwtService jwtService;
 
-	public PageDTO<Request> findAllOtherUserRequest(Integer page, Integer element, String token) {
+	public PageDTO<Request> findAllOtherUserRequest(Integer page, Integer element, String token, String sortBy,
+			String sortType) {
 		String username = jwtService.getUsernameFromToken(token);
 		User account = accountRepo.findByUsername(username);
 		Pageable pageable = PageRequest.of(page - 1, element, Sort.by("create_date").descending());
+		
+		if (sortBy.equalsIgnoreCase("createDate")) {
+			if(sortType.equalsIgnoreCase("desc")) {
+				pageable = PageRequest.of(page - 1, element, Sort.by("create_date").descending());
+			}
+			if(sortType.equalsIgnoreCase("asc")) {
+				pageable = PageRequest.of(page - 1, element, Sort.by("create_date").ascending());
+			}
+		}
+		if (sortBy.equalsIgnoreCase("amount")) {
+			if(sortType.equalsIgnoreCase("desc")) {
+				pageable = PageRequest.of(page - 1, element, Sort.by("amount").descending());
+			}
+			if(sortType.equalsIgnoreCase("asc")) {
+				pageable = PageRequest.of(page - 1, element, Sort.by("amount").ascending());
+			}
+		}
+
 		Page<Request> listRq = requestRepo.findAllOtherUserRequest(pageable, account.getId());
 
 		for (Request r : listRq) {

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class RequestController {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestController.class);
 
 	@Autowired
@@ -66,7 +66,73 @@ public class RequestController {
 		HttpStatus status = null;
 		PageDTO<Request> result = null;
 		try {
-			result = requestService.findAllOtherUserRequest(page, element, token);
+			result = requestService.findAllOtherUserRequest(page, element, token, "createDate", "desc");
+			if (result != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<PageDTO<Request>>(result, status);
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/request/user/allRequestSortByDateAsc")
+	public ResponseEntity<PageDTO<Request>> allRequestSortByDateAsc(@RequestParam Integer page,
+			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/request/user/allRequestSortByDateAsc");
+		HttpStatus status = null;
+		PageDTO<Request> result = null;
+		try {
+			result = requestService.findAllOtherUserRequest(page, element, token, "createDate", "asc");
+			if (result != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<PageDTO<Request>>(result, status);
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/request/user/allRequestSortByAmountDesc")
+	public ResponseEntity<PageDTO<Request>> allRequestSortByAmountDesc(@RequestParam Integer page,
+			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/request/user/allRequestSortByAmountDesc");
+		HttpStatus status = null;
+		PageDTO<Request> result = null;
+		try {
+			result = requestService.findAllOtherUserRequest(page, element, token, "amount", "desc");
+			if (result != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<PageDTO<Request>>(result, status);
+	}
+
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@GetMapping(value = "/rest/request/user/allRequestSortByAmountAsc")
+	public ResponseEntity<PageDTO<Request>> allRequestSortByAmountAsc(@RequestParam Integer page,
+			@RequestParam Integer element, @RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/request/user/allRequestSortByAmountAsc");
+		HttpStatus status = null;
+		PageDTO<Request> result = null;
+		try {
+			result = requestService.findAllOtherUserRequest(page, element, token, "amount", "asc");
 			if (result != null) {
 				status = HttpStatus.OK;
 			} else {
@@ -88,7 +154,7 @@ public class RequestController {
 		HttpStatus status = null;
 		PageDTO<Request> result = null;
 		try {
-			result = requestService.findUserAllRequestByStatus(page, element, token, "done");
+			result = requestService.findAllRequestByStatusWithLenderOrBorrower(page, element, token, "done");
 			if (result != null) {
 				status = HttpStatus.OK;
 			} else {
