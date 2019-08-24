@@ -54,6 +54,7 @@ class ViewDetailRequest extends React.Component {
       isOpenSuccess: false,
       isOpenError: false,
       message: '',
+      currencyUSDVND : null
     };
     this.toggleErrorModal = this.toggleErrorModal.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
@@ -466,6 +467,21 @@ class ViewDetailRequest extends React.Component {
     if (this.props.viewDetail.isHistoryDetail === false) {
       document.getElementById('saveDealButton').style.display = 'none';
     }
+    fetch('http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1', {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .then(async data => {
+        this.setState({
+          currencyUSDVND: data.quotes.USDVND,
+        });
+      }).catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          message: "Cannot access to server"
+        })
+      });
   }
 
   convertTimeStampToDate(date) {
@@ -807,7 +823,7 @@ class ViewDetailRequest extends React.Component {
                                     (this.props.request.data.amount *
                                       this.props.request.data.deal.milestone[1]
                                         .percent) /
-                                      23000
+                                        this.state.currencyUSDVND
                                   )}
                                   onSuccess={(details, data) => {
                                     this.toggleModal();
