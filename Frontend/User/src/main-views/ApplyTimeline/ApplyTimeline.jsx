@@ -75,6 +75,21 @@ class ApplyTimeline extends React.Component {
     // document.documentElement.scrollTop = 0;
     // document.scrollingElement.scrollTop = 0;
     // this.refs.main.scrollTop = 0;
+    fetch('http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1', {
+      method: 'GET',
+    })
+      .then(response => response.json())
+      .then(async data => {
+        this.setState({
+          currencyUSDVND: data.quotes.USDVND,
+        });
+      }).catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          message: "Cannot access to server"
+        })
+      });
   }
   constructor(props) {
     super(props);
@@ -147,6 +162,7 @@ class ApplyTimeline extends React.Component {
       backup_timeline_payback: [],
       penalty: 0,
       durationLate: 0,
+      currencyUSDVND : null
     };
     //Lending
     this.changeTimeLineLending = this.changeTimeLineLending.bind(this);
@@ -1263,7 +1279,7 @@ class ApplyTimeline extends React.Component {
                                         amount={this.roundUp(
                                           (this.state.amountProps *
                                             this.state.curDateLending.percent) /
-                                            23000
+                                            this.state.currencyUSDVND
                                         )}
                                         onSuccess={(details, data) => {
                                           this.toggleModalCheckTimelineLending();
@@ -1687,7 +1703,7 @@ class ApplyTimeline extends React.Component {
                                           this.state.curDatePayback.percent +
                                           this.state.penalty *
                                             this.props.request.data.amount) /
-                                          23000
+                                          this.state.currencyUSDVND
                                       )}
                                       onSuccess={(details, data) => {
                                         this.toggleModalCheckTimelinePayback();
