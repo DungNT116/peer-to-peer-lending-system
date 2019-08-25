@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 // reactstrap components
 import {
@@ -10,17 +10,17 @@ import {
   ModalHeader,
   ModalBody,
   FormGroup,
-  Col
-} from "reactstrap";
+  Col,
+} from 'reactstrap';
 
 // core components
-import MainNavbar from "../main-views/MainNavbar/MainNavbar.jsx";
+import MainNavbar from '../main-views/MainNavbar/MainNavbar.jsx';
 
 // index page sections
-import Hero from "./IndexSections/Hero.jsx";
-import SimpleFooter from "components/Footers/SimpleFooter";
-import { apiLink, bigchainAPI } from "api";
-import { BeatLoader } from "react-spinners";
+import Hero from './IndexSections/Hero.jsx';
+import SimpleFooter from 'components/Footers/SimpleFooter';
+import {apiLink, bigchainAPI} from 'api';
+import {BeatLoader} from 'react-spinners';
 
 class Index extends React.Component {
   constructor(props) {
@@ -30,7 +30,7 @@ class Index extends React.Component {
       modalValid: false,
       position: 0,
       validTx: {},
-      loading: true
+      loading: true,
     };
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
@@ -47,29 +47,31 @@ class Index extends React.Component {
   }
 
   getTransaction() {
-    fetch(apiLink + "/rest/transaction/getTop20Transaction", {
-      method: "GET",
+    fetch(apiLink + '/rest/transaction/getTop20Transaction', {
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json',
         // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
-      }
-    }).then(result => {
-      result.json().then(data => {
-        this.setState({
-          transactions: data
+      },
+    })
+      .then(result => {
+        result.json().then(data => {
+          this.setState({
+            transactions: data,
+          });
+          localStorage.setItem('token', '');
+          localStorage.setItem('profile', '');
+          localStorage.setItem('user', '');
         });
-        localStorage.setItem("token", "");
-        localStorage.setItem("profile", "");
-        localStorage.setItem("user", "");
+        if (result.status === 200) {
+          // alert("create success");
+        }
+      })
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
       });
-      if (result.status === 200) {
-        // alert("create success");
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.handleError(data)
-    });
   }
   async handleError(data) {
     var error = data.toString();
@@ -93,126 +95,159 @@ class Index extends React.Component {
     //get transaction
     this.getTransaction();
   }
-  
+
   roundUp(num) {
     let precision = Math.pow(10, 2);
     return Math.ceil(num * precision) / precision;
   }
   toggleModalValid() {
-    this.setState({ modalValid: !this.state.modalValid });
+    this.setState({modalValid: !this.state.modalValid});
   }
 
   validateTransaction(transactionInput) {
-    
     this.setState({
       validTx: {
-        idTrx: "",
-        status: "",
-        sender: false,
-        receiver: false,
-        amount: false,
-        createDate: false
-      }
+        idTrx: '',
+        status: '',
+        sender: null,
+        receiver: null,
+        amount: null,
+        createDate: null,
+      },
     });
-    fetch(bigchainAPI + "/search_transaction_by_id", {
-      method: "POST",
+    fetch(bigchainAPI + '/search_transaction_by_id', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        id: transactionInput.idTrx
+        id: transactionInput.idTrx,
+      }),
+    })
+      .then(result => {
+        result.json().then(data => {
+          setTimeout(
+            function() {
+              if (data.asset.data.tx_data.sender === transactionInput.sender) {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    sender: true,
+                  },
+                });
+              }else{
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    sender: false,
+                  },
+                });
+              }
+            }.bind(this),
+            1000
+          );
+          setTimeout(
+            function() {
+              if (
+                data.asset.data.tx_data.receiver === transactionInput.receiver
+              ) {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    receiver: true,
+                  },
+                });
+              }else{
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    receiver: false,
+                  },
+                });
+              }
+            }.bind(this),
+            2000
+          );
+          setTimeout(
+            function() {
+              if (
+                Number(data.asset.data.tx_data.amountTx) ===
+                transactionInput.amountValid
+              ) {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    amount: true,
+                  },
+                });
+              }else{
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    amount: false,
+                  },
+                });
+              }
+            }.bind(this),
+            3000
+          );
+          setTimeout(
+            function() {
+              if (
+                data.asset.data.tx_data.createDate ===
+                transactionInput.createDate
+              ) {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    createDate: true,
+                  },
+                });
+              } else {
+                this.setState({
+                  validTx: {
+                    ...this.state.validTx,
+                    createDate: false,
+                  },
+                });
+              }
+            }.bind(this),
+            4000
+          );
+          setTimeout(
+            function() {
+              if (
+                this.state.validTx.sender === true &&
+                this.state.validTx.receiver === true &&
+                this.state.validTx.amount === true &&
+                this.state.validTx.createDate === true
+              ) {
+                this.setState({
+                  validTx: {
+                    idTrx: data.asset.data.tx_data.txId,
+                    status: 'VALID TRANSACTION',
+                  },
+                });
+              } else {
+                this.setState({
+                  validTx: {
+                    idTrx: data.asset.data.tx_data.txId,
+                    status: 'INVALID TRANSACTION',
+                  },
+                });
+              }
+            }.bind(this),
+            4500
+          );
+        });
       })
-    }).then(result => {
-      result.json().then(data => {
-        setTimeout( 
-          function() {
-            if (data.asset.data.tx_data.sender === transactionInput.sender) {
-              this.setState({
-                validTx: {
-                  ...this.state.validTx,
-                  sender: true
-                }
-              });
-            }
-          }.bind(this),
-          1000
-        );
-        setTimeout(
-          function() {
-            if (data.asset.data.tx_data.receiver === transactionInput.receiver) {
-              this.setState({
-                validTx: {
-                  ...this.state.validTx,
-                  receiver: true
-                }
-              });
-            }
-          }.bind(this),
-          2000
-        );
-        setTimeout(
-          function () {
-            if (
-              Number(data.asset.data.tx_data.amountTx) === transactionInput.amountValid
-            ) {
-              this.setState({
-                validTx: {
-                  ...this.state.validTx,
-                  amount: true
-                }
-              });
-            }
-          }.bind(this),
-          3000
-        );
-        setTimeout(
-          function () {
-            if (
-              data.asset.data.tx_data.createDate === transactionInput.createDate
-            ) {
-              this.setState({
-                validTx: {
-                  ...this.state.validTx,
-                  createDate: true 
-                }
-              });
-            }
-          }.bind(this),
-          4000
-        );
-        setTimeout(
-          function () {
-            if (
-              this.state.validTx.sender === true &&
-              this.state.validTx.receiver === true &&
-              this.state.validTx.amount === true &&
-              this.state.validTx.createDate === true
-            ) {
-              this.setState({
-                validTx: {
-                  idTrx: data.asset.data.tx_data.txId,
-                  status: "VALID TRANSACTION"
-                }
-              });
-            } else {
-              this.setState({
-                validTx: {
-                  idTrx: data.asset.data.tx_data.txId,
-                  status: "INVALID TRANSACTION"
-                }
-              });
-            }
-          }.bind(this),
-          4500
-        );
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
       });
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.handleError(data)
-    });
   }
   numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   render() {
     const listItems = this.state.transactions.map((transaction, index) => (
@@ -220,9 +255,9 @@ class Index extends React.Component {
         <td
           style={{
             width: 200,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "inline-block"
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: 'inline-block',
           }}
         >
           {transaction.idTrx}
@@ -254,24 +289,29 @@ class Index extends React.Component {
               Valid transaction
             </ModalHeader>
             <ModalBody>
-              {this.state.validTx.idTrx === "" ? (
+              {this.state.validTx.idTrx === '' ? (
                 <div>
                   <FormGroup row className="py-2">
                     <Col md="6">Check Sender</Col>
                     <Col md="6">
                       {this.state.validTx.sender ? (
                         <i
-                          class="ni ni-check-bold"
-                          style={{ color: "green" }}
+                          className="ni ni-check-bold"
+                          style={{color: 'green'}}
+                        />
+                      ) : this.state.validTx.sender === false ? (
+                        <i
+                          className="ni ni-fat-remove"
+                          style={{color: 'red', fontSize: '20px'}}
                         />
                       ) : (
-                          <BeatLoader
-                            sizeUnit={"px"}
-                            size={10}
-                            color={"#123abc"}
-                            loading={this.state["loading-sender"]}
-                          />
-                        )}
+                        <BeatLoader
+                          sizeUnit={'px'}
+                          size={10}
+                          color={'#123abc'}
+                          loading={this.state['loading-sender']}
+                        />
+                      )}
                     </Col>
                   </FormGroup>
                   <FormGroup row className="py-2">
@@ -279,17 +319,22 @@ class Index extends React.Component {
                     <Col md="6">
                       {this.state.validTx.receiver ? (
                         <i
-                          class="ni ni-check-bold"
-                          style={{ color: "green" }}
+                          className="ni ni-check-bold"
+                          style={{color: 'green'}}
+                        />
+                      ) : this.state.validTx.receiver === false ? (
+                        <i
+                          className="ni ni-fat-remove"
+                          style={{color: 'red', fontSize: '20px'}}
                         />
                       ) : (
-                          <BeatLoader
-                            sizeUnit={"px"}
-                            size={10}
-                            color={"#123abc"}
-                            loading={this.state["loading-receiver"]}
-                          />
-                        )}
+                        <BeatLoader
+                          sizeUnit={'px'}
+                          size={10}
+                          color={'#123abc'}
+                          loading={this.state['loading-receiver']}
+                        />
+                      )}
                     </Col>
                   </FormGroup>
                   <FormGroup row className="py-2">
@@ -297,17 +342,22 @@ class Index extends React.Component {
                     <Col md="6">
                       {this.state.validTx.amount ? (
                         <i
-                          class="ni ni-check-bold"
-                          style={{ color: "green" }}
+                          className="ni ni-check-bold"
+                          style={{color: 'green'}}
+                        />
+                      ) : this.state.validTx.amount === false ? (
+                        <i
+                          className="ni ni-fat-remove"
+                          style={{color: 'red', fontSize: '20px'}}
                         />
                       ) : (
-                          <BeatLoader
-                            sizeUnit={"px"}
-                            size={10}
-                            color={"#123abc"}
-                            loading={this.state["loading-amount"]}
-                          />
-                        )}
+                        <BeatLoader
+                          sizeUnit={'px'}
+                          size={10}
+                          color={'#123abc'}
+                          loading={this.state['loading-amount']}
+                        />
+                      )}
                     </Col>
                   </FormGroup>
                   <FormGroup row className="py-2">
@@ -315,51 +365,56 @@ class Index extends React.Component {
                     <Col md="6">
                       {this.state.validTx.createDate ? (
                         <i
-                          class="ni ni-check-bold"
-                          style={{ color: "green" }}
+                          className="ni ni-check-bold"
+                          style={{color: 'green'}}
+                        />
+                      ) : this.state.validTx.createDate === false ? (
+                        <i
+                          className="ni ni-fat-remove"
+                          style={{color: 'red', fontSize: '20px'}}
                         />
                       ) : (
-                          <BeatLoader
-                            sizeUnit={"px"}
-                            size={10}
-                            color={"#123abc"}
-                            loading={this.state["loading-createDate"]}
-                          />
-                        )}
+                        <BeatLoader
+                          sizeUnit={'px'}
+                          size={10}
+                          color={'#123abc'}
+                          loading={this.state['loading-createDate']}
+                        />
+                      )}
                     </Col>
                   </FormGroup>
                 </div>
               ) : (
-                  <div>
-                    <FormGroup row className="py-2">
-                      <Col md="6">ID Transaction</Col>
-                      <Col md="6">Status</Col>
-                    </FormGroup>
-                    <FormGroup row className="py-2">
-                      <Col md="6">{this.state.validTx.idTrx}</Col>
-                      <Col md="6">
-                        {this.state.validTx.status == "VALID TRANSACTION" ? (
-                          <span>
-                            {this.state.validTx.status}
-                            <i
-                              class="ni ni-check-bold"
-                              style={{ color: "green", fontSize: "20px" }}
-                            />
-                          </span>
-                        ) : (
-                            <span>
-                              {this.state.validTx.status}
+                <div>
+                  <FormGroup row className="py-2">
+                    <Col md="6">ID Transaction</Col>
+                    <Col md="6">Status</Col>
+                  </FormGroup>
+                  <FormGroup row className="py-2">
+                    <Col md="6">{this.state.validTx.idTrx}</Col>
+                    <Col md="6">
+                      {this.state.validTx.status == 'VALID TRANSACTION' ? (
+                        <span>
+                          {this.state.validTx.status}
+                          <i
+                            class="ni ni-check-bold"
+                            style={{color: 'green', fontSize: '20px'}}
+                          />
+                        </span>
+                      ) : (
+                        <span>
+                          {this.state.validTx.status}
 
-                              <i
-                                className="ni ni-fat-remove"
-                                style={{ color: "red", fontSize: "20px" }}
-                              />
-                            </span>
-                          )}
-                      </Col>
-                    </FormGroup>
-                  </div>
-                )}
+                          <i
+                            className="ni ni-fat-remove"
+                            style={{color: 'red', fontSize: '20px'}}
+                          />
+                        </span>
+                      )}
+                    </Col>
+                  </FormGroup>
+                </div>
+              )}
             </ModalBody>
           </Modal>
         </td>
@@ -407,18 +462,22 @@ class Index extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenError}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
-          <div className="modal-header">
-            Error
-          </div>
+          <div className="modal-header">Error</div>
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               {this.state.message}
             </h3>
           </div>
           <div className="modal-footer">
-            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+            <Button
+              onClick={() => {
+                this.setState({isOpenError: false});
+              }}
+            >
+              OK
+            </Button>
           </div>
         </Modal>
       </>

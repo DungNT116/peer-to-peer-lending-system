@@ -19,7 +19,8 @@ import {
   TabPane,
   Nav,
   NavItem,
-  Modal
+  Modal,
+  Input,
 } from "reactstrap";
 
 import classnames from "classnames";
@@ -45,12 +46,21 @@ class ViewRequestList extends React.Component {
       plainTabs: 1,
       isOpenError: false,
       message: '',
+      selectedFilter: "0",
     };
     this.getRequest = this.getRequest.bind(this);
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.changePage = this.changePage.bind(this);
     this.handleError = this.handleError.bind(this);
+    this.onSelectFilterChange = this.onSelectFilterChange.bind(this);
+  }
+
+  async onSelectFilterChange(e) {
+    await this.setState({
+      selectedFilter: e.target.value
+    })
+    await this.getRequest();
   }
 
   toggleNavs = (e, state, index) => {
@@ -68,11 +78,27 @@ class ViewRequestList extends React.Component {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
   getRequest() {
+    let controllerLink = "/rest/request/user/";
+    console.log(this.state.selectedFilter)
+    switch (this.state.selectedFilter) {
+      case "0":
+        controllerLink += "allRequest?page=";
+        break;
+      case "1":
+        controllerLink += "allRequestSortByDateAsc?page=";
+        break;
+      case "2":
+        controllerLink += "allRequestSortByAmountDesc?page=";
+        break;
+      case "3":
+        controllerLink += "allRequestSortByAmountAsc?page=";
+        break;
+    }
+    console.log("aaaaaaaaaaaaaaaaaaa", controllerLink)
     let pageParam = encodeURIComponent(this.state.page);
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
     fetch(
-      apiLink +
-      "/rest/request/user/allRequest?page=" +
+      apiLink + controllerLink +
       pageParam +
       "&element=" +
       pageSizeParam,
@@ -170,6 +196,7 @@ class ViewRequestList extends React.Component {
     ));
     return (
       <>
+
         <MainNavbar />
         <main ref="main">
           <div className="position-relative">
@@ -234,11 +261,20 @@ class ViewRequestList extends React.Component {
                   <TabContent activeTab={"plainTabs" + this.state.plainTabs}>
                     {this.state.requests.length === 0 ?
                       (
-                        <p className="h3"style={{textAlign: 'center'}}>No data</p>
+                        <p className="h3" style={{ textAlign: 'center' }}>No data</p>
                       )
                       :
                       (
                         <TabPane tabId="plainTabs1">
+                          <Row className="justify-content-center text-center">
+                            <Input type="select" className="col-md-3 offset-md-9" onChange={this.onSelectFilterChange}>
+                              <option value="0" selected>Day descending</option>
+                              <option value="1">Day ascending</option>
+                              <option value="2">Amount descending</option>
+                              <option value="3">Amount ascending</option>
+                            </Input>
+                          </Row>
+                          <p></p>
                           <Row className="justify-content-center text-center">
                             <Table>
                               <thead>
