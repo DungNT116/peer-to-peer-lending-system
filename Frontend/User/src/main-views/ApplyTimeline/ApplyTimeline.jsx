@@ -290,19 +290,24 @@ class ApplyTimeline extends React.Component {
     for (let i = 0; i < timelineCopy.length; i++) {
       const element = timelineCopy[i];
       if (
-        this.convertDateToTimestamp(currentDay) > this.convertDateToTimestamp(new Date(element.data))
+        this.convertDateToTimestamp(currentDay) >
+        this.convertDateToTimestamp(new Date(element.data))
       ) {
         isLendingPrevious = true;
       }
     }
     if (!isDuplicate && !isLendingPrevious) {
       // change percent before save
-      for (let i = 1; i < timelineCopy.length; i++) {
+      for (let i = 0; i < timelineCopy.length; i++) {
         const element = timelineCopy[i];
+        if (i === 0) {
+          element.percent = null;
+        } else {
         element.percent =
           Math.round(
             (1 / (this.state.backup_timeline_lending.length - 1)) * 100
           ) / 100;
+        }
       }
 
       // save data after changing
@@ -691,7 +696,8 @@ class ApplyTimeline extends React.Component {
     for (let i = 0; i < timelinePaybackCopy.length; i++) {
       const element = timelinePaybackCopy[i];
       if (
-        this.convertDateToTimestamp(currentDay) > this.convertDateToTimestamp(new Date(element.data))
+        this.convertDateToTimestamp(currentDay) >
+        this.convertDateToTimestamp(new Date(element.data))
       ) {
         isPaybackPrevious = true;
       }
@@ -724,12 +730,16 @@ class ApplyTimeline extends React.Component {
         }
       }
       // change percent before save
-      for (let i = 1; i < timelinePaybackCopy.length; i++) {
+      for (let i = 0; i < timelinePaybackCopy.length; i++) {
         const element = timelinePaybackCopy[i];
-        element.percent =
-          Math.round(
-            (1 / (this.state.backup_timeline_payback.length - 1)) * 100
-          ) / 100;
+        if (i === 0) {
+          element.percent = null;
+        } else {
+          element.percent =
+            Math.round(
+              (1 / (this.state.backup_timeline_payback.length - 1)) * 100
+            ) / 100;
+        }
       }
       await this.setState({
         timeline_payback: timelinePaybackCopy,
@@ -756,18 +766,17 @@ class ApplyTimeline extends React.Component {
       document.getElementById('dropdownChoosePayback').style.display = '';
     } else {
       // window.alert('Duplicate date in milestone'); // popup show Error
-      if(isDuplicate) {
+      if (isDuplicate) {
         await this.setState({
           isOpenError: true,
           error: 'Duplicate date in milestone',
         });
-      } else if(isPaybackPrevious) {
+      } else if (isPaybackPrevious) {
         await this.setState({
           isOpenError: true,
-          error: 'Day cannot be set in the past'
-        })
+          error: 'Day cannot be set in the past',
+        });
       }
-      
     }
   }
   cancelPaybackTimeLine() {
@@ -1647,29 +1656,31 @@ class ApplyTimeline extends React.Component {
                                 </Col>
                                 <Col md="6">
                                   <Label className="h6">
-                                    {this.numberWithCommas(
-                                      (this.props.request.data.amount +
-                                        Math.round(
-                                          ((((this.props.request.data.amount *
-                                            (this.props.request.data.deal
-                                              .milestone[
-                                              this.props.request.data.deal
-                                                .milestone.length - 1
-                                            ].presentDate -
-                                              this.props.request.data.deal
-                                                .milestone[0].presentDate)) /
-                                            86400 /
-                                            30) *
-                                            (this.props.request.data
-                                              .interestRate /
-                                              12)) /
-                                            100) *
-                                            1000
-                                        ) /
-                                          1000) *
-                                        this.state.curDatePayback.percent +
-                                        this.state.penalty *
-                                          this.props.request.data.amount
+                                    {Math.round(
+                                      this.numberWithCommas(
+                                        (this.props.request.data.amount +
+                                          Math.round(
+                                            ((((this.props.request.data.amount *
+                                              (this.props.request.data.deal
+                                                .milestone[
+                                                this.props.request.data.deal
+                                                  .milestone.length - 1
+                                              ].presentDate -
+                                                this.props.request.data.deal
+                                                  .milestone[0].presentDate)) /
+                                              86400 /
+                                              30) *
+                                              (this.props.request.data
+                                                .interestRate /
+                                                12)) /
+                                              100) *
+                                              1000
+                                          ) /
+                                            1000) *
+                                          this.state.curDatePayback.percent +
+                                          this.state.penalty *
+                                            this.props.request.data.amount
+                                      )
                                     )}{' '}
                                     VNĐ
                                   </Label>
