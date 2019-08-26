@@ -491,17 +491,17 @@ class Profile extends React.Component {
                   //special with Video type
                   if (element.documentType.name === 'Video') {
                     if (element.status === 'invalid') {
-                      this.setState({
+                      await this.setState({
                         isVideoSaved: false,
                         isUploadedVideo: false,
                       });
                     } else {
-                      this.setState({
+                      await this.setState({
                         isUploadedVideo: true,
                         isVideoSaved: true,
                       });
                     }
-                    this.setState({
+                    await this.setState({
                       loadingVideo: false,
                     });
                   } else {
@@ -530,6 +530,9 @@ class Profile extends React.Component {
               isOpen: false,
             });
           });
+          console.log("aaaaaaaaaaaaaaaaaaaaaaaaaa")
+          console.log(this.state.isVideoSaved)
+          console.log(this.state.isUploadedVideo)
           // this.props.history.push("/view-request-trading");
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
@@ -542,7 +545,7 @@ class Profile extends React.Component {
       });
   }
 
-  uploadVideo() {
+  async uploadVideo() {
     const superBuffer = new Blob(window.recordedBlobs, {type: 'video/webm'});
     var base64data = '';
     var reader = new FileReader();
@@ -567,40 +570,38 @@ class Profile extends React.Component {
         //   documentType: this.state.documentID.documentType,
         //   file: this.state.documentID.listImage
         // })
-      })
-        .then(async result => {
-          if (result.status === 200) {
-            await this.setState({
-              isOpenUpload: true,
-            });
-            await setTimeout(
-              function() {
-                this.setState({
-                  isOpenUpload: false,
-                });
-              }.bind(this),
-              2000
-            );
-          } else if (result.status === 401) {
-            localStorage.removeItem('isLoggedIn');
-            this.props.history.push('/login-page');
-          } else if (result.status === 400) {
-            alert('error');
-          } else {
-            alert('error not found');
-          }
-        })
-        .catch(async data => {
-          //CANNOT ACCESS TO SERVER
-          await this.handleError(data)
-        });
+      }).then(async result => {
+        if (result.status === 200) {
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        } else if (result.status === 400) {
+          alert('error');
+        } else {
+          alert('error not found');
+        }
+      });
     };
-    this.setState({
+    await this.setState({
       isOpen: true,
       loading: true,
       isVideoSaved: true,
     });
+    await this.setState({
+      isOpenUpload: true,
+    });
+    await setTimeout(
+      function() {
+        this.setState({
+          isOpenUpload: false,
+        });
+      }.bind(this),
+      2000
+    );
     this.getDocument();
+    await this.setState({
+      isUploadedVideo: true,
+    });
   }
 
   async saveDocument(idDoc, type) {
@@ -833,19 +834,18 @@ class Profile extends React.Component {
         // "Authorization": this.props.tokenReducer.token
         // 'Access-Control-Allow-Origin': '*'
       },
-    })
-      .then(result => {
-        if (result.status === 401) {
-          localStorage.removeItem('isLoggedIn');
-          this.props.history.push('/login-page');
-        } else if (result.status === 200) {
-          result.json().then(async data => {
-            await this.setState({
-              documentTypes: data,
-            });
+    }).then(result => {
+      if (result.status === 401) {
+        localStorage.removeItem('isLoggedIn');
+        this.props.history.push('/login-page');
+      } else if (result.status === 200) {
+        result.json().then(async data => {
+          await this.setState({
+            documentTypes: data,
           });
-        }
-      })
+        });
+      }
+    });
   }
   getIdOfDocument(name) {
     const arrName = name.split(' ');

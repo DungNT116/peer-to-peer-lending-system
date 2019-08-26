@@ -1623,7 +1623,7 @@ class ApplyTimeline extends React.Component {
                                 </Col>
                                 <Col md="6">
                                   <Label className="h6">
-                                    {this.numberWithCommas(
+                                    {this.numberWithCommas(Math.round(
                                       (this.props.request.data.amount +
                                         Math.round(
                                           ((((this.props.request.data.amount *
@@ -1645,7 +1645,7 @@ class ApplyTimeline extends React.Component {
                                           1000) *
                                         this.state.curDatePayback.percent +
                                         this.state.penalty *
-                                          this.props.request.data.amount
+                                          this.props.request.data.amount)
                                     )}{' '}
                                     VNĐ
                                   </Label>
