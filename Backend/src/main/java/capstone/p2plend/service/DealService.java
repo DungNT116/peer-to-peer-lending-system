@@ -159,20 +159,37 @@ public class DealService {
 		requestRepo.save(request);
 
 		Long oldBorrowDate = null;
+		Integer pos = null;
 		List<Milestone> lstMilestone = dealExist.getMilestone();
+
 		for (Milestone m : lstMilestone) {
 			if (m.getPercent() == null && m.getType().equalsIgnoreCase("lend")) {
-				oldBorrowDate = m.getPresentDate();
+				pos = m.getId();
 				m.setPreviousDate(borrowDate);
 				m.setPresentDate(borrowDate);
 			}
 		}
 		for (Milestone m : lstMilestone) {
-			if (m.getPreviousDate() == oldBorrowDate && m.getType().equalsIgnoreCase("lend")) {
+			if (pos + 1 == m.getId() && m.getType().equalsIgnoreCase("lend")) {
 				m.setPreviousDate(borrowDate);
 			}
 		}
 		milestoneRepo.saveAll(lstMilestone);
+		
+		
+//		for (Milestone m : lstMilestone) {
+//			if (m.getPercent() == null && m.getType().equalsIgnoreCase("lend")) {
+//				oldBorrowDate = m.getPresentDate();
+//				m.setPreviousDate(borrowDate);
+//				m.setPresentDate(borrowDate);
+//			}
+//		}
+//		for (Milestone m : lstMilestone) {
+//			if (m.getPreviousDate() == oldBorrowDate && m.getType().equalsIgnoreCase("lend")) {
+//				m.setPreviousDate(borrowDate);
+//			}
+//		}
+//		milestoneRepo.saveAll(lstMilestone);
 
 		return true;
 	}
