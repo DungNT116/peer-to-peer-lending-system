@@ -334,7 +334,7 @@ class CreateRequestPage extends React.Component {
                 <Modal
                   className="modal-dialog-centered"
                   isOpen={this.state.isOpen}
-                  toggle={() => this.toggleModal('defaultModal')}
+                  // toggle={() => this.toggleModal('defaultModal')}
                   style={style.sameSizeWithParent}
                 >
                   <div className="modal-body">
