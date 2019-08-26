@@ -74,6 +74,13 @@ public class DealService {
 			return false;
 		}
 
+		Request rq = existDeal.getRequest();
+		if (rq.getLender() != null) {
+			if (rq.getBorrower().getId() != user.getId() && rq.getLender().getId() != user.getId()) {
+				return false;
+			}
+		}
+
 		existDeal.setStatus("dealing");
 		existDeal.setBorrowTimes(deal.getBorrowTimes());
 		existDeal.setPaybackTimes(deal.getPaybackTimes());
@@ -107,8 +114,9 @@ public class DealService {
 	}
 
 	public boolean acceptDeal(Deal deal, String token) {
-		if(deal.getId() == null) return false;
-		
+		if (deal.getId() == null)
+			return false;
+
 		String username = jwtService.getUsernameFromToken(token);
 		if (username == null) {
 			return false;
@@ -118,34 +126,62 @@ public class DealService {
 			return false;
 		}
 
+		if (deal.getRequest().getBorrowDate() == null) {
+			return false;
+		}
+		Long borrowDate = deal.getRequest().getBorrowDate();
+
 		Deal dealExist = dealRepo.findById(deal.getId()).get();
 		if (dealExist == null) {
 			return false;
 		}
-
-		dealExist.setStatus("accepted");
-		dealRepo.save(dealExist);
 
 		Request request = dealExist.getRequest();
 		if (request == null) {
 			return false;
 		}
 
+		if (request.getLender() != null) {
+			if (request.getBorrower().getId() != user.getId() && request.getLender().getId() != user.getId()) {
+				return false;
+			}
+		}
+
+		dealExist.setStatus("accepted");
+		dealRepo.save(dealExist);
+
+		// Change request status
 		request.setStatus("trading");
-		request.setBorrowDate(deal.getRequest().getBorrowDate());
+		request.setBorrowDate(borrowDate);
 		if (request.getLender() == null) {
 			request.setLender(user);
 		}
 		requestRepo.save(request);
 
+		Long oldBorrowDate = null;
+		List<Milestone> lstMilestone = dealExist.getMilestone();
+		for (Milestone m : lstMilestone) {
+			if (m.getPercent() == null && m.getType().equalsIgnoreCase("lend")) {
+				oldBorrowDate = m.getPresentDate();
+				m.setPreviousDate(borrowDate);
+				m.setPresentDate(borrowDate);
+			}
+		}
+		for (Milestone m : lstMilestone) {
+			if (m.getPreviousDate() == oldBorrowDate && m.getType().equalsIgnoreCase("lend")) {
+				m.setPreviousDate(borrowDate);
+			}
+		}
+		milestoneRepo.saveAll(lstMilestone);
+
 		return true;
 	}
 
 	public boolean cancelDeal(Deal dealGet, String token) {
-		if(dealGet.getId() == null) {
+		if (dealGet.getId() == null) {
 			return false;
 		}
-		
+
 		Deal deal = dealRepo.findById(dealGet.getId()).get();
 		if (deal == null) {
 			return false;
