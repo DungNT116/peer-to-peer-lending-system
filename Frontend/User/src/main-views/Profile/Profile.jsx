@@ -592,7 +592,7 @@ class Profile extends React.Component {
         })
         .catch(async data => {
           //CANNOT ACCESS TO SERVER
-          await this.handleError(data);
+          await this.handleError(data)
         });
     };
     this.setState({
@@ -846,10 +846,6 @@ class Profile extends React.Component {
           });
         }
       })
-      .catch(async data => {
-        //CANNOT ACCESS TO SERVER
-        await this.handleError(data);
-      });
   }
   getIdOfDocument(name) {
     const arrName = name.split(' ');
