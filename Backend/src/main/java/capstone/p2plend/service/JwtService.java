@@ -19,7 +19,7 @@ public class JwtService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(JwtService.class);
 	public static final String USERNAME = "username";
 	public static final String SECRET_KEY = "11111111111111111111111111111111";
-	public static final int EXPIRE_TIME = 1800000;
+	public static final int EXPIRE_TIME = 3600000;
 
 	public String generateTokenLogin(String username) {
 		String token = null;
