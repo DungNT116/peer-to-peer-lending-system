@@ -1,8 +1,13 @@
 package capstone.p2plend;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import capstone.p2plend.util.Keccak256Hashing;
 
 @SpringBootApplication
 @EnableScheduling
@@ -12,6 +17,9 @@ public class P2pLendApplication {
 
 //	@Autowired
 //	private PasswordEncoder passwordEncoder;
+	
+//	@Autowired
+//	private Keccak256Hashing hs;
 
 	public static void main(String[] args) {
 		SpringApplication.run(P2pLendApplication.class, args);
@@ -20,7 +28,12 @@ public class P2pLendApplication {
 //	@Bean
 //	public CommandLineRunner demo() {
 //		return (args) -> {
-//			LOGGER.info("CALL method POST");
+//			String a = "a";
+//			System.out.println(hs.hashWithBouncyCastle(a));
+//			System.out.println(hs.hashWithJavaMessageDigest(a));
+//			String b = "b";
+//			System.out.println(hs.hashWithBouncyCastle(b));
+//			System.out.println(hs.hashWithJavaMessageDigest(b));
 //		};
 //	}
 }
