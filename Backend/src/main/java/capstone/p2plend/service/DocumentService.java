@@ -1,6 +1,10 @@
 package capstone.p2plend.service;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -21,9 +25,13 @@ import capstone.p2plend.repo.DocumentFileRepository;
 import capstone.p2plend.repo.DocumentRepository;
 import capstone.p2plend.repo.DocumentTypeRepository;
 import capstone.p2plend.repo.UserRepository;
+import capstone.p2plend.util.Keccak256Hashing;
 
 @Service
 public class DocumentService {
+	
+	@Autowired
+	Keccak256Hashing kh;
 
 	@Autowired
 	DocumentRepository docRepo;
@@ -201,8 +209,6 @@ public class DocumentService {
 			}
 		}
 
-		
-		
 		if (count == 1) {
 			for (int i = 0; i < lstUserDocument.size(); i++) {
 				Document d = lstUserDocument.get(i);
@@ -275,5 +281,23 @@ public class DocumentService {
 		docRepo.saveAndFlush(existDoc);
 
 		return true;
+	}
+
+	public File getHashFile(String token) throws IOException {
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
+		List<Document> lstDocument = user.getDocument();
+		lstDocument.toString();
+
+		File file = new File("write.txt");
+		Writer writer = new BufferedWriter(new FileWriter(file));
+		String contents = kh.hashWithBouncyCastle(lstDocument.toString());
+		
+		
+		
+		writer.write(contents);
+		writer.close();
+		
+		return file;
 	}
 }

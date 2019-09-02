@@ -1,5 +1,6 @@
 package capstone.p2plend.controller;
 
+import java.io.File;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -29,6 +30,27 @@ public class DocumentController {
 	@Autowired
 	DocumentService docService;
 
+	@CrossOrigin
+	@Secured({ "ROLE_USER" })
+	@GetMapping("/rest/document/uploadFile")
+	public ResponseEntity<File> uploadFile(@RequestHeader("Authorization") String token) {
+		LOGGER.info("CALL method GET /rest/document/download/hashFile");
+		HttpStatus status = null;
+		File result = null;
+		try {
+			result = docService.getHashFile(token);
+			if (result != null) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<File>(result, status);
+	}
+	
 	@CrossOrigin
 	@Secured({ "ROLE_USER" })
 	@PostMapping("/rest/document/uploadFile")
