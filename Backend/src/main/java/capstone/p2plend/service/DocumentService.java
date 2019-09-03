@@ -326,7 +326,6 @@ public class DocumentService {
 				document.setDocumentFile(lstDocFile);
 				lstDocument.add(document);
 			}
-			System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lstDocument));
 			String contents = kh.hashWithBouncyCastle(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lstDocument));
 			writer.write(contents);
 			writer.close();
