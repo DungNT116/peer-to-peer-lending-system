@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import capstone.p2plend.dto.PageDTO;
 import capstone.p2plend.entity.Document;
 import capstone.p2plend.entity.DocumentFile;
@@ -283,7 +285,7 @@ public class DocumentService {
 
 		return true;
 	}
-
+	private ObjectMapper mapper = new ObjectMapper();
 	public File getHashFile(String token) throws IOException {
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
@@ -324,8 +326,8 @@ public class DocumentService {
 				document.setDocumentFile(lstDocFile);
 				lstDocument.add(document);
 			}
-			System.out.println(lstDocument.toString());
-			String contents = kh.hashWithBouncyCastle(lstDocument.toString());
+			System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lstDocument));
+			String contents = kh.hashWithBouncyCastle(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lstDocument));
 			writer.write(contents);
 			writer.close();
 			return file;
