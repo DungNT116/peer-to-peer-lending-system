@@ -36,6 +36,7 @@ public class DocumentController {
 	DocumentService docService;
 
 	@CrossOrigin
+	@Secured({ "ROLE_USER" })
 	@GetMapping("/rest/document/download/hashFile")
 	public ResponseEntity<Resource> getHash(@RequestHeader("Authorization") String token) {
 		LOGGER.info("CALL method GET /rest/document/download/hashFile");
