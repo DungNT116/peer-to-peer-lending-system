@@ -61,7 +61,7 @@ public class DocumentController {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
 		return ResponseEntity.ok().headers(header).contentLength(result.length())
-				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+				.contentType(MediaType.parseMediaType("text/plain")).body(resource);
 	}
 
 	@CrossOrigin
