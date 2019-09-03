@@ -5,7 +5,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.event.DocumentListener;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +32,7 @@ import capstone.p2plend.util.Keccak256Hashing;
 
 @Service
 public class DocumentService {
-	
+
 	@Autowired
 	Keccak256Hashing kh;
 
@@ -287,28 +290,40 @@ public class DocumentService {
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
 		List<Document> lstDocument = user.getDocument();
-		lstDocument.toString();
+		int count = 0;
+		List<Document> lstHashDocument = new ArrayList<Document>();
+		for (Document d : lstDocument) {
+			if (d.getDocumentType().getId() == 1 && d.getStatus().equalsIgnoreCase("valid")) {
+				lstHashDocument.add(d);
+				count = 1;
+			}
+		}
+		for (Document d : lstDocument) {
+			if (d.getDocumentType().getId() == 2 && d.getStatus().equalsIgnoreCase("valid")) {
+				lstHashDocument.add(d);
+				count = 2;
+			}
+		}
+		if (count == 2) {
+			File file = new File("write.txt");
+			Writer writer = new BufferedWriter(new FileWriter(file));
 
-		File file = new File("write.txt");
-		Writer writer = new BufferedWriter(new FileWriter(file));
-		String contents = kh.hashWithBouncyCastle(lstDocument.toString());
-		
-		
-		
-		writer.write(contents);
-		writer.close();
-		
-		return file;
-	}
-	
-	public File getHashFileTest() throws IOException {
-		File file = new File("write.txt");
-		Writer writer = new BufferedWriter(new FileWriter(file));
-		String contents = kh.hashWithBouncyCastle("This is the hash sample");
-		
-		writer.write(contents);
-		writer.close();
-		
-		return file;
+			lstDocument = new ArrayList<Document>();
+			for (Document d : lstHashDocument) {
+				Document document = new Document();
+				document.setId(d.getId());
+				document.setDocumentId(d.getDocumentId());
+				document.setStatus(d.getStatus());
+				System.out.println(d.getDocumentFile().toString());
+				document.setDocumentFile(d.getDocumentFile());
+				lstDocument.add(document);
+			}
+			System.out.println(lstDocument.toString());
+			String contents = kh.hashWithBouncyCastle(lstDocument.toString());
+			writer.write(contents);
+			writer.close();
+			return file;
+		}
+		return null;
 	}
 }

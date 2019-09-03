@@ -36,22 +36,21 @@ public class DocumentController {
 	DocumentService docService;
 
 	@CrossOrigin
-	@GetMapping("/document/download/hashFile")
-	public ResponseEntity<Resource> getHash() {
+	@GetMapping("/rest/document/download/hashFile")
+	public ResponseEntity<Resource> getHash(@RequestHeader("Authorization") String token) {
 		LOGGER.info("CALL method GET /rest/document/download/hashFile");
 		HttpStatus status = null;
 		File result = null;
 		InputStreamResource resource = null;
 		HttpHeaders header = new HttpHeaders();
 		try {
-			result = docService.getHashFileTest();
-			resource = new InputStreamResource(new FileInputStream(result));
-			
-	        header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=1.txt");
-	        header.add("Cache-Control", "no-cache, no-store, must-revalidate");
-	        header.add("Pragma", "no-cache");
-	        header.add("Expires", "0");
+			result = docService.getHashFile(token);
 			if (result != null) {
+				resource = new InputStreamResource(new FileInputStream(result));
+				header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pplsUserHashFile.txt");
+				header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+				header.add("Pragma", "no-cache");
+				header.add("Expires", "0");
 				status = HttpStatus.OK;
 			} else {
 				status = HttpStatus.BAD_REQUEST;
@@ -60,10 +59,8 @@ public class DocumentController {
 			LOGGER.error("Server Error", e);
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return ResponseEntity.ok().headers(header)
-				.contentLength(result.length())
-	            .contentType(MediaType.parseMediaType("application/octet-stream"))
-	            .body(resource);
+		return ResponseEntity.ok().headers(header).contentLength(result.length())
+				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 	}
 
 	@CrossOrigin
