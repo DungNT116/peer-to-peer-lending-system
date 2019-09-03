@@ -326,4 +326,13 @@ public class DocumentService {
 		}
 		return null;
 	}
+	
+	public File getHashFileTest() throws IOException {
+		File file = new File("write.txt");
+		Writer writer = new BufferedWriter(new FileWriter(file));
+		String contents = kh.hashWithBouncyCastle("Test hash file");
+		writer.write(contents);
+		writer.close();
+		return file;
+	}
 }
