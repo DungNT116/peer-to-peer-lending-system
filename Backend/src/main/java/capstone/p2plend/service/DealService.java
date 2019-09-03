@@ -158,7 +158,6 @@ public class DealService {
 		}
 		requestRepo.save(request);
 
-		Long oldBorrowDate = null;
 		Integer pos = null;
 		List<Milestone> lstMilestone = dealExist.getMilestone();
 

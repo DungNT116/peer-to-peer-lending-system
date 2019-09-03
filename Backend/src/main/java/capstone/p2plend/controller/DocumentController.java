@@ -1,14 +1,12 @@
 package capstone.p2plend.controller;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,50 +34,23 @@ public class DocumentController {
 	DocumentService docService;
 
 	@CrossOrigin
-	@GetMapping("/document/download/hashFileTest")
-	public ResponseEntity<Resource> getHashTest() {
-		LOGGER.info("CALL method GET /document/download/hashFileTest");
-		HttpStatus status = null;
-		File result = null;
-		InputStreamResource resource = null;
-		HttpHeaders header = new HttpHeaders();
-		try {
-			result = docService.getHashFileTest();
-			if (result != null) {
-				resource = new InputStreamResource(new FileInputStream(result));
-				header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pplsUserHashFile.txt");
-				header.add("Cache-Control", "no-cache, no-store, must-revalidate");
-				header.add("Pragma", "no-cache");
-				header.add("Expires", "0");
-				status = HttpStatus.OK;
-			} else {
-				status = HttpStatus.BAD_REQUEST;
-			}
-		} catch (Exception e) {
-			LOGGER.error("Server Error", e);
-			status = HttpStatus.INTERNAL_SERVER_ERROR;
-		}
-		return ResponseEntity.ok().headers(header).contentLength(result.length())
-				.contentType(MediaType.parseMediaType("text/plain")).body(resource);
-	}
-	
-	@CrossOrigin
 	@Secured({ "ROLE_USER" })
 	@GetMapping("/rest/document/download/hashFile")
-	public ResponseEntity<Resource> getHash(@RequestHeader("Authorization") String token) {
+	public ResponseEntity<byte[]> getHash(@RequestHeader("Authorization") String token) {
 		LOGGER.info("CALL method GET /rest/document/download/hashFile");
 		HttpStatus status = null;
 		File result = null;
-		InputStreamResource resource = null;
-		HttpHeaders header = new HttpHeaders();
+		byte[] fileContent = null;
+		HttpHeaders header = null;
 		try {
 			result = docService.getHashFile(token);
 			if (result != null) {
-				resource = new InputStreamResource(new FileInputStream(result));
-				header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pplsUserHashFile.txt");
-				header.add("Cache-Control", "no-cache, no-store, must-revalidate");
-				header.add("Pragma", "no-cache");
-				header.add("Expires", "0");
+				header = new HttpHeaders();
+				header.setContentType(MediaType.valueOf("text/plain"));
+				header.setContentLength(result.length());
+				header.set("Content-Disposition", "attachment; filename=" + result.getName());
+				System.out.println(result.getName());
+				fileContent = FileUtils.readFileToByteArray(result);
 				status = HttpStatus.OK;
 			} else {
 				status = HttpStatus.BAD_REQUEST;
@@ -88,8 +59,7 @@ public class DocumentController {
 			LOGGER.error("Server Error", e);
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return ResponseEntity.ok().headers(header).contentLength(result.length())
-				.contentType(MediaType.parseMediaType("text/plain")).body(resource);
+		return new ResponseEntity<>(fileContent, header, status);
 	}
 
 	@CrossOrigin

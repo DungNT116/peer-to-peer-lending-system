@@ -8,8 +8,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.event.DocumentListener;
-
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -305,7 +303,7 @@ public class DocumentService {
 			}
 		}
 		if (count == 2) {
-			File file = new File("write.txt");
+			File file = new File("pplsUserHashFile.txt");
 			Writer writer = new BufferedWriter(new FileWriter(file));
 
 			lstDocument = new ArrayList<Document>();
@@ -314,8 +312,16 @@ public class DocumentService {
 				document.setId(d.getId());
 				document.setDocumentId(d.getDocumentId());
 				document.setStatus(d.getStatus());
-				System.out.println(d.getDocumentFile().toString());
-				document.setDocumentFile(d.getDocumentFile());
+				List<DocumentFile> lstDocFile = new ArrayList<DocumentFile>();
+				for (DocumentFile df : d.getDocumentFile()) {
+					DocumentFile documentFile = new DocumentFile();
+					documentFile.setId(df.getId());
+					documentFile.setData(df.getData());
+					documentFile.setFileName(df.getFileName());
+					documentFile.setFileType(df.getFileType());
+					lstDocFile.add(documentFile);
+				}
+				document.setDocumentFile(lstDocFile);
 				lstDocument.add(document);
 			}
 			System.out.println(lstDocument.toString());
@@ -325,14 +331,5 @@ public class DocumentService {
 			return file;
 		}
 		return null;
-	}
-	
-	public File getHashFileTest() throws IOException {
-		File file = new File("write.txt");
-		Writer writer = new BufferedWriter(new FileWriter(file));
-		String contents = kh.hashWithBouncyCastle("Test hash file");
-		writer.write(contents);
-		writer.close();
-		return file;
 	}
 }

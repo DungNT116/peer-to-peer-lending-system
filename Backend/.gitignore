@@ -2,6 +2,7 @@ HELP.md
 /target/
 !.mvn/wrapper/maven-wrapper.jar
 /logs/
+pplsUserHashFile.txt
 
 ### STS ###
 .apt_generated
