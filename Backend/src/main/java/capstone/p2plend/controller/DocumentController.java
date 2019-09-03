@@ -1,12 +1,17 @@
 package capstone.p2plend.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,21 +29,28 @@ import capstone.p2plend.service.DocumentService;
 
 @RestController
 public class DocumentController {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(DocumentController.class);
 
 	@Autowired
 	DocumentService docService;
 
 	@CrossOrigin
-	@Secured({ "ROLE_USER" })
-	@GetMapping("/rest/document/uploadFile")
-	public ResponseEntity<File> uploadFile(@RequestHeader("Authorization") String token) {
+	@GetMapping("/document/download/hashFile")
+	public ResponseEntity<Resource> getHash() {
 		LOGGER.info("CALL method GET /rest/document/download/hashFile");
 		HttpStatus status = null;
 		File result = null;
+		InputStreamResource resource = null;
+		HttpHeaders header = new HttpHeaders();
 		try {
-			result = docService.getHashFile(token);
+			result = docService.getHashFileTest();
+			resource = new InputStreamResource(new FileInputStream(result));
+			
+	        header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=1.txt");
+	        header.add("Cache-Control", "no-cache, no-store, must-revalidate");
+	        header.add("Pragma", "no-cache");
+	        header.add("Expires", "0");
 			if (result != null) {
 				status = HttpStatus.OK;
 			} else {
@@ -48,9 +60,12 @@ public class DocumentController {
 			LOGGER.error("Server Error", e);
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-		return new ResponseEntity<File>(result, status);
+		return ResponseEntity.ok().headers(header)
+				.contentLength(result.length())
+	            .contentType(MediaType.parseMediaType("application/octet-stream"))
+	            .body(resource);
 	}
-	
+
 	@CrossOrigin
 	@Secured({ "ROLE_USER" })
 	@PostMapping("/rest/document/uploadFile")

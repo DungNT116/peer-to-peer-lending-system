@@ -300,4 +300,15 @@ public class DocumentService {
 		
 		return file;
 	}
+	
+	public File getHashFileTest() throws IOException {
+		File file = new File("write.txt");
+		Writer writer = new BufferedWriter(new FileWriter(file));
+		String contents = kh.hashWithBouncyCastle("This is the hash sample");
+		
+		writer.write(contents);
+		writer.close();
+		
+		return file;
+	}
 }
