@@ -64,6 +64,27 @@ public class DocumentController {
 
 	@CrossOrigin
 	@Secured({ "ROLE_USER" })
+	@PostMapping("/rest/document/validHashFile")
+	public ResponseEntity<String> validHashFile(@RequestHeader("Authorization") String token, @RequestParam("file") MultipartFile file) {
+		LOGGER.info("CALL method POST /rest/document/validHashFile");
+		HttpStatus status = null;
+		String result = null;
+		try {
+			result = docService.validHashFile(token, file);
+			if (result.equalsIgnoreCase("success")) {
+				status = HttpStatus.OK;
+			} else {
+				status = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			LOGGER.error("Server Error", e);
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<String>(result, status);
+	}
+	
+	@CrossOrigin
+	@Secured({ "ROLE_USER" })
 	@PostMapping("/rest/document/uploadFile")
 	public ResponseEntity<Integer> uploadFile(@RequestParam("documentTypeId") Integer documentTypeId,
 			@RequestHeader("Authorization") String token, @RequestParam("file") MultipartFile[] file) {

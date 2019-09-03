@@ -285,7 +285,9 @@ public class DocumentService {
 
 		return true;
 	}
+
 	private ObjectMapper mapper = new ObjectMapper();
+
 	public File getHashFile(String token) throws IOException {
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
@@ -326,11 +328,69 @@ public class DocumentService {
 				document.setDocumentFile(lstDocFile);
 				lstDocument.add(document);
 			}
-			String contents = kh.hashWithBouncyCastle(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lstDocument));
+			String contents = kh
+					.hashWithBouncyCastle(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lstDocument));
 			writer.write(contents);
 			writer.close();
 			return file;
 		}
 		return null;
+	}
+
+	public String validHashFile(String token, MultipartFile file) throws IOException {
+
+		String username = jwtService.getUsernameFromToken(token);
+		User user = userRepo.findByUsername(username);
+		List<Document> lstDocument = user.getDocument();
+		int count = 0;
+		List<Document> lstHashDocument = new ArrayList<Document>();
+		for (Document d : lstDocument) {
+			if (d.getDocumentType().getId() == 1 && d.getStatus().equalsIgnoreCase("valid")) {
+				lstHashDocument.add(d);
+				count = 1;
+			}
+		}
+		if (count != 1) {
+			return "ID not upload or hasn't validate yet";
+		}
+		for (Document d : lstDocument) {
+			if (d.getDocumentType().getId() == 2 && d.getStatus().equalsIgnoreCase("valid")) {
+				lstHashDocument.add(d);
+				count = 2;
+			}
+		}
+		if (count != 2) {
+			return "Video not upload or hasn't validate yet";
+		}
+		if (count == 2) {
+			lstDocument = new ArrayList<Document>();
+			for (Document d : lstHashDocument) {
+				Document document = new Document();
+				document.setId(d.getId());
+				document.setDocumentId(d.getDocumentId());
+				document.setStatus(d.getStatus());
+				List<DocumentFile> lstDocFile = new ArrayList<DocumentFile>();
+				for (DocumentFile df : d.getDocumentFile()) {
+					DocumentFile documentFile = new DocumentFile();
+					documentFile.setId(df.getId());
+					documentFile.setData(df.getData());
+					documentFile.setFileName(df.getFileName());
+					documentFile.setFileType(df.getFileType());
+					lstDocFile.add(documentFile);
+				}
+				document.setDocumentFile(lstDocFile);
+				lstDocument.add(document);
+			}
+			String contents = kh
+					.hashWithBouncyCastle(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lstDocument));
+			String fileContent = new String(file.getBytes());
+			if(contents.equals(fileContent)){
+				return "success";
+			} else {
+				return "Hash not match";
+			}
+			
+		}
+		return "User not yet upload any document";
 	}
 }
