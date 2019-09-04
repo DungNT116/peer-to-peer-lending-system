@@ -1,5 +1,5 @@
 import React from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 // reactstrap components
 import {
@@ -20,9 +20,9 @@ import {
   Input,
 } from 'reactstrap';
 
-import {database} from '../../firebase';
-import {PayPalButton} from 'react-paypal-button-v2';
-import {apiLink, bigchainAPI, client_API} from '../../api.jsx';
+import { database } from '../../firebase';
+import { PayPalButton } from 'react-paypal-button-v2';
+import { apiLink, bigchainAPI, client_API } from '../../api.jsx';
 // core components
 import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
@@ -54,7 +54,11 @@ class ViewDetailRequest extends React.Component {
       isOpenSuccess: false,
       isOpenError: false,
       message: '',
-      currencyUSDVND : null
+      currencyUSDVND: null,
+
+      validHash: false,
+      file: null,
+      hashError: '',
     };
     this.toggleErrorModal = this.toggleErrorModal.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
@@ -79,6 +83,103 @@ class ViewDetailRequest extends React.Component {
     this.saveTransaction = this.saveTransaction.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
     this.goToViewRequestTrading = this.goToViewRequestTrading.bind(this);
+    this.handleFileInput = this.handleFileInput.bind(this);
+    this.validHashFile = this.validHashFile.bind(this);
+    this.handleError = this.handleError.bind(this);
+  }
+
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
+      await this.setState({
+        isOpenError: true,
+        error: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        error: 'Something when wrong !',
+      });
+    }
+  }
+
+  async validHashFile() {
+    // if(this.state.file !== null || )
+
+    if (this.state.file !== undefined && this.state.file !== null) {
+      var file = this.state.file[0];
+      console.log(file)
+      var formData = new FormData();
+      console.log(file)
+      formData.append('file', file);
+      console.log(formData.get('file'))
+
+      fetch(apiLink + '/rest/document/validHashFile', {
+        method: 'POST',
+        headers: {
+          // ContentType: 'multipart/form-data',
+          // Accept: "application/json",
+          Authorization: localStorage.getItem('token'),
+        },
+        body: formData,
+      })
+        .then(async result => {
+          if (result.status === 200) {
+            await this.setState({
+              validHash: true
+            })
+          } else if (result.status === 401) {
+            localStorage.removeItem('isLoggedIn');
+            this.props.history.push('/login-page');
+          } else if (result.status === 400) {
+            result.text().then(async error => {
+              await this.setState({
+                hashError: error
+              })
+            })
+            // alert('error');
+          } else {
+            alert('error not found');
+          }
+        })
+        .catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.handleError(data);
+        });
+    } else {
+      // alert('please select image to upload');
+      await this.setState({
+        isOpenError: true,
+        message: 'please select text file to upload',
+      });
+    }
+  }
+
+  async handleFileInput(event, type) {
+    var files = event.target.files;
+    var validFilesCount = 0;
+    var totalFilesSize = 0;
+    for (let i = 0; i < files.length; i++) {
+      const element = files[i];
+      totalFilesSize += element.size;
+      if (!element.type.includes('text/plain')) {
+        validFilesCount--;
+      } else {
+        validFilesCount++;
+      }
+    }
+    //10 MB
+    if (validFilesCount === files.length && totalFilesSize <= 10000000) {
+      // var document = { documentType: type, listImage: event.target.files };
+      await this.setState({
+        file: files
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        message: 'please select text file or size is lower than 10MB',
+      });
+    }
   }
 
   toggleErrorModal() {
@@ -113,7 +214,7 @@ class ViewDetailRequest extends React.Component {
         receiver: data_transaction.data_tx.data.tx_data.receiver,
         amount: Number(
           this.props.request.data.amount *
-            this.props.request.data.deal.milestone[1].percent
+          this.props.request.data.deal.milestone[1].percent
         ),
         amountValid: Number(data.amount),
         status: data.status,
@@ -130,7 +231,7 @@ class ViewDetailRequest extends React.Component {
           isOpenSuccess: true
         })
         await setTimeout(
-          function() {
+          function () {
             this.props.history.push('/view-request-trading');
           }.bind(this),
           2000
@@ -185,7 +286,7 @@ class ViewDetailRequest extends React.Component {
           .once('value', snapshot => {
             if (snapshot.exists()) {
               const userData = snapshot.val();
-              this.setState({keyUserFb: Object.keys(userData)[0]});
+              this.setState({ keyUserFb: Object.keys(userData)[0] });
             }
           });
         await database
@@ -202,7 +303,7 @@ class ViewDetailRequest extends React.Component {
         var upvotesRef = database.ref(
           '/ppls/' + this.state.keyUserFb + '/countNew'
         );
-        await upvotesRef.transaction(function(current_value) {
+        await upvotesRef.transaction(function (current_value) {
           return (current_value || 0) + 1;
         });
       } else if (result.status === 401) {
@@ -302,7 +403,7 @@ class ViewDetailRequest extends React.Component {
           .once('value', snapshot => {
             if (snapshot.exists()) {
               const userData = snapshot.val();
-              this.setState({keyUserFb: Object.keys(userData)[0]});
+              this.setState({ keyUserFb: Object.keys(userData)[0] });
             }
           });
         await database
@@ -319,7 +420,7 @@ class ViewDetailRequest extends React.Component {
         var upvotesRef = database.ref(
           '/ppls/' + this.state.keyUserFb + '/countNew'
         );
-        await upvotesRef.transaction(function(current_value) {
+        await upvotesRef.transaction(function (current_value) {
           return (current_value || 0) + 1;
         });
       } else if (result.status === 400) {
@@ -350,13 +451,13 @@ class ViewDetailRequest extends React.Component {
     let numberOfLendingMilestones = 0;
     let numberOfPayBackMilestones = 0;
     let milestone = this.props.request.data.deal.milestone;
-    let timelineData = {lendingTimeline: [], payBackTimeline: []};
+    let timelineData = { lendingTimeline: [], payBackTimeline: [] };
     let lendingTimeline = [];
     let payBackTimeline = [];
-    let milestoneTimeline = {data: '', status: '', percent: ''};
+    let milestoneTimeline = { data: '', status: '', percent: '' };
     for (let i = 0; i < milestone.length; i++) {
       const element = milestone[i];
-      milestoneTimeline = {data: '', status: '', percent: ''};
+      milestoneTimeline = { data: '', status: '', percent: '' };
       milestoneTimeline.data = this.formatDate(
         this.convertTimeStampToDate(element.presentDate)
       );
@@ -490,7 +591,7 @@ class ViewDetailRequest extends React.Component {
   }
 
   toggleModal() {
-    this.setState({modal: !this.state.modal});
+    this.setState({ modal: !this.state.modal });
   }
   async makeDeal() {
     this.props.setIsHistory(false);
@@ -531,7 +632,7 @@ class ViewDetailRequest extends React.Component {
     this.saveNewDealInformationToDB();
 
     //set up view again
-    this.setState({editable: !this.state.editable});
+    this.setState({ editable: !this.state.editable });
     //button
     document.getElementById('dealButton').style.display = 'none';
     if (
@@ -653,16 +754,16 @@ class ViewDetailRequest extends React.Component {
                                 {/* đổi công thức như trong doc */}
                                 {this.numberWithCommas(
                                   this.props.request.data.amount +
-                                    Math.round(
-                                      ((((this.props.request.data.amount *
-                                        duration) /
-                                        30) *
-                                        (this.props.request.data.interestRate /
-                                          12)) /
-                                        100) *
-                                        1000
-                                    ) /
-                                      1000
+                                  Math.round(
+                                    ((((this.props.request.data.amount *
+                                      duration) /
+                                      30) *
+                                      (this.props.request.data.interestRate /
+                                        12)) /
+                                      100) *
+                                    1000
+                                  ) /
+                                  1000
                                 )}{' '}
                                 VND
                               </p>
@@ -706,7 +807,7 @@ class ViewDetailRequest extends React.Component {
                                       (this.props.request.data.interestRate /
                                         12)) /
                                       100) *
-                                      1000
+                                    1000
                                   ) / 1000
                                 )}{' '}
                                 VND
@@ -728,7 +829,7 @@ class ViewDetailRequest extends React.Component {
                             isPayMany={this.state.isPayMany}
                             borrowerUser={
                               this.props.request.data.borrower.username !==
-                              undefined
+                                undefined
                                 ? this.props.request.data.borrower.username
                                 : ''
                             }
@@ -741,121 +842,150 @@ class ViewDetailRequest extends React.Component {
                         {isHistoryDetail ? (
                           ''
                         ) : (
-                          <div>
-                            <CardFooter className="text-center">
-                              <Button
-                                type="submit"
-                                id="dealButton"
-                                size="md"
-                                className="btn btn-outline-primary"
-                                onClick={() => this.makeDeal()}
-                                disabled={this.state.editable}
-                              >
-                                <i className="fa fa-dot-circle-o" /> Make Deal
-                              </Button>{' '}
-                              <Button
-                                type="submit"
-                                id="saveDealButton"
-                                size="md"
-                                className="btn btn-outline-primary"
-                                onClick={this.toggleSaveDealModal}
-                                disabled={!this.state.editable}
-                              >
-                                <i className="ni ni-cloud-download-95" /> Save
-                                Deal
-                              </Button>{' '}
-                              {this.props.request.data.borrower.username ===
-                              localStorage.getItem('user') ? (
-                                ''
-                              ) : (
+                            <div>
+                              <CardFooter className="text-center">
                                 <Button
                                   type="submit"
-                                  id="acceptButton"
+                                  id="dealButton"
                                   size="md"
                                   className="btn btn-outline-primary"
-                                  onClick={this.toggleModal}
+                                  onClick={() => this.makeDeal()}
                                   disabled={this.state.editable}
                                 >
-                                  <i className="ni ni-check-bold" /> Accept
-                                </Button>
-                              )}
-                            </CardFooter>
-                            {/* save deal */}
-                            <Modal
-                              isOpen={this.state.saveDealModal}
-                              toggle={this.toggleSaveDealModal}
-                              className={this.props.className}
-                            >
-                              <ModalHeader toggle={this.toggleSaveDealModal}>
-                                Confirm saving
-                              </ModalHeader>
-                              <ModalBody>
-                                Are you sure to save this deal ?
-                              </ModalBody>
-                              <ModalFooter>
+                                  <i className="fa fa-dot-circle-o" /> Make Deal
+                              </Button>{' '}
                                 <Button
-                                  color="primary"
-                                  onClick={() => this.saveDeal()}
-                                >
-                                  Yes
-                                </Button>{' '}
-                                <Button
-                                  color="secondary"
+                                  type="submit"
+                                  id="saveDealButton"
+                                  size="md"
+                                  className="btn btn-outline-primary"
                                   onClick={this.toggleSaveDealModal}
+                                  disabled={!this.state.editable}
                                 >
-                                  Cancel
+                                  <i className="ni ni-cloud-download-95" /> Save
+                                  Deal
+                              </Button>{' '}
+                                {this.props.request.data.borrower.username ===
+                                  localStorage.getItem('user') ? (
+                                    ''
+                                  ) : (
+                                    <Button
+                                      type="submit"
+                                      id="acceptButton"
+                                      size="md"
+                                      className="btn btn-outline-primary"
+                                      onClick={this.toggleModal}
+                                      disabled={this.state.editable}
+                                    >
+                                      <i className="ni ni-check-bold" /> Accept
                                 </Button>
-                              </ModalFooter>
-                            </Modal>
-
-                            {/* accept modal */}
-                            <Modal
-                              isOpen={this.state.modal}
-                              toggle={this.toggleModal}
-                              className={this.props.className}
-                            >
-                              <ModalHeader toggle={this.toggleModal}>
-                                Payment
-                              </ModalHeader>
-                              <ModalBody>
-                                <PayPalButton
-                                  amount={this.roundUp(
-                                    (this.props.request.data.amount *
-                                      this.props.request.data.deal.milestone[1]
-                                        .percent) /
-                                        this.state.currencyUSDVND
                                   )}
-                                  onSuccess={(details, data) => {
-                                    this.toggleModal();
-                                    this.setState({
-                                      data_tx: {
-                                        txId: details.id,
-                                        createDate: this.convertDateToTimestamp(
-                                          new Date()
-                                        ),
-                                        status: details.status,
-                                        amount:
-                                          details.purchase_units[0].amount
-                                            .value,
-                                      },
-                                    });
-                                    this.send_tx();
-                                  }}
-                                  style={{
-                                    layout: 'horizontal',
-                                    shape: 'pill',
-                                    disableFunding: true,
-                                    tagline: false,
-                                    size: 'responsive',
-                                  }}
-                                  options={{
-                                    clientId: client_API,
-                                  }}
-                                />
+                              </CardFooter>
+                              {/* save deal */}
+                              <Modal
+                                isOpen={this.state.saveDealModal}
+                                toggle={this.toggleSaveDealModal}
+                                className={this.props.className}
+                              >
+                                <ModalHeader toggle={this.toggleSaveDealModal}>
+                                  Confirm saving
+                              </ModalHeader>
+                                <ModalBody>
+                                  Are you sure to save this deal ?
                               </ModalBody>
-                            </Modal>
-                          </div>
-                        )}
+                                <ModalFooter>
+                                  <Button
+                                    color="primary"
+                                    onClick={() => this.saveDeal()}
+                                  >
+                                    Yes
+                                </Button>{' '}
+                                  <Button
+                                    color="secondary"
+                                    onClick={this.toggleSaveDealModal}
+                                  >
+                                    Cancel
+                                </Button>
+                                </ModalFooter>
+                              </Modal>
+
+                              {/* accept modal */}
+                              <Modal
+                                isOpen={this.state.modal}
+                                toggle={this.toggleModal}
+                                className={this.props.className}
+                              >
+                                <ModalHeader toggle={this.toggleModal}>
+                                  Payment
+                              </ModalHeader>
+                                <ModalBody>
+                                  {this.state.validHash === true ?
+                                    (
+                                      <PayPalButton
+                                        amount={this.roundUp(
+                                          (this.props.request.data.amount *
+                                            this.props.request.data.deal.milestone[1]
+                                              .percent) /
+                                          this.state.currencyUSDVND
+                                        )}
+                                        onSuccess={(details, data) => {
+                                          this.toggleModal();
+                                          this.setState({
+                                            data_tx: {
+                                              txId: details.id,
+                                              createDate: this.convertDateToTimestamp(
+                                                new Date()
+                                              ),
+                                              status: details.status,
+                                              amount:
+                                                details.purchase_units[0].amount
+                                                  .value,
+                                            },
+                                          });
+                                          this.send_tx();
+                                        }}
+                                        style={{
+                                          layout: 'horizontal',
+                                          shape: 'pill',
+                                          disableFunding: true,
+                                          tagline: false,
+                                          size: 'responsive',
+                                        }}
+                                        options={{
+                                          clientId: client_API,
+                                        }}
+                                      />
+                                    )
+                                    :
+                                    (
+                                      <div>
+                                        <Input
+                                          type="file"
+                                          accept="text/plain"
+                                          onChange={this.handleFileInput} />
+                                          <p></p>
+                                        <Button
+                                          // type="submit"
+                                          size="md"
+                                          className="btn btn-outline-primary"
+                                          onClick={() => this.validHashFile()}
+                                        >
+                                          Check
+                                    </Button>
+                                    {this.state.hashError !== '' ? 
+                                    (<strong class='alert alert-danger' role='alert'>{this.state.hashError}</strong>)
+                                    :
+                                    ("")}
+                                        
+                                      </div>
+
+                                    )
+                                  }
+
+                                </ModalBody>
+                              </Modal>
+                            </div>
+                          )}
                       </Col>
                     </Row>
                   </div>
@@ -883,7 +1013,7 @@ class ViewDetailRequest extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenSuccess}
-          // toggle={() => this.toggleModal('defaultModal')}
+        // toggle={() => this.toggleModal('defaultModal')}
         >
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
