@@ -334,6 +334,10 @@ public class DocumentService {
 					.hashWithJavaMessageDigest(mapper.writeValueAsString(lstDocument));
 			writer.write(contents);
 			writer.close();
+			
+			user.setGenerateHashFile(true);
+			userRepo.saveAndFlush(user);
+			
 			return file;
 		}
 		return null;

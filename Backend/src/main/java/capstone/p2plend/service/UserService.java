@@ -80,6 +80,7 @@ public class UserService {
 		account.setEmail(user.getEmail());
 		account.setPhoneNumber(user.getPhoneNumber());
 		account.setLoanLimit(user.getLoanLimit());
+		account.setGenerateHashFile(user.getGenerateHashFile());
 		return account;
 	}
 
@@ -147,6 +148,7 @@ public class UserService {
 			return "Email existed";
 		}
 
+		account.setGenerateHashFile(false);
 		account.setRole("ROLE_USER");
 		account.setStatus("active");
 		account.setLoanLimit(0L);

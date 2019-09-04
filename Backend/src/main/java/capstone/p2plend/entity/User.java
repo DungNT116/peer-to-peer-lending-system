@@ -46,6 +46,9 @@ public class User {
 	@Column
 	private String role;
 
+	@Column
+	private Boolean generateHashFile;
+	
 	@Column(unique = true)
 	private String email;
 
@@ -139,6 +142,14 @@ public class User {
 
 	public void setRole(String role) {
 		this.role = role;
+	}
+	
+	public Boolean getGenerateHashFile() {
+		return generateHashFile;
+	}
+
+	public void setGenerateHashFile(Boolean generateHashFile) {
+		this.generateHashFile = generateHashFile;
 	}
 
 	public String getEmail() {
