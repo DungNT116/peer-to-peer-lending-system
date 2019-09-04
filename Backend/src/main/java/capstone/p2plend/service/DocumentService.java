@@ -292,6 +292,9 @@ public class DocumentService {
 	public File getHashFile(String token) throws IOException, NoSuchAlgorithmException {
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
+		if (user.getGenerateHashFile() == true) {
+			return null;
+		}
 		List<Document> lstDocument = user.getDocument();
 		int count = 0;
 		List<Document> lstHashDocument = new ArrayList<Document>();
@@ -329,15 +332,14 @@ public class DocumentService {
 				document.setDocumentFile(lstDocFile);
 				lstDocument.add(document);
 			}
-			
-			String contents = kh
-					.hashWithJavaMessageDigest(mapper.writeValueAsString(lstDocument));
+
+			String contents = kh.hashWithJavaMessageDigest(mapper.writeValueAsString(lstDocument));
 			writer.write(contents);
 			writer.close();
-			
+
 			user.setGenerateHashFile(true);
 			userRepo.saveAndFlush(user);
-			
+
 			return file;
 		}
 		return null;
@@ -387,8 +389,7 @@ public class DocumentService {
 				document.setDocumentFile(lstDocFile);
 				lstDocument.add(document);
 			}
-			String contents = kh
-					.hashWithJavaMessageDigest(mapper.writeValueAsString(lstDocument));
+			String contents = kh.hashWithJavaMessageDigest(mapper.writeValueAsString(lstDocument));
 			String fileContent = new String(file.getBytes());
 			if (contents.equals(fileContent)) {
 				return "success";
