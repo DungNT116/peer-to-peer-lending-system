@@ -594,11 +594,7 @@ class Profile extends React.Component {
   }
 
   async uploadVideo() {
-<<<<<<< HEAD
     const superBuffer = new Blob(window.recordedBlobs, {type: 'video/webm'});
-=======
-    const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
->>>>>>> 01bbc4bce93764da3213ee95220f95f558c8994c
     var base64data = '';
     var reader = new FileReader();
     reader.readAsDataURL(superBuffer);
@@ -624,11 +620,8 @@ class Profile extends React.Component {
         // })
       }).then(async result => {
         if (result.status === 200) {
-<<<<<<< HEAD
-=======
           await this.getDocument()
           console.log('success');
->>>>>>> 01bbc4bce93764da3213ee95220f95f558c8994c
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
           this.props.history.push('/login-page');
@@ -639,29 +632,6 @@ class Profile extends React.Component {
         }
       });
     };
-<<<<<<< HEAD
-    await this.setState({
-      isOpen: true,
-      loading: true,
-      isVideoSaved: true,
-    });
-    await this.setState({
-      isOpenUpload: true,
-    });
-    await setTimeout(
-      function() {
-        this.setState({
-          isOpenUpload: false,
-        });
-      }.bind(this),
-      2000
-    );
-    this.getDocument();
-    await this.setState({
-      isUploadedVideo: true,
-    });
-=======
->>>>>>> 01bbc4bce93764da3213ee95220f95f558c8994c
   }
 
   async saveDocument(idDoc, type) {
