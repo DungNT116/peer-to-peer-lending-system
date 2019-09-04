@@ -2,7 +2,10 @@ import React from 'react';
 
 // nodejs library that concatenates classes
 import classnames from 'classnames';
+
+//connect react and redux
 import {connect} from 'react-redux';
+
 // reactstrap components
 import {
   Card,
@@ -18,14 +21,17 @@ import {
   Modal
 } from 'reactstrap';
 
-// core components
+//components
 import MainNavbar from '../MainNavbar/MainNavbar';
 import ApplyTimeline from '../ApplyTimeline/ApplyTimeline.jsx';
-
-//api link
-import {apiLink} from '../../api.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter';
+
+//api link (path)
+import {apiLink} from '../../api.jsx';
+
+//currency input
 import Cleave from 'cleave.js/react';
+
 const textVerticalCenter = {
   display: 'flex',
   alignItems: 'center',
@@ -36,7 +42,7 @@ class CreateRequestPage extends React.Component {
     super(props);
     this.state = {
       amount: 0,
-      borrowDuration: '',
+      // borrowDuration: '',
       interestRate: '',
       createDate: '',
       lendingTimeline: [],
@@ -48,7 +54,7 @@ class CreateRequestPage extends React.Component {
       isOpenError: false
     };
 
-    this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
+    // this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDataTimeline = this.handleDataTimeline.bind(this);
     this.createMileStone = this.createMileStone.bind(this);
@@ -56,6 +62,9 @@ class CreateRequestPage extends React.Component {
     this.handleError = this.handleError.bind(this);
   }
 
+  //create milestone data from lending and payback timeline
+  //return list data contains lending and payback milestone
+  //milestone: previousDate: timestamp, presentDate: timestamp, percent: 0.1 - 1, type: lend - payback
   createMileStone() {
     let milestones = [];
     let milestone = {
@@ -116,6 +125,7 @@ class CreateRequestPage extends React.Component {
     return milestones;
   }
 
+  //function update lending and payback timeline from applytimeline
   async handleDataTimeline(lendingTimeline, paybackTimeline) {
     await this.setState({
       lendingTimeline: lendingTimeline,
@@ -123,14 +133,15 @@ class CreateRequestPage extends React.Component {
     });
   }
 
-  onBorrowDurationChange(event) {
-    var index = event.target.selectedIndex;
-    var text = event.target[index].innerText.split(' ')[0];
-    this.setState({
-      borrowDuration: text,
-    });
-  }
+  // onBorrowDurationChange(event) {
+  //   var index = event.target.selectedIndex;
+  //   var text = event.target[index].innerText.split(' ')[0];
+  //   this.setState({
+  //     borrowDuration: text,
+  //   });
+  // }
 
+  //create request
   async handleSubmit(event) {
     event.preventDefault();
     if (this.state.invalidAmount === false ) {
@@ -173,6 +184,8 @@ class CreateRequestPage extends React.Component {
     }
     event.preventDefault();
   }
+
+  //handle server error
   async handleError(data) {
     var error = data.toString();
     if (error === 'TypeError: Failed to fetch') {
@@ -187,6 +200,7 @@ class CreateRequestPage extends React.Component {
       });
     }
   }
+
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -196,15 +210,25 @@ class CreateRequestPage extends React.Component {
     this.setState({
       createDate: timeStampeDateNow,
     });
+
+    //hide make deal field
     this.props.setIsHistory(false);
+
+    //show make deal field
     this.props.setIsViewDetail(true);
+
+    //
     this.props.setIsHistoryDetail(false);
 
     this.getLoanLimit();
   }
+
+  //currency format
   numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
+
+  //get loan limit and interest rate
   getLoanLimit() {
     fetch(apiLink + '/rest/user/getUserMaximunLoanLimit', {
       method: 'GET',
@@ -230,6 +254,7 @@ class CreateRequestPage extends React.Component {
     });
   }
 
+  //handle amount change
   onAmountCleaveChange(event) {
     var rawValue = event.target.rawValue;
     if (rawValue > this.state.maxloadlimit) {

@@ -381,7 +381,7 @@ class DocumentDetail extends React.Component {
                                 {docData.documentFile.map(
                                   (imageData, indexImg) => (
                                     <Col
-                                      lg="4"
+                                      lg="6"
                                       key={indexImg}
                                       style={style.sameSizeWithParent}
                                     >

@@ -75,20 +75,24 @@ class ApplyTimeline extends React.Component {
     // document.documentElement.scrollTop = 0;
     // document.scrollingElement.scrollTop = 0;
     // this.refs.main.scrollTop = 0;
-    fetch('http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1', {
-      method: 'GET',
-    })
+    fetch(
+      'http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1',
+      {
+        method: 'GET',
+      }
+    )
       .then(response => response.json())
       .then(async data => {
         this.setState({
           currencyUSDVND: data.quotes.USDVND,
         });
-      }).catch(async data => {
+      })
+      .catch(async data => {
         //CANNOT ACCESS TO SERVER
         await this.setState({
           isOpenError: true,
-          message: "Cannot access to server"
-        })
+          message: 'Cannot access to server',
+        });
       });
   }
   constructor(props) {
@@ -129,7 +133,6 @@ class ApplyTimeline extends React.Component {
         },
       ],
       backup_timeline_lending: [],
-
       // payback state
       curPaybackId: 0,
       prevPaybackId: -1,
@@ -162,7 +165,7 @@ class ApplyTimeline extends React.Component {
       backup_timeline_payback: [],
       penalty: 0,
       durationLate: 0,
-      currencyUSDVND : null
+      currencyUSDVND: null,
     };
     //Lending
     this.changeTimeLineLending = this.changeTimeLineLending.bind(this);
@@ -261,6 +264,7 @@ class ApplyTimeline extends React.Component {
   }
   async saveTimeLineLending() {
     let isDuplicate = false;
+    let isLendingPrevious = false;
     //create new array same with timeline_lending for modifing
     let timelineCopy = JSON.parse(
       JSON.stringify(this.state.backup_timeline_lending)
@@ -279,14 +283,31 @@ class ApplyTimeline extends React.Component {
         return new Date(day1.data) - new Date(day2.data);
       });
     }
-    if (!isDuplicate) {
+
+    // var currentDay = this.convertDateToTimestamp(new Date());
+    var currentDay = new Date(this.state.timeline_lending[0].data);
+    // CHECK NOT ALLOW Milestone lower than current day
+    for (let i = 0; i < timelineCopy.length; i++) {
+      const element = timelineCopy[i];
+      if (
+        this.convertDateToTimestamp(currentDay) >
+        this.convertDateToTimestamp(new Date(element.data))
+      ) {
+        isLendingPrevious = true;
+      }
+    }
+    if (!isDuplicate && !isLendingPrevious) {
       // change percent before save
-      for (let i = 1; i < timelineCopy.length; i++) {
+      for (let i = 0; i < timelineCopy.length; i++) {
         const element = timelineCopy[i];
+        if (i === 0) {
+          element.percent = null;
+        } else {
         element.percent =
           Math.round(
             (1 / (this.state.backup_timeline_lending.length - 1)) * 100
           ) / 100;
+        }
       }
 
       // save data after changing
@@ -331,10 +352,17 @@ class ApplyTimeline extends React.Component {
       }
     } else {
       // window.alert('Duplicate date in milestone'); // popup show Error
-      await this.setState({
-        isOpenError: true,
-        error: 'Duplicate date in milestone',
-      });
+      if (isDuplicate) {
+        await this.setState({
+          isOpenError: true,
+          error: 'Duplicate date in milestone',
+        });
+      } else if (isLendingPrevious) {
+        await this.setState({
+          isOpenError: true,
+          error: 'Day cannot be set in the past',
+        });
+      }
     }
   }
   cancelTimeLineLending() {
@@ -449,17 +477,14 @@ class ApplyTimeline extends React.Component {
       }
     }
     if (pos == rawMilestone.length - 1 && today > presentDate) {
-      console.log('aaaaaaaaaaaaaa');
       durationLate = Math.round((today - presentDate) / 86400);
     } else if (pos === firstPayback) {
-      console.log('bbbbbbbbbbbbbbb');
       durationLate = Math.round((today - presentDate) / 86400);
     }
     // else if (today > previousDate && today < presentDate){
     //   console.log('cccccccccccccccc');
     //   durationLate = Math.round((today - previousDate) / 86400);
     // }
-    console.log(durationLate);
     for (let i = 1; i < mileStonePayback.length; i++) {
       const element = mileStonePayback[i];
       if (element.presentDate === presentDate) {
@@ -537,11 +562,6 @@ class ApplyTimeline extends React.Component {
           this.setState({isInMilestoneLending: false});
         }
       } else if (element.type === typePayment && typePayment === 'payback') {
-        console.log(element);
-        console.log(
-          'check day in range ',
-          element.previousDate <= dateNow && element.presentDate >= dateNow
-        );
         if (element.previousDate <= dateNow && element.presentDate >= dateNow) {
           this.setState({
             curDatePayback: element,
@@ -571,18 +591,12 @@ class ApplyTimeline extends React.Component {
           typePayment === 'payback' &&
           element !== paybackMS[0]
         ) {
-          console.log(
-            'element.presentDate < dateNow && element.type === typePayment'
-          );
-
           if (element.transaction.status != null) {
-            console.log('element.transaction.status != null');
             this.setState({
               isMilestonePaybackPaid: true,
             });
             break;
           } else {
-            console.log('ELSE element.transaction.status != null');
             this.setState({
               isInMilestonePayback: true,
               isMilestonePaybackPaid: false,
@@ -596,9 +610,6 @@ class ApplyTimeline extends React.Component {
             break;
           }
         } else {
-          console.log(
-            'ELSE element.presentDate < dateNow && element.type === typePayment'
-          );
           this.setState({isInMilestonePayback: false});
         }
       }
@@ -658,6 +669,7 @@ class ApplyTimeline extends React.Component {
   }
   async savePaybackTimeLine() {
     let isDuplicate = false;
+    let isPaybackPrevious = false;
     //create new array same with timeline_payback for modifing
     let timelinePaybackCopy = JSON.parse(
       JSON.stringify(this.state.backup_timeline_payback)
@@ -679,7 +691,18 @@ class ApplyTimeline extends React.Component {
         return new Date(day1.data) - new Date(day2.data);
       });
     }
-    if (!isDuplicate) {
+    var currentDay = new Date(this.state.timeline_payback[0].data);
+    // CHECK NOT ALLOW Milestone lower than current day
+    for (let i = 0; i < timelinePaybackCopy.length; i++) {
+      const element = timelinePaybackCopy[i];
+      if (
+        this.convertDateToTimestamp(currentDay) >
+        this.convertDateToTimestamp(new Date(element.data))
+      ) {
+        isPaybackPrevious = true;
+      }
+    }
+    if (!isDuplicate && !isPaybackPrevious) {
       // change data if type isLendMany and isPaybackMany
       if (this.state.isLendMany && this.state.isPaybackMany) {
         for (let i = 1; i < timelineLendingCopy.length; i++) {
@@ -707,12 +730,16 @@ class ApplyTimeline extends React.Component {
         }
       }
       // change percent before save
-      for (let i = 1; i < timelinePaybackCopy.length; i++) {
+      for (let i = 0; i < timelinePaybackCopy.length; i++) {
         const element = timelinePaybackCopy[i];
-        element.percent =
-          Math.round(
-            (1 / (this.state.backup_timeline_payback.length - 1)) * 100
-          ) / 100;
+        if (i === 0) {
+          element.percent = null;
+        } else {
+          element.percent =
+            Math.round(
+              (1 / (this.state.backup_timeline_payback.length - 1)) * 100
+            ) / 100;
+        }
       }
       await this.setState({
         timeline_payback: timelinePaybackCopy,
@@ -739,10 +766,17 @@ class ApplyTimeline extends React.Component {
       document.getElementById('dropdownChoosePayback').style.display = '';
     } else {
       // window.alert('Duplicate date in milestone'); // popup show Error
-      await this.setState({
-        isOpenError: true,
-        error: 'Duplicate date in milestone',
-      });
+      if (isDuplicate) {
+        await this.setState({
+          isOpenError: true,
+          error: 'Duplicate date in milestone',
+        });
+      } else if (isPaybackPrevious) {
+        await this.setState({
+          isOpenError: true,
+          error: 'Day cannot be set in the past',
+        });
+      }
     }
   }
   cancelPaybackTimeLine() {
@@ -858,7 +892,6 @@ class ApplyTimeline extends React.Component {
       receiver = this.props.borrowerUser;
     }
     if (receiver !== '') {
-      console.log(this.state.data_tx);
       let data_transaction = {
         data_tx: {
           data: {
@@ -1623,6 +1656,7 @@ class ApplyTimeline extends React.Component {
                                 </Col>
                                 <Col md="6">
                                   <Label className="h6">
+<<<<<<< HEAD
                                     {this.numberWithCommas(Math.round(
                                       (this.props.request.data.amount +
                                         Math.round(
@@ -1646,6 +1680,33 @@ class ApplyTimeline extends React.Component {
                                         this.state.curDatePayback.percent +
                                         this.state.penalty *
                                           this.props.request.data.amount)
+=======
+                                    {Math.round(
+                                      this.numberWithCommas(
+                                        (this.props.request.data.amount +
+                                          Math.round(
+                                            ((((this.props.request.data.amount *
+                                              (this.props.request.data.deal
+                                                .milestone[
+                                                this.props.request.data.deal
+                                                  .milestone.length - 1
+                                              ].presentDate -
+                                                this.props.request.data.deal
+                                                  .milestone[0].presentDate)) /
+                                              86400 /
+                                              30) *
+                                              (this.props.request.data
+                                                .interestRate /
+                                                12)) /
+                                              100) *
+                                              1000
+                                          ) /
+                                            1000) *
+                                          this.state.curDatePayback.percent +
+                                          this.state.penalty *
+                                            this.props.request.data.amount
+                                      )
+>>>>>>> 01bbc4bce93764da3213ee95220f95f558c8994c
                                     )}{' '}
                                     VNĐ
                                   </Label>
