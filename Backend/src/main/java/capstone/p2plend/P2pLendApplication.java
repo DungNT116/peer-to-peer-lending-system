@@ -16,27 +16,27 @@ public class P2pLendApplication {
 	
 //	private static final Logger LOGGER = LoggerFactory.getLogger(P2pLendApplication.class);
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
-	@Autowired
-	private Keccak256Hashing hs;
+//	@Autowired
+//	private PasswordEncoder passwordEncoder;
+//	
+//	@Autowired
+//	private Keccak256Hashing hs;
 
 	public static void main(String[] args) {
 		SpringApplication.run(P2pLendApplication.class, args);
 	}
 
-	@Bean
-	public CommandLineRunner demo() {
-		return (args) -> {
-			String a = "a";
-			System.out.println(hs.hashWithBouncyCastle(a));
-			System.out.println(hs.hashWithJavaMessageDigest(a));
-			String b = "b";
-			System.out.println(hs.hashWithBouncyCastle(b));
-			System.out.println(hs.hashWithJavaMessageDigest(b));
-			
-			System.out.println(passwordEncoder.encode("1"));
-		};
-	}
+//	@Bean
+//	public CommandLineRunner demo() {
+//		return (args) -> {
+//			String a = "a";
+//			System.out.println(hs.hashWithBouncyCastle(a));
+//			System.out.println(hs.hashWithJavaMessageDigest(a));
+//			String b = "b";
+//			System.out.println(hs.hashWithBouncyCastle(b));
+//			System.out.println(hs.hashWithJavaMessageDigest(b));
+//			
+//			System.out.println(passwordEncoder.encode("1"));
+//		};
+//	}
 }

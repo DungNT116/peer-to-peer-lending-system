@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -288,7 +289,7 @@ public class DocumentService {
 
 	private ObjectMapper mapper = new ObjectMapper();
 
-	public File getHashFile(String token) throws IOException {
+	public File getHashFile(String token) throws IOException, NoSuchAlgorithmException {
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
 		List<Document> lstDocument = user.getDocument();
@@ -328,8 +329,9 @@ public class DocumentService {
 				document.setDocumentFile(lstDocFile);
 				lstDocument.add(document);
 			}
+			
 			String contents = kh
-					.hashWithBouncyCastle(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lstDocument));
+					.hashWithJavaMessageDigest(mapper.writeValueAsString(lstDocument));
 			writer.write(contents);
 			writer.close();
 			return file;
@@ -337,7 +339,7 @@ public class DocumentService {
 		return null;
 	}
 
-	public String validHashFile(String token, MultipartFile file) throws IOException {
+	public String validHashFile(String token, MultipartFile file) throws IOException, NoSuchAlgorithmException {
 
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
@@ -382,14 +384,14 @@ public class DocumentService {
 				lstDocument.add(document);
 			}
 			String contents = kh
-					.hashWithBouncyCastle(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(lstDocument));
+					.hashWithJavaMessageDigest(mapper.writeValueAsString(lstDocument));
 			String fileContent = new String(file.getBytes());
-			if(contents.equals(fileContent)){
+			if (contents.equals(fileContent)) {
 				return "success";
 			} else {
 				return "Hash not match";
 			}
-			
+
 		}
 		return "User not yet upload any document";
 	}

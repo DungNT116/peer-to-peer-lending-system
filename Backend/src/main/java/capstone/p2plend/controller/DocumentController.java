@@ -49,7 +49,6 @@ public class DocumentController {
 				header.setContentType(MediaType.valueOf("text/plain"));
 				header.setContentLength(result.length());
 				header.set("Content-Disposition", "attachment; filename=" + result.getName());
-				System.out.println(result.getName());
 				fileContent = FileUtils.readFileToByteArray(result);
 				status = HttpStatus.OK;
 			} else {
