@@ -1656,31 +1656,29 @@ class ApplyTimeline extends React.Component {
                                 </Col>
                                 <Col md="6">
                                   <Label className="h6">
-                                    {Math.round(
-                                      this.numberWithCommas(
-                                        (this.props.request.data.amount +
-                                          Math.round(
-                                            ((((this.props.request.data.amount *
-                                              (this.props.request.data.deal
-                                                .milestone[
-                                                this.props.request.data.deal
-                                                  .milestone.length - 1
-                                              ].presentDate -
-                                                this.props.request.data.deal
-                                                  .milestone[0].presentDate)) /
-                                              86400 /
-                                              30) *
-                                              (this.props.request.data
-                                                .interestRate /
-                                                12)) /
-                                              100) *
-                                              1000
-                                          ) /
-                                            1000) *
-                                          this.state.curDatePayback.percent +
-                                          this.state.penalty *
-                                            this.props.request.data.amount
-                                      )
+                                    {this.numberWithCommas(Math.round(
+                                      (this.props.request.data.amount +
+                                        Math.round(
+                                          ((((this.props.request.data.amount *
+                                            (this.props.request.data.deal
+                                              .milestone[
+                                              this.props.request.data.deal
+                                                .milestone.length - 1
+                                            ].presentDate -
+                                              this.props.request.data.deal
+                                                .milestone[0].presentDate)) /
+                                            86400 /
+                                            30) *
+                                            (this.props.request.data
+                                              .interestRate /
+                                              12)) /
+                                            100) *
+                                            1000
+                                        ) /
+                                          1000) *
+                                        this.state.curDatePayback.percent +
+                                        this.state.penalty *
+                                          this.props.request.data.amount)
                                     )}{' '}
                                     VNĐ
                                   </Label>
