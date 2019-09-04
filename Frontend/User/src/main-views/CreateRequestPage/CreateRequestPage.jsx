@@ -448,6 +448,7 @@ class CreateRequestPage extends React.Component {
                           </FormGroup>
                           <ApplyTimeline
                             onDataChange={this.handleDataTimeline}
+                            isCreatePage={true}
                           />
                           <div className="text-center my-4">
                             {/* <Input type="submit" value="Send" /> */}

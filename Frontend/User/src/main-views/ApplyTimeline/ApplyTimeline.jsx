@@ -303,10 +303,10 @@ class ApplyTimeline extends React.Component {
         if (i === 0) {
           element.percent = null;
         } else {
-        element.percent =
-          Math.round(
-            (1 / (this.state.backup_timeline_lending.length - 1)) * 100
-          ) / 100;
+          element.percent =
+            Math.round(
+              (1 / (this.state.backup_timeline_lending.length - 1)) * 100
+            ) / 100;
         }
       }
 
@@ -1038,10 +1038,12 @@ class ApplyTimeline extends React.Component {
   }
   render() {
     const {curLendingId, curPaybackId} = this.state;
-    const curLendingStatus = this.state.timeline_lending[curLendingId].percent;
+    const curLendingPercent = this.state.timeline_lending[curLendingId].percent;
+    const curLendingStatus = this.state.timeline_lending[curLendingId].status;
     const isLendMany = this.state.isLendMany;
 
-    const curPaybackStatus = this.state.timeline_payback[curPaybackId].percent;
+    const curPaybackPercent = this.state.timeline_payback[curPaybackId].percent;
+    const curPaybackStatus = this.state.timeline_payback[curPaybackId].status;
     const isPaybackMany = this.state.isPaybackMany;
 
     const isTrading = this.props.viewDetail.isTrading;
@@ -1219,14 +1221,32 @@ class ApplyTimeline extends React.Component {
                         >
                           {this.createLendingTimeline()}
                         </div>
-
-                        <div className="text-center">
-                          {'Amount Percent to lend in milestone ' +
-                            curLendingId +
-                            ' is' +
-                            curLendingStatus * 100 +
-                            '%'}
-                        </div>
+                        {this.props.isCreatePage !== undefined ? (
+                          ''
+                        ) : (
+                          <div>
+                            <div className="text-center">
+                              {'Amount need to lend in milestone ' +
+                                curLendingId +
+                                ' : ' +
+                                this.numberWithCommas(
+                                  this.roundUp(
+                                    this.state.amountProps * curLendingPercent
+                                  )
+                                ) +
+                                ' VNĐ'}
+                            </div>
+                            <div className="text-center">
+                              {'Status : '}
+                              {curLendingStatus == null &&
+                              curLendingPercent == null
+                                ? '---'
+                                : curLendingStatus == null
+                                ? 'Not Yet'
+                                : curLendingStatus}
+                            </div>
+                          </div>
+                        )}
                       </Col>
                       <Col md="3">
                         {this.props.borrowerUser ===
@@ -1373,14 +1393,31 @@ class ApplyTimeline extends React.Component {
                     >
                       {this.createLendingTimeline()}
                     </div>
-
-                    <div className="text-center">
-                      {'Amount Percent to lend in milestone ' +
-                        curLendingId +
-                        ' is ' +
-                        curLendingStatus * 100 +
-                        '%'}
-                    </div>
+                    {this.props.isCreatePage !== undefined ? (
+                      ''
+                    ) : (
+                      <div>
+                        <div className="text-center">
+                          {'Amount need to lend in milestone ' +
+                            curLendingId +
+                            ' :  ' +
+                            this.numberWithCommas(
+                              this.roundUp(
+                                this.state.amountProps * curLendingPercent
+                              )
+                            ) +
+                            ' VNĐ'}
+                        </div>
+                        <div className="text-center">
+                          {'Status : '}
+                          {curLendingStatus == null && curLendingPercent == null
+                            ? '---'
+                            : curLendingStatus == null
+                            ? 'Not Yet'
+                            : curLendingStatus}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1553,13 +1590,45 @@ class ApplyTimeline extends React.Component {
                       >
                         {this.createPaybackTimeline()}
                       </div>
-                      <div className="text-center">
-                        {'Amount Percent to pay in milestone ' +
-                          curPaybackId +
-                          ' is ' +
-                          curPaybackStatus * 100 +
-                          ' %'}
-                      </div>
+                      {this.props.isCreatePage !== undefined ? (
+                        ''
+                      ) : (
+                        <div>
+                          <div className="text-center">
+                            {'Amount need to pay in milestone ' +
+                              curPaybackId +
+                              ' :  ' +
+                              (this.props.request.data.amount +
+                                Math.round(
+                                  ((((this.props.request.data.amount *
+                                    (this.props.request.data.deal.milestone[
+                                      this.props.request.data.deal.milestone
+                                        .length - 1
+                                    ].presentDate -
+                                      this.props.request.data.deal.milestone[0]
+                                        .presentDate)) /
+                                    86400 /
+                                    30) *
+                                    (this.props.request.data.interestRate /
+                                      12)) /
+                                    100) *
+                                    1000
+                                ) /
+                                  1000) *
+                                curPaybackPercent +
+                              ' VNĐ'}
+                          </div>
+                          <div className="text-center">
+                            {'Status : '}
+                            {curPaybackStatus == null &&
+                            curPaybackPercent == null
+                              ? '---'
+                              : curPaybackStatus == null
+                              ? 'Not Yet'
+                              : curPaybackStatus}
+                          </div>
+                        </div>
+                      )}
                     </Col>
                     <Col md="3">
                       {this.props.borrowerUser ===
@@ -1656,29 +1725,31 @@ class ApplyTimeline extends React.Component {
                                 </Col>
                                 <Col md="6">
                                   <Label className="h6">
-                                    {this.numberWithCommas(Math.round(
-                                      (this.props.request.data.amount +
-                                        Math.round(
-                                          ((((this.props.request.data.amount *
-                                            (this.props.request.data.deal
-                                              .milestone[
-                                              this.props.request.data.deal
-                                                .milestone.length - 1
-                                            ].presentDate -
-                                              this.props.request.data.deal
-                                                .milestone[0].presentDate)) /
-                                            86400 /
-                                            30) *
-                                            (this.props.request.data
-                                              .interestRate /
-                                              12)) /
-                                            100) *
-                                            1000
-                                        ) /
-                                          1000) *
-                                        this.state.curDatePayback.percent +
-                                        this.state.penalty *
-                                          this.props.request.data.amount)
+                                    {this.numberWithCommas(
+                                      Math.round(
+                                        (this.props.request.data.amount +
+                                          Math.round(
+                                            ((((this.props.request.data.amount *
+                                              (this.props.request.data.deal
+                                                .milestone[
+                                                this.props.request.data.deal
+                                                  .milestone.length - 1
+                                              ].presentDate -
+                                                this.props.request.data.deal
+                                                  .milestone[0].presentDate)) /
+                                              86400 /
+                                              30) *
+                                              (this.props.request.data
+                                                .interestRate /
+                                                12)) /
+                                              100) *
+                                              1000
+                                          ) /
+                                            1000) *
+                                          this.state.curDatePayback.percent +
+                                          this.state.penalty *
+                                            this.props.request.data.amount
+                                      )
                                     )}{' '}
                                     VNĐ
                                   </Label>
@@ -1797,13 +1868,47 @@ class ApplyTimeline extends React.Component {
                   >
                     {this.createPaybackTimeline()}
                   </div>
-                  <div className="text-center">
-                    {'Amount Percent to pay in milestone ' +
-                      curPaybackId +
-                      ' is ' +
-                      curPaybackStatus * 100 +
-                      '%'}
-                  </div>
+                  {this.props.isCreatePage !== undefined ? (
+                    ''
+                  ) : (
+                    <div>
+                      <div className="text-center">
+                        {'Amount need to pay in milestone ' +
+                          curPaybackId +
+                          ' :  ' +
+                          this.numberWithCommas(
+                            Math.round(
+                              this.props.request.data.amount +
+                                Math.round(
+                                  ((((this.props.request.data.amount *
+                                    (this.props.request.data.deal.milestone[
+                                      this.props.request.data.deal.milestone
+                                        .length - 1
+                                    ].presentDate -
+                                      this.props.request.data.deal.milestone[0]
+                                        .presentDate)) /
+                                    86400 /
+                                    30) *
+                                    (this.props.request.data.interestRate /
+                                      12)) /
+                                    100) *
+                                    1000
+                                ) /
+                                  1000
+                            ) * curPaybackPercent
+                          ) +
+                          ' VNĐ'}
+                      </div>
+                      <div className="text-center">
+                        {'Status : '}
+                        {curPaybackStatus == null && curPaybackPercent == null
+                          ? '---'
+                          : curPaybackStatus == null
+                          ? 'Not Yet'
+                          : curPaybackStatus}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
