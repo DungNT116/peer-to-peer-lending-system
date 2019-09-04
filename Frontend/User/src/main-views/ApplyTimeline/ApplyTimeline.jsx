@@ -298,15 +298,15 @@ class ApplyTimeline extends React.Component {
     }
     if (!isDuplicate && !isLendingPrevious) {
       // change percent before save
-      for (let i = 0; i < timelineCopy.length; i++) {
+      for (let i = 1; i < timelineCopy.length; i++) {
         const element = timelineCopy[i];
         if (i === 0) {
           element.percent = null;
         } else {
-        element.percent =
-          Math.round(
-            (1 / (this.state.backup_timeline_lending.length - 1)) * 100
-          ) / 100;
+          element.percent =
+            Math.round(
+              (1 / (this.state.backup_timeline_lending.length - 1)) * 100
+            ) / 100;
         }
       }
 
@@ -1656,8 +1656,8 @@ class ApplyTimeline extends React.Component {
                                 </Col>
                                 <Col md="6">
                                   <Label className="h6">
-                                    {Math.round(
-                                      this.numberWithCommas(
+                                    {this.numberWithCommas(
+                                      Math.round(
                                         (this.props.request.data.amount +
                                           Math.round(
                                             ((((this.props.request.data.amount *
