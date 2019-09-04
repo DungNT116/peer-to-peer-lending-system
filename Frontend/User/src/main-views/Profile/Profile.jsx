@@ -16,14 +16,14 @@ import {
   Modal,
 } from 'reactstrap';
 
-import { css } from '@emotion/core';
+import {css} from '@emotion/core';
 
-import { PulseLoader } from 'react-spinners';
+import {PulseLoader} from 'react-spinners';
 // core components
 import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
-import { apiLink } from '../../api.jsx';
-import { database } from 'firebase';
+import {apiLink} from '../../api.jsx';
+import {database} from 'firebase';
 class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -128,12 +128,12 @@ class Profile extends React.Component {
             tempLink.href = txtURL;
             tempLink.setAttribute('download', 'pplsUserHashFile.txt');
             tempLink.click();
-          })
+          });
         } else if (result.status === 400) {
           this.setState({
             isOpenError: true,
-            message: "Please upload identity card and video to get hash"
-          })
+            message: 'Please upload identity card and video to get hash',
+          });
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
           this.props.history.push('/login-page');
@@ -141,7 +141,7 @@ class Profile extends React.Component {
           result.text().then(async data => {
             await this.setState({
               isOpenError: true,
-              message: "something went wrong",
+              message: 'something went wrong',
             });
           });
         }
@@ -238,8 +238,8 @@ class Profile extends React.Component {
               isOpenSuccess: true,
             });
             setTimeout(
-              function () {
-                this.setState({ isOpenSuccess: false });
+              function() {
+                this.setState({isOpenSuccess: false});
               }.bind(this),
               1000
             );
@@ -250,7 +250,7 @@ class Profile extends React.Component {
             result.text().then(async data => {
               await this.setState({
                 isOpenError: true,
-                message: "something went wrong",
+                message: 'something went wrong',
               });
             });
           }
@@ -395,16 +395,16 @@ class Profile extends React.Component {
 
   async startRecording() {
     window.recordedBlobs = [];
-    let options = { mimeType: 'video/webm;codecs=vp9' };
+    let options = {mimeType: 'video/webm;codecs=vp9'};
     if (!MediaRecorder.isTypeSupported(options.mimeType)) {
       console.error(`${options.mimeType} is not Supported`);
-      options = { mimeType: 'video/webm;codecs=vp8' };
+      options = {mimeType: 'video/webm;codecs=vp8'};
       if (!MediaRecorder.isTypeSupported(options.mimeType)) {
         console.error(`${options.mimeType} is not Supported`);
-        options = { mimeType: 'video/webm' };
+        options = {mimeType: 'video/webm'};
         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
           console.error(`${options.mimeType} is not Supported`);
-          options = { mimeType: '' };
+          options = {mimeType: ''};
         }
       }
     }
@@ -484,7 +484,7 @@ class Profile extends React.Component {
     })
       .then(async result => {
         if (result.status === 200) {
-          this.setState({ docs: [] });
+          this.setState({docs: []});
           result.json().then(async data => {
             for (let i = 0; i < this.state.documentTypes.length; i++) {
               //get element in doc type
@@ -510,7 +510,7 @@ class Profile extends React.Component {
                         },
                       ],
                       ['loading' +
-                        elementType.acronym.replace(/\s+/g, '')]: false,
+                      elementType.acronym.replace(/\s+/g, '')]: false,
                     });
                   }
                 } else if (elementType.name === element.documentType.name) {
@@ -526,14 +526,14 @@ class Profile extends React.Component {
                         ...this.state.docs,
                         {
                           ['document' +
-                            element.documentType.name.replace(
-                              /\s+/g,
-                              ''
-                            )]: element,
+                          element.documentType.name.replace(
+                            /\s+/g,
+                            ''
+                          )]: element,
                         },
                       ],
                       ['loading' +
-                        element.documentType.acronym.replace(/\s+/g, '')]: false,
+                      element.documentType.acronym.replace(/\s+/g, '')]: false,
                     });
                   }
                   //special with Video type
@@ -564,12 +564,12 @@ class Profile extends React.Component {
               const element = data[i];
               if (
                 this.state.docs[
-                'document' + element.documentType.name.replace(/\s+/g, '')
+                  'document' + element.documentType.name.replace(/\s+/g, '')
                 ] === null
               ) {
                 await this.setState({
                   ['loading' +
-                    element.documentType.acronym.replace(/\s+/g, '')]: false,
+                  element.documentType.acronym.replace(/\s+/g, '')]: false,
                 });
               }
             }
@@ -591,7 +591,7 @@ class Profile extends React.Component {
   }
 
   async uploadVideo() {
-    const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
+    const superBuffer = new Blob(window.recordedBlobs, {type: 'video/webm'});
     var base64data = '';
     var reader = new FileReader();
     reader.readAsDataURL(superBuffer);
@@ -617,7 +617,7 @@ class Profile extends React.Component {
         // })
       }).then(async result => {
         if (result.status === 200) {
-          await this.getDocument()
+          await this.getDocument();
           console.log('success');
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
@@ -701,7 +701,7 @@ class Profile extends React.Component {
     }
     //10 MB
     if (validFilesCount === files.length && totalFilesSize <= 10000000) {
-      var document = { documentType: type, listImage: event.target.files };
+      var document = {documentType: type, listImage: event.target.files};
       await this.setState({
         ['uploadDocument' + type]: document,
       });
@@ -714,7 +714,7 @@ class Profile extends React.Component {
   }
 
   toggle() {
-    this.setState({ collapse: !this.state.collapse });
+    this.setState({collapse: !this.state.collapse});
   }
 
   async toggleAccordion(tab, docName) {
@@ -849,7 +849,7 @@ class Profile extends React.Component {
   autoPlayVideo(event) {
     event.preventDefault();
     const recordedVideo = document.querySelector('video#recorded');
-    const superBuffer = new Blob(window.recordedBlobs, { type: 'video/webm' });
+    const superBuffer = new Blob(window.recordedBlobs, {type: 'video/webm'});
     recordedVideo.src = null;
     recordedVideo.srcObject = null;
     recordedVideo.src = window.URL.createObjectURL(superBuffer);
@@ -946,6 +946,73 @@ class Profile extends React.Component {
             {this.state[
               'loading' + doc[Object.keys(doc)[0]].documentType.acronym
             ] === true ? (
+              <PulseLoader
+                css={override}
+                sizeUnit={'px'}
+                size={15}
+                color={'#123abc'}
+                loading={
+                  this.state[
+                    'loading' + doc[Object.keys(doc)[0]].documentType.acronym
+                  ]
+                }
+              />
+            ) : doc[Object.keys(doc)[0]].documentFile !== undefined &&
+              doc[Object.keys(doc)[0]].documentType.name !== 'Video' ? (
+              //
+              <div>
+                {/*  */}
+                {doc[Object.keys(doc)[0]].status === 'invalid' ? (
+                  <div>
+                    <small style={{color: 'red'}}>
+                      <strong>
+                        Your document is rejected, please upload again for
+                        validation !
+                      </strong>
+                    </small>
+                    <Input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={event =>
+                        this.handleFileInput(
+                          event,
+                          doc[Object.keys(doc)[0]].documentType.acronym
+                        )
+                      }
+                    />{' '}
+                    <Button
+                      type="button"
+                      onClick={async () =>
+                        await this.saveDocument(
+                          doc[Object.keys(doc)[0]].documentType.id,
+                          doc[Object.keys(doc)[0]].documentType.acronym
+                        )
+                      }
+                    >
+                      Save
+                    </Button>
+                  </div>
+                ) : doc[Object.keys(doc)[0]].status === 'pending' ? (
+                  'Document is waiting for validation'
+                ) : (
+                  ''
+                )}
+                {/*  */}
+                {doc[Object.keys(doc)[0]].documentFile.map(imageData => (
+                  <img
+                    src={this.setSrcImgBase64(
+                      imageData.fileType,
+                      imageData.data
+                    )}
+                    style={style.sameSizeWithParent}
+                  />
+                ))}
+              </div>
+            ) : doc[Object.keys(doc)[0]].documentType.name === 'Video' ? (
+              this.state[
+                'loading' + doc[Object.keys(doc)[0]].documentType.acronym
+              ] === true ? (
                 <PulseLoader
                   css={override}
                   sizeUnit={'px'}
@@ -953,205 +1020,138 @@ class Profile extends React.Component {
                   color={'#123abc'}
                   loading={
                     this.state[
-                    'loading' + doc[Object.keys(doc)[0]].documentType.acronym
+                      'loading' +
+                        doc[Object.keys(doc)[0]].documentType.acronym.replace(
+                          /\s+/g,
+                          ''
+                        )
                     ]
                   }
                 />
-              ) : doc[Object.keys(doc)[0]].documentFile !== undefined &&
-                doc[Object.keys(doc)[0]].documentType.name !== 'Video' ? (
-                  //
+              ) : this.state.isUploadedVideo === false ? (
+                this.state.isVideoSaved === false ? (
                   <div>
-                    {/*  */}
-                    {doc[Object.keys(doc)[0]].status === 'invalid' ? (
-                      <div>
-                        <small style={{ color: 'red' }}>
-                          <strong>
-                            Your document is rejected, please upload again for
-                            validation !
-                      </strong>
-                        </small>
-                        <Input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          onChange={event =>
-                            this.handleFileInput(
-                              event,
-                              doc[Object.keys(doc)[0]].documentType.acronym
-                            )
-                          }
-                        />{' '}
-                        <Button
-                          type="button"
-                          onClick={async () =>
-                            await this.saveDocument(
-                              doc[Object.keys(doc)[0]].documentType.id,
-                              doc[Object.keys(doc)[0]].documentType.acronym
-                            )
-                          }
-                        >
-                          Save
-                    </Button>
-                      </div>
-                    ) : doc[Object.keys(doc)[0]].status === 'pending' ? (
-                      'Document is waiting for validation'
-                    ) : (
-                          ''
-                        )}
-                    {/*  */}
-                    {doc[Object.keys(doc)[0]].documentFile.map(imageData => (
-                      <img
-                        src={this.setSrcImgBase64(
-                          imageData.fileType,
-                          imageData.data
-                        )}
-                        style={style.sameSizeWithParent}
-                      />
-                    ))}
-                  </div>
-                ) : doc[Object.keys(doc)[0]].documentType.name === 'Video' ? (
-                  this.state[
-                    'loading' + doc[Object.keys(doc)[0]].documentType.acronym
-                  ] === true ? (
-                      <PulseLoader
-                        css={override}
-                        sizeUnit={'px'}
-                        size={15}
-                        color={'#123abc'}
-                        loading={
-                          this.state[
-                          'loading' +
-                          doc[Object.keys(doc)[0]].documentType.acronym.replace(
-                            /\s+/g,
-                            ''
-                          )
-                          ]
-                        }
-                      />
-                    ) : this.state.isUploadedVideo === false ? (
-                      this.state.isVideoSaved === false ? (
-                        <div>
-                          <Row>
-                            <Col md={2} />
-                            <Col md={8}>
-                              <video autoPlay id="gum" />
-                              <video autoPlay id="recorded" />
-                            </Col>
-                            <Col md={2} />
-                          </Row>
-                          <Row>
-                            <h5>
-                              <strong>
-                                Turn on the camera , show your face clearly in camera
-                                and talk "I agree to use PPLS" to validate your
-                                Identity Video
+                    <Row>
+                      <Col md={2} />
+                      <Col md={8}>
+                        <video autoPlay id="gum" />
+                        <video autoPlay id="recorded" />
+                      </Col>
+                      <Col md={2} />
+                    </Row>
+                    <Row>
+                      <h5>
+                        <strong>
+                          Turn on the camera , show your face clearly in camera
+                          and talk "I agree to use PPLS" to validate your
+                          Identity Video
                         </strong>
-                            </h5>
-                          </Row>
-                          <Row>
-                            <Button
-                              size="md"
-                              className="btn btn-outline-primary"
-                              id="start"
-                              onClick={event => {
-                                this.openCamera(event);
-                              }}
-                            >
-                              Start camera
-                      </Button>
-                            <Button
-                              size="md"
-                              className="btn btn-outline-primary"
-                              id="record"
-                              onClick={event => {
-                                event.preventDefault();
-                                var recordButton = document.querySelector(
-                                  'button#record'
-                                );
-                                this.openCamera(event);
-                                if (recordButton.textContent === 'Start Recording') {
-                                  this.startRecording();
-                                  setTimeout(
-                                    function () {
-                                      this.stopRecording();
-                                      window.stream
-                                        .getTracks()
-                                        .forEach(function (track) {
-                                          track.stop();
-                                        });
-                                    }.bind(this),
-                                    5000
-                                  );
-                                }
-                              }}
-                            >
-                              Start Recording
-                      </Button>
-                            <Button
-                              size="md"
-                              className="btn btn-outline-primary"
-                              id="play"
-                              onClick={event => {
-                                this.autoPlayVideo(event);
-                              }}
-                            >
-                              Play
-                      </Button>{' '}
-                            <Button
-                              id="saveToDB"
-                              size="md"
-                              className="btn btn-outline-primary"
-                              onClick={event => {
-                                event.preventDefault();
-                                this.uploadVideo();
-                              }}
-                            >
-                              Save video
-                      </Button>
-                          </Row>
-                        </div>
-                      ) : (
-                          <div>
-                            <p>
-                              You had already upload video, waiting for validating from
-                              Admin
-                    </p>
-                          </div>
-                        )
-                    ) : (
-                        <div>
-                          <p>
-                            You had already upload video, system will keep your Identity
-                            Video due to User Privacy
-                  </p>
-                        </div>
-                      )
-                ) : (
-                    <div>
-                      <Input
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={event =>
-                          this.handleFileInput(
-                            event,
-                            doc[Object.keys(doc)[0]].documentType.acronym
-                          )
-                        }
-                      />{' '}
+                      </h5>
+                    </Row>
+                    <Row>
                       <Button
-                        type="button"
-                        onClick={async () =>
-                          await this.saveDocument(
-                            doc[Object.keys(doc)[0]].documentType.id,
-                            doc[Object.keys(doc)[0]].documentType.acronym
-                          )
-                        }
+                        size="md"
+                        className="btn btn-outline-primary"
+                        id="start"
+                        onClick={event => {
+                          this.openCamera(event);
+                        }}
                       >
-                        Save
+                        Start camera
+                      </Button>
+                      <Button
+                        size="md"
+                        className="btn btn-outline-primary"
+                        id="record"
+                        onClick={event => {
+                          event.preventDefault();
+                          var recordButton = document.querySelector(
+                            'button#record'
+                          );
+                          this.openCamera(event);
+                          if (recordButton.textContent === 'Start Recording') {
+                            this.startRecording();
+                            setTimeout(
+                              function() {
+                                this.stopRecording();
+                                window.stream
+                                  .getTracks()
+                                  .forEach(function(track) {
+                                    track.stop();
+                                  });
+                              }.bind(this),
+                              5000
+                            );
+                          }
+                        }}
+                      >
+                        Start Recording
+                      </Button>
+                      <Button
+                        size="md"
+                        className="btn btn-outline-primary"
+                        id="play"
+                        onClick={event => {
+                          this.autoPlayVideo(event);
+                        }}
+                      >
+                        Play
+                      </Button>{' '}
+                      <Button
+                        id="saveToDB"
+                        size="md"
+                        className="btn btn-outline-primary"
+                        onClick={event => {
+                          event.preventDefault();
+                          this.uploadVideo();
+                        }}
+                      >
+                        Save video
+                      </Button>
+                    </Row>
+                  </div>
+                ) : (
+                  <div>
+                    <p>
+                      You had already upload video, waiting for validating from
+                      Admin
+                    </p>
+                  </div>
+                )
+              ) : (
+                <div>
+                  <p>
+                    You had already upload video, system will keep your Identity
+                    Video due to User Privacy
+                  </p>
+                </div>
+              )
+            ) : (
+              <div>
+                <Input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={event =>
+                    this.handleFileInput(
+                      event,
+                      doc[Object.keys(doc)[0]].documentType.acronym
+                    )
+                  }
+                />{' '}
+                <Button
+                  type="button"
+                  onClick={async () =>
+                    await this.saveDocument(
+                      doc[Object.keys(doc)[0]].documentType.id,
+                      doc[Object.keys(doc)[0]].documentType.acronym
+                    )
+                  }
+                >
+                  Save
                 </Button>
-                    </div>
-                  )}
+              </div>
+            )}
           </CardBody>
         </Collapse>
       </Card>
@@ -1283,20 +1283,22 @@ class Profile extends React.Component {
                         <Col xs="5">
                           <h3 className="mb-0">My account</h3>
                         </Col>
-                        {this.state.isDownloaded === false ?
-                          (<Col className="text-right" xs="2">
+                        <Col className="text-right" xs="2">
+                          {this.state.isDownloaded === false ? (
                             <Button
                               id="hash"
                               color="primary"
-                              onClick={() => {this.setState({ hashModal: true });}}
+                              onClick={() => {
+                                this.setState({hashModal: true});
+                              }}
                               size="sm"
                             >
                               Get Hash
-                        </Button>
-                          </Col>)
-                          :
-                          ("")}
-
+                            </Button>
+                          ) : (
+                            ''
+                          )}
+                        </Col>
                         <Col className="text-right" xs="2">
                           {this.state.editable === false ? (
                             <Button
@@ -1314,8 +1316,8 @@ class Profile extends React.Component {
                               Edit Profile
                             </Button>
                           ) : (
-                              ''
-                            )}
+                            ''
+                          )}
                         </Col>
                         <Col className="text-right" xs="3">
                           {this.state.isChangePassword === false ? (
@@ -1331,8 +1333,8 @@ class Profile extends React.Component {
                               Change Password
                             </Button>
                           ) : (
-                              ''
-                            )}
+                            ''
+                          )}
                         </Col>
                       </Row>
                     </CardHeader>
@@ -1379,13 +1381,13 @@ class Profile extends React.Component {
                                           onChange={this.onPhoneNumberChange}
                                         />
                                         <p
-                                          style={{ color: 'red' }}
+                                          style={{color: 'red'}}
                                           id="phoneError"
                                         />
                                       </div>
                                     ) : (
-                                        <p>{this.state.phoneNumber}</p>
-                                      )}
+                                      <p>{this.state.phoneNumber}</p>
+                                    )}
                                   </FormGroup>
                                 </Col>
                                 <Col lg="6">
@@ -1406,13 +1408,13 @@ class Profile extends React.Component {
                                           onChange={this.onEmailChange}
                                         />
                                         <p
-                                          style={{ color: 'red' }}
+                                          style={{color: 'red'}}
                                           id="emailError"
                                         />
                                       </div>
                                     ) : (
-                                        <p>{this.state.email}</p>
-                                      )}
+                                      <p>{this.state.email}</p>
+                                    )}
                                   </FormGroup>
                                 </Col>
                               </Row>
@@ -1436,13 +1438,13 @@ class Profile extends React.Component {
                                           onChange={this.onFirstNameChange}
                                         />
                                         <p
-                                          style={{ color: 'red' }}
+                                          style={{color: 'red'}}
                                           id="firstnameError"
                                         />
                                       </div>
                                     ) : (
-                                        <p>{this.state.firstName}</p>
-                                      )}
+                                      <p>{this.state.firstName}</p>
+                                    )}
                                   </FormGroup>
                                 </Col>
                                 <Col lg="6">
@@ -1464,13 +1466,13 @@ class Profile extends React.Component {
                                           onChange={this.onLastNameChange}
                                         />
                                         <p
-                                          style={{ color: 'red' }}
+                                          style={{color: 'red'}}
                                           id="lastnameError"
                                         />
                                       </div>
                                     ) : (
-                                        <p>{this.state.lastName}</p>
-                                      )}
+                                      <p>{this.state.lastName}</p>
+                                    )}
                                   </FormGroup>
                                 </Col>
                               </Row>
@@ -1501,101 +1503,101 @@ class Profile extends React.Component {
                                   </Col>
                                 </Row>
                               ) : (
-                                  ''
-                                )}
+                                ''
+                              )}
                             </div>
                           ) : (
-                              <div>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-oldPassword"
-                                      >
-                                        Old Password
+                            <div>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-oldPassword"
+                                    >
+                                      Old Password
                                     </label>
-                                      <div>
-                                        <Input
-                                          className="form-control-alternative"
-                                          value={this.state.oldPassword}
-                                          id="input-oldPassword"
-                                          type="password"
-                                          onChange={this.changeOldPassword}
-                                        />
-                                      </div>
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-newPassword"
-                                      >
-                                        New Password
+                                    <div>
+                                      <Input
+                                        className="form-control-alternative"
+                                        value={this.state.oldPassword}
+                                        id="input-oldPassword"
+                                        type="password"
+                                        onChange={this.changeOldPassword}
+                                      />
+                                    </div>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-newPassword"
+                                    >
+                                      New Password
                                     </label>
-                                      <div>
-                                        <Input
-                                          className="form-control-alternative"
-                                          value={this.state.newPassword}
-                                          id="input-newPassword"
-                                          type="password"
-                                          onChange={this.changeNewPassword}
-                                        />
-                                        <p
-                                          style={{ color: 'red' }}
-                                          id="passwordError"
-                                        />
-                                      </div>
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <Row>
-                                  <Col lg="6">
-                                    <FormGroup>
-                                      <label
-                                        className="form-control-label"
-                                        htmlFor="input-comfirmPassword"
-                                      >
-                                        Confirm Password
+                                    <div>
+                                      <Input
+                                        className="form-control-alternative"
+                                        value={this.state.newPassword}
+                                        id="input-newPassword"
+                                        type="password"
+                                        onChange={this.changeNewPassword}
+                                      />
+                                      <p
+                                        style={{color: 'red'}}
+                                        id="passwordError"
+                                      />
+                                    </div>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Col lg="6">
+                                  <FormGroup>
+                                    <label
+                                      className="form-control-label"
+                                      htmlFor="input-comfirmPassword"
+                                    >
+                                      Confirm Password
                                     </label>
-                                      <div>
-                                        <Input
-                                          className="form-control-alternative"
-                                          value={this.state.confirmPassword}
-                                          id="input-confirmPassword"
-                                          type="password"
-                                          onChange={this.changeConfirmPassword}
-                                        />
-                                        <p id="confirmError" />
-                                      </div>
-                                    </FormGroup>
-                                  </Col>
-                                </Row>
-                                <Row>
-                                  <Button
-                                    id="savePassword"
-                                    color="primary"
-                                    onClick={() => this.changePassword()}
-                                    size="sm"
-                                  >
-                                    save
+                                    <div>
+                                      <Input
+                                        className="form-control-alternative"
+                                        value={this.state.confirmPassword}
+                                        id="input-confirmPassword"
+                                        type="password"
+                                        onChange={this.changeConfirmPassword}
+                                      />
+                                      <p id="confirmError" />
+                                    </div>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                              <Row>
+                                <Button
+                                  id="savePassword"
+                                  color="primary"
+                                  onClick={() => this.changePassword()}
+                                  size="sm"
+                                >
+                                  save
                                 </Button>{' '}
-                                  <Button
-                                    id="cancelChangePassword"
-                                    color="primary"
-                                    onClick={() => this.changeIsChangePassword()}
-                                    size="sm"
-                                  >
-                                    cancel
+                                <Button
+                                  id="cancelChangePassword"
+                                  color="primary"
+                                  onClick={() => this.changeIsChangePassword()}
+                                  size="sm"
+                                >
+                                  cancel
                                 </Button>
-                                </Row>
-                              </div>
-                            )}
+                              </Row>
+                            </div>
+                          )}
                         </div>
-                        <small style={{ color: 'red' }}>
+                        <small style={{color: 'red'}}>
                           <strong>
                             *Identity Card and Identity Video are required to
                             increase loan limit
@@ -1614,12 +1616,12 @@ class Profile extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenSuccess}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               <img
-                style={{ width: 50, height: 50 }}
+                style={{width: 50, height: 50}}
                 src={require('assets/img/theme/checked.png')}
               />
               Successfully Saved
@@ -1629,7 +1631,7 @@ class Profile extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenError}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
           <div className="modal-header">Error</div>
           <div className="modal-body">
@@ -1640,7 +1642,7 @@ class Profile extends React.Component {
           <div className="modal-footer">
             <Button
               onClick={() => {
-                this.setState({ isOpenError: false });
+                this.setState({isOpenError: false});
               }}
             >
               OK
@@ -1655,31 +1657,30 @@ class Profile extends React.Component {
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               <img
-                style={{ width: 50, height: 50 }}
+                style={{width: 50, height: 50}}
                 src={require('assets/img/theme/checked.png')}
               />
               Successfully Upload Video
             </h3>
           </div>
         </Modal>
-        <Modal
-          className="modal-dialog-centered"
-          isOpen={this.state.hashModal}
-        >
+        <Modal className="modal-dialog-centered" isOpen={this.state.hashModal}>
           <div className="modal-header">Confirm</div>
           <div className="modal-body">
             <h3 className="modal-title">
-              <p>This hash file use for execute transaction and download once!</p>
+              <p>
+                This hash file use for execute transaction and download once!
+              </p>
               <p>Please keep this file safe</p>
             </h3>
           </div>
           <div className="modal-footer">
             <Button
               onClick={() => {
-                this.getHashFile()
+                this.getHashFile();
                 this.setState({
-                  hashModal: false
-                })
+                  hashModal: false,
+                });
               }}
             >
               OK
@@ -1687,8 +1688,8 @@ class Profile extends React.Component {
             <Button
               onClick={() => {
                 this.setState({
-                  hashModal: false
-                })
+                  hashModal: false,
+                });
               }}
             >
               close

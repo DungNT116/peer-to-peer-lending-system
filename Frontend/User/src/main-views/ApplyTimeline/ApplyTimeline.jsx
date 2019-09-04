@@ -166,6 +166,10 @@ class ApplyTimeline extends React.Component {
       penalty: 0,
       durationLate: 0,
       currencyUSDVND: null,
+
+      validHash: false,
+      file: null,
+      hashError: '',
     };
     //Lending
     this.changeTimeLineLending = this.changeTimeLineLending.bind(this);
@@ -185,6 +189,9 @@ class ApplyTimeline extends React.Component {
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
     this.handleError = this.handleError.bind(this);
+
+    this.handleFileInput = this.handleFileInput.bind(this);
+    this.validHashFile = this.validHashFile.bind(this);
   }
   numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -1032,16 +1039,96 @@ class ApplyTimeline extends React.Component {
       });
   }
 
+  async validHashFile() {
+    // if(this.state.file !== null || )
+
+    if (this.state.file !== undefined && this.state.file !== null) {
+      var file = this.state.file[0];
+      console.log(file);
+      var formData = new FormData();
+      console.log(file);
+      formData.append('file', file);
+      console.log(formData.get('file'));
+
+      fetch(apiLink + '/rest/document/validHashFile', {
+        method: 'POST',
+        headers: {
+          // ContentType: 'multipart/form-data',
+          // Accept: "application/json",
+          Authorization: localStorage.getItem('token'),
+        },
+        body: formData,
+      })
+        .then(async result => {
+          if (result.status === 200) {
+            await this.setState({
+              validHash: true,
+            });
+          } else if (result.status === 401) {
+            localStorage.removeItem('isLoggedIn');
+            this.props.history.push('/login-page');
+          } else if (result.status === 400) {
+            result.text().then(async error => {
+              await this.setState({
+                hashError: error,
+              });
+            });
+            // alert('error');
+          } else {
+            alert('error not found');
+          }
+        })
+        .catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.handleError(data);
+        });
+    } else {
+      // alert('please select image to upload');
+      await this.setState({
+        isOpenError: true,
+        message: 'please select text file to upload',
+      });
+    }
+  }
+
+  async handleFileInput(event, type) {
+    var files = event.target.files;
+    var validFilesCount = 0;
+    var totalFilesSize = 0;
+    for (let i = 0; i < files.length; i++) {
+      const element = files[i];
+      totalFilesSize += element.size;
+      if (!element.type.includes('text/plain')) {
+        validFilesCount--;
+      } else {
+        validFilesCount++;
+      }
+    }
+    //10 MB
+    if (validFilesCount === files.length && totalFilesSize <= 10000000) {
+      // var document = { documentType: type, listImage: event.target.files };
+      await this.setState({
+        file: files,
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        message: 'please select text file or size is lower than 10MB',
+      });
+    }
+  }
   roundUp(num) {
     let precision = Math.pow(10, 2);
     return Math.ceil(num * precision) / precision;
   }
   render() {
     const {curLendingId, curPaybackId} = this.state;
-    const curLendingStatus = this.state.timeline_lending[curLendingId].percent;
-    const isLendMany = this.state.isLendMany;
+    const curLendingPercent = this.state.timeline_lending[curLendingId].percent;
+    const curLendingStatus = this.state.timeline_lending[curLendingId].status;
 
-    const curPaybackStatus = this.state.timeline_payback[curPaybackId].percent;
+    const isLendMany = this.state.isLendMany;
+    const curPaybackPercent = this.state.timeline_payback[curPaybackId].percent;
+    const curPaybackStatus = this.state.timeline_payback[curPaybackId].status;
     const isPaybackMany = this.state.isPaybackMany;
 
     const isTrading = this.props.viewDetail.isTrading;
@@ -1221,11 +1308,37 @@ class ApplyTimeline extends React.Component {
                         </div>
 
                         <div className="text-center">
-                          {'Amount Percent to lend in milestone ' +
+                          {'Amount need to lend in milestone ' +
                             curLendingId +
-                            ' is' +
-                            curLendingStatus * 100 +
-                            '%'}
+                            ' : ' +
+                            this.numberWithCommas(
+                              Math.round(
+                                (this.props.request.data.amount +
+                                  Math.round(
+                                    ((((this.props.request.data.amount *
+                                      (this.props.request.data.deal.milestone[
+                                        this.props.request.data.deal.milestone
+                                          .length - 1
+                                      ].presentDate -
+                                        this.props.request.data.deal
+                                          .milestone[0].presentDate)) /
+                                      86400 /
+                                      30) *
+                                      (this.props.request.data.interestRate /
+                                        12)) /
+                                      100) *
+                                      1000
+                                  ) /
+                                    1000) *
+                                  curLendingPercent
+                              )
+                            )}
+                        </div>
+                        <div className="text-center">
+                          {'Status :  '}
+                          {curLendingStatus == ''
+                            ? 'Not Yet'
+                            : curLendingStatus}
                         </div>
                       </Col>
                       <Col md="3">
@@ -1308,40 +1421,70 @@ class ApplyTimeline extends React.Component {
                                     </Col>
                                   ) : (
                                     <Col>
-                                      <PayPalButton
-                                        amount={this.roundUp(
-                                          (this.state.amountProps *
-                                            this.state.curDateLending.percent) /
-                                            this.state.currencyUSDVND
-                                        )}
-                                        onSuccess={(details, data) => {
-                                          this.toggleModalCheckTimelineLending();
-                                          this.setState({
-                                            modalLending: false,
-                                            data_tx: {
-                                              txId: details.id,
-                                              createDate: this.convertDateToTimestamp(
-                                                new Date()
-                                              ),
-                                              status: details.status,
-                                              amount:
-                                                details.purchase_units[0].amount
-                                                  .value,
-                                            },
-                                          });
-                                          this.send_tx();
-                                        }}
-                                        style={{
-                                          layout: 'horizontal',
-                                          shape: 'pill',
-                                          disableFunding: true,
-                                          tagline: false,
-                                          size: 'responsive',
-                                        }}
-                                        options={{
-                                          clientId: client_API,
-                                        }}
-                                      />
+                                      {this.state.validHash === true ? (
+                                        <PayPalButton
+                                          amount={this.roundUp(
+                                            (this.state.amountProps *
+                                              this.state.curDateLending
+                                                .percent) /
+                                              this.state.currencyUSDVND
+                                          )}
+                                          onSuccess={(details, data) => {
+                                            this.toggleModalCheckTimelineLending();
+                                            this.setState({
+                                              modalLending: false,
+                                              data_tx: {
+                                                txId: details.id,
+                                                createDate: this.convertDateToTimestamp(
+                                                  new Date()
+                                                ),
+                                                status: details.status,
+                                                amount:
+                                                  details.purchase_units[0]
+                                                    .amount.value,
+                                              },
+                                            });
+                                            this.send_tx();
+                                          }}
+                                          style={{
+                                            layout: 'horizontal',
+                                            shape: 'pill',
+                                            disableFunding: true,
+                                            tagline: false,
+                                            size: 'responsive',
+                                          }}
+                                          options={{
+                                            clientId: client_API,
+                                          }}
+                                        />
+                                      ) : (
+                                        <div>
+                                          <Input
+                                            type="file"
+                                            accept="text/plain"
+                                            onChange={this.handleFileInput}
+                                          />
+                                          <p></p>
+                                          <Button
+                                            // type="submit"
+                                            size="md"
+                                            className="btn btn-outline-primary"
+                                            onClick={() => this.validHashFile()}
+                                          >
+                                            Check
+                                          </Button>
+                                          {this.state.hashError !== '' ? (
+                                            <strong
+                                              class="alert alert-danger"
+                                              role="alert"
+                                            >
+                                              {this.state.hashError}
+                                            </strong>
+                                          ) : (
+                                            ''
+                                          )}
+                                        </div>
+                                      )}
                                     </Col>
                                   )}
                                 </FormGroup>
@@ -1375,11 +1518,34 @@ class ApplyTimeline extends React.Component {
                     </div>
 
                     <div className="text-center">
-                      {'Amount Percent to lend in milestone ' +
+                      {'Amount need to lend in milestone ' +
                         curLendingId +
-                        ' is ' +
-                        curLendingStatus * 100 +
-                        '%'}
+                        ' : ' +
+                        this.numberWithCommas(
+                          Math.round(
+                            (this.props.request.data.amount +
+                              Math.round(
+                                ((((this.props.request.data.amount *
+                                  (this.props.request.data.deal.milestone[
+                                    this.props.request.data.deal.milestone
+                                      .length - 1
+                                  ].presentDate -
+                                    this.props.request.data.deal.milestone[0]
+                                      .presentDate)) /
+                                  86400 /
+                                  30) *
+                                  (this.props.request.data.interestRate / 12)) /
+                                  100) *
+                                  1000
+                              ) /
+                                1000) *
+                              curLendingPercent
+                          )
+                        )}
+                    </div>
+                    <div className="text-center">
+                      {'Status :  '}
+                      {curLendingStatus == '' ? 'Not Yet' : curLendingStatus}
                     </div>
                   </div>
                 )}
@@ -1554,11 +1720,35 @@ class ApplyTimeline extends React.Component {
                         {this.createPaybackTimeline()}
                       </div>
                       <div className="text-center">
-                        {'Amount Percent to pay in milestone ' +
+                        {'Amount need to pay in milestone ' +
                           curPaybackId +
-                          ' is ' +
-                          curPaybackStatus * 100 +
-                          ' %'}
+                          ' : ' +
+                          this.numberWithCommas(
+                            Math.round(
+                              (this.props.request.data.amount +
+                                Math.round(
+                                  ((((this.props.request.data.amount *
+                                    (this.props.request.data.deal.milestone[
+                                      this.props.request.data.deal.milestone
+                                        .length - 1
+                                    ].presentDate -
+                                      this.props.request.data.deal.milestone[0]
+                                        .presentDate)) /
+                                    86400 /
+                                    30) *
+                                    (this.props.request.data.interestRate /
+                                      12)) /
+                                    100) *
+                                    1000
+                                ) /
+                                  1000) *
+                                curPaybackPercent
+                            )
+                          )}
+                      </div>
+                      <div className="text-center">
+                        {'Status :  '}
+                        {curPaybackStatus == '' ? 'Not Yet' : curPaybackStatus}
                       </div>
                     </Col>
                     <Col md="3">
@@ -1714,60 +1904,91 @@ class ApplyTimeline extends React.Component {
                                   </Col>
                                 ) : (
                                   <Col>
-                                    <PayPalButton
-                                      amount={this.roundUp(
-                                        ((this.props.request.data.amount +
-                                          Math.round(
-                                            ((((this.props.request.data.amount *
-                                              (this.props.request.data.deal
-                                                .milestone[
-                                                this.props.request.data.deal
-                                                  .milestone.length - 1
-                                              ].presentDate -
-                                                this.props.request.data.deal
-                                                  .milestone[0].presentDate)) /
-                                              86400 /
-                                              30) *
-                                              (this.props.request.data
-                                                .interestRate /
-                                                12)) /
-                                              100) *
-                                              1000
-                                          ) /
-                                            1000) *
-                                          this.state.curDatePayback.percent +
-                                          this.state.penalty *
-                                            this.props.request.data.amount) /
-                                          this.state.currencyUSDVND
-                                      )}
-                                      onSuccess={(details, data) => {
-                                        this.toggleModalCheckTimelinePayback();
-                                        this.setState({
-                                          modalPayback: false,
-                                          data_tx: {
-                                            txId: details.id,
-                                            createDate: this.convertDateToTimestamp(
-                                              new Date()
-                                            ),
-                                            status: details.status,
-                                            amount:
-                                              details.purchase_units[0].amount
-                                                .value,
-                                          },
-                                        });
-                                        this.send_tx();
-                                      }}
-                                      style={{
-                                        layout: 'horizontal',
-                                        shape: 'pill',
-                                        disableFunding: true,
-                                        tagline: false,
-                                        size: 'responsive',
-                                      }}
-                                      options={{
-                                        clientId: client_API,
-                                      }}
-                                    />
+                                    {this.state.validHash === true ? (
+                                      <PayPalButton
+                                        amount={this.roundUp(
+                                          ((this.props.request.data.amount +
+                                            Math.round(
+                                              ((((this.props.request.data
+                                                .amount *
+                                                (this.props.request.data.deal
+                                                  .milestone[
+                                                  this.props.request.data.deal
+                                                    .milestone.length - 1
+                                                ].presentDate -
+                                                  this.props.request.data.deal
+                                                    .milestone[0]
+                                                    .presentDate)) /
+                                                86400 /
+                                                30) *
+                                                (this.props.request.data
+                                                  .interestRate /
+                                                  12)) /
+                                                100) *
+                                                1000
+                                            ) /
+                                              1000) *
+                                            this.state.curDatePayback.percent +
+                                            this.state.penalty *
+                                              this.props.request.data.amount) /
+                                            this.state.currencyUSDVND
+                                        )}
+                                        onSuccess={(details, data) => {
+                                          this.toggleModalCheckTimelinePayback();
+                                          this.setState({
+                                            modalPayback: false,
+                                            data_tx: {
+                                              txId: details.id,
+                                              createDate: this.convertDateToTimestamp(
+                                                new Date()
+                                              ),
+                                              status: details.status,
+                                              amount:
+                                                details.purchase_units[0].amount
+                                                  .value,
+                                            },
+                                          });
+                                          this.send_tx();
+                                        }}
+                                        style={{
+                                          layout: 'horizontal',
+                                          shape: 'pill',
+                                          disableFunding: true,
+                                          tagline: false,
+                                          size: 'responsive',
+                                        }}
+                                        options={{
+                                          clientId: client_API,
+                                        }}
+                                      />
+                                    ) : (
+                                      <div>
+                                        <Input
+                                          type="file"
+                                          accept="text/plain"
+                                          onChange={this.handleFileInput}
+                                        />
+                                        <p></p>
+                                        <Button
+                                          // type="submit"
+                                          size="md"
+                                          className="btn btn-outline-primary"
+                                          onClick={() => this.validHashFile()}
+                                        >
+                                          Check
+                                        </Button>
+                                        {this.state.hashError !== '' ? (
+                                          <strong
+                                            class="alert alert-danger"
+                                            role="alert"
+                                          >
+                                            {this.state.hashError}
+                                          </strong>
+                                        ) : (
+                                          ''
+                                        )}
+                                      </div>
+                                    )}
                                   </Col>
                                 )}
                               </FormGroup>
@@ -1800,11 +2021,34 @@ class ApplyTimeline extends React.Component {
                     {this.createPaybackTimeline()}
                   </div>
                   <div className="text-center">
-                    {'Amount Percent to pay in milestone ' +
+                    {'Amount need to pay in milestone ' +
                       curPaybackId +
-                      ' is ' +
-                      curPaybackStatus * 100 +
-                      '%'}
+                      ' : ' +
+                      this.numberWithCommas(
+                        Math.round(
+                          (this.props.request.data.amount +
+                            Math.round(
+                              ((((this.props.request.data.amount *
+                                (this.props.request.data.deal.milestone[
+                                  this.props.request.data.deal.milestone
+                                    .length - 1
+                                ].presentDate -
+                                  this.props.request.data.deal.milestone[0]
+                                    .presentDate)) /
+                                86400 /
+                                30) *
+                                (this.props.request.data.interestRate / 12)) /
+                                100) *
+                                1000
+                            ) /
+                              1000) *
+                            curPaybackPercent
+                        )
+                      )}
+                  </div>
+                  <div className="text-center">
+                    {'Status :  '}
+                    {curPaybackStatus == '' ? 'Not Yet' : curPaybackStatus}
                   </div>
                 </div>
               )}
