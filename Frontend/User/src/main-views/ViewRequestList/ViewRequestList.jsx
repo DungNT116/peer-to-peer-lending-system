@@ -94,7 +94,6 @@ class ViewRequestList extends React.Component {
         controllerLink += "allRequestSortByAmountAsc?page=";
         break;
     }
-    console.log("aaaaaaaaaaaaaaaaaaa", controllerLink)
     let pageParam = encodeURIComponent(this.state.page);
     let pageSizeParam = encodeURIComponent(this.state.pageSize);
     fetch(

@@ -54,7 +54,11 @@ class ViewDetailRequest extends React.Component {
       isOpenSuccess: false,
       isOpenError: false,
       message: '',
-      currencyUSDVND : null
+      currencyUSDVND: null,
+
+      validHash: false,
+      file: null,
+      hashError: '',
     };
     this.toggleErrorModal = this.toggleErrorModal.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
@@ -79,6 +83,103 @@ class ViewDetailRequest extends React.Component {
     this.saveTransaction = this.saveTransaction.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
     this.goToViewRequestTrading = this.goToViewRequestTrading.bind(this);
+    this.handleFileInput = this.handleFileInput.bind(this);
+    this.validHashFile = this.validHashFile.bind(this);
+    this.handleError = this.handleError.bind(this);
+  }
+
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
+      await this.setState({
+        isOpenError: true,
+        error: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        error: 'Something when wrong !',
+      });
+    }
+  }
+
+  async validHashFile() {
+    // if(this.state.file !== null || )
+
+    if (this.state.file !== undefined && this.state.file !== null) {
+      var file = this.state.file[0];
+      console.log(file);
+      var formData = new FormData();
+      console.log(file);
+      formData.append('file', file);
+      console.log(formData.get('file'));
+
+      fetch(apiLink + '/rest/document/validHashFile', {
+        method: 'POST',
+        headers: {
+          // ContentType: 'multipart/form-data',
+          // Accept: "application/json",
+          Authorization: localStorage.getItem('token'),
+        },
+        body: formData,
+      })
+        .then(async result => {
+          if (result.status === 200) {
+            await this.setState({
+              validHash: true,
+            });
+          } else if (result.status === 401) {
+            localStorage.removeItem('isLoggedIn');
+            this.props.history.push('/login-page');
+          } else if (result.status === 400) {
+            result.text().then(async error => {
+              await this.setState({
+                hashError: error,
+              });
+            });
+            // alert('error');
+          } else {
+            alert('error not found');
+          }
+        })
+        .catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.handleError(data);
+        });
+    } else {
+      // alert('please select image to upload');
+      await this.setState({
+        isOpenError: true,
+        message: 'please select text file to upload',
+      });
+    }
+  }
+
+  async handleFileInput(event, type) {
+    var files = event.target.files;
+    var validFilesCount = 0;
+    var totalFilesSize = 0;
+    for (let i = 0; i < files.length; i++) {
+      const element = files[i];
+      totalFilesSize += element.size;
+      if (!element.type.includes('text/plain')) {
+        validFilesCount--;
+      } else {
+        validFilesCount++;
+      }
+    }
+    //10 MB
+    if (validFilesCount === files.length && totalFilesSize <= 10000000) {
+      // var document = { documentType: type, listImage: event.target.files };
+      await this.setState({
+        file: files,
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        message: 'please select text file or size is lower than 10MB',
+      });
+    }
   }
 
   toggleErrorModal() {
@@ -123,30 +224,32 @@ class ViewDetailRequest extends React.Component {
           id: Number(this.props.request.data.deal.milestone[1].id),
         },
       }),
-    }).then(async result => {
-      if (result.status === 200) {
-        // alert('create success');
-        await this.setState({
-          isOpenSuccess: true
-        })
-        await setTimeout(
-          function() {
-            this.props.history.push('/view-request-trading');
-          }.bind(this),
-          2000
-        );
-        // this.props.history.push("/view-request-trading");
-      } else if (result.status === 401) {
-        localStorage.removeItem('isLoggedIn');
-        this.props.history.push('/login-page');
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
+    })
+      .then(async result => {
+        if (result.status === 200) {
+          // alert('create success');
+          await this.setState({
+            isOpenSuccess: true,
+          });
+          await setTimeout(
+            function() {
+              this.props.history.push('/view-request-trading');
+            }.bind(this),
+            2000
+          );
+          // this.props.history.push("/view-request-trading");
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        }
       })
-    });
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          message: 'Cannot access to server',
+        });
+      });
   }
 
   validRedux() {
@@ -176,46 +279,48 @@ class ViewDetailRequest extends React.Component {
           borrowDate: Math.round(new Date().getTime() / 1000),
         },
       }),
-    }).then(async result => {
-      if (result.status === 200) {
-        await database
-          .ref('ppls')
-          .orderByChild('username')
-          .equalTo(this.state.borrowUsername)
-          .once('value', snapshot => {
-            if (snapshot.exists()) {
-              const userData = snapshot.val();
-              this.setState({keyUserFb: Object.keys(userData)[0]});
-            }
+    })
+      .then(async result => {
+        if (result.status === 200) {
+          await database
+            .ref('ppls')
+            .orderByChild('username')
+            .equalTo(this.state.borrowUsername)
+            .once('value', snapshot => {
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+                this.setState({keyUserFb: Object.keys(userData)[0]});
+              }
+            });
+          await database
+            .ref('/ppls/' + this.state.keyUserFb + '/notification')
+            .push({
+              message:
+                localStorage.getItem('user') +
+                ' accepted request number : ' +
+                this.props.request.data.id +
+                ' !',
+              sender: localStorage.getItem('user'),
+              requestId: this.props.request.data.id,
+            });
+          var upvotesRef = database.ref(
+            '/ppls/' + this.state.keyUserFb + '/countNew'
+          );
+          await upvotesRef.transaction(function(current_value) {
+            return (current_value || 0) + 1;
           });
-        await database
-          .ref('/ppls/' + this.state.keyUserFb + '/notification')
-          .push({
-            message:
-              localStorage.getItem('user') +
-              ' accepted request number : ' +
-              this.props.request.data.id +
-              ' !',
-            sender: localStorage.getItem('user'),
-            requestId: this.props.request.data.id,
-          });
-        var upvotesRef = database.ref(
-          '/ppls/' + this.state.keyUserFb + '/countNew'
-        );
-        await upvotesRef.transaction(function(current_value) {
-          return (current_value || 0) + 1;
-        });
-      } else if (result.status === 401) {
-        localStorage.removeItem('isLoggedIn');
-        this.props.history.push('/login-page');
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        }
       })
-    });
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          message: 'Cannot access to server',
+        });
+      });
   }
 
   createMileStone() {
@@ -290,48 +395,50 @@ class ViewDetailRequest extends React.Component {
         paybackTimes: this.state.paybackTimeline.length,
         milestone: this.createMileStone(),
       }),
-    }).then(async result => {
-      if (result.status === 401) {
-        localStorage.removeItem('isLoggedIn');
-        this.props.history.push('/login-page');
-      } else if (result.status === 200) {
-        await database
-          .ref('ppls')
-          .orderByChild('username')
-          .equalTo(this.state.makeDealUsername)
-          .once('value', snapshot => {
-            if (snapshot.exists()) {
-              const userData = snapshot.val();
-              this.setState({keyUserFb: Object.keys(userData)[0]});
-            }
+    })
+      .then(async result => {
+        if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        } else if (result.status === 200) {
+          await database
+            .ref('ppls')
+            .orderByChild('username')
+            .equalTo(this.state.makeDealUsername)
+            .once('value', snapshot => {
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+                this.setState({keyUserFb: Object.keys(userData)[0]});
+              }
+            });
+          await database
+            .ref('/ppls/' + this.state.keyUserFb + '/notification')
+            .push({
+              message:
+                localStorage.getItem('user') +
+                ' make deal request number : ' +
+                this.props.request.data.id +
+                ' !',
+              sender: localStorage.getItem('user'),
+              requestId: this.props.request.data.id,
+            });
+          var upvotesRef = database.ref(
+            '/ppls/' + this.state.keyUserFb + '/countNew'
+          );
+          await upvotesRef.transaction(function(current_value) {
+            return (current_value || 0) + 1;
           });
-        await database
-          .ref('/ppls/' + this.state.keyUserFb + '/notification')
-          .push({
-            message:
-              localStorage.getItem('user') +
-              ' make deal request number : ' +
-              this.props.request.data.id +
-              ' !',
-            sender: localStorage.getItem('user'),
-            requestId: this.props.request.data.id,
-          });
-        var upvotesRef = database.ref(
-          '/ppls/' + this.state.keyUserFb + '/countNew'
-        );
-        await upvotesRef.transaction(function(current_value) {
-          return (current_value || 0) + 1;
-        });
-      } else if (result.status === 400) {
-        this.toggleErrorModal();
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
+        } else if (result.status === 400) {
+          this.toggleErrorModal();
+        }
       })
-    });
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          message: 'Cannot access to server',
+        });
+      });
   }
 
   formatDate(date) {
@@ -353,10 +460,15 @@ class ViewDetailRequest extends React.Component {
     let timelineData = {lendingTimeline: [], payBackTimeline: []};
     let lendingTimeline = [];
     let payBackTimeline = [];
+    console.log('aaaaaaaaaaa', milestone);
     let milestoneTimeline = {data: '', status: '', percent: ''};
     for (let i = 0; i < milestone.length; i++) {
       const element = milestone[i];
-      milestoneTimeline = {data: '', status: '', percent: ''};
+      milestoneTimeline = {
+        data: '',
+        status: element.transaction.status,
+        percent: '',
+      };
       milestoneTimeline.data = this.formatDate(
         this.convertTimeStampToDate(element.presentDate)
       );
@@ -445,12 +557,13 @@ class ViewDetailRequest extends React.Component {
         });
         this.acceptDeal();
         this.saveTransaction(data, data_transaction);
-      }).catch(async data => {
+      })
+      .catch(async data => {
         //CANNOT ACCESS TO SERVER
         await this.setState({
           isOpenError: true,
-          message: "Cannot access to server"
-        })
+          message: 'Cannot access to server',
+        });
       });
   };
 
@@ -467,20 +580,24 @@ class ViewDetailRequest extends React.Component {
     if (this.props.viewDetail.isHistoryDetail === false) {
       document.getElementById('saveDealButton').style.display = 'none';
     }
-    fetch('http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1', {
-      method: 'GET',
-    })
+    fetch(
+      'http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1',
+      {
+        method: 'GET',
+      }
+    )
       .then(response => response.json())
       .then(async data => {
         this.setState({
           currencyUSDVND: data.quotes.USDVND,
         });
-      }).catch(async data => {
+      })
+      .catch(async data => {
         //CANNOT ACCESS TO SERVER
         await this.setState({
           isOpenError: true,
-          message: "Cannot access to server"
-        })
+          message: 'Cannot access to server',
+        });
       });
   }
 
@@ -652,17 +769,20 @@ class ViewDetailRequest extends React.Component {
                               <p className="h6">
                                 {/* đổi công thức như trong doc */}
                                 {this.numberWithCommas(
-                                  this.props.request.data.amount +
-                                    Math.round(
-                                      ((((this.props.request.data.amount *
-                                        duration) /
-                                        30) *
-                                        (this.props.request.data.interestRate /
-                                          12)) /
-                                        100) *
+                                  Math.round(
+                                    this.props.request.data.amount +
+                                      Math.round(
+                                        ((((this.props.request.data.amount *
+                                          duration) /
+                                          30) *
+                                          (this.props.request.data
+                                            .interestRate /
+                                            12)) /
+                                          100) *
+                                          1000
+                                      ) /
                                         1000
-                                    ) /
-                                      1000
+                                  )
                                 )}{' '}
                                 VND
                               </p>
@@ -700,14 +820,16 @@ class ViewDetailRequest extends React.Component {
                               <p className="h6">
                                 {this.numberWithCommas(
                                   Math.round(
-                                    ((((this.props.request.data.amount *
-                                      duration) /
-                                      30) *
-                                      (this.props.request.data.interestRate /
-                                        12)) /
-                                      100) *
-                                      1000
-                                  ) / 1000
+                                    Math.round(
+                                      ((((this.props.request.data.amount *
+                                        duration) /
+                                        30) *
+                                        (this.props.request.data.interestRate /
+                                          12)) /
+                                        100) *
+                                        1000
+                                    ) / 1000
+                                  )
                                 )}{' '}
                                 VND
                               </p>
@@ -818,40 +940,69 @@ class ViewDetailRequest extends React.Component {
                                 Payment
                               </ModalHeader>
                               <ModalBody>
-                                <PayPalButton
-                                  amount={this.roundUp(
-                                    (this.props.request.data.amount *
-                                      this.props.request.data.deal.milestone[1]
-                                        .percent) /
+                                {this.state.validHash === true ? (
+                                  <PayPalButton
+                                    amount={this.roundUp(
+                                      (this.props.request.data.amount *
+                                        this.props.request.data.deal
+                                          .milestone[1].percent) /
                                         this.state.currencyUSDVND
-                                  )}
-                                  onSuccess={(details, data) => {
-                                    this.toggleModal();
-                                    this.setState({
-                                      data_tx: {
-                                        txId: details.id,
-                                        createDate: this.convertDateToTimestamp(
-                                          new Date()
-                                        ),
-                                        status: details.status,
-                                        amount:
-                                          details.purchase_units[0].amount
-                                            .value,
-                                      },
-                                    });
-                                    this.send_tx();
-                                  }}
-                                  style={{
-                                    layout: 'horizontal',
-                                    shape: 'pill',
-                                    disableFunding: true,
-                                    tagline: false,
-                                    size: 'responsive',
-                                  }}
-                                  options={{
-                                    clientId: client_API,
-                                  }}
-                                />
+                                    )}
+                                    onSuccess={(details, data) => {
+                                      this.toggleModal();
+                                      this.setState({
+                                        data_tx: {
+                                          txId: details.id,
+                                          createDate: this.convertDateToTimestamp(
+                                            new Date()
+                                          ),
+                                          status: details.status,
+                                          amount:
+                                            details.purchase_units[0].amount
+                                              .value,
+                                        },
+                                      });
+                                      this.send_tx();
+                                    }}
+                                    style={{
+                                      layout: 'horizontal',
+                                      shape: 'pill',
+                                      disableFunding: true,
+                                      tagline: false,
+                                      size: 'responsive',
+                                    }}
+                                    options={{
+                                      clientId: client_API,
+                                    }}
+                                  />
+                                ) : (
+                                  <div>
+                                    <Input
+                                      type="file"
+                                      accept="text/plain"
+                                      onChange={this.handleFileInput}
+                                    />
+                                    <p></p>
+                                    <Button
+                                      // type="submit"
+                                      size="md"
+                                      className="btn btn-outline-primary"
+                                      onClick={() => this.validHashFile()}
+                                    >
+                                      Check
+                                    </Button>
+                                    {this.state.hashError !== '' ? (
+                                      <strong
+                                        class="alert alert-danger"
+                                        role="alert"
+                                      >
+                                        {this.state.hashError}
+                                      </strong>
+                                    ) : (
+                                      ''
+                                    )}
+                                  </div>
+                                )}
                               </ModalBody>
                             </Modal>
                           </div>
@@ -888,28 +1039,32 @@ class ViewDetailRequest extends React.Component {
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               <img
-                style={{ width: 50, height: 50 }}
+                style={{width: 50, height: 50}}
                 src={require('assets/img/theme/checked.png')}
               />
               Successfully Saved
-              </h3>
+            </h3>
           </div>
         </Modal>
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenError}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
-          <div className="modal-header">
-            Error
-          </div>
+          <div className="modal-header">Error</div>
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               {this.state.message}
             </h3>
           </div>
           <div className="modal-footer">
-            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+            <Button
+              onClick={() => {
+                this.setState({isOpenError: false});
+              }}
+            >
+              OK
+            </Button>
           </div>
         </Modal>
       </>

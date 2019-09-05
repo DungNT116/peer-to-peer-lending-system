@@ -23,6 +23,7 @@ import {PulseLoader} from 'react-spinners';
 import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
 import {apiLink} from '../../api.jsx';
+import {database} from 'firebase';
 class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -72,6 +73,7 @@ class Profile extends React.Component {
       isOpenSuccess: false,
       isOpenError: false,
       isOpenUpload: false,
+      isDownloaded: false,
     };
     this.getProfile = this.getProfile.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -104,6 +106,50 @@ class Profile extends React.Component {
     this.getDocumentTypeList = this.getDocumentTypeList.bind(this);
 
     this.handleError = this.handleError.bind(this);
+    this.getHashFile = this.getHashFile.bind(this);
+  }
+
+  getHashFile() {
+    // window.open('192.168.7.215:8080/document/download/hashFileTest')
+    fetch(apiLink + '/rest/document/download/hashFile', {
+      method: 'GET',
+      headers: {
+        // "Content-Type": "application/json",
+        Authorization: localStorage.getItem('token'),
+      },
+    })
+      .then(async result => {
+        if (result.status === 200) {
+          //load profile again
+          this.getProfile();
+          result.blob().then(blob => {
+            var txtURL = window.URL.createObjectURL(blob);
+            var tempLink = document.createElement('a');
+            tempLink.href = txtURL;
+            tempLink.setAttribute('download', 'pplsUserHashFile.txt');
+            tempLink.click();
+          });
+        } else if (result.status === 400) {
+          this.setState({
+            isOpenError: true,
+            message: 'Please upload identity card and video to get hash',
+          });
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        } else {
+          result.text().then(async data => {
+            await this.setState({
+              isOpenError: true,
+              message: 'something went wrong',
+            });
+          });
+        }
+      })
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
+      });
   }
 
   changeOldPassword(event) {
@@ -204,7 +250,7 @@ class Profile extends React.Component {
             result.text().then(async data => {
               await this.setState({
                 isOpenError: true,
-                message: data,
+                message: 'something went wrong',
               });
             });
           }
@@ -405,6 +451,7 @@ class Profile extends React.Component {
   setSrcImgBase64(type, image) {
     return 'data:' + type + ';base64, ' + image;
   }
+
   containsObject(obj, list) {
     for (var i = 0; i < list.length; i++) {
       const [first] = Object.keys(list[i]);
@@ -417,6 +464,7 @@ class Profile extends React.Component {
     }
     return false;
   }
+
   containKeyInArray(keyName, list) {
     for (let i = 0; i < list.length; i++) {
       const element = list[i];
@@ -427,7 +475,6 @@ class Profile extends React.Component {
     return false;
   }
   async getDocument() {
-    console.log('voo');
     await fetch(apiLink + '/rest/document/getUserDocument', {
       method: 'GET',
       headers: {
@@ -502,7 +549,7 @@ class Profile extends React.Component {
                         isVideoSaved: true,
                       });
                     }
-                    this.setState({
+                    await this.setState({
                       loadingVideo: false,
                     });
                   } else {
@@ -531,7 +578,9 @@ class Profile extends React.Component {
               isOpen: false,
             });
           });
-          console.log('het 200');
+          console.log('aaaaaaaaaaaaaaaaaaaaaaaaaa');
+          console.log(this.state.isVideoSaved);
+          console.log(this.state.isUploadedVideo);
           // this.props.history.push("/view-request-trading");
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
@@ -571,7 +620,7 @@ class Profile extends React.Component {
         // })
       }).then(async result => {
         if (result.status === 200) {
-          await this.getDocument()
+          await this.getDocument();
           console.log('success');
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
@@ -644,7 +693,6 @@ class Profile extends React.Component {
     var files = event.target.files;
     var validFilesCount = 0;
     var totalFilesSize = 0;
-    var validSize = false;
     for (let i = 0; i < files.length; i++) {
       const element = files[i];
       totalFilesSize += element.size;
@@ -701,6 +749,7 @@ class Profile extends React.Component {
       }
     }
   }
+
   fillArray(value, len) {
     var arr = [];
     for (var i = 0; i < len; i++) {
@@ -708,9 +757,11 @@ class Profile extends React.Component {
     }
     return arr;
   }
+
   componentWillMount() {
     this.getDocumentTypeList();
     this.getDocument();
+    // this.getHashFile();
   }
 
   componentDidMount() {
@@ -734,6 +785,7 @@ class Profile extends React.Component {
       .then(result => {
         if (result.status === 200) {
           result.json().then(data => {
+            console.log(data);
             this.setState({
               username: data.username,
               firstName: data.firstName,
@@ -745,6 +797,7 @@ class Profile extends React.Component {
               newLastName: data.lastName,
               newEmail: data.email,
               newPhoneNumber: data.phoneNumber,
+              isDownloaded: data.generateHashFile,
             });
           });
         } else if (result.status === 401) {
@@ -1230,10 +1283,26 @@ class Profile extends React.Component {
                   <Card className="bg-secondary shadow">
                     <CardHeader className="bg-white border-0">
                       <Row className="align-items-center">
-                        <Col xs="6">
+                        <Col xs="5">
                           <h3 className="mb-0">My account</h3>
                         </Col>
-                        <Col className="text-right" xs="3">
+                        <Col className="text-right" xs="2">
+                          {this.state.isDownloaded === false ? (
+                            <Button
+                              id="hash"
+                              color="primary"
+                              onClick={() => {
+                                this.setState({hashModal: true});
+                              }}
+                              size="sm"
+                            >
+                              Get Hash
+                            </Button>
+                          ) : (
+                            ''
+                          )}
+                        </Col>
+                        <Col className="text-right" xs="2">
                           {this.state.editable === false ? (
                             <Button
                               id="editProfile"
@@ -1596,6 +1665,38 @@ class Profile extends React.Component {
               />
               Successfully Upload Video
             </h3>
+          </div>
+        </Modal>
+        <Modal className="modal-dialog-centered" isOpen={this.state.hashModal}>
+          <div className="modal-header">Confirm</div>
+          <div className="modal-body">
+            <h3 className="modal-title">
+              <p>
+                This hash file use for execute transaction and download once!
+              </p>
+              <p>Please keep this file safe</p>
+            </h3>
+          </div>
+          <div className="modal-footer">
+            <Button
+              onClick={() => {
+                this.getHashFile();
+                this.setState({
+                  hashModal: false,
+                });
+              }}
+            >
+              OK
+            </Button>
+            <Button
+              onClick={() => {
+                this.setState({
+                  hashModal: false,
+                });
+              }}
+            >
+              close
+            </Button>
           </div>
         </Modal>
       </>
