@@ -1,5 +1,11 @@
 package capstone.p2plend.service;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -13,11 +19,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import capstone.p2plend.dto.PageDTO;
+import capstone.p2plend.entity.Document;
+import capstone.p2plend.entity.DocumentFile;
 import capstone.p2plend.entity.Request;
 import capstone.p2plend.entity.User;
 import capstone.p2plend.repo.RequestRepository;
 import capstone.p2plend.repo.UserRepository;
+import capstone.p2plend.util.EmailModule;
+import capstone.p2plend.util.Keccak256Hashing;
 
 @Service
 public class UserService {
@@ -26,13 +38,16 @@ public class UserService {
 	UserRepository userRepo;
 
 	@Autowired
+	Keccak256Hashing kh;
+
+	@Autowired
 	RequestRepository requestRepo;
 
 	@Autowired
 	JwtService jwtService;
 
 	@Autowired
-	EmailService emailService;
+	EmailModule emailModule;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -156,7 +171,7 @@ public class UserService {
 
 		account = userRepo.save(account);
 
-		emailService.sendSimpleMessage(account.getEmail(), "Welcome to PPLS",
+		emailModule.sendSimpleMessage(account.getEmail(), "Welcome to PPLS",
 				"You have create account successfully in PPLS website");
 
 		return "Account successfully created";
@@ -302,10 +317,10 @@ public class UserService {
 		if (oldPassword == null || newPassword == null) {
 			return "old password or new password is null";
 		}
-		
+
 		if (oldPassword.equalsIgnoreCase(newPassword))
 			return "old password and new password is similar";
-		
+
 		String username = jwtService.getUsernameFromToken(token);
 		User user = userRepo.findByUsername(username);
 		if (user == null) {
@@ -316,7 +331,7 @@ public class UserService {
 		if (valid) {
 			user.setPassword(passwordEncoder.encode(newPassword));
 			User savedUser = userRepo.saveAndFlush(user);
-			if(savedUser != null) {
+			if (savedUser != null) {
 				return "success";
 			}
 		}
@@ -343,14 +358,83 @@ public class UserService {
 		String str = strb.toString();
 
 		user.setPassword(passwordEncoder.encode(str));
-		emailService.sendSimpleMessage(email, "You have request a new Password from PPLS site",
+		emailModule.sendSimpleMessage(email, "You have request a new Password from PPLS site",
 				"Your new password: " + str);
 
 		User savedUser = userRepo.saveAndFlush(user);
-		if(savedUser != null) {
+		if (savedUser != null) {
 			return "success";
 		}
 
 		return "error";
+	}
+
+	private ObjectMapper mapper = new ObjectMapper();
+
+	public String resendHashUserFile(User paramUser) throws IOException, NoSuchAlgorithmException {
+		if (paramUser.getId() == null) {
+			return "Missing required field";
+		}
+		User user = userRepo.findById(paramUser.getId()).get();
+		if (user == null) {
+			return "No such user found in the system";
+		}
+
+		if (user.getGenerateHashFile() == false) {
+			return "User still not yet generate this file";
+		}
+		List<Document> lstDocument = user.getDocument();
+		int count = 0;
+		List<Document> lstHashDocument = new ArrayList<Document>();
+		for (Document d : lstDocument) {
+			if (d.getDocumentType().getId() == 1 && d.getStatus().equalsIgnoreCase("valid")) {
+				lstHashDocument.add(d);
+				count = 1;
+			}
+		}
+		if(count != 1) {
+			return "User ID not up load or validate yet";
+		}
+		for (Document d : lstDocument) {
+			if (d.getDocumentType().getId() == 2 && d.getStatus().equalsIgnoreCase("valid")) {
+				lstHashDocument.add(d);
+				count = 2;
+			}
+		}
+		if(count != 2) {
+			return "User Video not up load or validate yet";
+		}
+		if (count == 2) {
+			File file = new File("pplsUserHashFile.txt");
+			Writer writer = new BufferedWriter(new FileWriter(file));
+
+			lstDocument = new ArrayList<Document>();
+			for (Document d : lstHashDocument) {
+				Document document = new Document();
+				document.setId(d.getId());
+				document.setDocumentId(d.getDocumentId());
+				document.setStatus(d.getStatus());
+				List<DocumentFile> lstDocFile = new ArrayList<DocumentFile>();
+				for (DocumentFile df : d.getDocumentFile()) {
+					DocumentFile documentFile = new DocumentFile();
+					documentFile.setId(df.getId());
+					documentFile.setData(df.getData());
+					documentFile.setFileName(df.getFileName());
+					documentFile.setFileType(df.getFileType());
+					lstDocFile.add(documentFile);
+				}
+				document.setDocumentFile(lstDocFile);
+				lstDocument.add(document);
+			}
+
+			String contents = kh.hashWithJavaMessageDigest(mapper.writeValueAsString(lstDocument));
+			writer.write(contents);
+			writer.close();
+
+			emailModule.sendMessageWithAttachment(user.getEmail(), "(Admin)PPLS resend you hash file", "Check this email attachment for your hash file", file.getAbsolutePath());
+
+			return "success";
+		}
+		return "Error";
 	}
 }

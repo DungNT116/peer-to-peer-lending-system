@@ -1,6 +1,8 @@
 package capstone.p2plend.service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import capstone.p2plend.repo.MilestoneRepository;
 import capstone.p2plend.repo.RequestRepository;
 import capstone.p2plend.repo.TransactionRepository;
 import capstone.p2plend.repo.UserRepository;
+import capstone.p2plend.util.EmailModule;
 
 @Service
 public class TransactionService {
@@ -35,6 +38,9 @@ public class TransactionService {
 
 	@Autowired
 	RequestRepository requestRepo;
+
+	@Autowired
+	EmailModule emailModule;
 
 	@Autowired
 	JwtService jwtService;
@@ -106,6 +112,8 @@ public class TransactionService {
 			return "Required field are missing";
 		}
 
+		String senderUsername = transaction.getSender();
+
 		int idMilestone = transaction.getMilestone().getId();
 		Milestone existMilestone = milestoneRepo.findById(transaction.getMilestone().getId()).get();
 		if (existMilestone.getTransaction() != null) {
@@ -158,9 +166,22 @@ public class TransactionService {
 			request.setStatus("done");
 			Request savedRq = requestRepo.save(request);
 			if (savedRq == null) {
-				return "Error while ajust request status";
+				return "Error while adjust request status";
 			}
 		}
+
+		Long time = transaction.getCreateDate() * 1000L;
+		Timestamp stamp = new Timestamp(time);
+		Date date = new Date(stamp.getTime());
+
+		User user = userRepo.findByUsername(senderUsername);
+		emailModule.sendSimpleMessage(user.getEmail(), "Successful transaction execution",
+				"Transaction id: " + transaction.getIdTrx() + "\n" 
+						+ "Send date: " + date + "\n"
+						+ "Send from: " + transaction.getSender() + "\n"
+						+ "Send to: " + transaction.getReceiver() + "\n"
+						+ "Send amount: " + transaction.getAmount() + "\n"
+						+ "Send amount(in USD): " + transaction.getAmountValid() + "\n");
 
 		return "success";
 	}

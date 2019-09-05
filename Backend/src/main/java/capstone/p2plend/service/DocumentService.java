@@ -396,7 +396,6 @@ public class DocumentService {
 			} else {
 				return "Hash not match";
 			}
-
 		}
 		return "User not yet upload any document";
 	}

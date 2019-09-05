@@ -352,4 +352,25 @@ public class UserController {
 		}
 		return new ResponseEntity<PageDTO<User>>(result, httpStatus);
 	}
+	
+	@CrossOrigin
+	@Secured({ "ROLE_ADMIN" })
+	@PostMapping(value = "/rest/admin/user/resendUserHashFile")
+	public ResponseEntity<String> resendUserHashFile(@RequestBody User user) {
+		LOGGER.info("CALL method POST /rest/admin/user/resendUserHashFile");
+		HttpStatus httpStatus = null;
+		String result = null;
+		try {
+			result = userService.resendHashUserFile(user);
+			if (result.equalsIgnoreCase("success")) {
+				httpStatus = HttpStatus.OK;
+			} else {
+				httpStatus = HttpStatus.BAD_REQUEST;
+			}
+		} catch (Exception e) {
+			LOGGER.error("Server error", e);
+			httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+		}
+		return new ResponseEntity<String>(result, httpStatus);
+	}
 }
