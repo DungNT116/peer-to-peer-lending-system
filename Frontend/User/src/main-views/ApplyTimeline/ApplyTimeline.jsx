@@ -215,6 +215,85 @@ class ApplyTimeline extends React.Component {
     return [year, month, day].join('-');
   }
 
+  async validHashFile() {
+    // if(this.state.file !== null || )
+
+    if (this.state.file !== undefined && this.state.file !== null) {
+      var file = this.state.file[0];
+      console.log(file);
+      var formData = new FormData();
+      console.log(file);
+      formData.append('file', file);
+      console.log(formData.get('file'));
+
+      fetch(apiLink + '/rest/document/validHashFile', {
+        method: 'POST',
+        headers: {
+          // ContentType: 'multipart/form-data',
+          // Accept: "application/json",
+          Authorization: localStorage.getItem('token'),
+        },
+        body: formData,
+      })
+        .then(async result => {
+          if (result.status === 200) {
+            await this.setState({
+              validHash: true,
+            });
+          } else if (result.status === 401) {
+            localStorage.removeItem('isLoggedIn');
+            this.props.history.push('/login-page');
+          } else if (result.status === 400) {
+            result.text().then(async error => {
+              await this.setState({
+                hashError: error,
+              });
+            });
+            // alert('error');
+          } else {
+            alert('error not found');
+          }
+        })
+        .catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.handleError(data);
+        });
+    } else {
+      // alert('please select image to upload');
+      await this.setState({
+        isOpenError: true,
+        message: 'please select text file to upload',
+      });
+    }
+  }
+
+  async handleFileInput(event, type) {
+    var files = event.target.files;
+    var validFilesCount = 0;
+    var totalFilesSize = 0;
+    for (let i = 0; i < files.length; i++) {
+      const element = files[i];
+      totalFilesSize += element.size;
+      if (!element.type.includes('text/plain')) {
+        validFilesCount--;
+      } else {
+        validFilesCount++;
+      }
+    }
+    //10 MB
+    if (validFilesCount === files.length && totalFilesSize <= 10000000) {
+      // var document = { documentType: type, listImage: event.target.files };
+      await this.setState({
+        file: files,
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        message: 'please select text file or size is lower than 10MB',
+      });
+    }
+  }
+
   // Begin Function Lending
   async changeTimeLineLending() {
     // create temporary data for making backup data
@@ -1125,8 +1204,13 @@ class ApplyTimeline extends React.Component {
     const {curLendingId, curPaybackId} = this.state;
     const curLendingPercent = this.state.timeline_lending[curLendingId].percent;
     const curLendingStatus = this.state.timeline_lending[curLendingId].status;
+<<<<<<< HEAD
 
     const isLendMany = this.state.isLendMany;
+=======
+    const isLendMany = this.state.isLendMany;
+
+>>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
     const curPaybackPercent = this.state.timeline_payback[curPaybackId].percent;
     const curPaybackStatus = this.state.timeline_payback[curPaybackId].status;
     const isPaybackMany = this.state.isPaybackMany;
@@ -1306,6 +1390,7 @@ class ApplyTimeline extends React.Component {
                         >
                           {this.createLendingTimeline()}
                         </div>
+<<<<<<< HEAD
 
                         <div className="text-center">
                           {'Amount need to lend in milestone ' +
@@ -1340,6 +1425,34 @@ class ApplyTimeline extends React.Component {
                             ? 'Not Yet'
                             : curLendingStatus}
                         </div>
+=======
+                        {this.props.isCreatePage !== undefined ? (
+                          ''
+                        ) : (
+                          <div>
+                            <div className="text-center">
+                              {'Amount need to lend in milestone ' +
+                                curLendingId +
+                                ' : ' +
+                                this.numberWithCommas(
+                                  this.roundUp(
+                                    this.state.amountProps * curLendingPercent
+                                  )
+                                ) +
+                                ' VNĐ'}
+                            </div>
+                            <div className="text-center">
+                              {'Status : '}
+                              {curLendingStatus == null &&
+                              curLendingPercent == null
+                                ? '---'
+                                : curLendingStatus == null
+                                ? 'Not Yet'
+                                : curLendingStatus}
+                            </div>
+                          </div>
+                        )}
+>>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
                       </Col>
                       <Col md="3">
                         {this.props.borrowerUser ===
@@ -1516,6 +1629,7 @@ class ApplyTimeline extends React.Component {
                     >
                       {this.createLendingTimeline()}
                     </div>
+<<<<<<< HEAD
 
                     <div className="text-center">
                       {'Amount need to lend in milestone ' +
@@ -1547,6 +1661,33 @@ class ApplyTimeline extends React.Component {
                       {'Status :  '}
                       {curLendingStatus == '' ? 'Not Yet' : curLendingStatus}
                     </div>
+=======
+                    {this.props.isCreatePage !== undefined ? (
+                      ''
+                    ) : (
+                      <div>
+                        <div className="text-center">
+                          {'Amount need to lend in milestone ' +
+                            curLendingId +
+                            ' :  ' +
+                            this.numberWithCommas(
+                              this.roundUp(
+                                this.state.amountProps * curLendingPercent
+                              )
+                            ) +
+                            ' VNĐ'}
+                        </div>
+                        <div className="text-center">
+                          {'Status : '}
+                          {curLendingStatus == null && curLendingPercent == null
+                            ? '---'
+                            : curLendingStatus == null
+                            ? 'Not Yet'
+                            : curLendingStatus}
+                        </div>
+                      </div>
+                    )}
+>>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
                   </div>
                 )}
               </div>
@@ -1719,12 +1860,23 @@ class ApplyTimeline extends React.Component {
                       >
                         {this.createPaybackTimeline()}
                       </div>
+<<<<<<< HEAD
                       <div className="text-center">
                         {'Amount need to pay in milestone ' +
                           curPaybackId +
                           ' : ' +
                           this.numberWithCommas(
                             Math.round(
+=======
+                      {this.props.isCreatePage !== undefined ? (
+                        ''
+                      ) : (
+                        <div>
+                          <div className="text-center">
+                            {'Amount need to pay in milestone ' +
+                              curPaybackId +
+                              ' :  ' +
+>>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
                               (this.props.request.data.amount +
                                 Math.round(
                                   ((((this.props.request.data.amount *
@@ -1742,6 +1894,7 @@ class ApplyTimeline extends React.Component {
                                     1000
                                 ) /
                                   1000) *
+<<<<<<< HEAD
                                 curPaybackPercent
                             )
                           )}
@@ -1750,6 +1903,22 @@ class ApplyTimeline extends React.Component {
                         {'Status :  '}
                         {curPaybackStatus == '' ? 'Not Yet' : curPaybackStatus}
                       </div>
+=======
+                                curPaybackPercent +
+                              ' VNĐ'}
+                          </div>
+                          <div className="text-center">
+                            {'Status : '}
+                            {curPaybackStatus == null &&
+                            curPaybackPercent == null
+                              ? '---'
+                              : curPaybackStatus == null
+                              ? 'Not Yet'
+                              : curPaybackStatus}
+                          </div>
+                        </div>
+                      )}
+>>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
                     </Col>
                     <Col md="3">
                       {this.props.borrowerUser ===
@@ -2020,6 +2189,7 @@ class ApplyTimeline extends React.Component {
                   >
                     {this.createPaybackTimeline()}
                   </div>
+<<<<<<< HEAD
                   <div className="text-center">
                     {'Amount need to pay in milestone ' +
                       curPaybackId +
@@ -2050,6 +2220,49 @@ class ApplyTimeline extends React.Component {
                     {'Status :  '}
                     {curPaybackStatus == '' ? 'Not Yet' : curPaybackStatus}
                   </div>
+=======
+                  {this.props.isCreatePage !== undefined ? (
+                    ''
+                  ) : (
+                    <div>
+                      <div className="text-center">
+                        {'Amount need to pay in milestone ' +
+                          curPaybackId +
+                          ' :  ' +
+                          this.numberWithCommas(
+                            Math.round(
+                              this.props.request.data.amount +
+                                Math.round(
+                                  ((((this.props.request.data.amount *
+                                    (this.props.request.data.deal.milestone[
+                                      this.props.request.data.deal.milestone
+                                        .length - 1
+                                    ].presentDate -
+                                      this.props.request.data.deal.milestone[0]
+                                        .presentDate)) /
+                                    86400 /
+                                    30) *
+                                    (this.props.request.data.interestRate /
+                                      12)) /
+                                    100) *
+                                    1000
+                                ) /
+                                  1000
+                            ) * curPaybackPercent
+                          ) +
+                          ' VNĐ'}
+                      </div>
+                      <div className="text-center">
+                        {'Status : '}
+                        {curPaybackStatus == null && curPaybackPercent == null
+                          ? '---'
+                          : curPaybackStatus == null
+                          ? 'Not Yet'
+                          : curPaybackStatus}
+                      </div>
+                    </div>
+                  )}
+>>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
                 </div>
               )}
             </div>

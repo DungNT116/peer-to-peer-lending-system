@@ -549,7 +549,7 @@ class Profile extends React.Component {
                         isVideoSaved: true,
                       });
                     }
-                    this.setState({
+                    await this.setState({
                       loadingVideo: false,
                     });
                   } else {
@@ -578,6 +578,9 @@ class Profile extends React.Component {
               isOpen: false,
             });
           });
+          console.log('aaaaaaaaaaaaaaaaaaaaaaaaaa');
+          console.log(this.state.isVideoSaved);
+          console.log(this.state.isUploadedVideo);
           // this.props.history.push("/view-request-trading");
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
