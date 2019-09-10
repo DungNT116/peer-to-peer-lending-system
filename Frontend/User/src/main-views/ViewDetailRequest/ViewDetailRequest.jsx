@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
 // reactstrap components
 import {
@@ -20,9 +20,9 @@ import {
   Input,
 } from 'reactstrap';
 
-import { database } from '../../firebase';
-import { PayPalButton } from 'react-paypal-button-v2';
-import { apiLink, bigchainAPI, client_API } from '../../api.jsx';
+import {database} from '../../firebase';
+import {PayPalButton} from 'react-paypal-button-v2';
+import {apiLink, bigchainAPI, client_API} from '../../api.jsx';
 // core components
 import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
@@ -251,11 +251,11 @@ class ViewDetailRequest extends React.Component {
 
     if (this.state.file !== undefined && this.state.file !== null) {
       var file = this.state.file[0];
-      console.log(file)
+      console.log(file);
       var formData = new FormData();
-      console.log(file)
+      console.log(file);
       formData.append('file', file);
-      console.log(formData.get('file'))
+      console.log(formData.get('file'));
 
       fetch(apiLink + '/rest/document/validHashFile', {
         method: 'POST',
@@ -269,17 +269,17 @@ class ViewDetailRequest extends React.Component {
         .then(async result => {
           if (result.status === 200) {
             await this.setState({
-              validHash: true
-            })
+              validHash: true,
+            });
           } else if (result.status === 401) {
             localStorage.removeItem('isLoggedIn');
             this.props.history.push('/login-page');
           } else if (result.status === 400) {
             result.text().then(async error => {
               await this.setState({
-                hashError: error
-              })
-            })
+                hashError: error,
+              });
+            });
             // alert('error');
           } else {
             alert('error not found');
@@ -315,7 +315,7 @@ class ViewDetailRequest extends React.Component {
     if (validFilesCount === files.length && totalFilesSize <= 10000000) {
       // var document = { documentType: type, listImage: event.target.files };
       await this.setState({
-        file: files
+        file: files,
       });
     } else {
       await this.setState({
@@ -357,7 +357,7 @@ class ViewDetailRequest extends React.Component {
         receiver: data_transaction.data_tx.data.tx_data.receiver,
         amount: Number(
           this.props.request.data.amount *
-          this.props.request.data.deal.milestone[1].percent
+            this.props.request.data.deal.milestone[1].percent
         ),
         amountValid: Number(data.amount),
         status: data.status,
@@ -396,8 +396,14 @@ class ViewDetailRequest extends React.Component {
         isOpenError: true,
         message: "Cannot access to server"
       })
-    });
-  }
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          message: 'Cannot access to server',
+        });
+      });
+  })}
 
   validRedux() {
     if (
@@ -426,46 +432,48 @@ class ViewDetailRequest extends React.Component {
           borrowDate: Math.round(new Date().getTime() / 1000),
         },
       }),
-    }).then(async result => {
-      if (result.status === 200) {
-        await database
-          .ref('ppls')
-          .orderByChild('username')
-          .equalTo(this.state.borrowUsername)
-          .once('value', snapshot => {
-            if (snapshot.exists()) {
-              const userData = snapshot.val();
-              this.setState({ keyUserFb: Object.keys(userData)[0] });
-            }
+    })
+      .then(async result => {
+        if (result.status === 200) {
+          await database
+            .ref('ppls')
+            .orderByChild('username')
+            .equalTo(this.state.borrowUsername)
+            .once('value', snapshot => {
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+                this.setState({keyUserFb: Object.keys(userData)[0]});
+              }
+            });
+          await database
+            .ref('/ppls/' + this.state.keyUserFb + '/notification')
+            .push({
+              message:
+                localStorage.getItem('user') +
+                ' accepted request number : ' +
+                this.props.request.data.id +
+                ' !',
+              sender: localStorage.getItem('user'),
+              requestId: this.props.request.data.id,
+            });
+          var upvotesRef = database.ref(
+            '/ppls/' + this.state.keyUserFb + '/countNew'
+          );
+          await upvotesRef.transaction(function(current_value) {
+            return (current_value || 0) + 1;
           });
-        await database
-          .ref('/ppls/' + this.state.keyUserFb + '/notification')
-          .push({
-            message:
-              localStorage.getItem('user') +
-              ' accepted request number : ' +
-              this.props.request.data.id +
-              ' !',
-            sender: localStorage.getItem('user'),
-            requestId: this.props.request.data.id,
-          });
-        var upvotesRef = database.ref(
-          '/ppls/' + this.state.keyUserFb + '/countNew'
-        );
-        await upvotesRef.transaction(function (current_value) {
-          return (current_value || 0) + 1;
-        });
-      } else if (result.status === 401) {
-        localStorage.removeItem('isLoggedIn');
-        this.props.history.push('/login-page');
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        }
       })
-    });
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          message: 'Cannot access to server',
+        });
+      });
   }
 
   createMileStone() {
@@ -540,48 +548,50 @@ class ViewDetailRequest extends React.Component {
         paybackTimes: this.state.paybackTimeline.length,
         milestone: this.createMileStone(),
       }),
-    }).then(async result => {
-      if (result.status === 401) {
-        localStorage.removeItem('isLoggedIn');
-        this.props.history.push('/login-page');
-      } else if (result.status === 200) {
-        await database
-          .ref('ppls')
-          .orderByChild('username')
-          .equalTo(this.state.makeDealUsername)
-          .once('value', snapshot => {
-            if (snapshot.exists()) {
-              const userData = snapshot.val();
-              this.setState({ keyUserFb: Object.keys(userData)[0] });
-            }
+    })
+      .then(async result => {
+        if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        } else if (result.status === 200) {
+          await database
+            .ref('ppls')
+            .orderByChild('username')
+            .equalTo(this.state.makeDealUsername)
+            .once('value', snapshot => {
+              if (snapshot.exists()) {
+                const userData = snapshot.val();
+                this.setState({keyUserFb: Object.keys(userData)[0]});
+              }
+            });
+          await database
+            .ref('/ppls/' + this.state.keyUserFb + '/notification')
+            .push({
+              message:
+                localStorage.getItem('user') +
+                ' make deal request number : ' +
+                this.props.request.data.id +
+                ' !',
+              sender: localStorage.getItem('user'),
+              requestId: this.props.request.data.id,
+            });
+          var upvotesRef = database.ref(
+            '/ppls/' + this.state.keyUserFb + '/countNew'
+          );
+          await upvotesRef.transaction(function(current_value) {
+            return (current_value || 0) + 1;
           });
-        await database
-          .ref('/ppls/' + this.state.keyUserFb + '/notification')
-          .push({
-            message:
-              localStorage.getItem('user') +
-              ' make deal request number : ' +
-              this.props.request.data.id +
-              ' !',
-            sender: localStorage.getItem('user'),
-            requestId: this.props.request.data.id,
-          });
-        var upvotesRef = database.ref(
-          '/ppls/' + this.state.keyUserFb + '/countNew'
-        );
-        await upvotesRef.transaction(function (current_value) {
-          return (current_value || 0) + 1;
-        });
-      } else if (result.status === 400) {
-        this.toggleErrorModal();
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
+        } else if (result.status === 400) {
+          this.toggleErrorModal();
+        }
       })
-    });
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.setState({
+          isOpenError: true,
+          message: 'Cannot access to server',
+        });
+      });
   }
 
   formatDate(date) {
@@ -600,13 +610,18 @@ class ViewDetailRequest extends React.Component {
     let numberOfLendingMilestones = 0;
     let numberOfPayBackMilestones = 0;
     let milestone = this.props.request.data.deal.milestone;
-    let timelineData = { lendingTimeline: [], payBackTimeline: [] };
+    let timelineData = {lendingTimeline: [], payBackTimeline: []};
     let lendingTimeline = [];
     let payBackTimeline = [];
-    let milestoneTimeline = { data: '', status: '', percent: '' };
+    console.log('aaaaaaaaaaa', milestone);
+    let milestoneTimeline = {data: '', status: '', percent: ''};
     for (let i = 0; i < milestone.length; i++) {
       const element = milestone[i];
-      milestoneTimeline = { data: '', status: '', percent: '' };
+      milestoneTimeline = {
+        data: '',
+        status: element.transaction.status,
+        percent: '',
+      };
       milestoneTimeline.data = this.formatDate(
         this.convertTimeStampToDate(element.presentDate)
       );
@@ -698,12 +713,13 @@ class ViewDetailRequest extends React.Component {
         this.toggleModal();
         //after success redirect to trading page
         this.saveTransaction(data, data_transaction);
-      }).catch(async data => {
+      })
+      .catch(async data => {
         //CANNOT ACCESS TO SERVER
         await this.setState({
           isOpenError: true,
-          message: "Cannot access to server"
-        })
+          message: 'Cannot access to server',
+        });
       });
   };
 
@@ -722,20 +738,24 @@ class ViewDetailRequest extends React.Component {
     if (this.props.viewDetail.isHistoryDetail === false) {
       document.getElementById('saveDealButton').style.display = 'none';
     }
-    fetch('http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1', {
-      method: 'GET',
-    })
+    fetch(
+      'http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1',
+      {
+        method: 'GET',
+      }
+    )
       .then(response => response.json())
       .then(async data => {
         this.setState({
           currencyUSDVND: data.quotes.USDVND,
         });
-      }).catch(async data => {
+      })
+      .catch(async data => {
         //CANNOT ACCESS TO SERVER
         await this.setState({
           isOpenError: true,
-          message: "Cannot access to server"
-        })
+          message: 'Cannot access to server',
+        });
       });
   }
 
@@ -745,7 +765,7 @@ class ViewDetailRequest extends React.Component {
   }
 
   toggleModal() {
-    this.setState({ modal: !this.state.modal });
+    this.setState({modal: !this.state.modal});
   }
   async makeDeal() {
     this.props.setIsHistory(false);
@@ -786,7 +806,7 @@ class ViewDetailRequest extends React.Component {
     this.saveNewDealInformationToDB();
 
     //set up view again
-    this.setState({ editable: !this.state.editable });
+    this.setState({editable: !this.state.editable});
     //button
     document.getElementById('dealButton').style.display = 'none';
     if (
@@ -906,17 +926,20 @@ class ViewDetailRequest extends React.Component {
                             <Col xs="12" md="9">
                               <p className="h6">
                                 {this.numberWithCommas(
-                                  this.props.request.data.amount +
                                   Math.round(
-                                    ((((this.props.request.data.amount *
-                                      duration) /
-                                      30) *
-                                      (this.props.request.data.interestRate /
-                                        12)) /
-                                      100) *
-                                    1000
-                                  ) /
-                                  1000
+                                    this.props.request.data.amount +
+                                      Math.round(
+                                        ((((this.props.request.data.amount *
+                                          duration) /
+                                          30) *
+                                          (this.props.request.data
+                                            .interestRate /
+                                            12)) /
+                                          100) *
+                                          1000
+                                      ) /
+                                        1000
+                                  )
                                 )}{' '}
                                 VND
                               </p>
@@ -954,14 +977,16 @@ class ViewDetailRequest extends React.Component {
                               <p className="h6">
                                 {this.numberWithCommas(
                                   Math.round(
-                                    ((((this.props.request.data.amount *
-                                      duration) /
-                                      30) *
-                                      (this.props.request.data.interestRate /
-                                        12)) /
-                                      100) *
-                                    1000
-                                  ) / 1000
+                                    Math.round(
+                                      ((((this.props.request.data.amount *
+                                        duration) /
+                                        30) *
+                                        (this.props.request.data.interestRate /
+                                          12)) /
+                                        100) *
+                                        1000
+                                    ) / 1000
+                                  )
                                 )}{' '}
                                 VND
                               </p>
@@ -982,7 +1007,7 @@ class ViewDetailRequest extends React.Component {
                             isPayMany={this.state.isPayMany}
                             borrowerUser={
                               this.props.request.data.borrower.username !==
-                                undefined
+                              undefined
                                 ? this.props.request.data.borrower.username
                                 : ''
                             }
@@ -995,81 +1020,81 @@ class ViewDetailRequest extends React.Component {
                         {isHistoryDetail ? (
                           ''
                         ) : (
-                            <div>
-                              <CardFooter className="text-center">
+                          <div>
+                            <CardFooter className="text-center">
+                              <Button
+                                type="submit"
+                                id="dealButton"
+                                size="md"
+                                className="btn btn-outline-primary"
+                                onClick={() => this.makeDeal()}
+                                disabled={this.state.editable}
+                              >
+                                <i className="fa fa-dot-circle-o" /> Make Deal
+                              </Button>{' '}
+                              <Button
+                                type="submit"
+                                id="saveDealButton"
+                                size="md"
+                                className="btn btn-outline-primary"
+                                onClick={this.toggleSaveDealModal}
+                                disabled={!this.state.editable}
+                              >
+                                <i className="ni ni-cloud-download-95" /> Save
+                                Deal
+                              </Button>{' '}
+                              {this.props.request.data.borrower.username ===
+                              localStorage.getItem('user') ? (
+                                ''
+                              ) : (
                                 <Button
                                   type="submit"
-                                  id="dealButton"
+                                  id="acceptButton"
                                   size="md"
                                   className="btn btn-outline-primary"
-                                  onClick={() => this.makeDeal()}
+                                  onClick={this.toggleModal}
                                   disabled={this.state.editable}
                                 >
-                                  <i className="fa fa-dot-circle-o" /> Make Deal
-                              </Button>{' '}
-                                <Button
-                                  type="submit"
-                                  id="saveDealButton"
-                                  size="md"
-                                  className="btn btn-outline-primary"
-                                  onClick={this.toggleSaveDealModal}
-                                  disabled={!this.state.editable}
-                                >
-                                  <i className="ni ni-cloud-download-95" /> Save
-                                  Deal
-                              </Button>{' '}
-                                {this.props.request.data.borrower.username ===
-                                  localStorage.getItem('user') ? (
-                                    ''
-                                  ) : (
-                                    <Button
-                                      type="submit"
-                                      id="acceptButton"
-                                      size="md"
-                                      className="btn btn-outline-primary"
-                                      onClick={this.toggleModal}
-                                      disabled={this.state.editable}
-                                    >
-                                      <i className="ni ni-check-bold" /> Accept
+                                  <i className="ni ni-check-bold" /> Accept
                                 </Button>
-                                  )}
-                              </CardFooter>
-                              {/* save deal */}
-                              <Modal
-                                isOpen={this.state.saveDealModal}
-                                toggle={this.toggleSaveDealModal}
-                                className={this.props.className}
-                              >
-                                <ModalHeader toggle={this.toggleSaveDealModal}>
-                                  Confirm saving
+                              )}
+                            </CardFooter>
+                            {/* save deal */}
+                            <Modal
+                              isOpen={this.state.saveDealModal}
+                              toggle={this.toggleSaveDealModal}
+                              className={this.props.className}
+                            >
+                              <ModalHeader toggle={this.toggleSaveDealModal}>
+                                Confirm saving
                               </ModalHeader>
-                                <ModalBody>
-                                  Are you sure to save this deal ?
+                              <ModalBody>
+                                Are you sure to save this deal ?
                               </ModalBody>
-                                <ModalFooter>
-                                  <Button
-                                    color="primary"
-                                    onClick={() => this.saveDeal()}
-                                  >
-                                    Yes
+                              <ModalFooter>
+                                <Button
+                                  color="primary"
+                                  onClick={() => this.saveDeal()}
+                                >
+                                  Yes
                                 </Button>{' '}
-                                  <Button
-                                    color="secondary"
-                                    onClick={this.toggleSaveDealModal}
-                                  >
-                                    Cancel
+                                <Button
+                                  color="secondary"
+                                  onClick={this.toggleSaveDealModal}
+                                >
+                                  Cancel
                                 </Button>
-                                </ModalFooter>
-                              </Modal>
+                              </ModalFooter>
+                            </Modal>
 
-                              {/* accept modal */}
-                              <Modal
-                                isOpen={this.state.modal}
-                                toggle={this.toggleModal}
-                                className={this.props.className}
-                              >
-                                <ModalHeader toggle={this.toggleModal}>
-                                  Payment
+                            {/* accept modal */}
+                            <Modal
+                              isOpen={this.state.modal}
+                              toggle={this.toggleModal}
+                              className={this.props.className}
+                            >
+                              <ModalHeader toggle={this.toggleModal}>
+                                Payment
                               </ModalHeader>
                                 <ModalBody>
                                   {this.state.validHash === true ?
@@ -1166,33 +1191,37 @@ class ViewDetailRequest extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenSuccess}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               <img
-                style={{ width: 50, height: 50 }}
+                style={{width: 50, height: 50}}
                 src={require('assets/img/theme/checked.png')}
               />
               Successfully Saved
-              </h3>
+            </h3>
           </div>
         </Modal>
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenError}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
-          <div className="modal-header">
-            Error
-          </div>
+          <div className="modal-header">Error</div>
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               {this.state.message}
             </h3>
           </div>
           <div className="modal-footer">
-            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+            <Button
+              onClick={() => {
+                this.setState({isOpenError: false});
+              }}
+            >
+              OK
+            </Button>
           </div>
         </Modal>
         <Modal
