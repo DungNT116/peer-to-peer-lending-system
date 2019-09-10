@@ -42,10 +42,10 @@ public class RequestController {
 			@RequestHeader("Authorization") String token) {
 		LOGGER.info("CALL method POST /rest/request/createRequest");
 		HttpStatus status = null;
-		boolean valid = false;
+		String valid = null;
 		try {
 			valid = requestService.createRequest(request, token);
-			if (valid == true) {
+			if (valid.equalsIgnoreCase("success")) {
 				status = HttpStatus.OK;
 			} else {
 				status = HttpStatus.BAD_REQUEST;

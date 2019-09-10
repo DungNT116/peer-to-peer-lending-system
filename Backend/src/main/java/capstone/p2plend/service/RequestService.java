@@ -368,20 +368,20 @@ public class RequestService {
 		return pageDTO;
 	}
 
-	public boolean createRequest(Request request, String token) {
+	public String createRequest(Request request, String token) {
 
 		Deal deal = new Deal();
 		if (request.getDeal() != null) {
 			deal = request.getDeal();
 		} else {
-			return false;
+			return "Required field Deal are missing";
 		}
 
 		List<Milestone> listMilestone = new ArrayList<>();
 		if (request.getDeal().getMilestone() != null) {
 			listMilestone.addAll(request.getDeal().getMilestone());
 		} else {
-			return false;
+			return "Required field Milestone are missing";
 		}
 
 		int countPayback = 0;
@@ -396,10 +396,10 @@ public class RequestService {
 		}
 
 		if (countPayback != deal.getPaybackTimes()) {
-			return false;
+			return "Payback milestone not equal to the times field";
 		}
 		if (countLend != deal.getBorrowTimes()) {
-			return false;
+			return "Lend milestone not equal to the times field";
 		}
 
 		String username = jwtService.getUsernameFromToken(token);
@@ -428,7 +428,7 @@ public class RequestService {
 
 		currentLoanAmount += request.getAmount();
 		if (currentLoanAmount > loanLimit) {
-			return false;
+			return "Reach maximum loan limit";
 		}
 
 		request.setBorrower(account);
@@ -472,7 +472,7 @@ public class RequestService {
 			backupMilestoneRepo.saveAndFlush(bm);
 		}
 
-		return true;
+		return "success";
 	}
 
 	public boolean remove(Request requestGet, String token) {
