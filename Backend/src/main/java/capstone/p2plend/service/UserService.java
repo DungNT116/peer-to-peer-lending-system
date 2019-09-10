@@ -392,7 +392,7 @@ public class UserService {
 				count = 1;
 			}
 		}
-		if(count != 1) {
+		if (count != 1) {
 			return "User ID not up load or validate yet";
 		}
 		for (Document d : lstDocument) {
@@ -401,11 +401,11 @@ public class UserService {
 				count = 2;
 			}
 		}
-		if(count != 2) {
+		if (count != 2) {
 			return "User Video not up load or validate yet";
 		}
 		if (count == 2) {
-			File file = new File("pplsUserHashFile.txt");
+			File file = new File("pplsHash_" + user.getUsername() + ".txt");
 			Writer writer = new BufferedWriter(new FileWriter(file));
 
 			lstDocument = new ArrayList<Document>();
@@ -431,7 +431,8 @@ public class UserService {
 			writer.write(contents);
 			writer.close();
 
-			emailModule.sendMessageWithAttachment(user.getEmail(), "(Admin)PPLS resend you hash file", "Check this email attachment for your hash file", file.getAbsolutePath());
+			emailModule.sendMessageWithAttachment(user.getEmail(), "(Admin)PPLS resend you hash file",
+					"Check this email attachment for your hash file", file.getAbsolutePath());
 
 			return "success";
 		}

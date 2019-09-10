@@ -311,7 +311,7 @@ public class DocumentService {
 			}
 		}
 		if (count == 2) {
-			File file = new File("pplsUserHashFile.txt");
+			File file = new File("pplsHash_" + user.getUsername() + ".txt");
 			Writer writer = new BufferedWriter(new FileWriter(file));
 
 			lstDocument = new ArrayList<Document>();

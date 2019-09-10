@@ -180,7 +180,7 @@ public class TransactionService {
 						+ "Send date: " + date + "\n"
 						+ "Send from: " + transaction.getSender() + "\n"
 						+ "Send to: " + transaction.getReceiver() + "\n"
-						+ "Send amount: " + transaction.getAmount() + "\n"
+						+ "Send amount(in VND): " + transaction.getAmount() + "\n"
 						+ "Send amount(in USD): " + transaction.getAmountValid() + "\n");
 
 		return "success";
