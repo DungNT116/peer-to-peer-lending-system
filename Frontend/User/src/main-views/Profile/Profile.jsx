@@ -24,6 +24,10 @@ import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
 import { apiLink } from '../../api.jsx';
 import { database } from 'firebase';
+
+// library support generate pdf file
+import jsPDF from 'jspdf';
+
 class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -126,7 +130,7 @@ class Profile extends React.Component {
             var txtURL = window.URL.createObjectURL(blob);
             var tempLink = document.createElement('a');
             tempLink.href = txtURL;
-            tempLink.setAttribute('download', 'pplsUserHashFile.txt');
+            tempLink.setAttribute('download', 'pplsHash_' + localStorage.getItem('user') +'.txt');
             tempLink.click();
           })
         } else if (result.status === 400) {

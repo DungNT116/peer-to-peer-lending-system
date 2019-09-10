@@ -27,6 +27,8 @@ import { apiLink, bigchainAPI, client_API } from '../../api.jsx';
 import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
 import ApplyTimeline from '../ApplyTimeline/ApplyTimeline';
+// library support generate pdf file
+import jsPDF from 'jspdf';
 
 class ViewDetailRequest extends React.Component {
   constructor(props) {
@@ -59,6 +61,9 @@ class ViewDetailRequest extends React.Component {
       validHash: false,
       file: null,
       hashError: '',
+      isOpenPDF: false,
+      fullName: '',
+      blockchainID: '',
     };
     this.toggleErrorModal = this.toggleErrorModal.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
@@ -86,6 +91,144 @@ class ViewDetailRequest extends React.Component {
     this.handleFileInput = this.handleFileInput.bind(this);
     this.validHashFile = this.validHashFile.bind(this);
     this.handleError = this.handleError.bind(this);
+    this.generatePDF = this.generatePDF.bind(this);
+    this.getProfile = this.getProfile.bind(this);
+  }
+
+  getProfile() {
+    fetch(apiLink + '/rest/user/getUser', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: localStorage.getItem('token'),
+        // "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      },
+    })
+      .then(result => {
+        if (result.status === 200) {
+          result.json().then(data => {
+            console.log(data.firstName + ' ' + data.lastName);
+            this.setState({
+              fullName: data.firstName + ' ' + data.lastName
+            });
+          });
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        }
+      })
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
+      });
+  }
+
+  generatePDF() {
+    console.log(this.props.request.data)
+    let duration =
+      (this.props.request.data.deal.milestone[
+        this.props.request.data.deal.milestone.length - 1
+      ].presentDate -
+        this.props.request.data.deal.milestone[0].presentDate) /
+      86400;
+    var doc = new jsPDF()
+
+    doc.setFontSize(35)
+    doc.text('Transaction information', 105, 20, 'center')
+    doc.setFontSize(25)
+    doc.text('Deal Information', 20, 40)
+    doc.setFontSize(14)
+    doc.text('Borrower Name: ' + this.props.request.data.borrower.firstName + ' ' + this.props.request.data.borrower.lastName, 20, 50)
+    doc.text('Lender Name: ' + this.state.fullName, 20, 60)
+    doc.text('Total Amount: ' + this.numberWithCommas(
+      this.props.request.data.amount +
+      Math.round(
+        ((((this.props.request.data.amount *
+          duration) /
+          30) *
+          (this.props.request.data.interestRate /
+            12)) /
+          100) *
+        1000
+      ) /
+      1000
+    ) + ' VND', 20, 70)
+    doc.text('Borrow Amount: ' + this.numberWithCommas(this.props.request.data.amount) + ' VND', 20, 80)
+    doc.text('Interest Rate: ' + this.props.request.data.interestRate + ' percent per year', 20, 90)
+    doc.text('Interest Received: ' + this.numberWithCommas(
+      Math.round(
+        ((((this.props.request.data.amount *
+          duration) /
+          30) *
+          (this.props.request.data.interestRate /
+            12)) /
+          100) *
+        1000
+      ) / 1000
+    ) + ' VND', 20, 100)
+    doc.setFontSize(25)
+    doc.text('Milestone Information (Month/Day/Year): ', 20, 120)
+    doc.setFontSize(14)
+    var line = 120;
+    for (let i = 0; i < this.props.request.data.deal.milestone.length; i++) {
+      const element = this.props.request.data.deal.milestone[i];
+      // console.log(element)
+      line += 10
+      if (element.type === 'lend') {
+        if (element.transaction.status !== null) {
+          doc.text('Milestone Lend ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
+        } else {
+          if (i === 0) {
+            doc.text('Milestone Lend ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
+          } else {
+            doc.text('Milestone Lend ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.presentDate), 20, line)
+          }
+        }
+
+      } else if (element.type === 'payback') {
+        if (element.transaction.status !== null) {
+          doc.text('Milestone payback ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
+        } else {
+          doc.text('Milestone payback ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.presentDate), 20, line)
+        }
+      }
+    }
+    let user = localStorage.getItem('user');
+    let lenderUsername = '';
+    if (this.props.request.data.borrower.username !== user) {
+      lenderUsername = user;
+    } else {
+      lenderUsername = this.props.request.data.borrower.username;
+    }
+    line += 20;
+    doc.setFontSize(25)
+    doc.text('Transaction Information: ', 20, line)
+
+    doc.setFontSize(14)
+    line += 10;
+    var tmp = doc.splitTextToSize('Transaction ID: ' + this.state.blockchainID, 180);
+    doc.text(20, line, tmp)
+    line += 15;
+    doc.text('Sender: ' + lenderUsername, 20, line)
+    line += 10;
+    doc.text('Receiver: ' + this.props.request.data.borrower.username, 20, line)
+    line += 10;
+    doc.text('Transaction Amount (USD): ' + this.state.data_tx.amount + 'USD', 20, line)
+    line += 10;
+    doc.text('Transaction Amount (VND): ' + this.numberWithCommas(this.roundUp(
+      (this.props.request.data.amount *
+        this.props.request.data.deal.milestone[1]
+          .percent))) + 'VND', 20, line)
+    line += 10;
+    doc.text('Transaction Day: ' + this.convertTimeStampToDate(this.state.data_tx.createDate), 20, line)
+    // txId: this.state.data_tx.txId,
+    // sender: user,
+    // receiver: this.props.request.data.borrower.username,
+    // amountTx: this.state.data_tx.amount,
+    // createDate: this.state.data_tx.createDate,
+
+    doc.save('a4.pdf')
   }
 
   async handleError(data) {
@@ -227,15 +370,21 @@ class ViewDetailRequest extends React.Component {
     }).then(async result => {
       if (result.status === 200) {
         // alert('create success');
+        // await this.setState({
+        //   isOpenSuccess: true
+        // })
+        // await setTimeout(
+        //   async function () {
+        //     // this.props.history.push('/view-request-trading');
+        //     await this.setState({
+        //       isOpenSuccess: false
+        //     })
+        //   }.bind(this),
+        //   1000
+        // );
         await this.setState({
-          isOpenSuccess: true
+          isOpenPDF: true
         })
-        await setTimeout(
-          function () {
-            this.props.history.push('/view-request-trading');
-          }.bind(this),
-          2000
-        );
         // this.props.history.push("/view-request-trading");
       } else if (result.status === 401) {
         localStorage.removeItem('isLoggedIn');
@@ -541,10 +690,13 @@ class ViewDetailRequest extends React.Component {
     })
       .then(response => response.json())
       .then(async data => {
-        this.setState({
+        await this.setState({
           borrowUsername: this.props.request.data.borrower.username,
+          blockchainID: data.id
         });
         this.acceptDeal();
+        this.toggleModal();
+        //after success redirect to trading page
         this.saveTransaction(data, data_transaction);
       }).catch(async data => {
         //CANNOT ACCESS TO SERVER
@@ -556,6 +708,8 @@ class ViewDetailRequest extends React.Component {
   };
 
   componentDidMount() {
+    this.getProfile();
+    // this.generatePDF();
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
@@ -751,7 +905,6 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                             <Col xs="12" md="9">
                               <p className="h6">
-                                {/* đổi công thức như trong doc */}
                                 {this.numberWithCommas(
                                   this.props.request.data.amount +
                                   Math.round(
@@ -929,7 +1082,7 @@ class ViewDetailRequest extends React.Component {
                                           this.state.currencyUSDVND
                                         )}
                                         onSuccess={(details, data) => {
-                                          this.toggleModal();
+                                          // this.toggleModal();
                                           this.setState({
                                             data_tx: {
                                               txId: details.id,
@@ -963,7 +1116,7 @@ class ViewDetailRequest extends React.Component {
                                           type="file"
                                           accept="text/plain"
                                           onChange={this.handleFileInput} />
-                                          <p></p>
+                                        <p></p>
                                         <Button
                                           // type="submit"
                                           size="md"
@@ -972,11 +1125,11 @@ class ViewDetailRequest extends React.Component {
                                         >
                                           Check
                                     </Button>
-                                    {this.state.hashError !== '' ? 
-                                    (<strong class='alert alert-danger' role='alert'>{this.state.hashError}</strong>)
-                                    :
-                                    ("")}
-                                        
+                                        {this.state.hashError !== '' ?
+                                          (<strong class='alert alert-danger' role='alert'>{this.state.hashError}</strong>)
+                                          :
+                                          ("")}
+
                                       </div>
 
                                     )
@@ -1040,6 +1193,36 @@ class ViewDetailRequest extends React.Component {
           </div>
           <div className="modal-footer">
             <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+          </div>
+        </Modal>
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenPDF}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">
+            Transaction information
+          </div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              Milestone 1: {this.convertTimeStampToDate(this.props.request.data.deal.milestone[0].presentDate)}
+            </h3>
+            <p style={{wordBreak: 'break-all'}}>Transaction ID: {this.state.blockchainID}</p>
+            <p>Sender: {this.props.request.data.borrower.username !== localStorage.getItem('user') ? (localStorage.getItem('user')) : (this.props.request.data.borrower.username)}</p>
+            <p>Receiver: {this.props.request.data.borrower.username}</p>
+            <p>Transaction Amount (USD): {this.state.data_tx.amount} USD</p>
+            <p>Transaction Amount (VND): {this.numberWithCommas(this.roundUp(
+              (this.props.request.data.amount *
+                this.props.request.data.deal.milestone[1]
+                  .percent)))} VND</p>
+            <p>Transaction Day: {this.convertTimeStampToDate(this.state.data_tx.createDate)}</p>
+          </div>
+          <div className="modal-footer">
+            <Button onClick={() => {
+              this.setState({ isOpenPDF: false })
+              this.props.history.push('/view-request-trading');
+              }}>OK</Button>
+            <Button onClick={() => this.generatePDF()}>Download Receipt</Button>
           </div>
         </Modal>
       </>
