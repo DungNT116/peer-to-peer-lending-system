@@ -171,26 +171,29 @@ class ViewDetailRequest extends React.Component {
     doc.text('Milestone Information (Month/Day/Year): ', 20, 120)
     doc.setFontSize(14)
     var line = 120;
+    var paybackIndex = 1;
     for (let i = 0; i < this.props.request.data.deal.milestone.length; i++) {
       const element = this.props.request.data.deal.milestone[i];
       // console.log(element)
-      line += 10
-      if (element.type === 'lend') {
+      line += 5
+      if (element.type === 'lend' && i % 2 === 1) {
         if (element.transaction.status !== null) {
-          doc.text('Milestone Lend ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
+          doc.text('Milestone Lend ' + Number(i) + ' - ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.previousDate) + ' - ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
         } else {
-          if (i === 0) {
-            doc.text('Milestone Lend ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
+          if (i === 1) {
+            doc.text('Milestone Lend ' + Number(i) + ' - ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.previousDate) + ' - ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
           } else {
-            doc.text('Milestone Lend ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.presentDate), 20, line)
+            doc.text('Milestone Lend ' + Number(i) + ' - ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.previousDate) + ' - ' + this.convertTimeStampToDate(element.presentDate), 20, line)
           }
         }
 
-      } else if (element.type === 'payback') {
+      } else if (element.type === 'payback' && i % 2 === 1) {
         if (element.transaction.status !== null) {
-          doc.text('Milestone payback ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
+          doc.text('Milestone payback ' + Number(paybackIndex) + ' - ' + Number(paybackIndex + 1) + ': ' + this.convertTimeStampToDate(element.previousDate) + ' - ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
+          paybackIndex += 2;
         } else {
-          doc.text('Milestone payback ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.presentDate), 20, line)
+          doc.text('Milestone Payback ' + Number(paybackIndex) + ' - ' + Number(paybackIndex + 1) + ': ' + this.convertTimeStampToDate(element.previousDate) + ' - ' + this.convertTimeStampToDate(element.presentDate), 20, line)
+          paybackIndex += 2;
         }
       }
     }
@@ -207,6 +210,8 @@ class ViewDetailRequest extends React.Component {
 
     doc.setFontSize(14)
     line += 10;
+    doc.text('Milestone 1 - 2: ' + this.convertTimeStampToDate(this.props.request.data.deal.milestone[1].previousDate) + ' - ' + this.convertTimeStampToDate(this.props.request.data.deal.milestone[1].presentDate), 20, line)
+    line += 10;
     var tmp = doc.splitTextToSize('Transaction ID: ' + this.state.blockchainID, 180);
     doc.text(20, line, tmp)
     line += 15;
@@ -214,20 +219,14 @@ class ViewDetailRequest extends React.Component {
     line += 10;
     doc.text('Receiver: ' + this.props.request.data.borrower.username, 20, line)
     line += 10;
-    doc.text('Transaction Amount (USD): ' + this.state.data_tx.amount + 'USD', 20, line)
+    doc.text('Transaction Amount (USD): ' + this.state.data_tx.amount + ' USD', 20, line)
     line += 10;
     doc.text('Transaction Amount (VND): ' + this.numberWithCommas(this.roundUp(
       (this.props.request.data.amount *
         this.props.request.data.deal.milestone[1]
-          .percent))) + 'VND', 20, line)
+          .percent))) + ' VND', 20, line)
     line += 10;
     doc.text('Transaction Day: ' + this.convertTimeStampToDate(this.state.data_tx.createDate), 20, line)
-    // txId: this.state.data_tx.txId,
-    // sender: user,
-    // receiver: this.props.request.data.borrower.username,
-    // amountTx: this.state.data_tx.amount,
-    // createDate: this.state.data_tx.createDate,
-
     doc.save('a4.pdf')
   }
 
@@ -765,7 +764,17 @@ class ViewDetailRequest extends React.Component {
   }
 
   toggleModal() {
-    this.setState({modal: !this.state.modal});
+    if(this.state.modal === true) {
+      this.setState({
+        modal: !this.state.modal,
+        validHash: false
+      });
+    } else {
+      this.setState({
+        modal: !this.state.modal,
+      });
+    }
+    
   }
   async makeDeal() {
     this.props.setIsHistory(false);
@@ -1234,7 +1243,7 @@ class ViewDetailRequest extends React.Component {
           </div>
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
-              Milestone 1: {this.convertTimeStampToDate(this.props.request.data.deal.milestone[0].presentDate)}
+              Milestone 1 - 2: {this.convertTimeStampToDate(this.props.request.data.deal.milestone[1].previousDate) + ' - ' + this.convertTimeStampToDate(this.props.request.data.deal.milestone[1].presentDate)}
             </h3>
             <p style={{wordBreak: 'break-all'}}>Transaction ID: {this.state.blockchainID}</p>
             <p>Sender: {this.props.request.data.borrower.username !== localStorage.getItem('user') ? (localStorage.getItem('user')) : (this.props.request.data.borrower.username)}</p>
