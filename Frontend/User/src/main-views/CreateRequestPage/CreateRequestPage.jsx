@@ -18,7 +18,7 @@ import {
   Label,
   Form,
   Button,
-  Modal
+  Modal,
 } from 'reactstrap';
 
 //components
@@ -50,8 +50,8 @@ class CreateRequestPage extends React.Component {
       invalidAmount: true,
       errorAmount: '',
       maxloadlimit: 0,
-      isOpen : false,
-      isOpenError: false
+      isOpen: false,
+      isOpenError: false,
     };
 
     // this.onBorrowDurationChange = this.onBorrowDurationChange.bind(this);
@@ -144,7 +144,7 @@ class CreateRequestPage extends React.Component {
   //create request
   async handleSubmit(event) {
     event.preventDefault();
-    if (this.state.invalidAmount === false ) {
+    if (this.state.invalidAmount === false) {
       fetch(apiLink + '/rest/request/createRequest', {
         method: 'POST',
         headers: {
@@ -162,25 +162,31 @@ class CreateRequestPage extends React.Component {
             milestone: this.createMileStone(),
           },
         }),
-      }).then(result => {
-        if (result.status === 200) {
-          this.setState({
-            isOpen: true,
-          });
-          setTimeout(
-            function() {
-              setTimeout(this.props.history.push('view-new-request'), 3000);
-            }.bind(this),
-            3000
-          );
-        } else if (result.status === 401) {
-          localStorage.removeItem('isLoggedIn');
-          this.props.history.push('/login-page');
-        }
-      }).catch(async data => {
-        //CANNOT ACCESS TO SERVER
-        await this.handleError(data)
-      });
+      })
+        .then(result => {
+          if (result.status === 200) {
+            this.setState({
+              isOpen: true,
+            });
+            setTimeout(
+              function() {
+                setTimeout(this.props.history.push('view-new-request'), 3000);
+              }.bind(this),
+              3000
+            );
+          } else if (result.status === 401) {
+            localStorage.removeItem('isLoggedIn');
+            this.props.history.push('/login-page');
+          } else if (result.status === 400) {
+            result.text().then(data => {
+              console.log(data);
+            });
+          }
+        })
+        .catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.handleError(data);
+        });
     }
     event.preventDefault();
   }
@@ -236,22 +242,24 @@ class CreateRequestPage extends React.Component {
         'Content-Type': 'application/json',
         Authorization: localStorage.getItem('token'),
       },
-    }).then(result => {
-      if (result.status === 200) {
-        result.json().then(data => {
-          this.setState({
-            maxloadlimit: data.loanLimit,
-            interestRate : data.interestRate
+    })
+      .then(result => {
+        if (result.status === 200) {
+          result.json().then(data => {
+            this.setState({
+              maxloadlimit: data.loanLimit,
+              interestRate: data.interestRate,
+            });
           });
-        });
-      } else if (result.status === 401) {
-        localStorage.removeItem('isLoggedIn');
-        this.props.history.push('/login-page');
-      }
-    }).catch(async data => {
-      //CANNOT ACCESS TO SERVER
-      await this.handleError(data);
-    });
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        }
+      })
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
+      });
   }
 
   //handle amount change
@@ -314,7 +322,7 @@ class CreateRequestPage extends React.Component {
         height: '100%',
       },
     };
-    
+
     return (
       <>
         <MainNavbar />
@@ -367,7 +375,7 @@ class CreateRequestPage extends React.Component {
                       <img
                         style={{width: 50, height: 50}}
                         src={require('assets/img/theme/checked.png')}
-                      /> 
+                      />
                       Successfully created request !
                     </h3>
                   </div>
@@ -432,7 +440,7 @@ class CreateRequestPage extends React.Component {
                               </small>
                             </Col>
                           </FormGroup>
-                          
+
                           <FormGroup row>
                             <Col lg="3" md="3">
                               <Label
@@ -475,18 +483,22 @@ class CreateRequestPage extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenError}
-        // toggle={() => this.toggleModal('defaultModal')}
+          // toggle={() => this.toggleModal('defaultModal')}
         >
-          <div className="modal-header">
-            Error
-          </div>
+          <div className="modal-header">Error</div>
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               {this.state.error}
             </h3>
           </div>
           <div className="modal-footer">
-            <Button onClick={() => { this.setState({ isOpenError: false }) }}>OK</Button>
+            <Button
+              onClick={() => {
+                this.setState({isOpenError: false});
+              }}
+            >
+              OK
+            </Button>
           </div>
         </Modal>
       </>

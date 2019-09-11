@@ -297,7 +297,7 @@ class ViewOwnTransaction extends React.Component {
         </td>
         <td>{transaction.sender}</td>
         <td>{transaction.receiver}</td>
-        <td>{this.numberWithCommas(transaction.amount)} VND</td>
+        <td>{this.numberWithCommas(Math.round(transaction.amount))} VND</td>
         <td>{this.convertTimeStampToDate(transaction.createDate)}</td>
         {/* <td>{transaction.status}</td> */}
         <td>

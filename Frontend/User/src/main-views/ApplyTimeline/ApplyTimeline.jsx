@@ -26,6 +26,8 @@ import {PayPalButton} from 'react-paypal-button-v2';
 import {apiLink, bigchainAPI, client_API} from '../../api.jsx';
 //api link
 import HorizontalTimeline from 'react-horizontal-timeline';
+// library support generate pdf file
+import jsPDF from 'jspdf';
 class ApplyTimeline extends React.Component {
   async componentWillMount() {
     //this function will update lending array and payback array in parent component (create request)
@@ -71,10 +73,233 @@ class ApplyTimeline extends React.Component {
       });
     }
   }
+  getProfile() {
+    fetch(apiLink + '/rest/user/getUser', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: localStorage.getItem('token'),
+        // "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      },
+    })
+      .then(result => {
+        if (result.status === 200) {
+          result.json().then(data => {
+            console.log(data.firstName + ' ' + data.lastName);
+            this.setState({
+              fullName: data.firstName + ' ' + data.lastName,
+            });
+          });
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        }
+      })
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
+      });
+  }
+  generatePDF() {
+    console.log(this.props.request.data);
+    let duration =
+      (this.props.request.data.deal.milestone[
+        this.props.request.data.deal.milestone.length - 1
+      ].presentDate -
+        this.props.request.data.deal.milestone[0].presentDate) /
+      86400;
+    var doc = new jsPDF();
+
+    doc.setFontSize(35);
+    doc.text('Transaction information', 105, 20, 'center');
+    doc.setFontSize(25);
+    doc.text('Deal Information', 20, 40);
+    doc.setFontSize(14);
+    doc.text(
+      'Borrower Name: ' +
+        this.props.request.data.borrower.firstName +
+        ' ' +
+        this.props.request.data.borrower.lastName,
+      20,
+      50
+    );
+    console.log(this.props.request.data);
+    doc.text(
+      'Lender Name: ' +
+        this.props.request.data.lender.firstName +
+        ' ' +
+        this.props.request.data.lender.lastName,
+      20,
+      60
+    );
+    doc.text(
+      'Total Amount: ' +
+        this.numberWithCommas(
+          this.props.request.data.amount +
+            Math.round(
+              ((((this.props.request.data.amount * duration) / 30) *
+                (this.props.request.data.interestRate / 12)) /
+                100) *
+                1000
+            ) /
+              1000
+        ) +
+        ' VND',
+      20,
+      70
+    );
+    doc.text(
+      'Borrow Amount: ' +
+        this.numberWithCommas(this.props.request.data.amount) +
+        ' VND',
+      20,
+      80
+    );
+    doc.text(
+      'Interest Rate: ' +
+        this.props.request.data.interestRate +
+        ' percent per year',
+      20,
+      90
+    );
+    doc.text(
+      'Interest Received: ' +
+        this.numberWithCommas(
+          Math.round(
+            ((((this.props.request.data.amount * duration) / 30) *
+              (this.props.request.data.interestRate / 12)) /
+              100) *
+              1000
+          ) / 1000
+        ) +
+        ' VND',
+      20,
+      100
+    );
+    doc.setFontSize(25);
+    doc.text('Milestone Information (Month/Day/Year): ', 20, 120);
+    doc.setFontSize(14);
+    var line = 120;
+    for (let i = 0; i < this.props.request.data.deal.milestone.length; i++) {
+      const element = this.props.request.data.deal.milestone[i];
+      // console.log(element)
+      line += 10;
+      if (element.type === 'lend') {
+        if (element.transaction.status !== null) {
+          doc.text(
+            'Milestone Lend ' +
+              Number(i + 1) +
+              ': ' +
+              this.convertTimeStampToDate(element.presentDate) +
+              ' (Paid)',
+            20,
+            line
+          );
+        } else {
+          if (i === 0) {
+            doc.text(
+              'Milestone Lend ' +
+                Number(i + 1) +
+                ': ' +
+                this.convertTimeStampToDate(element.presentDate) +
+                ' (Paid)',
+              20,
+              line
+            );
+          } else {
+            doc.text(
+              'Milestone Lend ' +
+                Number(i + 1) +
+                ': ' +
+                this.convertTimeStampToDate(element.presentDate),
+              20,
+              line
+            );
+          }
+        }
+      } else if (element.type === 'payback') {
+        if (element.transaction.status !== null) {
+          doc.text(
+            'Milestone payback ' +
+              Number(i + 1) +
+              ': ' +
+              this.convertTimeStampToDate(element.presentDate) +
+              ' (Paid)',
+            20,
+            line
+          );
+        } else {
+          doc.text(
+            'Milestone payback ' +
+              Number(i + 1) +
+              ': ' +
+              this.convertTimeStampToDate(element.presentDate),
+            20,
+            line
+          );
+        }
+      }
+    }
+    let user = localStorage.getItem('user');
+    let lenderUsername = '';
+    if (this.props.request.data.borrower.username !== user) {
+      lenderUsername = user;
+    } else {
+      lenderUsername = this.props.request.data.borrower.username;
+    }
+    line += 20;
+    doc.setFontSize(25);
+    doc.text('Transaction Information: ', 20, line);
+
+    doc.setFontSize(14);
+    line += 10;
+    var tmp = doc.splitTextToSize(
+      'Transaction ID: ' + this.state.blockchainID,
+      180
+    );
+    doc.text(20, line, tmp);
+    line += 15;
+    doc.text('Sender: ' + localStorage.getItem('user'), 20, line);
+    line += 10;
+    doc.text('Receiver: ' + this.state.receiver, 20, line);
+    line += 10;
+    doc.text(
+      'Transaction Amount (USD): ' + this.state.data_tx.amount + 'USD',
+      20,
+      line
+    );
+    line += 10;
+    doc.text(
+      'Transaction Amount (VND): ' +
+        this.numberWithCommas(
+          this.roundUp(
+            this.props.request.data.amount *
+              this.props.request.data.deal.milestone[1].percent
+          )
+        ) +
+        'VND',
+      20,
+      line
+    );
+    line += 10;
+    doc.text(
+      'Transaction Day: ' +
+        this.convertTimeStampToDate(this.state.data_tx.createDate),
+      20,
+      line
+    );
+
+    doc.save(
+      'receipt-' + lenderUsername + '-' + this.state.data_tx.createDate + '.pdf'
+    );
+  }
+
   async componentDidMount() {
     // document.documentElement.scrollTop = 0;
     // document.scrollingElement.scrollTop = 0;
     // this.refs.main.scrollTop = 0;
+    this.getProfile();
     fetch(
       'http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1',
       {
@@ -118,6 +343,7 @@ class ApplyTimeline extends React.Component {
       modalLending: false,
       isInMilestoneLending: false,
       isMilestoneLendingPaid: false,
+      fullName: '',
       timeline_lending: [
         {
           data: this.formatDate(new Date(Date.now())),
@@ -192,6 +418,9 @@ class ApplyTimeline extends React.Component {
 
     this.handleFileInput = this.handleFileInput.bind(this);
     this.validHashFile = this.validHashFile.bind(this);
+    this.generatePDF = this.generatePDF.bind(this);
+
+    this.getProfile = this.getProfile.bind(this);
   }
   numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -629,38 +858,38 @@ class ApplyTimeline extends React.Component {
       const element = this.state.rawMilestone[i];
       if (element.type === typePayment && typePayment === 'lend') {
         if (element.previousDate <= dateNow && element.presentDate >= dateNow) {
-          this.setState({
+          await this.setState({
             curDateLending: element,
             typePayment: typePayment,
             isInMilestoneLending: true,
           });
           if (element.transaction.status != null) {
-            this.setState({
+            await this.setState({
               isMilestoneLendingPaid: true,
             });
           } else {
-            this.setState({
+            await this.setState({
               isMilestoneLendingPaid: false,
             });
           }
           break;
         } else {
-          this.setState({isInMilestoneLending: false});
+          await this.setState({isInMilestoneLending: false});
         }
       } else if (element.type === typePayment && typePayment === 'payback') {
         if (element.previousDate <= dateNow && element.presentDate >= dateNow) {
-          this.setState({
+          await this.setState({
             curDatePayback: element,
             typePayment: typePayment,
             isInMilestonePayback: true,
           });
           if (element.transaction.status != null) {
-            this.setState({
+            await this.setState({
               isMilestonePaybackPaid: true,
             });
             break;
           } else {
-            this.setState({
+            await this.setState({
               isMilestonePaybackPaid: false,
             });
             this.checkPaymentPaid(
@@ -678,12 +907,12 @@ class ApplyTimeline extends React.Component {
           element !== paybackMS[0]
         ) {
           if (element.transaction.status != null) {
-            this.setState({
+            await this.setState({
               isMilestonePaybackPaid: true,
             });
             break;
           } else {
-            this.setState({
+            await this.setState({
               isInMilestonePayback: true,
               isMilestonePaybackPaid: false,
             });
@@ -696,7 +925,7 @@ class ApplyTimeline extends React.Component {
             break;
           }
         } else {
-          this.setState({isInMilestonePayback: false});
+          await this.setState({isInMilestonePayback: false});
         }
       }
     }
@@ -969,15 +1198,19 @@ class ApplyTimeline extends React.Component {
     }
   }
   //End Function Payback
-  send_tx = () => {
+  async send_tx() {
     let user = localStorage.getItem('user');
     let receiver = '';
     if (user === this.props.borrowerUser) {
-      receiver = this.props.lenderUser;
+      await this.setState({
+        receiver: this.props.lenderUser,
+      });
     } else {
-      receiver = this.props.borrowerUser;
+      await this.setState({
+        receiver: this.props.borrowerUser,
+      });
     }
-    if (receiver !== '') {
+    if (this.state.receiver !== '') {
       let data_transaction = {
         data_tx: {
           data: {
@@ -985,7 +1218,7 @@ class ApplyTimeline extends React.Component {
             tx_data: {
               txId: this.state.data_tx.txId,
               sender: user,
-              receiver: receiver,
+              receiver: this.state.receiver,
               amountTx: this.state.data_tx.amount,
               createDate: this.state.data_tx.createDate,
             },
@@ -1014,7 +1247,11 @@ class ApplyTimeline extends React.Component {
         body: JSON.stringify(data_transaction),
       })
         .then(response => response.json())
-        .then(data => {
+        .then(async data => {
+          await this.setState({
+            borrowUsername: this.props.request.data.borrower.username,
+            blockchainID: data.id,
+          });
           this.saveTransaction(data, data_transaction);
         })
         .catch(async data => {
@@ -1025,7 +1262,7 @@ class ApplyTimeline extends React.Component {
     } else {
       alert('Receiver is null');
     }
-  };
+  }
   saveTransaction(data, data_transaction) {
     let idMilestone = -1;
     let amountToSV = 0;
@@ -1074,7 +1311,7 @@ class ApplyTimeline extends React.Component {
       .then(async result => {
         if (result.status === 200) {
           await this.setState({
-            isOpenSuccess: true,
+            isOpenPDF: true,
           });
           await database
             .ref('ppls')
@@ -1102,7 +1339,7 @@ class ApplyTimeline extends React.Component {
           await upvotesRef.transaction(function(current_value) {
             return (current_value || 0) + 1;
           });
-          this.props.goToViewRequestTrading();
+          // this.props.goToViewRequestTrading();
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
           this.props.history.push('/login-page');
@@ -1204,13 +1441,8 @@ class ApplyTimeline extends React.Component {
     const {curLendingId, curPaybackId} = this.state;
     const curLendingPercent = this.state.timeline_lending[curLendingId].percent;
     const curLendingStatus = this.state.timeline_lending[curLendingId].status;
-<<<<<<< HEAD
-
-    const isLendMany = this.state.isLendMany;
-=======
     const isLendMany = this.state.isLendMany;
 
->>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
     const curPaybackPercent = this.state.timeline_payback[curPaybackId].percent;
     const curPaybackStatus = this.state.timeline_payback[curPaybackId].status;
     const isPaybackMany = this.state.isPaybackMany;
@@ -1390,42 +1622,6 @@ class ApplyTimeline extends React.Component {
                         >
                           {this.createLendingTimeline()}
                         </div>
-<<<<<<< HEAD
-
-                        <div className="text-center">
-                          {'Amount need to lend in milestone ' +
-                            curLendingId +
-                            ' : ' +
-                            this.numberWithCommas(
-                              Math.round(
-                                (this.props.request.data.amount +
-                                  Math.round(
-                                    ((((this.props.request.data.amount *
-                                      (this.props.request.data.deal.milestone[
-                                        this.props.request.data.deal.milestone
-                                          .length - 1
-                                      ].presentDate -
-                                        this.props.request.data.deal
-                                          .milestone[0].presentDate)) /
-                                      86400 /
-                                      30) *
-                                      (this.props.request.data.interestRate /
-                                        12)) /
-                                      100) *
-                                      1000
-                                  ) /
-                                    1000) *
-                                  curLendingPercent
-                              )
-                            )}
-                        </div>
-                        <div className="text-center">
-                          {'Status :  '}
-                          {curLendingStatus == ''
-                            ? 'Not Yet'
-                            : curLendingStatus}
-                        </div>
-=======
                         {this.props.isCreatePage !== undefined ? (
                           ''
                         ) : (
@@ -1452,7 +1648,6 @@ class ApplyTimeline extends React.Component {
                             </div>
                           </div>
                         )}
->>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
                       </Col>
                       <Col md="3">
                         {this.props.borrowerUser ===
@@ -1629,39 +1824,6 @@ class ApplyTimeline extends React.Component {
                     >
                       {this.createLendingTimeline()}
                     </div>
-<<<<<<< HEAD
-
-                    <div className="text-center">
-                      {'Amount need to lend in milestone ' +
-                        curLendingId +
-                        ' : ' +
-                        this.numberWithCommas(
-                          Math.round(
-                            (this.props.request.data.amount +
-                              Math.round(
-                                ((((this.props.request.data.amount *
-                                  (this.props.request.data.deal.milestone[
-                                    this.props.request.data.deal.milestone
-                                      .length - 1
-                                  ].presentDate -
-                                    this.props.request.data.deal.milestone[0]
-                                      .presentDate)) /
-                                  86400 /
-                                  30) *
-                                  (this.props.request.data.interestRate / 12)) /
-                                  100) *
-                                  1000
-                              ) /
-                                1000) *
-                              curLendingPercent
-                          )
-                        )}
-                    </div>
-                    <div className="text-center">
-                      {'Status :  '}
-                      {curLendingStatus == '' ? 'Not Yet' : curLendingStatus}
-                    </div>
-=======
                     {this.props.isCreatePage !== undefined ? (
                       ''
                     ) : (
@@ -1687,7 +1849,6 @@ class ApplyTimeline extends React.Component {
                         </div>
                       </div>
                     )}
->>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
                   </div>
                 )}
               </div>
@@ -1860,14 +2021,6 @@ class ApplyTimeline extends React.Component {
                       >
                         {this.createPaybackTimeline()}
                       </div>
-<<<<<<< HEAD
-                      <div className="text-center">
-                        {'Amount need to pay in milestone ' +
-                          curPaybackId +
-                          ' : ' +
-                          this.numberWithCommas(
-                            Math.round(
-=======
                       {this.props.isCreatePage !== undefined ? (
                         ''
                       ) : (
@@ -1876,35 +2029,28 @@ class ApplyTimeline extends React.Component {
                             {'Amount need to pay in milestone ' +
                               curPaybackId +
                               ' :  ' +
->>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
-                              (this.props.request.data.amount +
+                              this.numberWithCommas(
                                 Math.round(
-                                  ((((this.props.request.data.amount *
-                                    (this.props.request.data.deal.milestone[
-                                      this.props.request.data.deal.milestone
-                                        .length - 1
-                                    ].presentDate -
-                                      this.props.request.data.deal.milestone[0]
-                                        .presentDate)) /
-                                    86400 /
-                                    30) *
-                                    (this.props.request.data.interestRate /
-                                      12)) /
-                                    100) *
-                                    1000
-                                ) /
-                                  1000) *
-<<<<<<< HEAD
-                                curPaybackPercent
-                            )
-                          )}
-                      </div>
-                      <div className="text-center">
-                        {'Status :  '}
-                        {curPaybackStatus == '' ? 'Not Yet' : curPaybackStatus}
-                      </div>
-=======
-                                curPaybackPercent +
+                                  (this.props.request.data.amount +
+                                    Math.round(
+                                      ((((this.props.request.data.amount *
+                                        (this.props.request.data.deal.milestone[
+                                          this.props.request.data.deal.milestone
+                                            .length - 1
+                                        ].presentDate -
+                                          this.props.request.data.deal
+                                            .milestone[0].presentDate)) /
+                                        86400 /
+                                        30) *
+                                        (this.props.request.data.interestRate /
+                                          12)) /
+                                        100) *
+                                        1000
+                                    ) /
+                                      1000) *
+                                    curPaybackPercent
+                                )
+                              ) +
                               ' VNĐ'}
                           </div>
                           <div className="text-center">
@@ -1918,7 +2064,6 @@ class ApplyTimeline extends React.Component {
                           </div>
                         </div>
                       )}
->>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
                     </Col>
                     <Col md="3">
                       {this.props.borrowerUser ===
@@ -2189,38 +2334,6 @@ class ApplyTimeline extends React.Component {
                   >
                     {this.createPaybackTimeline()}
                   </div>
-<<<<<<< HEAD
-                  <div className="text-center">
-                    {'Amount need to pay in milestone ' +
-                      curPaybackId +
-                      ' : ' +
-                      this.numberWithCommas(
-                        Math.round(
-                          (this.props.request.data.amount +
-                            Math.round(
-                              ((((this.props.request.data.amount *
-                                (this.props.request.data.deal.milestone[
-                                  this.props.request.data.deal.milestone
-                                    .length - 1
-                                ].presentDate -
-                                  this.props.request.data.deal.milestone[0]
-                                    .presentDate)) /
-                                86400 /
-                                30) *
-                                (this.props.request.data.interestRate / 12)) /
-                                100) *
-                                1000
-                            ) /
-                              1000) *
-                            curPaybackPercent
-                        )
-                      )}
-                  </div>
-                  <div className="text-center">
-                    {'Status :  '}
-                    {curPaybackStatus == '' ? 'Not Yet' : curPaybackStatus}
-                  </div>
-=======
                   {this.props.isCreatePage !== undefined ? (
                     ''
                   ) : (
@@ -2231,24 +2344,26 @@ class ApplyTimeline extends React.Component {
                           ' :  ' +
                           this.numberWithCommas(
                             Math.round(
-                              this.props.request.data.amount +
-                                Math.round(
-                                  ((((this.props.request.data.amount *
-                                    (this.props.request.data.deal.milestone[
-                                      this.props.request.data.deal.milestone
-                                        .length - 1
-                                    ].presentDate -
-                                      this.props.request.data.deal.milestone[0]
-                                        .presentDate)) /
-                                    86400 /
-                                    30) *
-                                    (this.props.request.data.interestRate /
-                                      12)) /
-                                    100) *
+                              Math.round(
+                                this.props.request.data.amount +
+                                  Math.round(
+                                    ((((this.props.request.data.amount *
+                                      (this.props.request.data.deal.milestone[
+                                        this.props.request.data.deal.milestone
+                                          .length - 1
+                                      ].presentDate -
+                                        this.props.request.data.deal
+                                          .milestone[0].presentDate)) /
+                                      86400 /
+                                      30) *
+                                      (this.props.request.data.interestRate /
+                                        12)) /
+                                      100) *
+                                      1000
+                                  ) /
                                     1000
-                                ) /
-                                  1000
-                            ) * curPaybackPercent
+                              ) * curPaybackPercent
+                            )
                           ) +
                           ' VNĐ'}
                       </div>
@@ -2262,7 +2377,6 @@ class ApplyTimeline extends React.Component {
                       </div>
                     </div>
                   )}
->>>>>>> 2e18a9100c1b01c9d63b3cf010ed6d1625e2281d
                 </div>
               )}
             </div>
@@ -2306,6 +2420,113 @@ class ApplyTimeline extends React.Component {
             </h3>
           </div>
         </Modal>
+
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenPDF}
+          // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">Transaction information</div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              Milestone :{' '}
+              {this.state.curDateLending != {} &&
+              this.state.curDateLending.type == 'lend'
+                ? this.convertTimeStampToDate(
+                    this.state.curDateLending.presentDate
+                  )
+                : this.state.curDatePayback !== {} &&
+                  this.state.curDatePayback.type == 'payback'
+                ? this.convertTimeStampToDate(
+                    this.state.curDatePayback.presentDate
+                  )
+                : console.log('ERROR curDate !!!')}
+            </h3>
+            <p style={{wordBreak: 'break-all'}}>
+              Transaction ID: {this.state.blockchainID}
+            </p>
+
+            {this.state.data_tx !== undefined ? (
+              <div>
+                <p>Sender: {localStorage.getItem('user')}</p>
+                <p>Receiver: {this.state.receiver}</p>
+                <p>Transaction Amount (USD): {this.state.data_tx.amount} USD</p>
+              </div>
+            ) : (
+              ''
+            )}
+
+            <p>
+              Transaction Amount (VND):{' '}
+              {this.state.curDateLending != {} &&
+              this.state.curDateLending.type == 'lend'
+                ? this.numberWithCommas(
+                    Math.round(
+                      this.props.request.data.amount +
+                        Math.round(
+                          ((((this.props.request.data.amount *
+                            (this.props.request.data.deal.milestone[
+                              this.props.request.data.deal.milestone.length - 1
+                            ].presentDate -
+                              this.props.request.data.deal.milestone[0]
+                                .presentDate)) /
+                            86400 /
+                            30) *
+                            (this.props.request.data.interestRate / 12)) /
+                            100) *
+                            1000
+                        ) /
+                          1000
+                    ) * this.state.curDateLending.percent
+                  )
+                : this.state.curDatePayback !== {} &&
+                  this.state.curDatePayback.type == 'payback'
+                ? this.numberWithCommas(
+                    Math.round(
+                      this.props.request.data.amount +
+                        Math.round(
+                          ((((this.props.request.data.amount *
+                            (this.props.request.data.deal.milestone[
+                              this.props.request.data.deal.milestone.length - 1
+                            ].presentDate -
+                              this.props.request.data.deal.milestone[0]
+                                .presentDate)) /
+                            86400 /
+                            30) *
+                            (this.props.request.data.interestRate / 12)) /
+                            100) *
+                            1000
+                        ) /
+                          1000
+                    ) * this.state.curDatePayback.percent
+                  )
+                : console.log('ERROR curPercent !!!')}{' '}
+              VND
+            </p>
+            {this.state.data_tx !== undefined ? (
+              <p>
+                Created Day:{' '}
+                {this.convertTimeStampToDate(this.state.data_tx.createDate)}
+              </p>
+            ) : (
+              ''
+            )}
+          </div>
+          <div className="modal-footer">
+            <Button
+              onClick={() => {
+                this.setState({isOpenPDF: false});
+                this.props.goToViewRequestTrading();
+              }}
+            >
+              OK
+            </Button>
+            <Button onClick={() => this.generatePDF()}>Download Receipt</Button>
+          </div>
+        </Modal>
+
+        {console.log(this.state.curDateLending)}
+        {console.log(this.state.curDatePayback)}
       </>
     );
   }
