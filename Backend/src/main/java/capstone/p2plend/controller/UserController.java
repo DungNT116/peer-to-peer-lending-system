@@ -356,13 +356,12 @@ public class UserController {
 	@CrossOrigin
 	@Secured({ "ROLE_ADMIN" })
 	@PostMapping(value = "/rest/admin/user/resendUserHashFile")
-	public ResponseEntity<String> resendUserHashFile(@RequestParam("username") String username,
-			@RequestParam("email") String email) {
+	public ResponseEntity<String> resendUserHashFile(@RequestParam("inputField") String inputField) {
 		LOGGER.info("CALL method POST /rest/admin/user/resendUserHashFile");
 		HttpStatus httpStatus = null;
 		String result = null;
 		try {
-			result = userService.resendHashUserFile(username, email);
+			result = userService.resendHashUserFile(inputField);
 			if (result.equalsIgnoreCase("success")) {
 				httpStatus = HttpStatus.OK;
 			} else {
