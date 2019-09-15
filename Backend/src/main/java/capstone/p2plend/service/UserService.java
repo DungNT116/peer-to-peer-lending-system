@@ -432,7 +432,7 @@ public class UserService {
 			writer.close();
 
 			emailModule.sendMessageWithAttachment(user.getEmail(), "(Admin)PPLS resend you hash file",
-					"Check this email attachment for your hash file", file.getAbsolutePath());
+					"Check this email attachment for your hash file", file.getAbsolutePath(), "pplsHash_" + user.getUsername() + ".txt");
 
 			return "success";
 		}

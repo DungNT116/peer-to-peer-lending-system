@@ -36,7 +36,7 @@ public class EmailModule {
 		}
 	}
 
-	public void sendMessageWithAttachment(String to, String subject, String text, String pathToAttachment) {
+	public void sendMessageWithAttachment(String to, String subject, String text, String pathToAttachment, String fileName) {
 		try {
 			LOGGER.info("CALL function send message with attachment");
 
@@ -48,7 +48,7 @@ public class EmailModule {
 			helper.setText(text);
 
 			FileSystemResource file = new FileSystemResource(new File(pathToAttachment));
-			helper.addAttachment("Invoice", file);
+			helper.addAttachment(fileName, file);
 
 			emailSender.send(message);
 		} catch (MessagingException e) {
