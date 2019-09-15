@@ -219,12 +219,13 @@ class CreateRequestPage extends React.Component {
 
     //hide make deal field
     this.props.setIsHistory(false);
-
     //show make deal field
     this.props.setIsViewDetail(true);
 
     //
     this.props.setIsHistoryDetail(false);
+    
+    this.props.setIsTrading(false);
 
     this.getLoanLimit();
   }
