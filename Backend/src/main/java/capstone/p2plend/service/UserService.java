@@ -371,11 +371,14 @@ public class UserService {
 
 	private ObjectMapper mapper = new ObjectMapper();
 
-	public String resendHashUserFile(User paramUser) throws IOException, NoSuchAlgorithmException {
-		if (paramUser.getId() == null) {
-			return "Missing required field";
+	public String resendHashUserFile(String username, String email) throws IOException, NoSuchAlgorithmException {
+		if (username == null || username.isEmpty()) {
+			return "Username can not be null or empty";
 		}
-		User user = userRepo.findById(paramUser.getId()).get();
+		if (email == null || email.isEmpty()) {
+			return "Email can not be null or empty";
+		}
+		User user = userRepo.findByUsernameAndEmail(username, email);
 		if (user == null) {
 			return "No such user found in the system";
 		}
