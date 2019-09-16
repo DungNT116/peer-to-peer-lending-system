@@ -94,7 +94,9 @@ class UserList extends React.Component {
   async resendEmail() {
     await this.setState({
       validSignature: false,
+      errorInput: '',
     });
+    console.log('aaaaa : ', this.state.validSignature);
     fetch(
       apiLink +
         '/rest/admin/user/resendUserHashFile?inputField=' +
@@ -108,9 +110,7 @@ class UserList extends React.Component {
       }
     ).then(async result => {
       if (result.status === 200) {
-        await this.setState({
-          validSignature: true,
-        });
+        this.toggleModal('defaultModalResend');
       } else if (result.status === 400) {
         result.text().then(async error => {
           await this.setState({
@@ -122,6 +122,7 @@ class UserList extends React.Component {
         alert('error not found');
       }
     });
+
     // .catch(async data => {
     //   //CANNOT ACCESS TO SERVER
     //   await this.handleError(data);
@@ -363,8 +364,6 @@ class UserList extends React.Component {
                       type="button"
                       onClick={() => {
                         this.resendEmail();
-                        if (this.state.validSignature == true)
-                          this.toggleModal('defaultModalResend');
                       }}
                     >
                       Yes
