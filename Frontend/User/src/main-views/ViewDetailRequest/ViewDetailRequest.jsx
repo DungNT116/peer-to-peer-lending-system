@@ -1,5 +1,5 @@
 import React from 'react';
-import {connect} from 'react-redux';
+import { connect } from 'react-redux';
 
 // reactstrap components
 import {
@@ -20,13 +20,15 @@ import {
   Input,
 } from 'reactstrap';
 
-import {database} from '../../firebase';
-import {PayPalButton} from 'react-paypal-button-v2';
-import {apiLink, bigchainAPI, client_API} from '../../api.jsx';
+import { database } from '../../firebase';
+import { PayPalButton } from 'react-paypal-button-v2';
+import { apiLink, bigchainAPI, client_API } from '../../api.jsx';
 // core components
 import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
 import ApplyTimeline from '../ApplyTimeline/ApplyTimeline';
+// library support generate pdf file
+import jsPDF from 'jspdf';
 
 class ViewDetailRequest extends React.Component {
   constructor(props) {
@@ -59,6 +61,9 @@ class ViewDetailRequest extends React.Component {
       validHash: false,
       file: null,
       hashError: '',
+      isOpenPDF: false,
+      fullName: '',
+      blockchainID: '',
     };
     this.toggleErrorModal = this.toggleErrorModal.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
@@ -86,6 +91,199 @@ class ViewDetailRequest extends React.Component {
     this.handleFileInput = this.handleFileInput.bind(this);
     this.validHashFile = this.validHashFile.bind(this);
     this.handleError = this.handleError.bind(this);
+    this.generatePDF = this.generatePDF.bind(this);
+    this.getProfile = this.getProfile.bind(this);
+  }
+
+  getProfile() {
+    fetch(apiLink + '/rest/user/getUser', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: localStorage.getItem('token'),
+        // "Authorization": this.props.tokenReducer.token
+        // 'Access-Control-Allow-Origin': '*'
+      },
+    })
+      .then(result => {
+        if (result.status === 200) {
+          result.json().then(data => {
+            console.log(data.firstName + ' ' + data.lastName);
+            this.setState({
+              fullName: data.firstName + ' ' + data.lastName,
+            });
+          });
+        } else if (result.status === 401) {
+          localStorage.removeItem('isLoggedIn');
+          this.props.history.push('/login-page');
+        }
+      })
+      .catch(async data => {
+        //CANNOT ACCESS TO SERVER
+        await this.handleError(data);
+      });
+  }
+
+  generatePDF() {
+    console.log(this.props.request.data);
+    let duration =
+      (this.props.request.data.deal.milestone[
+        this.props.request.data.deal.milestone.length - 1
+      ].presentDate -
+        this.props.request.data.deal.milestone[0].presentDate) /
+      86400;
+    var doc = new jsPDF();
+
+    doc.setFontSize(35);
+    doc.text('Transaction information', 105, 20, 'center');
+    doc.setFontSize(25);
+    doc.text('Deal Information', 20, 40);
+    doc.setFontSize(14);
+    doc.text(
+      'Borrower Name: ' +
+      this.props.request.data.borrower.firstName +
+      ' ' +
+      this.props.request.data.borrower.lastName,
+      20,
+      50
+    );
+    doc.text('Lender Name: ' + this.state.fullName, 20, 60);
+    doc.text(
+      'Total Amount: ' +
+      this.numberWithCommas(
+        this.props.request.data.amount +
+        Math.round(
+          ((((this.props.request.data.amount * duration) / 30) *
+            (this.props.request.data.interestRate / 12)) /
+            100) *
+          1000
+        ) /
+        1000
+      ) +
+      ' VND',
+      20,
+      70
+    );
+    doc.text(
+      'Borrow Amount: ' +
+      this.numberWithCommas(this.props.request.data.amount) +
+      ' VND',
+      20,
+      80
+    );
+    doc.text(
+      'Interest Rate: ' +
+      this.props.request.data.interestRate +
+      ' percent per year',
+      20,
+      90
+    );
+    doc.text(
+      'Interest Received: ' +
+      this.numberWithCommas(
+        Math.round(
+          ((((this.props.request.data.amount * duration) / 30) *
+            (this.props.request.data.interestRate / 12)) /
+            100) *
+          1000
+        ) / 1000
+      ) +
+      ' VND',
+      20,
+      100
+    );
+    doc.setFontSize(25);
+    doc.text('Milestone Information (Month/Day/Year): ', 20, 120);
+    doc.setFontSize(14);
+    var line = 120;
+    var paybackIndex = 0;
+    for (let i = 0; i < this.props.request.data.deal.milestone.length; i++) {
+      const element = this.props.request.data.deal.milestone[i];  
+      if (element.type === 'lend' && i !== 0) {
+        line += 10
+        if (element.transaction.status !== null) {
+          doc.text('Milestone Lend ' + Number(i) + ' - ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.previousDate) + ' - ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
+        } else {
+          if (i === 1) {
+            doc.text('Milestone Lend ' + Number(i) + ' - ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.previousDate) + ' - ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
+          } else {
+            doc.text('Milestone Lend ' + Number(i) + ' - ' + Number(i + 1) + ': ' + this.convertTimeStampToDate(element.previousDate) + ' - ' + this.convertTimeStampToDate(element.presentDate), 20, line)
+          }
+        }
+      } else if (element.type === 'payback') {
+        if (paybackIndex !== 0) {
+          line += 10
+          if (element.transaction.status !== null) {
+            doc.text('Milestone payback ' + Number(paybackIndex) + ' - ' + Number(paybackIndex + 1) + ': ' + this.convertTimeStampToDate(element.previousDate) + ' - ' + this.convertTimeStampToDate(element.presentDate) + " (Paid)", 20, line)
+            paybackIndex++;
+          } else {
+            doc.text('Milestone Payback ' + Number(paybackIndex) + ' - ' + Number(paybackIndex + 1) + ': ' + this.convertTimeStampToDate(element.previousDate) + ' - ' + this.convertTimeStampToDate(element.presentDate), 20, line)
+            paybackIndex++;
+          }
+        } else {
+          paybackIndex++;
+        }
+      }
+    }
+    let user = localStorage.getItem('user');
+    let lenderUsername = '';
+    if (this.props.request.data.borrower.username !== user) {
+      lenderUsername = user;
+    } else {
+      lenderUsername = this.props.request.data.borrower.username;
+    }
+    line += 20;
+    doc.setFontSize(25);
+    doc.text('Transaction Information: ', 20, line);
+
+    doc.setFontSize(14);
+    line += 10;
+    doc.text('Milestone 1 - 2: ' + this.convertTimeStampToDate(this.props.request.data.deal.milestone[1].previousDate) + ' - ' + this.convertTimeStampToDate(this.props.request.data.deal.milestone[1].presentDate), 20, line)
+    line += 10;
+    var tmp = doc.splitTextToSize('Transaction ID: ' + this.state.blockchainID, 180);
+    doc.text(20, line, tmp)
+    line += 15;
+    doc.text('Sender: ' + lenderUsername, 20, line);
+    line += 10;
+    doc.text(
+      'Receiver: ' + this.props.request.data.borrower.username,
+      20,
+      line
+    );
+    line += 10;
+    doc.text(
+      'Transaction Amount (USD): ' + this.state.data_tx.amount + ' USD',
+      20,
+      line
+    );
+    line += 10;
+    doc.text(
+      'Transaction Amount (VND): ' +
+      this.numberWithCommas(
+        this.roundUp(
+          this.props.request.data.amount *
+          this.props.request.data.deal.milestone[1].percent
+        )
+      ) +
+      ' VND',
+      20,
+      line
+    );
+    line += 10;
+    doc.text(
+      'Created Day: ' +
+      this.convertTimeStampToDate(this.state.data_tx.createDate),
+      20,
+      line
+    );
+
+    doc.save(
+      'receipt-' +
+      lenderUsername +
+      '-' +
+      this.state.data_tx.createDate +
+      '.pdf'
+    );
   }
 
   async handleError(data) {
@@ -214,7 +412,7 @@ class ViewDetailRequest extends React.Component {
         receiver: data_transaction.data_tx.data.tx_data.receiver,
         amount: Number(
           this.props.request.data.amount *
-            this.props.request.data.deal.milestone[1].percent
+          this.props.request.data.deal.milestone[1].percent
         ),
         amountValid: Number(data.amount),
         status: data.status,
@@ -228,15 +426,21 @@ class ViewDetailRequest extends React.Component {
       .then(async result => {
         if (result.status === 200) {
           // alert('create success');
+          // await this.setState({
+          //   isOpenSuccess: true
+          // })
+          // await setTimeout(
+          //   async function () {
+          //     // this.props.history.push('/view-request-trading');
+          //     await this.setState({
+          //       isOpenSuccess: false
+          //     })
+          //   }.bind(this),
+          //   1000
+          // );
           await this.setState({
-            isOpenSuccess: true,
+            isOpenPDF: true,
           });
-          await setTimeout(
-            function() {
-              this.props.history.push('/view-request-trading');
-            }.bind(this),
-            2000
-          );
           // this.props.history.push("/view-request-trading");
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
@@ -248,6 +452,12 @@ class ViewDetailRequest extends React.Component {
         await this.setState({
           isOpenError: true,
           message: 'Cannot access to server',
+        }).catch(async data => {
+          //CANNOT ACCESS TO SERVER
+          await this.setState({
+            isOpenError: true,
+            message: 'Cannot access to server',
+          });
         });
       });
   }
@@ -289,7 +499,7 @@ class ViewDetailRequest extends React.Component {
             .once('value', snapshot => {
               if (snapshot.exists()) {
                 const userData = snapshot.val();
-                this.setState({keyUserFb: Object.keys(userData)[0]});
+                this.setState({ keyUserFb: Object.keys(userData)[0] });
               }
             });
           await database
@@ -306,7 +516,7 @@ class ViewDetailRequest extends React.Component {
           var upvotesRef = database.ref(
             '/ppls/' + this.state.keyUserFb + '/countNew'
           );
-          await upvotesRef.transaction(function(current_value) {
+          await upvotesRef.transaction(function (current_value) {
             return (current_value || 0) + 1;
           });
         } else if (result.status === 401) {
@@ -408,7 +618,7 @@ class ViewDetailRequest extends React.Component {
             .once('value', snapshot => {
               if (snapshot.exists()) {
                 const userData = snapshot.val();
-                this.setState({keyUserFb: Object.keys(userData)[0]});
+                this.setState({ keyUserFb: Object.keys(userData)[0] });
               }
             });
           await database
@@ -425,7 +635,7 @@ class ViewDetailRequest extends React.Component {
           var upvotesRef = database.ref(
             '/ppls/' + this.state.keyUserFb + '/countNew'
           );
-          await upvotesRef.transaction(function(current_value) {
+          await upvotesRef.transaction(function (current_value) {
             return (current_value || 0) + 1;
           });
         } else if (result.status === 400) {
@@ -457,11 +667,11 @@ class ViewDetailRequest extends React.Component {
     let numberOfLendingMilestones = 0;
     let numberOfPayBackMilestones = 0;
     let milestone = this.props.request.data.deal.milestone;
-    let timelineData = {lendingTimeline: [], payBackTimeline: []};
+    let timelineData = { lendingTimeline: [], payBackTimeline: [] };
     let lendingTimeline = [];
     let payBackTimeline = [];
     console.log('aaaaaaaaaaa', milestone);
-    let milestoneTimeline = {data: '', status: '', percent: ''};
+    let milestoneTimeline = { data: '', status: '', percent: '' };
     for (let i = 0; i < milestone.length; i++) {
       const element = milestone[i];
       milestoneTimeline = {
@@ -552,10 +762,13 @@ class ViewDetailRequest extends React.Component {
     })
       .then(response => response.json())
       .then(async data => {
-        this.setState({
+        await this.setState({
           borrowUsername: this.props.request.data.borrower.username,
+          blockchainID: data.id,
         });
         this.acceptDeal();
+        this.toggleModal();
+        //after success redirect to trading page
         this.saveTransaction(data, data_transaction);
       })
       .catch(async data => {
@@ -568,6 +781,8 @@ class ViewDetailRequest extends React.Component {
   };
 
   componentDidMount() {
+    this.getProfile();
+    // this.generatePDF();
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     this.refs.main.scrollTop = 0;
@@ -607,7 +822,17 @@ class ViewDetailRequest extends React.Component {
   }
 
   toggleModal() {
-    this.setState({modal: !this.state.modal});
+    if (this.state.modal === true) {
+      this.setState({
+        modal: !this.state.modal,
+        validHash: false
+      });
+    } else {
+      this.setState({
+        modal: !this.state.modal,
+      });
+    }
+
   }
   async makeDeal() {
     this.props.setIsHistory(false);
@@ -648,7 +873,7 @@ class ViewDetailRequest extends React.Component {
     this.saveNewDealInformationToDB();
 
     //set up view again
-    this.setState({editable: !this.state.editable});
+    this.setState({ editable: !this.state.editable });
     //button
     document.getElementById('dealButton').style.display = 'none';
     if (
@@ -767,21 +992,20 @@ class ViewDetailRequest extends React.Component {
                             </Col>
                             <Col xs="12" md="9">
                               <p className="h6">
-                                {/* đổi công thức như trong doc */}
                                 {this.numberWithCommas(
                                   Math.round(
                                     this.props.request.data.amount +
-                                      Math.round(
-                                        ((((this.props.request.data.amount *
-                                          duration) /
-                                          30) *
-                                          (this.props.request.data
-                                            .interestRate /
-                                            12)) /
-                                          100) *
-                                          1000
-                                      ) /
-                                        1000
+                                    Math.round(
+                                      ((((this.props.request.data.amount *
+                                        duration) /
+                                        30) *
+                                        (this.props.request.data
+                                          .interestRate /
+                                          12)) /
+                                        100) *
+                                      1000
+                                    ) /
+                                    1000
                                   )
                                 )}{' '}
                                 VND
@@ -827,7 +1051,7 @@ class ViewDetailRequest extends React.Component {
                                         (this.props.request.data.interestRate /
                                           12)) /
                                         100) *
-                                        1000
+                                      1000
                                     ) / 1000
                                   )
                                 )}{' '}
@@ -850,7 +1074,7 @@ class ViewDetailRequest extends React.Component {
                             isPayMany={this.state.isPayMany}
                             borrowerUser={
                               this.props.request.data.borrower.username !==
-                              undefined
+                                undefined
                                 ? this.props.request.data.borrower.username
                                 : ''
                             }
@@ -863,150 +1087,150 @@ class ViewDetailRequest extends React.Component {
                         {isHistoryDetail ? (
                           ''
                         ) : (
-                          <div>
-                            <CardFooter className="text-center">
-                              <Button
-                                type="submit"
-                                id="dealButton"
-                                size="md"
-                                className="btn btn-outline-primary"
-                                onClick={() => this.makeDeal()}
-                                disabled={this.state.editable}
-                              >
-                                <i className="fa fa-dot-circle-o" /> Make Deal
-                              </Button>{' '}
-                              <Button
-                                type="submit"
-                                id="saveDealButton"
-                                size="md"
-                                className="btn btn-outline-primary"
-                                onClick={this.toggleSaveDealModal}
-                                disabled={!this.state.editable}
-                              >
-                                <i className="ni ni-cloud-download-95" /> Save
-                                Deal
-                              </Button>{' '}
-                              {this.props.request.data.borrower.username ===
-                              localStorage.getItem('user') ? (
-                                ''
-                              ) : (
+                            <div>
+                              <CardFooter className="text-center">
                                 <Button
                                   type="submit"
-                                  id="acceptButton"
+                                  id="dealButton"
                                   size="md"
                                   className="btn btn-outline-primary"
-                                  onClick={this.toggleModal}
+                                  onClick={() => this.makeDeal()}
                                   disabled={this.state.editable}
                                 >
-                                  <i className="ni ni-check-bold" /> Accept
-                                </Button>
-                              )}
-                            </CardFooter>
-                            {/* save deal */}
-                            <Modal
-                              isOpen={this.state.saveDealModal}
-                              toggle={this.toggleSaveDealModal}
-                              className={this.props.className}
-                            >
-                              <ModalHeader toggle={this.toggleSaveDealModal}>
-                                Confirm saving
-                              </ModalHeader>
-                              <ModalBody>
-                                Are you sure to save this deal ?
-                              </ModalBody>
-                              <ModalFooter>
+                                  <i className="fa fa-dot-circle-o" /> Make Deal
+                              </Button>{' '}
                                 <Button
-                                  color="primary"
-                                  onClick={() => this.saveDeal()}
-                                >
-                                  Yes
-                                </Button>{' '}
-                                <Button
-                                  color="secondary"
+                                  type="submit"
+                                  id="saveDealButton"
+                                  size="md"
+                                  className="btn btn-outline-primary"
                                   onClick={this.toggleSaveDealModal}
+                                  disabled={!this.state.editable}
                                 >
-                                  Cancel
-                                </Button>
-                              </ModalFooter>
-                            </Modal>
-
-                            {/* accept modal */}
-                            <Modal
-                              isOpen={this.state.modal}
-                              toggle={this.toggleModal}
-                              className={this.props.className}
-                            >
-                              <ModalHeader toggle={this.toggleModal}>
-                                Payment
-                              </ModalHeader>
-                              <ModalBody>
-                                {this.state.validHash === true ? (
-                                  <PayPalButton
-                                    amount={this.roundUp(
-                                      (this.props.request.data.amount *
-                                        this.props.request.data.deal
-                                          .milestone[1].percent) /
-                                        this.state.currencyUSDVND
-                                    )}
-                                    onSuccess={(details, data) => {
-                                      this.toggleModal();
-                                      this.setState({
-                                        data_tx: {
-                                          txId: details.id,
-                                          createDate: this.convertDateToTimestamp(
-                                            new Date()
-                                          ),
-                                          status: details.status,
-                                          amount:
-                                            details.purchase_units[0].amount
-                                              .value,
-                                        },
-                                      });
-                                      this.send_tx();
-                                    }}
-                                    style={{
-                                      layout: 'horizontal',
-                                      shape: 'pill',
-                                      disableFunding: true,
-                                      tagline: false,
-                                      size: 'responsive',
-                                    }}
-                                    options={{
-                                      clientId: client_API,
-                                    }}
-                                  />
-                                ) : (
-                                  <div>
-                                    <Input
-                                      type="file"
-                                      accept="text/plain"
-                                      onChange={this.handleFileInput}
-                                    />
-                                    <p></p>
+                                  <i className="ni ni-cloud-download-95" /> Save
+                                  Deal
+                              </Button>{' '}
+                                {this.props.request.data.borrower.username ===
+                                  localStorage.getItem('user') ? (
+                                    ''
+                                  ) : (
                                     <Button
-                                      // type="submit"
+                                      type="submit"
+                                      id="acceptButton"
                                       size="md"
                                       className="btn btn-outline-primary"
-                                      onClick={() => this.validHashFile()}
+                                      onClick={this.toggleModal}
+                                      disabled={this.state.editable}
                                     >
-                                      Check
-                                    </Button>
-                                    {this.state.hashError !== '' ? (
-                                      <strong
-                                        class="alert alert-danger"
-                                        role="alert"
-                                      >
-                                        {this.state.hashError}
-                                      </strong>
-                                    ) : (
-                                      ''
-                                    )}
-                                  </div>
-                                )}
+                                      <i className="ni ni-check-bold" /> Accept
+                                </Button>
+                                  )}
+                              </CardFooter>
+                              {/* save deal */}
+                              <Modal
+                                isOpen={this.state.saveDealModal}
+                                toggle={this.toggleSaveDealModal}
+                                className={this.props.className}
+                              >
+                                <ModalHeader toggle={this.toggleSaveDealModal}>
+                                  Confirm saving
+                              </ModalHeader>
+                                <ModalBody>
+                                  Are you sure to save this deal ?
                               </ModalBody>
-                            </Modal>
-                          </div>
-                        )}
+                                <ModalFooter>
+                                  <Button
+                                    color="primary"
+                                    onClick={() => this.saveDeal()}
+                                  >
+                                    Yes
+                                </Button>{' '}
+                                  <Button
+                                    color="secondary"
+                                    onClick={this.toggleSaveDealModal}
+                                  >
+                                    Cancel
+                                </Button>
+                                </ModalFooter>
+                              </Modal>
+
+                              {/* accept modal */}
+                              <Modal
+                                isOpen={this.state.modal}
+                                toggle={this.toggleModal}
+                                className={this.props.className}
+                              >
+                                <ModalHeader toggle={this.toggleModal}>
+                                  Payment
+                              </ModalHeader>
+                                <ModalBody>
+                                  {this.state.validHash === true ? (
+                                    <PayPalButton
+                                      amount={this.roundUp(
+                                        (this.props.request.data.amount *
+                                          this.props.request.data.deal
+                                            .milestone[1].percent) /
+                                        this.state.currencyUSDVND
+                                      )}
+                                      onSuccess={(details, data) => {
+                                        // this.toggleModal();
+                                        this.setState({
+                                          data_tx: {
+                                            txId: details.id,
+                                            createDate: this.convertDateToTimestamp(
+                                              new Date()
+                                            ),
+                                            status: details.status,
+                                            amount:
+                                              details.purchase_units[0].amount
+                                                .value,
+                                          },
+                                        });
+                                        this.send_tx();
+                                      }}
+                                      style={{
+                                        layout: 'horizontal',
+                                        shape: 'pill',
+                                        disableFunding: true,
+                                        tagline: false,
+                                        size: 'responsive',
+                                      }}
+                                      options={{
+                                        clientId: client_API,
+                                      }}
+                                    />
+                                  ) : (
+                                      <div>
+                                        <Input
+                                          type="file"
+                                          accept="text/plain"
+                                          onChange={this.handleFileInput}
+                                        />
+                                        <p></p>
+                                        <Button
+                                          // type="submit"
+                                          size="md"
+                                          className="btn btn-outline-primary"
+                                          onClick={() => this.validHashFile()}
+                                        >
+                                          Check
+                                    </Button>
+                                        {this.state.hashError !== '' ? (
+                                          <strong
+                                            class="alert alert-danger"
+                                            role="alert"
+                                          >
+                                            {this.state.hashError}
+                                          </strong>
+                                        ) : (
+                                            ''
+                                          )}
+                                      </div>
+                                    )}
+                                </ModalBody>
+                              </Modal>
+                            </div>
+                          )}
                       </Col>
                     </Row>
                   </div>
@@ -1034,12 +1258,12 @@ class ViewDetailRequest extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenSuccess}
-          // toggle={() => this.toggleModal('defaultModal')}
+        // toggle={() => this.toggleModal('defaultModal')}
         >
           <div className="modal-body">
             <h3 className="modal-title" id="modal-title-default">
               <img
-                style={{width: 50, height: 50}}
+                style={{ width: 50, height: 50 }}
                 src={require('assets/img/theme/checked.png')}
               />
               Successfully Saved
@@ -1049,7 +1273,7 @@ class ViewDetailRequest extends React.Component {
         <Modal
           className="modal-dialog-centered"
           isOpen={this.state.isOpenError}
-          // toggle={() => this.toggleModal('defaultModal')}
+        // toggle={() => this.toggleModal('defaultModal')}
         >
           <div className="modal-header">Error</div>
           <div className="modal-body">
@@ -1060,11 +1284,60 @@ class ViewDetailRequest extends React.Component {
           <div className="modal-footer">
             <Button
               onClick={() => {
-                this.setState({isOpenError: false});
+                this.setState({ isOpenError: false });
               }}
             >
               OK
             </Button>
+          </div>
+        </Modal>
+        <Modal
+          className="modal-dialog-centered"
+          isOpen={this.state.isOpenPDF}
+        // toggle={() => this.toggleModal('defaultModal')}
+        >
+          <div className="modal-header">Transaction information</div>
+          <div className="modal-body">
+            <h3 className="modal-title" id="modal-title-default">
+              Milestone 1 - 2: {this.convertTimeStampToDate(this.props.request.data.deal.milestone[1].previousDate) + ' - ' + this.convertTimeStampToDate(this.props.request.data.deal.milestone[1].presentDate)}
+            </h3>
+            <p style={{ wordBreak: 'break-all' }}>
+              Transaction ID: {this.state.blockchainID}
+            </p>
+            <p>
+              Sender:{' '}
+              {this.props.request.data.borrower.username !==
+                localStorage.getItem('user')
+                ? localStorage.getItem('user')
+                : this.props.request.data.borrower.username}
+            </p>
+            <p>Receiver: {this.props.request.data.borrower.username}</p>
+            <p>Transaction Amount (USD): {this.state.data_tx.amount} USD</p>
+            <p>
+              Transaction Amount (VND):{' '}
+              {this.numberWithCommas(
+                this.roundUp(
+                  this.props.request.data.amount *
+                  this.props.request.data.deal.milestone[1].percent
+                )
+              )}{' '}
+              VND
+            </p>
+            <p>
+              Created Day:{' '}
+              {this.convertTimeStampToDate(this.state.data_tx.createDate)}
+            </p>
+          </div>
+          <div className="modal-footer">
+            <Button
+              onClick={() => {
+                this.setState({ isOpenPDF: false });
+                this.props.history.push('/view-request-trading');
+              }}
+            >
+              OK
+            </Button>
+            <Button onClick={() => this.generatePDF()}>Download Receipt</Button>
           </div>
         </Modal>
       </>
