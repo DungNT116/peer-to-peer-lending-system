@@ -56,6 +56,7 @@ class ViewOwnTransaction extends React.Component {
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.changePage = this.changePage.bind(this);
     this.getTransaction = this.getTransaction.bind(this);
+    this.handleError = this.handleError.bind(this);
   }
 
   toggleNavs = (e, state, index) => {
@@ -104,10 +105,7 @@ class ViewOwnTransaction extends React.Component {
 
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data);
     });
   }
 
@@ -231,11 +229,22 @@ class ViewOwnTransaction extends React.Component {
       });
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
+      await this.handleError(data)
+    });
+  }
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
       await this.setState({
         isOpenError: true,
-        message: "Cannot access to server"
-      })
-    });
+        error: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        error: 'Something when wrong !',
+      });
+    }
   }
   numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

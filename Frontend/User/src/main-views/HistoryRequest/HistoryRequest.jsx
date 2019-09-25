@@ -45,6 +45,7 @@ class HistoryRequest extends React.Component {
     this.changePage = this.changePage.bind(this);
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
+    this.handleError = this.handleError(this);
   }
   toggleNavs = (e, state, index) => {
     e.preventDefault();
@@ -71,6 +72,7 @@ class HistoryRequest extends React.Component {
         }
       }
     ).then(result => {
+      
       if (result.status === 200) {
         // alert("create success");
         result.json().then(data => {
@@ -85,15 +87,25 @@ class HistoryRequest extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        error: "Cannot access to server"
-      })
+      await this.handleError(data);
     });
     // event.preventDefault();
     // this.props.history.push('/')
   }
-
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
+      await this.setState({
+        isOpenError: true,
+        error: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        error: 'Something when wrong !',
+      });
+    }
+  }
   convertTimeStampToDate(date) {
     var timestampToDate = new Date(date * 1000);
     return timestampToDate.toLocaleDateString();

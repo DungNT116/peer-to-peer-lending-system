@@ -50,6 +50,7 @@ class ViewRequestList extends React.Component {
     this.setDataToDetailPage = this.setDataToDetailPage.bind(this);
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.changePage = this.changePage.bind(this);
+    this.handleError = this.handleError.bind(this);
   }
 
   toggleNavs = (e, state, index) => {
@@ -99,13 +100,23 @@ class ViewRequestList extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data)
     });
   }
-
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
+      await this.setState({
+        isOpenError: true,
+        error: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        error: 'Something when wrong !',
+      });
+    }
+  }
   setDataToDetailPage(id) {
     this.props.setRequest(id);
     this.props.setIsHistory(true);

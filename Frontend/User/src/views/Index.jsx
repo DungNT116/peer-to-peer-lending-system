@@ -35,6 +35,7 @@ class Index extends React.Component {
     this.convertTimeStampToDate = this.convertTimeStampToDate.bind(this);
     this.convertDateToTimestamp = this.convertDateToTimestamp.bind(this);
     this.getTransaction = this.getTransaction.bind(this);
+    this.handleError = this.handleError.bind(this);
   }
 
   convertDateToTimestamp(date) {
@@ -67,13 +68,23 @@ class Index extends React.Component {
       }
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data)
     });
   }
-
+  async handleError(data) {
+    var error = data.toString();
+    if (error === 'TypeError: Failed to fetch') {
+      await this.setState({
+        isOpenError: true,
+        error: 'Cannot access to server',
+      });
+    } else {
+      await this.setState({
+        isOpenError: true,
+        error: 'Something when wrong !',
+      });
+    }
+  }
   componentDidMount() {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -113,8 +124,6 @@ class Index extends React.Component {
       })
     }).then(result => {
       result.json().then(data => {
-        console.log(data)
-        let dateCreate = new Date(data.asset.data.tx_data.createDate);
         setTimeout( 
           function() {
             if (data.asset.data.tx_data.sender === transactionInput.sender) {
@@ -159,13 +168,12 @@ class Index extends React.Component {
         setTimeout(
           function () {
             if (
-              Math.round(dateCreate.getTime() / 1000) ===
-              transactionInput.createDate
+              data.asset.data.tx_data.createDate === transactionInput.createDate
             ) {
               this.setState({
                 validTx: {
                   ...this.state.validTx,
-                  createDate: true
+                  createDate: true 
                 }
               });
             }
@@ -200,10 +208,7 @@ class Index extends React.Component {
       });
     }).catch(async data => {
       //CANNOT ACCESS TO SERVER
-      await this.setState({
-        isOpenError: true,
-        message: "Cannot access to server"
-      })
+      await this.handleError(data)
     });
   }
   numberWithCommas(x) {
