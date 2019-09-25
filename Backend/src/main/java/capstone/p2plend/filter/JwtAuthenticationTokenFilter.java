@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,12 +19,12 @@ import capstone.p2plend.service.UserService;
 import capstone.p2plend.service.JwtService;
 
 public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter {
-	
+
 	private final static String TOKEN_HEADER = "authorization";
-	
+
 	@Autowired
 	private JwtService jwtService;
-	
+
 	@Autowired
 	private UserService userService;
 

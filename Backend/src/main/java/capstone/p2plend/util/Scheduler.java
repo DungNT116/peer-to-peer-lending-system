@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,8 @@ import capstone.p2plend.service.EmailService;
 
 @Component
 public class Scheduler {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Scheduler.class);
 
 	@Autowired
 	EmailService emailService;
@@ -40,8 +44,8 @@ public class Scheduler {
 	@Scheduled(cron = "0 0 4 * * ?")
 	public void sendMailScheduler() {
 		try {
-			System.out.println("Start scaning system...");
-			System.out.println("Checking system for deadline of milestone...");
+			LOGGER.info("Checking system for deadline of milestone...");
+			int count = 0;
 			List<Request> lstRequest = requestRepo.findAllRequestByStatus("trading");
 			for (int i = 0; i < lstRequest.size(); i++) {
 				Request r = lstRequest.get(i);
@@ -58,48 +62,51 @@ public class Scheduler {
 					Timestamp stamp = new Timestamp(time);
 					Date deadLine = new Date(stamp.getTime());
 					Date currentDate = new Date();
-					System.out.println(
-							"Current system date checking for deadline of milestone start checking at: " + currentDate);
 					Long diff = deadLine.getTime() - currentDate.getTime();
 					if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) <= 3L && m.getTransaction() == null) {
 						if (m.getType().equalsIgnoreCase("lend")) {
-							System.out.println(lender.getEmail());
 							emailService.sendSimpleMessage(lender.getEmail(),
 									"PPLS Remind Deadline of the current lend for loan request(lender)",
 									"Your current lend deadline is, Deadline " + deadLine
 											+ ", to complete this trasaction, Login to our website to make the transaction for request number: "
 											+ r.getId() + ", Milestone number: " + m.getId());
+							count++;
 							emailService.sendSimpleMessage(borrower.getEmail(),
 									"PPLS notice of the loan has not been paid(borrower)",
 									"Current deadline of the lend milestone still not been paid, dealine: " + deadLine
 											+ " We will remind the other person about this");
+							count++;
 						}
-						if (m.getType().equalsIgnoreCase("payback")) {
-							System.out.println(borrower.getEmail());
+						if (m.getType().equalsIgnoreCase("payback")) {							
 							emailService.sendSimpleMessage(borrower.getEmail(),
 									"PPLS Remind Deadline of the current payback for loan request(borrower)",
 									"Your current payback deadline is, Deadline " + deadLine
 											+ " to complete this trasaction, Login to our website to make the transaction for request number: "
 											+ r.getId() + ", Milestone number: " + m.getId());
+							count++;
 							emailService.sendSimpleMessage(lender.getEmail(),
 									"PPLS notice of the loan has not been paid(lender)",
 									"Current deadline of the payback milestone still not been paid, dealine: "
 											+ deadLine + " We will remind the other person about this");
+							count++;
 						}
+
 					}
 				}
 			}
-			System.out.println("Finish checking system...");
+			LOGGER.info("Finish check system for milestone near deadline, sent " + count + " mail");
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Error while try to send schedule mail", e);
 		}
 	}
 
 //	@Scheduled(cron = "0 * * ? * *")
+	@Transactional
 	@Scheduled(cron = "0 0 1 * * ?")
 	public void deletePendingRequestWhenExpired() {
 		try {
-			System.out.println("Start scaning system...");
+			LOGGER.info("Start checking system for pending request overdue five days");
+			int count = 0;
 			List<Request> lstRequest = requestRepo.findAllRequestByStatus("pending");
 			for (int i = 0; i < lstRequest.size(); i++) {
 				Request r = lstRequest.get(i);
@@ -107,18 +114,17 @@ public class Scheduler {
 				Timestamp stamp = new Timestamp(time);
 				Date createDate = new Date(stamp.getTime());
 				Date currentDate = new Date();
-				System.out
-						.println("System check the request for more than 5 days... start checking at: " + currentDate);
 				Long diff = currentDate.getTime() - createDate.getTime();
 				if (TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) > 5) {
 					Request existedRq = requestRepo.findById(r.getId()).get();
 					existedRq.setStatus("deleted");
-					Request savedRq = requestRepo.saveAndFlush(existedRq);
+					requestRepo.saveAndFlush(existedRq);
+					count++;
 				}
 			}
-
+			LOGGER.info("Finish checking system for pending request overdue five days, deleted " + count + " request overdue five days");
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Error while trying to delete request that expired", e);
 		}
 	}
 
@@ -126,8 +132,7 @@ public class Scheduler {
 	@Scheduled(cron = "0 */5 * ? * *")
 	public void adjustUserLoanLimit() {
 		try {
-
-			System.out.println("Startin to scan and adjust user loan limit");
+			LOGGER.info("System started checking and adjust user loan limit");
 
 			List<User> lstUser = userRepo.findAll();
 			for (int q = 0; q < lstUser.size(); q++) {
@@ -183,9 +188,9 @@ public class Scheduler {
 					}
 				}
 			}
-			System.out.println("Done adjusting user loan limit");
+			LOGGER.info("Done adjusting user loan limit");
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error("Error while trying adjust user loan limit", e);
 		}
 	}
 }
