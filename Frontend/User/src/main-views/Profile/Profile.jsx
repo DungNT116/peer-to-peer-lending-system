@@ -22,8 +22,8 @@ import {PulseLoader} from 'react-spinners';
 // core components
 import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
-import { apiLink } from '../../api.jsx';
-import { database } from 'firebase';
+import {apiLink} from '../../api.jsx';
+import {database} from 'firebase';
 
 // library support generate pdf file
 import jsPDF from 'jspdf';
@@ -129,7 +129,10 @@ class Profile extends React.Component {
             var txtURL = window.URL.createObjectURL(blob);
             var tempLink = document.createElement('a');
             tempLink.href = txtURL;
-            tempLink.setAttribute('download', 'pplsHash_' + localStorage.getItem('user') +'.txt');
+            tempLink.setAttribute(
+              'download',
+              'pplsHash_' + localStorage.getItem('user') + '.txt'
+            );
             tempLink.click();
           });
         } else if (result.status === 400) {
@@ -1286,10 +1289,10 @@ class Profile extends React.Component {
                   <Card className="bg-secondary shadow">
                     <CardHeader className="bg-white border-0">
                       <Row className="align-items-center">
-                        <Col xs="5">
+                        <Col xs="4">
                           <h3 className="mb-0">My account</h3>
                         </Col>
-                        <Col className="text-right" xs="2">
+                        <Col className="text-right" xs="3">
                           {this.state.isDownloaded === false ? (
                             <Button
                               id="hash"
@@ -1675,9 +1678,18 @@ class Profile extends React.Component {
           <div className="modal-body">
             <h3 className="modal-title">
               <p>
-                This hash file use for execute transaction and download once!
+                This signature file use for execute transaction and download
+                once!
               </p>
               <p>Please keep this file safe</p>
+            </h3>
+
+            <h3 className="modal-title" style={{color: 'red'}}>
+              <p>
+                If you lose this signature file, please contact supporter with
+                following email to get another file:
+              </p>
+              <p>lengominhtestmail@gmail.com</p>
             </h3>
           </div>
           <div className="modal-footer">
