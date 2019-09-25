@@ -22,8 +22,12 @@ import {PulseLoader} from 'react-spinners';
 // core components
 import MainNavbar from '../MainNavbar/MainNavbar.jsx';
 import SimpleFooter from 'components/Footers/SimpleFooter.jsx';
-import {apiLink} from '../../api.jsx';
-import {database} from 'firebase';
+import { apiLink } from '../../api.jsx';
+import { database } from 'firebase';
+
+// library support generate pdf file
+import jsPDF from 'jspdf';
+
 class Profile extends React.Component {
   constructor(props) {
     super(props);
@@ -110,7 +114,6 @@ class Profile extends React.Component {
   }
 
   getHashFile() {
-    // window.open('192.168.7.215:8080/document/download/hashFileTest')
     fetch(apiLink + '/rest/document/download/hashFile', {
       method: 'GET',
       headers: {
@@ -126,13 +129,13 @@ class Profile extends React.Component {
             var txtURL = window.URL.createObjectURL(blob);
             var tempLink = document.createElement('a');
             tempLink.href = txtURL;
-            tempLink.setAttribute('download', 'pplsUserHashFile.txt');
+            tempLink.setAttribute('download', 'pplsHash_' + localStorage.getItem('user') +'.txt');
             tempLink.click();
           });
         } else if (result.status === 400) {
           this.setState({
             isOpenError: true,
-            message: 'Please upload identity card and video to get hash',
+            message: 'Please upload required document to get signature',
           });
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
@@ -1296,7 +1299,7 @@ class Profile extends React.Component {
                               }}
                               size="sm"
                             >
-                              Get Hash
+                              Get Signature
                             </Button>
                           ) : (
                             ''
