@@ -102,7 +102,6 @@ class ApplyTimeline extends React.Component {
       });
   }
   generatePDF() {
-    console.log(this.props.request.data);
     let duration =
       (this.props.request.data.deal.milestone[
         this.props.request.data.deal.milestone.length - 1
@@ -124,7 +123,6 @@ class ApplyTimeline extends React.Component {
       20,
       50
     );
-    console.log(this.props.request.data);
     doc.text(
       'Lender Name: ' +
         this.props.request.data.lender.firstName +
@@ -181,27 +179,35 @@ class ApplyTimeline extends React.Component {
     doc.text('Milestone Information (Month/Day/Year): ', 20, 120);
     doc.setFontSize(14);
     var line = 120;
+    var paybackIndex = 0;
     for (let i = 0; i < this.props.request.data.deal.milestone.length; i++) {
       const element = this.props.request.data.deal.milestone[i];
-      // console.log(element)
-      line += 10;
-      if (element.type === 'lend') {
+      if (element.type === 'lend' && i !== 0) {
+        line += 10;
         if (element.transaction.status !== null) {
           doc.text(
             'Milestone Lend ' +
+              Number(i) +
+              ' - ' +
               Number(i + 1) +
               ': ' +
+              this.convertTimeStampToDate(element.previousDate) +
+              ' - ' +
               this.convertTimeStampToDate(element.presentDate) +
               ' (Paid)',
             20,
             line
           );
         } else {
-          if (i === 0) {
+          if (i == this.state.posLend) {
             doc.text(
               'Milestone Lend ' +
+                Number(i) +
+                ' - ' +
                 Number(i + 1) +
                 ': ' +
+                this.convertTimeStampToDate(element.previousDate) +
+                ' - ' +
                 this.convertTimeStampToDate(element.presentDate) +
                 ' (Paid)',
               20,
@@ -210,8 +216,12 @@ class ApplyTimeline extends React.Component {
           } else {
             doc.text(
               'Milestone Lend ' +
+                Number(i) +
+                ' - ' +
                 Number(i + 1) +
                 ': ' +
+                this.convertTimeStampToDate(element.previousDate) +
+                ' - ' +
                 this.convertTimeStampToDate(element.presentDate),
               20,
               line
@@ -219,25 +229,43 @@ class ApplyTimeline extends React.Component {
           }
         }
       } else if (element.type === 'payback') {
-        if (element.transaction.status !== null) {
-          doc.text(
-            'Milestone payback ' +
-              Number(i + 1) +
-              ': ' +
-              this.convertTimeStampToDate(element.presentDate) +
-              ' (Paid)',
-            20,
-            line
-          );
+        if (paybackIndex !== 0) {
+          line += 10;
+          if (
+            element.transaction.status !== null ||
+            this.state.posPayback == i
+          ) {
+            doc.text(
+              'Milestone Payback ' +
+                Number(paybackIndex) +
+                ' - ' +
+                Number(paybackIndex + 1) +
+                ': ' +
+                this.convertTimeStampToDate(element.previousDate) +
+                ' - ' +
+                this.convertTimeStampToDate(element.presentDate) +
+                ' (Paid)',
+              20,
+              line
+            );
+            paybackIndex++;
+          } else {
+            doc.text(
+              'Milestone Payback ' +
+                Number(paybackIndex) +
+                ' - ' +
+                Number(paybackIndex + 1) +
+                ': ' +
+                this.convertTimeStampToDate(element.previousDate) +
+                ' - ' +
+                this.convertTimeStampToDate(element.presentDate),
+              20,
+              line
+            );
+            paybackIndex++;
+          }
         } else {
-          doc.text(
-            'Milestone payback ' +
-              Number(i + 1) +
-              ': ' +
-              this.convertTimeStampToDate(element.presentDate),
-            20,
-            line
-          );
+          paybackIndex++;
         }
       }
     }
@@ -301,7 +329,7 @@ class ApplyTimeline extends React.Component {
     // this.refs.main.scrollTop = 0;
     this.getProfile();
     fetch(
-      'http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1',
+      'http://www.apilayer.net/api/live?access_key=918334dfb998541f312b699884cc813a&format=1',
       {
         method: 'GET',
       }
@@ -770,10 +798,10 @@ class ApplyTimeline extends React.Component {
     });
   }
   toggleModalCheckTimelineLending() {
-    this.setState({modalLending: !this.state.modalLending});
+    this.setState({modalLending: !this.state.modalLending, validHash: false});
   }
   toggleModalCheckTimelinePayback() {
-    this.setState({modalPayback: !this.state.modalPayback});
+    this.setState({modalPayback: !this.state.modalPayback, validHash: false});
   }
   async checkPaymentPaid(rawMilestone, previousDate, presentDate, pos) {
     let penalty = 0;
@@ -862,6 +890,7 @@ class ApplyTimeline extends React.Component {
             curDateLending: element,
             typePayment: typePayment,
             isInMilestoneLending: true,
+            posLend: i,
           });
           if (element.transaction.status != null) {
             await this.setState({
@@ -873,6 +902,27 @@ class ApplyTimeline extends React.Component {
             });
           }
           break;
+        } else if (
+          element.presentDate < dateNow &&
+          element.type === typePayment &&
+          typePayment === 'lend' &&
+          element !== lendMS[0]
+        ) {
+          if (element.transaction.status != null) {
+            await this.setState({
+              isMilestoneLendingPaid: true,
+            });
+            // break;
+          } else {
+            await this.setState({
+              curDateLending: element,
+              typePayment: typePayment,
+              posLend: i,
+              isInMilestoneLending: true,
+              isMilestoneLendingPaid: false,
+            });
+            break;
+          }
         } else {
           await this.setState({isInMilestoneLending: false});
         }
@@ -882,6 +932,7 @@ class ApplyTimeline extends React.Component {
             curDatePayback: element,
             typePayment: typePayment,
             isInMilestonePayback: true,
+            posPayback: i,
           });
           if (element.transaction.status != null) {
             await this.setState({
@@ -910,7 +961,7 @@ class ApplyTimeline extends React.Component {
             await this.setState({
               isMilestonePaybackPaid: true,
             });
-            break;
+            // break;
           } else {
             await this.setState({
               isInMilestonePayback: true,
@@ -2433,11 +2484,19 @@ class ApplyTimeline extends React.Component {
               {this.state.curDateLending != {} &&
               this.state.curDateLending.type == 'lend'
                 ? this.convertTimeStampToDate(
+                    this.state.curDateLending.previousDate
+                  ) +
+                  ' - ' +
+                  this.convertTimeStampToDate(
                     this.state.curDateLending.presentDate
                   )
                 : this.state.curDatePayback !== {} &&
                   this.state.curDatePayback.type == 'payback'
                 ? this.convertTimeStampToDate(
+                    this.state.curDatePayback.previousDate
+                  ) +
+                  ' - ' +
+                  this.convertTimeStampToDate(
                     this.state.curDatePayback.presentDate
                   )
                 : console.log('ERROR curDate !!!')}
