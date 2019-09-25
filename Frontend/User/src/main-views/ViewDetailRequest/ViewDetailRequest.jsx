@@ -796,7 +796,7 @@ class ViewDetailRequest extends React.Component {
       document.getElementById('saveDealButton').style.display = 'none';
     }
     fetch(
-      'http://www.apilayer.net/api/live?access_key=b0346f8c3eb9232b90f3d8f63534e6f4&format=1',
+      'http://www.apilayer.net/api/live?access_key=918334dfb998541f312b699884cc813a&format=1',
       {
         method: 'GET',
       }

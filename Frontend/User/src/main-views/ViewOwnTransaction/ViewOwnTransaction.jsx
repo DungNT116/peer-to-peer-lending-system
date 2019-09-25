@@ -142,8 +142,11 @@ class ViewOwnTransaction extends React.Component {
         id: transactionInput.idTrx,
       }),
     })
-      .then(result => {
-        result.json().then(data => {
+      .then( result => {
+        result.json().then(async data => {
+          await this.setState({
+            data_tx : data.asset.data.tx_data
+          })
           setTimeout(
             function() {
               if (data.asset.data.tx_data.sender === transactionInput.sender) {
@@ -328,15 +331,21 @@ class ViewOwnTransaction extends React.Component {
                     <Col md="6">Check Sender</Col>
                     <Col md="6">
                       {this.state.validTx.sender ? (
-                        <i
-                          className="ni ni-check-bold"
-                          style={{color: 'green'}}
-                        />
+                        <span>
+                          {this.state.data_tx.sender}
+                          <i
+                            className="ni ni-check-bold"
+                            style={{color: 'green'}}
+                          />
+                        </span>
                       ) : this.state.validTx.sender === false ? (
-                        <i
-                          className="ni ni-fat-remove"
-                          style={{color: 'red', fontSize: '20px'}}
-                        />
+                        <span>
+                          {this.state.data_tx.sender}
+                          <i
+                            className="ni ni-fat-remove"
+                            style={{color: 'red', fontSize: '20px'}}
+                          />
+                        </span>
                       ) : (
                         <BeatLoader
                           sizeUnit={'px'}
@@ -351,15 +360,21 @@ class ViewOwnTransaction extends React.Component {
                     <Col md="6">Check Receiver</Col>
                     <Col md="6">
                       {this.state.validTx.receiver ? (
-                        <i
-                          className="ni ni-check-bold"
-                          style={{color: 'green'}}
-                        />
+                        <span>
+                          {this.state.data_tx.receiver}
+                          <i
+                            className="ni ni-check-bold"
+                            style={{color: 'green'}}
+                          />
+                        </span>
                       ) : this.state.validTx.receiver === false ? (
-                        <i
-                          className="ni ni-fat-remove"
-                          style={{color: 'red', fontSize: '20px'}}
-                        />
+                        <span>
+                          {this.state.data_tx.receiver}
+                          <i
+                            className="ni ni-fat-remove"
+                            style={{color: 'red', fontSize: '20px'}}
+                          />
+                        </span>
                       ) : (
                         <BeatLoader
                           sizeUnit={'px'}
@@ -373,16 +388,27 @@ class ViewOwnTransaction extends React.Component {
                   <FormGroup row className="py-2">
                     <Col md="6">Check Amount</Col>
                     <Col md="6">
+                      {console.log(transaction.amount)}
                       {this.state.validTx.amount ? (
-                        <i
-                          className="ni ni-check-bold"
-                          style={{color: 'green'}}
-                        />
+                        <span>
+                          {this.state.data_tx.amountTx}
+                          USD
+                          <i
+                            className="ni ni-check-bold"
+                            style={{color: 'green'}}
+                          />
+                        </span>
                       ) : this.state.validTx.amount === false ? (
-                        <i
-                          className="ni ni-fat-remove"
-                          style={{color: 'red', fontSize: '20px'}}
-                        />
+                        <span>
+                          {this.numberWithCommas(
+                            Math.round(this.state.data_tx.amount)
+                          )}{' '}
+                          USD 
+                          <i
+                            className="ni ni-fat-remove"
+                            style={{color: 'red', fontSize: '20px'}}
+                          />
+                        </span>
                       ) : (
                         <BeatLoader
                           sizeUnit={'px'}
@@ -397,15 +423,21 @@ class ViewOwnTransaction extends React.Component {
                     <Col md="6">Check Create Date</Col>
                     <Col md="6">
                       {this.state.validTx.createDate ? (
-                        <i
-                          className="ni ni-check-bold"
-                          style={{color: 'green'}}
-                        />
+                        <span>
+                          {this.convertTimeStampToDate(this.state.data_tx.createDate)}
+                          <i
+                            className="ni ni-check-bold"
+                            style={{color: 'green'}}
+                          />
+                        </span>
                       ) : this.state.validTx.createDate === false ? (
-                        <i
-                          className="ni ni-fat-remove"
-                          style={{color: 'red', fontSize: '20px'}}
-                        />
+                        <span>
+                          {this.convertTimeStampToDate(this.state.data_tx.createDate)}
+                          <i
+                            className="ni ni-fat-remove"
+                            style={{color: 'red', fontSize: '20px'}}
+                          />
+                        </span>
                       ) : (
                         <BeatLoader
                           sizeUnit={'px'}
