@@ -114,7 +114,6 @@ class Profile extends React.Component {
   }
 
   getHashFile() {
-    // window.open('192.168.7.215:8080/document/download/hashFileTest')
     fetch(apiLink + '/rest/document/download/hashFile', {
       method: 'GET',
       headers: {
@@ -139,7 +138,7 @@ class Profile extends React.Component {
         } else if (result.status === 400) {
           this.setState({
             isOpenError: true,
-            message: 'Please upload identity card and video to get signature',
+            message: 'Please upload required document to get signature',
           });
         } else if (result.status === 401) {
           localStorage.removeItem('isLoggedIn');
