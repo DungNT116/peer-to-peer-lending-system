@@ -48,7 +48,7 @@
     "cleave.js": "^1.5.3",
     "firebase": "^6.3.3",
     "moment": "2.24.0",
-    "node-sass": "4.11.0",
+    "node-sass": "4.14.1",
     "nouislider": "13.1.1",
     "react": "16.8.4",
     "react-chartjs-2": "2.7.4",
