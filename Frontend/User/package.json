@@ -56,7 +56,7 @@
     "headroom.js": "0.9.4",
     "jquery": "^3.4.1",
     "jspdf": "^1.5.3",
-    "moment": "2.24.0",
+    "moment": "2.29.4",
     "node-sass": "4.12.0",
     "nouislider": "13.1.5",
     "react": "^16.8.6",
